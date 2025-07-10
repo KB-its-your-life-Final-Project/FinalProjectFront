@@ -3,5 +3,5 @@
 
 백엔드 관련 설정 및 API 문서는 아래 레포지토리를 참고하세요: 
 
-👉 [FinalProjectBack GitHub Repository](https://github.com/KB-its-your-life-Final-Project/FinalProjectBack/blob/main/CONTRIBUTING.md)
+👉 [FinalProjectBack GitHub Repository](https://github.com/KB-its-your-life-Final-Project/FinalProjectBack/blob/main/.github/CONTRIBUTING.md)
 
