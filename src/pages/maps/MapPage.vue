@@ -4,19 +4,80 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import {postMapBounds} from "@/api/mapsApi.ts";
+import MapNavTabs from "@/components/maps/MapNavTabs.vue";
+import {postMapBounds,getMapItems} from "@/api/mapsApi.ts";
 
 const mapEl = ref<HTMLDivElement|null>(null);
 const mapInstance = ref<naver.maps.Map|null>(null); //지도 객체 저장
 
 const searchTerm = ref('')//사용자가 검색할 때 입력할 검색어(지역/건물명)
-const filters =[
-  {label: '가격', value:'price'},
-  {label: '면적', value: 'area'},
-  {label: '주차',value: 'parking'},
+//지도 상단에 뜨는 탭 목록들
+const tabs =[
+  { label: '아파트', value: 'apt' },
+  { label: '오피스텔',   value: 'studio' },
+  { label: '빌라', value: 'villa' },
+  { label: '원룸', value: 'room' },
 ];
-const selectedFilter = ref('all'); //선택된 조건들
+const activeTab = ref('apt'); //선택된 탭
 
+const markers = ref<naver.maps.Marker[]>([]);//백엔드로부터 전달받은 위치들(지도에 표시할 마커 위치들)
+
+// 지도에 마커들 랜더링하기
+function renderMarkers(locs: { lat: number; lng: number }[]) {
+  markers.value.forEach(m => m.setMap(null));
+  markers.value = [];
+  locs.forEach(loc => {
+    if (mapInstance.value) {
+      const m = new naver.maps.Marker({
+        position: new naver.maps.LatLng(loc.lat, loc.lng),
+        map: mapInstance.value,
+      });
+      markers.value.push(m);
+    }
+  });
+}
+// 지도의 좌표, 사용자가 선택한 탭을 백엔드로 전송
+async function loadBounds() {
+  if (!mapInstance.value) return;
+  const bounds = mapInstance.value.getBounds();
+  const sw = bounds.getSW();//지도 남서쪽 모서리
+  const ne = bounds.getNE();//지도 북동쪽 모서리
+
+  // 서버로 보낼 현재 보이는 지도의 모서리 점 좌표, 사용자가 선택한 건물 종류
+  const params ={
+    swLat: sw.lat(),
+    swLng: sw.lng(),
+    neLat: ne.lat(),
+    neLng: ne.lng(),
+    filter: activeTab.value, //사용자가 선택한 건물 유형
+  };
+
+  // 서버로부터 전달받을 위치들
+  const items = await getMapItems(params);
+  renderMarkers(items);
+
+
+  try{
+    const response = await postMapBounds(params);
+    console.log('POST 응답:', response.data);
+  }catch(e){
+    console.error('POST 요청 실패:',e);
+  }
+
+  console.log(sw.lat(), sw.lng(), ne.lat(), ne.lng());
+
+}
+//사용자가 선택한 탭에 따라 loadBounds 호출하기 (백엔드로 데이터 전달)
+function handleTabChange(value: string){
+  activeTab.value=value;
+  loadBounds();
+}
+//테스트용
+const testLocations = [
+  { lat: 37.566535, lng: 126.977969 }, // 서울시청
+  { lat: 37.497942, lng: 127.027621 }, // 강남역
+  { lat: 37.528611, lng: 126.924500 }, // 여의도 공원
+];
 function initMap() {
   if (mapEl.value && window.naver) {
     //생성된 지도 객체를 mapInstance에 저장
@@ -24,6 +85,7 @@ function initMap() {
       center: new naver.maps.LatLng(37.5670135, 126.978374),//지도 속성 초기화 용도
       zoom: 10,
     });
+    renderMarkers(testLocations);
     //처음 랜더링 되었을 때 화면에 보이는 지도의 좌표 백엔드로 전송
     loadBounds();
     // 사용자가 지도를 움직이거나 줌인/줌아웃할 때마다 화면에 보이는 지도의 좌표 백엔드로 전송
@@ -48,31 +110,7 @@ onMounted(() => {
 });
 
 
-// 지도의 좌표 전송
-async function loadBounds() {
-  if (!mapInstance.value) return;
-  const bounds = mapInstance.value.getBounds();
-  const sw = bounds.getSW();//지도 남서쪽 모서리
-  const ne = bounds.getNE();//지도 북동쪽 모서리
 
-  const params ={
-    swLat: sw.lat(),
-    swLng: sw.lng(),
-    neLat: ne.lat(),
-    neLng: ne.lng(),
-    filter: selectedFilter.value,
-  };
-
-  try{
-    const response = await postMapBounds(params);
-    console.log('POST 응답:', response.data);
-  }catch(e){
-    console.error('POST 요청 실패:',e);
-  }
-
-  console.log(sw.lat(), sw.lng(), ne.lat(), ne.lng());
-
-}
 
 
 
@@ -84,18 +122,26 @@ async function onSearch(){
   const geocoder = new window.naver.maps.Service.Geocoder;
 }
 
-// 사용자가 선택한 필터링 조건들로 필터 설정
-function selectFilter(value:string){
-  selectedFilter.value=value;
 
-}
 </script>
 
 <template>
+<!--상위 요소-->
   <div class="relative w-full h-screen">
+    <!--  내비 탭-->
+    <MapNavTabs
+      :tabs="tabs"
+      :activeTab="activeTab"
+      @update:activeTab="handleTabChange"
+    />
+    <!-- 2) 탭 높이(48px)만큼 아래에서 지도가 꽉 차도록 -->
+    <div
+      ref="mapEl"
+      class="absolute inset-x-0 bottom-0 top-12"
+    ></div>
     <!--    검색 바-->
     <div
-      class="absolute top-4 left-1/2 transform -translate-x-1/2 z-20
+      class="absolute top-12 left-1/2 transform -translate-x-1/2 z-20
              w-3/4 max-w-lg mx-auto"
     >
       <div class="flex items-center bg-white rounded-full shadow-md px-4 py-2">
@@ -113,40 +159,7 @@ function selectFilter(value:string){
         </button>
       </div>
     </div>
-    <!--    필터 버튼 그룹-->
-    <div
-      class="absolute top-20 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2"
-    >
-      <button
-        v-for="opt in filters"
-        :key="opt.value"
-        @click="selectFilter(opt.value)"
-        :class="[
-      'flex items-center px-3 py-1 border rounded-full transition',
-      selectedFilter === opt.value
-        ? 'bg-purple-600 text-white border-purple-600'
-        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-    ]"
-      >
-        <!-- 레이블 -->
-        <span class="text-sm font-medium">{{ opt.label }}</span>
-        <!-- 드롭다운 화살표 아이콘 -->
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-4 h-4 ml-1"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
-    </div>
+
 
     <!--  지도 표시-->
     <div ref="mapEl" class="w-full h-full"></div>
