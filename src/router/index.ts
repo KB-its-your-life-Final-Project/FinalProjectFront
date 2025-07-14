@@ -15,6 +15,12 @@ const routes: RouteRecordRaw[] = [
   // ...대메뉴1Routes,
   // ...대메뉴2Routes,
 
+  // 지도 화면
+  {
+    path: "/maps",
+    name: "maps",
+    component: () => import("@/pages/maps/MapPage.vue"),
+  },
   // 404 NotFound
   {
     path: "/:paths(.*)*",

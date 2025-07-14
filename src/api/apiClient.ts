@@ -9,10 +9,10 @@ import router from "@/router";
 
 // axios객체 생성 (프로젝트 전체에서 사용할 객체)
 // request/response 인터셉터 설정이 된 axios객체를 사용하기 위함
-const instance: AxiosInstance = axios.create({
+const apiClient: AxiosInstance = axios.create({
   timeout: 1000,
 });
-
+export default apiClient;
 // // Request 인터셉터
 // instance.interceptors.request.use(
 //   (config: AxiosRequestConfig): AxiosRequestConfig => {
