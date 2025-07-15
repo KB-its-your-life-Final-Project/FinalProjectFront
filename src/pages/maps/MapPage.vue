@@ -30,6 +30,10 @@ function generateDummyData(count: number): LatLng[] {
   });
 }
 
+// 현재 지도에 표시된 매물 데이터
+const currentItems =  ref<{ lat: number; lng: number;  }[]>([]);
+// 목록 보기 버튼
+const showList = ref(false);
 
 // 클러스터링 진행
 function applyClustering(locs: LatLng[]) {
@@ -96,6 +100,7 @@ async function loadBounds() {
 
   // 서버로부터 전달받을 위치들 (GET 조회)
   const items = await getMapItems(params);
+  currentItems.value = items; //현재 지도에 표시되는 매물들 저장
   // 지도에 마킹
   renderMarkers(items);
 
@@ -185,35 +190,45 @@ onMounted(() => {
       @update:saleType="selectSale"
       @update:propertyType="selectProperty"
     />
-    <!-- 2) 탭 높이(48px)만큼 아래에서 지도가 꽉 차도록 -->
-<!--    <div-->
-<!--      ref="mapEl"-->
-<!--      class="absolute inset-x-0 bottom-0 top-12"-->
-<!--    ></div>-->
-<!--    &lt;!&ndash;    검색 바&ndash;&gt;-->
-<!--    <div-->
-<!--      class="absolute top-12 left-1/2 transform -translate-x-1/2 z-20-->
-<!--             w-3/4 max-w-lg mx-auto"-->
-<!--    >-->
-<!--      <div class="flex items-center bg-white rounded-full shadow-md px-4 py-2">-->
-<!--        &lt;!&ndash; 검색 입력 &ndash;&gt;-->
-<!--        <input-->
-<!--          v-model="searchTerm"-->
-<!--          @keyup.enter="onSearch"-->
-<!--          type="text"-->
-<!--          placeholder="검색어를 입력해주세요."-->
-<!--          class="flex-1 bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"-->
-<!--        />-->
-<!--        &lt;!&ndash; 검색 버튼 &ndash;&gt;-->
-<!--        <button @click="onSearch" class="ml-2">-->
-<!--          &lt;!&ndash; 아이콘 삽입 &ndash;&gt;-->
-<!--        </button>-->
-<!--      </div>-->
-<!--    </div>-->
-
 
     <!--  지도 표시-->
     <div ref="mapEl" class="w-full h-full"></div>
+
+    <!--  목록 보기 버튼 (하단 중앙) -->
+    <button
+      @click="showList = true"
+      class="absolute bottom-4 left-1/2 transform -translate-x-1/2
+             bg-yellow-300 text-white px-4 py-2 rounded-full
+             shadow-lg hover:bg-yellow-300 transition"
+    >
+      목록 보기
+    </button>
+    <!--  리스트 패널 -->
+    <div
+      v-if="showList"
+      class="absolute inset-x-0 bottom-0 max-h-1/2 bg-white
+             shadow-xl rounded-t-lg overflow-y-auto
+             p-4 flex flex-col"
+    >
+      <!-- 닫기 버튼 -->
+      <button
+        @click="showList = false"
+        class="self-end mb-2 text-gray-500 hover:text-gray-800"
+      >✕</button>
+
+      <!-- 매물 목록 -->
+      <ul class="space-y-3">
+        <li
+          v-for="(item, idx) in currentItems"
+          :key="idx"
+          class="border rounded-lg p-3 hover:bg-gray-50 transition"
+        >
+          <!-- 예시: 위도·경도 출력, 실제 필드로 교체 -->
+          <p><strong>위치:</strong> {{ item.lat.toFixed(5) }}, {{ item.lng.toFixed(5) }}</p>
+          <!-- 추가 정보 -->
+        </li>
+      </ul>
+    </div>
   </div>
 
 </template>
