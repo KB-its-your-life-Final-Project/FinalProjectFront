@@ -168,12 +168,6 @@ onMounted(() => {
 });
 
 
-// //사용자가 직접 지역/건물명으로 검색하는 경우
-// async function onSearch(){
-//   if(!searchTerm.value.trim())return;
-//   //장소 검색
-//   const geocoder = new window.naver.maps.Service.Geocoder;
-// }
 
 
 </script>
