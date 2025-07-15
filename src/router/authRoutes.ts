@@ -11,8 +11,8 @@ const authRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/auth/LoginPage.vue"),
       },
       {
-        path: "/auth/join",
-        name: "join",
+        path: "/auth/register",
+        name: "register",
         component: () => import("@/pages/auth/RegisterPage.vue"),
       },
       {

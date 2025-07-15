@@ -6,10 +6,10 @@ import NavBar from "./NavBar.vue";
 
 <template>
   <div class="DefaultLayout">
-    <Header />
+    <!-- <Header /> -->
     <slot></slot>
-    <Footer />
-    <NavBar />
+    <!-- <Footer /> -->
+    <!-- <NavBar /> -->
   </div>
 </template>
 
