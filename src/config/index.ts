@@ -17,10 +17,10 @@ const appConfig: AppConfig = {
   title: "MZ 세대를 위한 부동산 안전거래 도우미 앱",
   navBarMenus: [
     { title: "홈", url: "/",  icon:  ['fas', 'house']},
-    { title: "지도", url: "/", icon: ['far', 'map']  },
-    { title: "관심매물", url: "/",icon: ['far', 'star'] },
+    { title: "지도", url: "/map", icon: ['far', 'map']  },
+    { title: "관심매물", url: "/favorite",icon: ['far', 'star'] },
 /*    { title: "혜택", url: "" },*/
-    { title: "전체 메뉴", url: "/", icon: ['fas', 'bars']  },
+    { title: "전체 메뉴", url: "/menu", icon: ['fas', 'bars']  },
   ],
 };
 

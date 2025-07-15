@@ -14,14 +14,14 @@ import NavBar from "./NavBar.vue";
 </template>-->
 
 <template>
-  <div class="h-screen flex flex-col overflow-auto">
-    <Header class ="h-[100px]" />
+<!--  <div class="h-screen flex flex-col overflow-auto">-->
+  <div class="min-h-screen flex flex-col">
 
     <main class="flex-1 overflow-auto">
       <slot></slot>
     </main>
 
-    <Footer class ="h-[60px]"/>
+    <Footer/>
     <NavBar class ="h-[60px]" />
   </div>
 </template>

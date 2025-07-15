@@ -10,6 +10,26 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/pages/HomePage.vue"),
   },
 
+  {
+    path: "/about",
+    name: "about",
+    component: () => import("@/pages/info/AboutPage.vue"),
+  },
+  {
+    path: "/map",
+    name: "map",
+    component: () => import("@/pages/MapPage.vue"),
+  },
+  {
+    path: "/favorite",
+    name: "favorite",
+    component: () => import("@/pages/FavoritePage.vue"),
+  },
+  {
+    path: "/menu",
+    name: "menu",
+    component: () => import("@/pages/MenuPage.vue"),
+  },
   ...authRoutes,        // 인증 관련 화면 라우트 연결
   ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결
   // ...대메뉴1Routes,

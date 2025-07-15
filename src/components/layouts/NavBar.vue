@@ -1,29 +1,20 @@
 <!-- 하단 고정 메뉴바 -->
 <script setup lang="ts">
 import appConfig from "@/config";
-
+import { RouterLink } from "vue-router";
 </script>
 
-<!--<template>
-  <div class="fixed bottom-0 bg-yellow-100 w-full">
-    <ul class="flex justify-around m-0 list-none">
-      <li v-for="(menu, index) in appConfig.navBarMenus" :key="index"
-        class="flex-1 text-center hover:bg-yellow-300 transition-colors duration-300">
-        <router-link :to="menu.url">{{ menu.title }}</router-link>
-      </li>
-    </ul>
-  </div>
-</template>-->
 <template>
   <nav class="w-full bg-white flex justify-around">
-    <div
+    <RouterLink
       v-for="(menu, index) in appConfig.navBarMenus"
       :key="index"
-      class="flex flex-col items-center text-sm"
+      :to="menu.url"
+      class="flex flex-col items-center text-sm mt-2"
     >
       <font-awesome-icon :icon="menu.icon" class="text-xl" />
       {{ menu.title }}
-    </div>
+    </RouterLink>
   </nav>
 </template>
 

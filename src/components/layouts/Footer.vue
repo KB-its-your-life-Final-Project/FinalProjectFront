@@ -1,9 +1,11 @@
 <!-- Footer -->
 <script setup lang="ts">
+import { RouterLink } from 'vue-router';
 </script>
 
 <template>
-  <div class="Footer">
+  <div class="fixed bottom-14 right-4 text-right text-xs text-gray-500 z-50">
+    <RouterLink to="/about">서비스 소개</RouterLink>
     <p>All rights reserved.</p>
     <p>Version 1.0.0</p>
   </div>
@@ -11,7 +13,7 @@
 
 <style scoped>
 .Footer {
-  background: lightgrey;
+  background: white;
   justify-items: center;
 }
 </style>
