@@ -4,7 +4,7 @@
 </script>
 
 <template>
-  <header class="bg-yellow-300 w-full px-5 pt-6 pb-[70px] relative">
+  <header class="bg-yellow-300 w-full px-4 pt-6 pb-[70px] relative">
 
     <slot />
   </header>

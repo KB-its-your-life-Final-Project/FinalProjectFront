@@ -21,8 +21,8 @@ import NavBar from "./NavBar.vue";
       <slot></slot>
     </main>
 
-    <Footer/>
-    <NavBar class ="h-[60px]" />
+
+    <NavBar />
   </div>
 </template>
 

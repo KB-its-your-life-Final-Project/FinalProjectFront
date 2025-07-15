@@ -5,7 +5,7 @@ import { RouterLink } from "vue-router";
 </script>
 
 <template>
-  <nav class="w-full bg-white flex justify-around">
+  <nav class="fixed bottom-0 left-0 w-full h-16 bg-white flex justify-around z-50">
     <RouterLink
       v-for="(menu, index) in appConfig.navBarMenus"
       :key="index"

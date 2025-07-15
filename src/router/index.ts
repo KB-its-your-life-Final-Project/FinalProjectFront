@@ -35,6 +35,11 @@ const routes: RouteRecordRaw[] = [
     name: "safereport",
     component: () => import("@/pages/SafeReportPage.vue"),
   },
+  {
+    path: "/localinfo",
+    name: "localinfo",
+    component: () => import("@/pages/LocalInfoPage.vue"),
+  },
   ...authRoutes,        // 인증 관련 화면 라우트 연결
   ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결
   // ...대메뉴1Routes,
