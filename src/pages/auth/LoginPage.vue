@@ -53,7 +53,6 @@
 <style scoped>
 .google-sec {
   background-color: #4285f4;
-  /* border: 0.1rem, solid, #4285f4; */
   color: #fff;
 }
 .kakao-sec {
@@ -61,6 +60,6 @@
 }
 .email-sec {
   background-color: #fff;
-  border: 0.1rem, solid, #d8dadc;
+  border: 0.1rem, solid, #c2c2c2;
 }
 </style>

@@ -9,8 +9,8 @@
       <div>
         <label for="username"> 이메일 주소 </label>
         <div class="flex flex-row w-full h-auto">
-          <input class="flex-grow rounded-l-md h-11 min-w-0" type="email" placeholder="이메일을 입력하세요" />
-          <button class="submit-btn rounded-r-md w-24 h-11 text-white whitespace-nowrap">인증</button>
+          <input class="input-email flex-grow rounded-l-md h-11 min-w-0" type="email" placeholder="이메일을 입력하세요" />
+          <button class="btn rounded-r-md w-24 h-11 text-white whitespace-nowrap">인증</button>
         </div>
       </div>
       <div>
@@ -35,7 +35,7 @@
           id="password2"
         />
       </div>
-      <button class="submit-btn w-full h-12 rounded-xl text-white" type="submit">확인</button>
+      <button class="btn btn__form w-full h-12 rounded-xl text-white" type="submit">확인</button>
     </form>
   </div>
 </template>
@@ -48,8 +48,14 @@ input {
   border: 1px solid #c2c2c2;
   padding: 0.7rem;
 }
-.submit-btn {
+.input-email {
+  border-right: transparent;
+}
+.btn {
   background-color: #ffbc00;
+}
+.btn__form {
+  margin-top: 5rem;
 }
 form {
   margin-top: 3rem;
