@@ -4,13 +4,16 @@
 > 백엔드 관련 설정 및 API 문서는 아래 레포지토리를 참고하세요:
 > 👉 [FinalProjectBack GitHub Repository](https://github.com/KB-its-your-life-Final-Project/FinalProjectBack/blob/main/.github/CONTRIBUTING.md)
 
-> 1 frontend 기술 스택
-> 2 디렉토리 구조
-> 3 초기 설정
-> 4 개발 및 빌드
-> 5 코드 정리 및 검사
+## 목차
 
-## 1 기술 스택
+1. 사용 언어 및 기술
+2. 디렉토리 구조
+3. 초기 설정
+4. 개발 및 빌드
+5. 코드 정리 및 검사
+6. 커스텀 스타일 클래스명 (tailwind)
+
+## 1 사용 언어 및 기술
 
 - 언어: TypeScript 5.8.3
 - 프레임워크: Vue.js 3.5.17
@@ -102,3 +105,46 @@ npx prettier --write .
 ```sh
 npm run lint
 ```
+
+## 6 커스텀 스타일 클래스명 (tailwind)
+
+##### 폰트 (Pretendard)
+
+| 폰트 이름               | 클래스명                       |
+| ----------------------- | ------------------------------ |
+| "Pretendard-Thin"       | `--font-pretendard-thin`       |
+| "Pretendard-ExtraLight" | `--font-pretendard-extralight` |
+| "Pretendard-Light"      | `--font-pretendard-light`      |
+| "Pretendard-Medium"     | `--font-pretendard-medium`     |
+| "Pretendard-Regular"    | `--font-pretendard-regular`    |
+| "Pretendard-SemiBold"   | `--font-pretendard-semibold`   |
+| "Pretendard-Bold"       | `--font-pretendard-bold`       |
+| "Pretendard-ExtraBold"  | `--font-pretendard-extrabold`  |
+| "Pretendard-Black"      | `--font-pretendard-black`      |
+
+##### 색상값 (KB 색상 팔레트)
+
+| 색상값  | 클래스명 예시             |
+| ------- | ------------------------- |
+| #ffbc00 | `--bg-kb-yellow-positive` |
+| #ffd338 | `--bg-kb-yellow`          |
+| #ffcc00 | `--bg-kb-yellow-native`   |
+| #60584c | `--bg-kb-gray-dark`       |
+| #918274 | `--bg-kb-gray-light`      |
+| #000000 | `--bg-kb-ui-01`           |
+| #26282c | `--bg-kb-ui-02`           |
+| #484b51 | `--bg-kb-ui-03`           |
+| #696e76 | `--bg-kb-ui-04`           |
+| #8c949e | `--bg-kb-ui-05`           |
+| #aab0b8 | `--bg-kb-ui-06`           |
+| #c6cbd0 | `--bg-kb-ui-07`           |
+| #dde1e4 | `--bg-kb-ui-08`           |
+| #ebeef0 | `--bg-kb-ui-09`           |
+| #f7f7f8 | `--bg-kb-ui-10`           |
+| #ffffff | `--bg-kb-ui-11`           |
+| #287eff | `--bg-positive`           |
+| #f23f3f | `--bg-error`              |
+| #ff5858 | `--bg-error-input`        |
+| #ffd338 | `--bg-caution`            |
+
+![색상값 사진](src/assets/imgs/colors.png)
