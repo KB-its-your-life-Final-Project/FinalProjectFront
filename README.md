@@ -122,6 +122,8 @@ npm run lint
 | "Pretendard-ExtraBold"  | `--font-pretendard-extrabold`  |
 | "Pretendard-Black"      | `--font-pretendard-black`      |
 
+##### 색상값 (KB 색상 팔레트)
+
 | 색상값  | 클래스명 예시             |
 | ------- | ------------------------- |
 | #ffbc00 | `--bg-kb-yellow-positive` |
