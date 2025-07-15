@@ -19,7 +19,48 @@ const mapInstance = ref<naver.maps.Map|null>(null); //지도 객체 저장
 const markers = ref<naver.maps.Marker[]>([]);//백엔드로부터 전달받은 위치들(지도에 표시할 마커 위치들)
 let clusterer: any = null;
 
+// 더미 데이터 생성
+function generateDummyData(count: number): LatLng[] {
+  if (!mapInstance.value) return [];
+  const center = mapInstance.value.getCenter();
+  return Array.from({ length: count }, () => {
+    const offsetLat = (Math.random() - 0.5) * 0.1; // ±0.05
+    const offsetLng = (Math.random() - 0.5) * 0.1;
+    return { lat: center.lat() + offsetLat, lng: center.lng() + offsetLng };
+  });
+}
 
+
+// 클러스터링 진행
+function applyClustering(locs: LatLng[]) {
+  // 기존 마커 제거
+  markers.value.forEach(m => m.setMap(null));
+  markers.value = [];
+
+  // 새로운 마커 생성
+  locs.forEach(loc => {
+    if (!mapInstance.value) return;
+    const marker = new naver.maps.Marker({
+      position: new naver.maps.LatLng(loc.lat, loc.lng),
+      map: mapInstance.value
+    });
+    markers.value.push(marker);
+  });
+
+  // 기존 클러스터 제거
+  if (clusterer) {
+    clusterer.clear();
+  }
+
+  // 클러스터링 적용
+  clusterer = new MarkerClustering({
+    map: mapInstance.value,
+    markers: markers.value,
+    minClusterSize: 2,
+    gridSize: 100,
+    disableClickZoom: false
+  });
+}
 
 // 지도에 마커들 랜더링하기
 function renderMarkers(locs: { lat: number; lng: number }[]) {
@@ -73,11 +114,14 @@ async function loadBounds() {
 // 필터 항목 선택
 function selectSale(opt: string) {
   saleType.value = opt;
+  //const boundsData = generateDummyData(0); // placeholder
+  applyClustering(generateDummyData(50));
   loadBounds();
 }
 
 function selectProperty(opt: string) {
   propertyType.value = opt;
+  applyClustering(generateDummyData(50));
   loadBounds();
 }
 
@@ -89,17 +133,16 @@ function initMap() {
       center: new naver.maps.LatLng(37.5670135, 126.978374),//지도 속성 초기화 용도
       zoom: 14,
     });
-    //테스트용 좌표
-    const testLocations = [
-      { lat: 37.566535, lng: 126.977969 }, // 서울시청
-      { lat: 37.497942, lng: 127.027621 }, // 강남역
-      { lat: 37.528611, lng: 126.924500 }, // 여의도 공원
-    ];
-    renderMarkers(testLocations);
     //처음 랜더링 되었을 때 화면에 보이는 지도의 좌표 백엔드로 전송
     loadBounds();
     // 사용자가 지도를 움직이거나 줌인/줌아웃할 때마다 화면에 보이는 지도의 좌표 백엔드로 전송
     mapInstance.value.addListener('idle',loadBounds);
+
+    // 더미 데이터로 클러스터링
+    const dummyData = generateDummyData(50);
+    applyClustering(dummyData);
+
+
   }
 }
 
@@ -118,11 +161,6 @@ onMounted(() => {
     initMap();
   }
 });
-
-
-
-
-
 
 
 // //사용자가 직접 지역/건물명으로 검색하는 경우
@@ -148,10 +186,10 @@ onMounted(() => {
       @update:propertyType="selectProperty"
     />
     <!-- 2) 탭 높이(48px)만큼 아래에서 지도가 꽉 차도록 -->
-    <div
-      ref="mapEl"
-      class="absolute inset-x-0 bottom-0 top-12"
-    ></div>
+<!--    <div-->
+<!--      ref="mapEl"-->
+<!--      class="absolute inset-x-0 bottom-0 top-12"-->
+<!--    ></div>-->
 <!--    &lt;!&ndash;    검색 바&ndash;&gt;-->
 <!--    <div-->
 <!--      class="absolute top-12 left-1/2 transform -translate-x-1/2 z-20-->
