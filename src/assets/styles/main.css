@@ -1,5 +1,6 @@
-@import "./base.css";
 @import "tailwindcss";
+@import "./fonts.css";
+@import "./colors.css";
 
 /* 초기화 */
 * {
@@ -10,9 +11,10 @@
 html,
 body {
   height: 100%;
-  font-family: "NotoSansKR", sans-serif;
-  color: var(--color-font-main);
-  background-color: var(--bg-color);
+  max-width: 400px;
+  font-family: "Pretendard-Regular", sans-serif;
+  color: #000;
+  background-color: #fff;
 }
 #app {
   margin: 0;

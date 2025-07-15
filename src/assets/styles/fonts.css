@@ -1,0 +1,49 @@
+/* Pretendard */
+@font-face {
+  font-family: "Pretendard-Thin";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-Thin.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard-ExtraLight";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-ExtraLight.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard-Light";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-Light.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard-Medium";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-Medium.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard-Regular";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-Regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard-SemiBold";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-SemiBold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard-Bold";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-Bold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard-ExtraBold";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-ExtraBold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard-Black";
+  src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-Black.otf") format("opentype");
+}
+
+@theme {
+  --font-pretendard-thin: "Pretendard-Thin";
+  --font-pretendard-extralight: "Pretendard-ExtraLight";
+  --font-pretendard-light: "Pretendard-Light";
+  --font-pretendard-medium: "Pretendard-Medium";
+  --font-pretendard-regular: "Pretendard-Regular";
+  --font-pretendard-semibold: "Pretendard-SemiBold";
+  --font-pretendard-bold: "Pretendard-Bold";
+  --font-pretendard-extrabold: "Pretendard-ExtraBold";
+  --font-pretendard-black: "Pretendard-Black";
+}
