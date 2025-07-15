@@ -30,6 +30,11 @@ const routes: RouteRecordRaw[] = [
     name: "menu",
     component: () => import("@/pages/MenuPage.vue"),
   },
+  {
+    path: "/safereport",
+    name: "safereport",
+    component: () => import("@/pages/SafeReportPage.vue"),
+  },
   ...authRoutes,        // 인증 관련 화면 라우트 연결
   ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결
   // ...대메뉴1Routes,

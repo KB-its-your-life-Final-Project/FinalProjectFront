@@ -1,4 +1,6 @@
 
+@tailwind utilities;
+
 @import "tailwindcss";
 @import "./fonts.css";
 @import "./colors.css";
@@ -14,6 +16,7 @@ body {
   height: 100%;
   max-width: 400px;
   font-family: "Pretendard-Regular", sans-serif;
+  font-size: 14px;
   color: #000;
   background-color: #fff;
 }

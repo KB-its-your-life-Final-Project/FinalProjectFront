@@ -1,9 +1,57 @@
 <!--MapPage 레이아웃-->
+<script setup lang="ts">
+import { ref } from "vue";
+import Header from "@/components/layouts/Header.vue";
+import NavBar from "@/components/layouts/NavBar.vue";
+
+const searchQuery = ref("");
+function clearSearch() {
+  searchQuery.value = "";
+}
+</script>
+
 
 <template>
-  <div>Map Page</div>
+
+  <div class="pb-24">
+
+    <Header>
+      <div class="flex justify-between items-center px-4 text-sm text-black">
+
+        <div class="flex items-center">
+          <font-awesome-icon :icon="['fas', 'arrow-left']" class="text-lg mr-2" />
+          <span>아파트 검색</span>
+        </div>
+
+        <font-awesome-icon :icon="['fas', 'bell']" class="text-xl" />
+      </div>
+
+      <!-- 검색창 -->
+      <div class="relative mt-3 px-4">
+        <div class="w-full bg-white flex items-center px-4 py-2 rounded-full shadow-md">
+          <font-awesome-icon :icon="['fas', 'house']" class="text-gray-400 mr-2" />
+          <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="어떤 주소가 궁금하세요?"
+              class="w-full focus:outline-none placeholder-gray-400 text-sm"
+          />
+          <font-awesome-icon
+              v-if="searchQuery"
+              :icon="['far', 'circle-xmark']"
+              class="text-gray-400 ml-2 cursor-pointer hover:text-gray-600"
+              @click="clearSearch"
+          />
+        </div>
+      </div>
+    </Header>
+
+    <!-- 지도부분 넣어주세요!!!! -->
+    <div class="w-full h-[400px] bg-gray-200 mt-4">
+<!-- 지도 API   -->
+      <p class="text-center pt-20 text-gray-500">지도 불러오는 영역</p>
+    </div>
+
+  </div>
 </template>
 
-<script setup lang="ts">
-
-</script>

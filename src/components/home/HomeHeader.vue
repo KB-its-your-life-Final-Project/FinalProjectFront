@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import Header from '@/components/layouts/Header.vue'
+import { ref } from 'vue';
+
+// 검색어 상태 변수 선언 (입력값 바인딩)
+const searchQuery = ref('');
+
+// 검색어를 지우는 함수
+function clearSearch() {
+  searchQuery.value = '';
+}
 </script>
 
 <template>
@@ -14,10 +23,18 @@ import Header from '@/components/layouts/Header.vue'
     <div class="absolute left-1/2 bottom-0 translate-y-1/2 -translate-x-1/2 w-[85%] bg-white flex items-center px-4 py-2 rounded-full shadow-md">
       <font-awesome-icon :icon="['fas', 'magnifying-glass']" class="text-gray-400 mr-2" />
       <input
+        v-model="searchQuery"
         type="text"
         placeholder="어떤 주소가 궁금하세요?"
         class="w-full focus:outline-none placeholder-gray-400 text-sm"
       />
+      <font-awesome-icon
+        v-if="searchQuery"
+        :icon="['far','circle-xmark']"
+        class="text-gray-400 ml-2 cursor-pointer hover:text-gray-600"
+        @click="clearSearch"
+      />
+
     </div>
   </Header>
 </template>
