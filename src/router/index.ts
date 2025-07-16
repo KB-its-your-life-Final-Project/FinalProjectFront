@@ -7,9 +7,8 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "home",
-    component: () => import("@/pages/HomePage.vue"),
+    component: () => import("@/pages/navbar/HomePage.vue"),
   },
-
   {
     path: "/about",
     name: "about",
@@ -18,27 +17,41 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/map",
     name: "map",
-    component: () => import("@/pages/MapPage.vue"),
+    component: () => import("@/pages/navbar/MapPage.vue"),
   },
   {
     path: "/favorite",
     name: "favorite",
-    component: () => import("@/pages/FavoritePage.vue"),
+    component: () => import("@/pages/navbar/FavoritePage.vue"),
   },
   {
     path: "/menu",
     name: "menu",
-    component: () => import("@/pages/MenuPage.vue"),
+    component: () => import("@/pages/navbar/MenuPage.vue"),
+  },
+  {
+    path: "/menupage",
+    name: "menupage",
+    component: () => import("@/pages/navbar/MenuPage.vue"),
   },
   {
     path: "/safereport",
     name: "safereport",
-    component: () => import("@/pages/SafeReportPage.vue"),
+    component: () => import("@/pages/main/SafeReportPage.vue"),
   },
   {
     path: "/localinfo",
     name: "localinfo",
-    component: () => import("@/pages/LocalInfoPage.vue"),
+    component: () => import("@/pages/main/LocalInfoPage.vue"),
+  },  {
+    path: "/localinfosearch",
+    name: "localinfosearch",
+    component: () => import("@/pages/main/LocalInfoSearchPage.vue"),
+  },
+  {
+    path: "/alarmpage",
+    name: "alarmpage",
+    component: () => import("@/pages/alarm/AlarmPage.vue"),
   },
   ...authRoutes,        // 인증 관련 화면 라우트 연결
   ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결

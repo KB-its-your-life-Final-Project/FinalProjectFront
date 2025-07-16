@@ -40,14 +40,21 @@ src/
 ├── components/                # 컴포넌트
 │   ├── common/                # 공통 UI 컴포넌트 (버튼, 모달 등)
 │   ├── layouts/               # 레이아웃 관련 컴포넌트
-│   └── auth/                  # 예시) 인증 관련 컴포넌트
+│   └── home/                  # 예시) 인증 관련 컴포넌트
 
 ├── config/                    # 설정 파일
 │   └── index.ts
 
 ├── pages/                     # 화면
+│   ├── alarm/                 
 │   ├── auth/                  # 예시) 인증 관련 화면
-│   └── NotFoundPage.vue       # 404 Not Found 화면
+│   ├── info/   
+│   ├── main/  
+│   ├── mypage/    
+│   ├── navbar/   
+│   ├── LoadingPage.vue
+│   ├── NotFoundPage.vue
+    └── TestPage.vue       # 404 Not Found 화면
 
 ├── router/                    # Router
 │   ├── index.ts               # 라우터 생성 및 설정

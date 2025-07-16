@@ -3,6 +3,7 @@
 import Header from '@/components/layouts/Header.vue';
 import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import BackHeader from "@/components/layouts/BackHeader.vue";
 // 관심 지역 리스트 (임시 데이터)
 const favoriteRegions = ref([
     // 여기에 사용자가 설정한 찜들이 뜰 수 있도록 연동할 것!
@@ -42,18 +43,14 @@ const favoriteApts = [
 
 <template>
   <div class="pb-24">
-    <!-- ✅ Header -->
-    <Header>
-      <div class="flex justify-between items-center px-4 text-sm text-black w-full">
+
+    <BackHeader title="관심 목록">
+<!--      <div class="flex justify-between items-center px-4 text-sm text-black w-full">
         <div class="flex items-center space-x-4">
           <font-awesome-icon :icon="['fas', 'arrow-left']" class="text-lg" />
           <span class="ml-2">관심 목록</span>
         </div>
-        <div class="flex items-center space-x-6 text-xl">
-          <font-awesome-icon :icon="['fas', 'bell']" class="mr-4" />
-          <font-awesome-icon :icon="['fas', 'bars']" />
-        </div>
-      </div>
+      </div>-->
 
       <div class="text-center mt-3">
         <p class="text-sm text-black">원룸, 빌라, 오피스텔, 아파트</p>
@@ -68,9 +65,9 @@ const favoriteApts = [
         />
         <font-awesome-icon :icon="['fas', 'magnifying-glass']" class="text-gray-400 ml-2" />
       </div>
-    </Header>
+    </BackHeader>
 
-    <!-- ✅ 관심 지역 -->
+
     <section class="px-4 mt-6">
       <h2 class="text-sm font-semibold mb-2">관심 지역</h2>
       <ul class="space-y-4">
@@ -96,7 +93,7 @@ const favoriteApts = [
       </ul>
     </section>
 
-    <!-- ✅ 관심 단지 -->
+
     <section class="px-4 mt-6">
       <h2 class="text-sm font-semibold mb-2">관심 단지</h2>
       <div class="flex space-x-4 overflow-x-auto">
@@ -112,7 +109,7 @@ const favoriteApts = [
       </div>
     </section>
 
-    <!-- ✅ 최근 본 단지 -->
+
     <section class="px-4 mt-6">
       <h2 class="text-sm font-semibold mb-2">최근 본 단지</h2>
       <ul class="space-y-2">

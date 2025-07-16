@@ -18,7 +18,7 @@ const appConfig: AppConfig = {
   navBarMenus: [
     { title: "홈", url: "/",  icon:  ['fas', 'house']},
     { title: "지도", url: "/map", icon: ['far', 'map']  },
-    { title: "관심매물", url: "/favorite",icon: ['far', 'star'] },
+    { title: "내 찜 목록", url: "/favorite",icon: ['far', 'star'] },
 /*    { title: "혜택", url: "" },*/
     { title: "전체 메뉴", url: "/menu", icon: ['fas', 'bars']  },
   ],

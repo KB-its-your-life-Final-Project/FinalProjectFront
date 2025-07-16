@@ -3,6 +3,7 @@
 import { ref } from "vue";
 import Header from "@/components/layouts/Header.vue";
 import NavBar from "@/components/layouts/NavBar.vue";
+import BackHeader from "@/components/layouts/BackHeader.vue";
 
 const searchQuery = ref("");
 function clearSearch() {
@@ -15,16 +16,8 @@ function clearSearch() {
 
   <div class="pb-24">
 
-    <Header>
-      <div class="flex justify-between items-center px-4 text-sm text-black">
+    <BackHeader title="아파트 검색">
 
-        <div class="flex items-center">
-          <font-awesome-icon :icon="['fas', 'arrow-left']" class="text-lg mr-2" />
-          <span>아파트 검색</span>
-        </div>
-
-        <font-awesome-icon :icon="['fas', 'bell']" class="text-xl" />
-      </div>
 
       <!-- 검색창 -->
       <div class="relative mt-3 px-4">
@@ -44,7 +37,7 @@ function clearSearch() {
           />
         </div>
       </div>
-    </Header>
+    </BackHeader>
 
     <!-- 지도부분 넣어주세요!!!! -->
     <div class="w-full h-[400px] bg-gray-200 mt-4">

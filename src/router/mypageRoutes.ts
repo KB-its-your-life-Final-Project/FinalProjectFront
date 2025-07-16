@@ -14,6 +14,10 @@ const mypageRoutes: RouteRecordRaw[] = [
         path: "/mypage/edit",
         name: "edit",
         component: () => import("../pages/mypage/EditPage.vue"),
+      }, {
+        path: "/mypage/main",
+        name: "edit",
+        component: () => import("../pages/mypage/MyMainPage.vue"),
       },
     ],
   },

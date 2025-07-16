@@ -1,11 +1,28 @@
 <!-- Header -->
-
+<!--뒤로가기가 없는 헤더 ex) 메인 페이지-->
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+function goToAlarmPage() {
+  router.push('/alarmpage');
+}
+function goToMenuPage(){
+  router.push('/menupage');
+}
 </script>
 
 <template>
-  <header class="bg-yellow-300 w-full px-4 pt-6 pb-[70px] relative">
+  <header class="bg-yellow-300 w-full px-4 pt-16 pb-[70px] relative">
 
+    <div class="absolute top-4 right-4 flex items-center space-x-4 text-gray-700 text-xl">
+      <font-awesome-icon
+        :icon="['fas', 'bell']"
+        class="cursor-pointer mr-4"
+        @click="goToAlarmPage"
+      />
+      <font-awesome-icon :icon="['fas', 'bars']" class="cursor-pointer" @click="goToMenuPage"/>
+    </div>
     <slot />
   </header>
 </template>
