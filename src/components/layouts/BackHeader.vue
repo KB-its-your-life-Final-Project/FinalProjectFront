@@ -23,7 +23,7 @@ function goToMenuPage(){
 <template>
 
 
-  <header class="bg-yellow-300 w-full px-4 pt-16 pb-[70px] relative">
+  <header class="bg-yellow-300 w-full px-[1rem] pt-[4rem] pb-[4.375rem] relative">
     <!--    <div class="absolute top-4 right-4">
           <font-awesome-icon :icon="['fas', 'bell']" class="text-xl text-gray-700" />
         </div>-->
@@ -31,15 +31,16 @@ function goToMenuPage(){
 
 
 
-      <div class="absolute top-4 left-4 flex items-center space-x-4 text-gray-700 text-xl">
+      <div class="absolute top-[1rem] left-[1rem] flex items-center space-x-[1rem] text-gray-700 text-[1.25rem]">
       <font-awesome-icon
         :icon="['fas', 'arrow-left']"
-        class="text-lg mr-4 cursor-pointer"
+        class="text-[1.125rem] mr-[1rem] cursor-pointer"
         @click="goBack"
       />
       <span class="text-base font-semibold text-black">{{ title }}</span>
     </div>
-      <div class="absolute top-4 right-4 flex items-center space-x-4 text-gray-700 text-xl">
+
+      <div class="absolute top-[1rem] right-[1rem] flex items-center space-x-[1rem] text-gray-700 text-[1.25rem]">
       <font-awesome-icon
         :icon="['fas', 'bell']"
         class="cursor-pointer mr-4"

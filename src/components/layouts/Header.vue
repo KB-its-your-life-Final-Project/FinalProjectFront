@@ -13,9 +13,9 @@ function goToMenuPage(){
 </script>
 
 <template>
-  <header class="bg-yellow-300 w-full px-4 pt-16 pb-[70px] relative">
+  <header class="bg-yellow-300 w-full px-[1rem] pt-[4rem] pb-[4.375rem] relative">
 
-    <div class="absolute top-4 right-4 flex items-center space-x-4 text-gray-700 text-xl">
+    <div class="absolute top-[1rem] right-[1rem] flex items-center space-x-[1rem] text-gray-700 text-xl">
       <font-awesome-icon
         :icon="['fas', 'bell']"
         class="cursor-pointer mr-4"

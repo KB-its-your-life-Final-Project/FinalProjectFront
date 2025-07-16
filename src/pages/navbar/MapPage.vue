@@ -14,14 +14,14 @@ function clearSearch() {
 
 <template>
 
-  <div class="pb-24">
-
+  <div class="min-h-screen flex flex-col items-center bg-gray-50">
+    <div class="w-full max-w-md flex flex-col flex-1 pb-[6rem]">
     <BackHeader title="아파트 검색">
 
 
       <!-- 검색창 -->
-      <div class="relative mt-3 px-4">
-        <div class="w-full bg-white flex items-center px-4 py-2 rounded-full shadow-md">
+      <div class="relative mt-[1rem] px-[1rem]">
+      <div class="w-full bg-white flex items-center px-4 py-2 rounded-full shadow-md">
           <font-awesome-icon :icon="['fas', 'house']" class="text-gray-400 mr-2" />
           <input
               v-model="searchQuery"
@@ -37,14 +37,15 @@ function clearSearch() {
           />
         </div>
       </div>
+
     </BackHeader>
-
     <!-- 지도부분 넣어주세요!!!! -->
-    <div class="w-full h-[400px] bg-gray-200 mt-4">
+    <div class="w-full h-[25rem] bg-gray-200 mt-[1.5rem] rounded-xl">
 <!-- 지도 API   -->
-      <p class="text-center pt-20 text-gray-500">지도 불러오는 영역</p>
+      <p class="text-center pt-[5rem] text-gray-500">지도 불러오는 영역</p>
     </div>
-
+      </div>
+      <NavBar />
   </div>
 </template>
 
