@@ -17,7 +17,8 @@ import { HomeCardTypes } from '@/components/home/HomeMenu.ts';
 -->
   <div class="min-h-screen flex flex-col items-center bg-gray-50">
 
-    <div class="w-full max-w-[26.875rem] flex flex-col flex-1">
+    <div class="w-full flex flex-col flex-1">
+<!--      max-w-md-->
 
     <HomeHeader />
     <main class="flex-1 px-4 pt-4 space-y-4 overflow-auto pb-24">

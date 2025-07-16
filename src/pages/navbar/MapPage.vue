@@ -15,7 +15,8 @@ function clearSearch() {
 <template>
 
   <div class="min-h-screen flex flex-col items-center bg-gray-50">
-    <div class="w-full max-w-md flex flex-col flex-1 pb-[6rem]">
+    <div class="w-full  flex flex-col flex-1 pb-[6rem]">
+<!--  max-w-md  :늘리고 싶지 않으면  -->
     <BackHeader title="아파트 검색">
 
 
