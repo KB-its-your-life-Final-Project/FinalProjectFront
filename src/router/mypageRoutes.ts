@@ -6,12 +6,12 @@ const mypageRoutes: RouteRecordRaw[] = [
     // component: () => import("뷰파일.vue"),
     children: [
       {
-        path: "/mypage/profile",
+        path: "/profile",
         name: "profile",
         component: () => import("../pages/mypage/ProfilePage.vue"),
       },
       {
-        path: "/mypage/edit",
+        path: "/edit",
         name: "edit",
         component: () => import("../pages/mypage/EditPage.vue"),
       },

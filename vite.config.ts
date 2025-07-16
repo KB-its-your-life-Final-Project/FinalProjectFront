@@ -22,5 +22,8 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    build: {
+      outDir: "../FinalProjectBack/src/main/webapp/resources",
+    },
   };
 });
