@@ -10,10 +10,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/pages/HomePage.vue"),
   },
 
-  ...authRoutes,        // 인증 관련 화면 라우트 연결
-  ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결
-  // ...대메뉴1Routes,
-  // ...대메뉴2Routes,
+  ...authRoutes, // 인증 관련 화면 라우트 연결
+  ...mypageRoutes, // 마이페이지 관련 화면 라우트 연결
 
   // 지도 화면
   {
@@ -39,6 +37,6 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-})
+});
 
 export default router;
