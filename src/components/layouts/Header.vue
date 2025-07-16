@@ -7,9 +7,7 @@ const router = useRouter();
 function goToAlarmPage() {
   router.push('/alarmpage');
 }
-function goToMenuPage(){
-  router.push('/menupage');
-}
+
 </script>
 
 <template>
@@ -18,10 +16,9 @@ function goToMenuPage(){
     <div class="absolute top-[1rem] right-[1rem] flex items-center space-x-[1rem] text-gray-700 text-xl">
       <font-awesome-icon
         :icon="['fas', 'bell']"
-        class="cursor-pointer mr-4"
+        class="cursor-pointer"
         @click="goToAlarmPage"
       />
-      <font-awesome-icon :icon="['fas', 'bars']" class="cursor-pointer" @click="goToMenuPage"/>
     </div>
     <slot />
   </header>

@@ -10,14 +10,13 @@ const props = defineProps<{
 }>();
 const router = useRouter();
 function goBack() {
-  router.back();
+  router.back(); //뒤로가기
+/*  router.push('/'); 홈으로 가면*/
 }
 function goToAlarmPage() {
   router.push('/alarmpage');
 }
-function goToMenuPage(){
-  router.push('/menupage');
-}
+
 </script>
 
 <template>
@@ -43,10 +42,9 @@ function goToMenuPage(){
       <div class="absolute top-[1rem] right-[1rem] flex items-center space-x-[1rem] text-gray-700 text-[1.25rem]">
       <font-awesome-icon
         :icon="['fas', 'bell']"
-        class="cursor-pointer mr-4"
+        class="cursor-pointer"
         @click="goToAlarmPage"
       />
-      <font-awesome-icon :icon="['fas', 'bars']" class="cursor-pointer"  @click="goToMenuPage"/>
     </div>
     </div>
     <slot />
