@@ -3,15 +3,18 @@
 <script setup lang="ts">
 import BackHeader from "@/components/layouts/BackHeader.vue";
 import { reactive, ref } from 'vue'
-import SelectBuilding from "@/pages/safeReport/SelectBuilding.vue";
+import SearchBuilding from "@/pages/safeReport/SearchBuilding.vue";
 import SelectBudget from "@/pages/safeReport/SelectBudget.vue";
 import SafeReportResult from "@/pages/safeReport/SafeReportResult.vue";
 
-const steps = [SelectBuilding, SelectBudget, SafeReportResult]
+const steps = [SearchBuilding, SelectBudget, SafeReportResult]
 const currentStep = ref(0) //현재 렌더링할 컴포넌트 순서
 
 const formData = reactive({
   buildingName: '',
+  roadAddress: '', //도로명주소
+  jibunAddress: '', //지번주소
+  extraAddress: '',
   budget: null,
   // 필요하면 추가 필드
 })
