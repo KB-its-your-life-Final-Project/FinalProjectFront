@@ -6,15 +6,23 @@ const authRoutes: RouteRecordRaw[] = [
     // component: () => import('뷰파일.vue'),
     children: [
       {
-        path: "loginintro",
-        name: "loginIntro",
+        path: "login",      // /auth/login
+        name: "login",
         component: () => import("@/pages/auth/LoginIntroPage.vue"),
+        children: [
+          {
+            path: "email",  // /auth/login/email
+            name: "loginEmail",
+            component: () => import("@/pages/auth/LoginEmailPage.vue"),
+          },
+          {
+            path: "kakao",  // /auth/login/kakao
+            name: "loginKakao",
+            component: () => import("@/pages/auth/LoginKakaoPage.vue"),
+          },
+        ]
       },
-      {
-        path: "loginemail",
-        name: "loginEmail",
-        component: () => import("@/pages/auth/LoginEmailPage.vue"),
-      },
+
       {
         path: "register",
         name: "register",

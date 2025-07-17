@@ -6,7 +6,6 @@ const headers = { headers: { "Content-Type": "multipart/form-data" } };
 export interface Member {
   username: string;
   password1: string;
-  profileImg?: File;
 }
 
 export interface ChangePasswordDTO {
@@ -41,19 +40,18 @@ export default {
     formData.append("username", member.username);
     formData.append("password", member.password1);
 
-    if (member.profileImg) {
-      formData.append('profileImg', member.profileImg);
-    }
-
-    const {data} = await apiClient.put(`${BASE_URL}/${member.username}`, formData, headers);
-    console.log('AUTH PUT: ', data);
+    const { data } = await apiClient.put(`${BASE_URL}/${member.username}`, formData, headers);
+    console.log("AUTH PUT: ", data);
     return data;
   },
 
   // 비밀번호 변경
   async changePassword(formData: ChangePasswordDTO): Promise<any> {
-    const {data} = await apiClient.put(`${BASE_URL}/${formData.username}/changepassword`, formData);
+    const { data } = await apiClient.put(
+      `${BASE_URL}/${formData.username}/changepassword`,
+      formData,
+    );
     console.log(`AUTH PUT (Change Password): `, data);
     return data;
-  }
-}
+  },
+};

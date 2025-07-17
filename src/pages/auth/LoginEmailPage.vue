@@ -50,7 +50,12 @@ const loginUser = async () => {
     <form @submit.prevent="loginUser" method="post" class="w-5/6 h-auto flex flex-col gap-5">
       <div>
         <label for="username">이메일 주소</label>
-        <input class="w-full h-11 rounded-md" type="email" placeholder="이메일을 입력하세요" v-model="member.username"/>
+        <input
+          class="w-full h-11 rounded-md"
+          type="email"
+          placeholder="이메일을 입력하세요"
+          v-model="member.username"
+        />
       </div>
       <div>
         <label for="password">비밀번호</label>
@@ -61,7 +66,9 @@ const loginUser = async () => {
           v-model="member.password"
         />
       </div>
-      <button class="btn w-full h-12 rounded-xl text-white" type="submit" :disabled="disableSubmit">로그인</button>
+      <button class="btn w-full h-12 rounded-xl text-white" type="submit" :disabled="disableSubmit">
+        로그인
+      </button>
     </form>
   </div>
 </template>

@@ -7,65 +7,29 @@ const userEmail = ref<string>("");
 
 onMounted(() => {
   const kakao = (window as any).Kakao;
-  if (kakao && !kakao.isInitialized()) {
-    kakao.init("79ef37ac2de5c500a79ac57598fc8b86");
-    // kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
-    console.log("Kakao SDK initialized");
+  if (kakao) {
+    console.log("Kakao SDK가 로드되었습니다.");
+    return;
+  }
+  if (!kakao.isInitialized()) {
+    kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
+    console.log("Kakao SDK가 초기화되었습니다.");
   }
 });
 
 const loginKakao = async () => {
-  const Kakao = (window as any).Kakao;
-  if (!Kakao) {
-    alert("카카오 SDK가 로드되지 않았습니다.");
+  const kakao = (window as any).Kakao;
+  if (kakao && !kakao.isInitialized()) {
+    kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
+    // kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
+    console.log("Kakao SDK initialized.");
+  } else {
+    alert("Kakao SDK is not initialized.");
     return;
   }
-  if (!Kakao.Auth) {
-    alert("카카오 인증 모듈이 준비되지 않았습니다.");
-    return;
-  }
-
-  try {
-    // 로그인
-    const authObj = await new Promise<any>((resolve, reject) => {
-      Kakao.Auth.login({
-        success: resolve,
-        fail: reject,
-      });
-    });
-
-    // access token으로 사용자 정보 요청
-    const profile = await new Promise<any>((resolve, reject) => {
-      Kakao.API.request({
-        url: "/v2/user/me",
-        success: resolve,
-        fail: reject,
-      });
-    });
-
-    userEmail.value = profile.kakao_account?.email || "";
-    console.log("사용자 이메일:", userEmail.value);
-
-    // 백엔드로 access token과 이메일 전송해서 로그인 처리 요청
-    const response = await fetch("/api/auth/kakao", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        accessToken: authObj.access_token,
-        email: userEmail.value
-      }),
-    });
-    const data = await response.json();
-
-    if (data.success) {
-      router.push("/");
-    } else {
-      alert("로그인에 실패했습니다.");
-    }
-  } catch (error) {
-    console.error("카카오 로그인 또는 사용자 정보 요청 실패", error);
-    alert("로그인 중 오류가 발생했습니다.");
-  }
+  kakao.Auth.authorize({
+    redirectUri: "http://localhost:5173/auth/login/kakao",
+  });
 };
 </script>
 
@@ -84,7 +48,10 @@ const loginKakao = async () => {
     <div class="flex flex-col items-center w-full gap-8">
       <!-- 로그인 버튼 영역 -->
       <div class="flex flex-col items-center w-5/6 h-auto gap-3">
-        <button class="kakao-sec w-full h-14 flex flex-column justify-center rounded-xl" @click="loginKakao">
+        <button
+          class="kakao-sec w-full h-14 flex flex-column justify-center rounded-xl"
+          @click="loginKakao"
+        >
           <div class="flex flex-row items-center gap-3">
             <img class="size-5" src="@/assets/imgs/kakao.svg" alt="카카오 로고" />
             <span>카카오톡으로 시작하기</span>
@@ -101,7 +68,7 @@ const loginKakao = async () => {
             <img class="size-5" src="@/assets/imgs/email.svg" alt="이메일 이미지" />
             <router-link to="/auth/loginemail">
               <span>E-mail로 시작하기</span>
-          </router-link>
+            </router-link>
           </div>
         </button>
       </div>
@@ -137,6 +104,8 @@ const loginKakao = async () => {
 .email-sec:hover {
   background-color: #d6deeb;
   border: 0.1rem solid #d6deeb;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 </style>
