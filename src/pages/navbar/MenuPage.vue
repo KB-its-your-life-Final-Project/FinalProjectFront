@@ -1,7 +1,7 @@
 <!-- MenuPage.vue 레이아웃 -->
 <template>
 
-    <BackHeader title="전체 메뉴" />
+    <Header title="전체 메뉴" />
 
     <h1 class="text-xl font-bold">전체 메뉴</h1>
     <ul class="mt-4 space-y-2">
@@ -16,5 +16,6 @@
 
 <script setup lang="ts">
 // 필요 시 기능 추가
+import Header from '@/components/layouts/Header.vue'
 import BackHeader from "@/components/layouts/BackHeader.vue";
 </script>

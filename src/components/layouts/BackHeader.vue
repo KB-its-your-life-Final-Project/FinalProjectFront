@@ -8,6 +8,7 @@ import Header from "@/components/layouts/Header.vue";
 const props = defineProps<{
   title: string;
 }>();
+
 const router = useRouter();
 function goBack() {
   router.back(); //뒤로가기
