@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from "./Header.vue";
 import Footer from "./Footer.vue";
-import NavBar from "./NavBar.vue";
+
 </script>
 
 <!--<template>
@@ -9,7 +9,7 @@ import NavBar from "./NavBar.vue";
     <Header />
     <slot></slot>
     <Footer />
-    <NavBar />
+
   </div>
 </template>-->
 
@@ -24,7 +24,7 @@ import NavBar from "./NavBar.vue";
     </main>
 
 
-    <NavBar />
+    <Section />
   </div>
   </div>
 </template>

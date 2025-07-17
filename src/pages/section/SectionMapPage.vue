@@ -1,0 +1,40 @@
+<!--MapPage 레이아웃-->
+<script setup lang="ts">
+import { ref } from "vue";
+import Header from "@/components/common/Header.vue";
+import Section from "@/components/common/Section.vue";
+import LogoSearchBar from "@/components/common/LogoSearchBar.vue";
+import { useSearch } from '@/utils/useSearch'
+const { searchQuery, clearSearch } = useSearch()
+
+</script>
+
+
+<template>
+
+  <div class="min-h-screen flex flex-col items-center bg-gray-50">
+    <div class="w-full  flex flex-col flex-1 pb-[6rem]">
+<!--  max-w-md  :늘리고 싶지 않으면  -->
+      <Header :title="'아파트 검색'" :showBack="true" :showAlarm="true">
+
+
+      <!-- 검색창 -->
+        <div class="relative mt-[3rem] px-[1rem]">
+          <LogoSearchBar
+            v-model="searchQuery"
+            placeholder="어떤 주소가 궁금하세요?"
+            @clear="clearSearch"
+          />
+        </div>
+
+    </Header>
+    <!-- 지도부분 넣어주세요!!!! -->
+    <div class="w-full h-[25rem] bg-gray-200 mt-[1.5rem] rounded-xl">
+<!-- 지도 API   -->
+      <p class="text-center pt-[5rem] text-gray-500">지도 불러오는 영역</p>
+    </div>
+      </div>
+      <Section />
+  </div>
+</template>
+

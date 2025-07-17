@@ -7,7 +7,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "home",
-    component: () => import("@/pages/navbar/HomePage.vue"),
+    component: () => import("@/pages/section/HomePage.vue"),
   },
   {
     path: "/about",
@@ -17,22 +17,22 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/map",
     name: "map",
-    component: () => import("@/pages/navbar/MapPage.vue"),
+    component: () => import("@/pages/section/SectionMapPage.vue"),
   },
   {
     path: "/favorite",
     name: "favorite",
-    component: () => import("@/pages/navbar/FavoritePage.vue"),
+    component: () => import("@/pages/section/FavoritePage.vue"),
   },
   {
     path: "/menu",
     name: "menu",
-    component: () => import("@/pages/navbar/MenuPage.vue"),
+    component: () => import("@/pages/section/MenuPage.vue"),
   },
   {
     path: "/menupage",
     name: "menupage",
-    component: () => import("@/pages/navbar/MenuPage.vue"),
+    component: () => import("@/pages/section/MenuPage.vue"),
   },
   {
     path: "/safereport",

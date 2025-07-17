@@ -1,15 +1,15 @@
 <!--예시입니다.... -->
 
 <script setup lang="ts">
-import Header from "@/components/layouts/Header.vue";
+import Header from "@/components/common/Header.vue";
+import Section from "@/components/common/Section.vue";
 </script>
 
 <template>
   <div class="pb-24">
 
-    <Header>
-
-        <font-awesome-icon :icon="['fas', 'arrow-left']" />
+    <Header :showBack="true" :showAlarm="true">
+    <font-awesome-icon :icon="['fas', 'arrow-left']" />
         <span class="text-sm font-semibold">AI 안심 진단 리포트</span>
 
     </Header>
@@ -52,4 +52,5 @@ import Header from "@/components/layouts/Header.vue";
       </button>
     </div>
   </div>
+  <Section />
 </template>
