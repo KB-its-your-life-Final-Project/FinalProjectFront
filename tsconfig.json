@@ -9,6 +9,6 @@
     }
   ],
   "compilerOptions": {
-    "types": ["jquery"]
+    "types": ["jquery", "navermaps"]
   }
 }

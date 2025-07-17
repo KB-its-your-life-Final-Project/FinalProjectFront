@@ -33,6 +33,7 @@
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
     "@types/jquery": "^3.5.29",
+    "@types/navermaps": "^3.9.1",
     "@types/node": "^22.15.32",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/eslint-config-prettier": "^10.2.0",

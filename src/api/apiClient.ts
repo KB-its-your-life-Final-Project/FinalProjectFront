@@ -12,9 +12,9 @@ import router from "@/router";
 const apiClient: AxiosInstance = axios.create({
   timeout: 1000,
 });
-export default apiClient;
-// // Request 인터셉터
-// instance.interceptors.request.use(
+// export default apiClient;
+// Request 인터셉터
+// apiClient.interceptors.request.use(
 //   (config: AxiosRequestConfig): AxiosRequestConfig => {
 //     const { getToken } = useAuthStore();
 //     const token = getToken();
@@ -30,7 +30,7 @@ export default apiClient;
 // );
 
 // // Response 인터셉터
-// instance.interceptors.response.use(
+// apiClient.interceptors.response.use(
 //   (response: AxiosResponse): AxiosResponse => {
 //     if (response.status === 200) {
 //       return response;
@@ -50,4 +50,4 @@ export default apiClient;
 //     return Promise.reject(error);
 //   }
 // );
-// export default instance
+export default apiClient
