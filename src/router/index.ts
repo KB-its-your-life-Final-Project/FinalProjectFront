@@ -9,6 +9,11 @@ const routes: RouteRecordRaw[] = [
     name: "home",
     component: () => import("@/pages/HomePage.vue"),
   },
+  {
+    path: "/wizard",
+    name: "wizard",
+    component: () => import("@/pages/wizard/WizardPage.vue"),
+  },
 
   ...authRoutes,        // 인증 관련 화면 라우트 연결
   ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결
