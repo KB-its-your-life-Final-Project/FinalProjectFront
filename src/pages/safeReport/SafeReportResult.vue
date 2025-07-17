@@ -4,13 +4,12 @@ import {useRouter} from 'vue-router'
 
 interface FormData{
   buildingName: string
-  transactionType: string
   budget:number|null
 }
 
 const props = defineProps<{formData:FormData}>()
 
-const {buildingName, transactionType, budget} = toRefs(props.formData)
+const {buildingName, budget} = toRefs(props.formData)
 const router = useRouter()
 
 function goHome(){
@@ -36,7 +35,6 @@ function goHome(){
 
   <ul class="space-y-2">
     <li>🏢 건물명: {{ buildingName }}</li>
-    <li>🔄 거래 유형: {{ transactionType }}</li>
     <li>💰 예산: {{ budget }} 만원</li>
   </ul>
   <section class="px-4 mt-6 flex flex-col gap-2 text-sm">

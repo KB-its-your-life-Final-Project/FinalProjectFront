@@ -44,7 +44,7 @@ function next(){
       </button>
     </div>
 
-    <dib class="fixed z-10 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
+    <div class="fixed z-10 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
         :disabled="!BuildingName.trim()"
@@ -52,7 +52,7 @@ function next(){
       >
         다음
       </button>
-    </dib>
+    </div>
 
   </div>
 
