@@ -1,35 +1,25 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-
-const router = useRouter();
-const userEmail = ref<string>("");
+import { onMounted } from "vue";
 
 onMounted(() => {
   const kakao = (window as any).Kakao;
-  if (kakao) {
-    console.log("Kakao SDK가 로드되었습니다.");
-    return;
-  }
-  if (!kakao.isInitialized()) {
+  if (kakao && !kakao.isInitialized()) {
     kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
-    console.log("Kakao SDK가 초기화되었습니다.");
+    console.log("Kakao SDK가 초기화되었습니다");
+  } else if (kakao) {
+    console.log("Kakao SDK가 이미 로드되었습니다");
+  } else {
+    console.warn("Kakao SDK를 찾을 수 없습니다");
   }
 });
 
 const loginKakao = async () => {
-  const kakao = (window as any).Kakao;
-  if (kakao && !kakao.isInitialized()) {
-    kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
-    // kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
-    console.log("Kakao SDK initialized.");
-  } else {
-    alert("Kakao SDK is not initialized.");
-    return;
-  }
-  kakao.Auth.authorize({
-    redirectUri: "http://localhost:5173/auth/login/kakao",
-  });
+  const REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
+  const REDIRECT_URI = encodeURIComponent(import.meta.env.VITE_KAKAO_REDIRECT_URI);
+  // prompt=consent 동의 화면 강제 호출
+   console.log("REST_API_KEY", REST_API_KEY)
+  const AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&prompt=consent`;
+  window.location.href = AUTH_URL;
 };
 </script>
 
@@ -66,7 +56,7 @@ const loginKakao = async () => {
         <button class="email-sec w-full h-14 flex flex-column justify-center rounded-xl">
           <div class="flex flex-row items-center gap-3">
             <img class="size-5" src="@/assets/imgs/email.svg" alt="이메일 이미지" />
-            <router-link to="/auth/loginemail">
+            <router-link to="/auth/loginEmail">
               <span>E-mail로 시작하기</span>
             </router-link>
           </div>

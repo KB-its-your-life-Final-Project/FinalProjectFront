@@ -15,21 +15,10 @@ const instance: AxiosInstance = axios.create({
 
 // Request 인터셉터
 instance.interceptors.request.use(
-  (config: AxiosRequestConfig): AxiosRequestConfig => {
-    const { getToken } = authStore();
-    const token = getToken();
-    if (!config.headers) {
-      config.headers = {};
-    }
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-      console.log("전송될 jwt>> " + config.headers.Authorization);
-    }
+  (config) => {
     return config;
   },
-  (error: any): Promise<never> => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error)
 );
 
 // Response 인터셉터
@@ -43,15 +32,15 @@ instance.interceptors.response.use(
     }
     return response;
   },
-  async (error: AxiosError): Promise<never> => {
-    if (error.response?.status === 401) {
-      const { logoutUser } = authStore();
-      logoutUser();
-      router.push("/auth/login?error=login_required");
-      return Promise.reject({ error: "로그인이 필요한 서비스입니다." });
-    }
-    return Promise.reject(error);
-  },
+  // async (error: AxiosError): Promise<never> => {
+  //   if (error.response?.status === 401) {
+  //     const { logoutUser } = authStore();
+  //     logoutUser();
+  //     router.push("/auth/login?error=login_required");
+  //     return Promise.reject({ error: "로그인이 필요한 서비스입니다." });
+  //   }
+  //   return Promise.reject(error);
+  // },
 );
 
 export default instance;

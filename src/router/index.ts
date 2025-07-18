@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 import authRoutes from "./authRoutes";
 import mypageRoutes from "./mypageRoutes";
+import apiClient from "@/api/apiClient";
 
 const routes: RouteRecordRaw[] = [
   // 홈 화면
@@ -8,6 +9,7 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     name: "home",
     component: () => import("@/pages/HomePage.vue"),
+    meta: { requiresAuth: true }, // 테스트용으로 넣어놈
   },
 
   ...authRoutes, // 인증 관련 화면 라우트 연결
@@ -33,6 +35,27 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+});
+
+// 전역 인증 가드 (로그인 여부)
+router.beforeEach(async (to, from, next) => {
+  if (!to.meta.requiresAuth) {
+    return next();
+  }
+
+  try {
+    const res = await apiClient.get("/api/member/loggedin", {
+      mwithCredentials: true,  // HttpOnly 쿠키 포함 요청
+    });
+    if (res.status === 200) {
+      next(); // 인증 성공 -> 화면 이동
+    } else {
+      next("/auth/login"); // 인증 실패 -> 로그인 화면 이동
+    }
+  } catch (e) {
+    console.error("인증 실패: ", e)
+    next("/auth/login")
+  }
 });
 
 export default router;

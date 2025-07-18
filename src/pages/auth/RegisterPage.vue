@@ -7,38 +7,50 @@ const router = useRouter();
 const checkError = ref<string>("");
 
 interface MemberRegisterForm {
-  username: string;
+  email: string;
+  name: string;
   password1: string;
   password2: string;
 }
 
 const member = reactive<MemberRegisterForm>({
-  username: "",
+  email: "",
+  name: "",
   password1: "",
   password2: "",
 });
 
 const disableSubmit = ref<boolean>(true);
 
-const checkUsername = async () => {
-  if (!member.username) {
+const checkEmail = async () => {
+  if (!member.email) {
     alert("이메일을 입력하세요");
     return;
   }
 
-  const isDuplicate: boolean = await authApi.checkUsername(member.username);
+  const isDuplicate: boolean = await authApi.checkEmail(member.email);
   disableSubmit.value = isDuplicate;
   checkError.value = isDuplicate ? "이미 사용중인 이메일입니다" : "사용 가능한 이메일입니다";
 };
 
 const registerUser = async () => {
+  if (!member.name) {
+    alert("이름을 입력하세요");
+    return;
+  }
+  if (!member.password1 || !member.password2) {
+    alert("비밀번호를 입력하세요");
+    return;
+  }
   if (member.password1 !== member.password2) {
     alert("비밀번호가 일치하지 않습니다");
     return;
   }
   try {
-    await authApi.registerUser(member);
-    router.push({ name: "login" });
+    const response = await authApi.registerUser(member);
+    console.log("response: ", response);
+    localStorage.setItem("savedEmail", member.email);
+    router.push({ name: "loginEmail" });
   } catch (e) {
     console.error(e);
   }
@@ -52,17 +64,17 @@ const registerUser = async () => {
   <div class="flex flex-col items-center">
     <form @submit.prevent="registerUser" method="post" class="w-5/6 h-auto flex flex-col gap-5">
       <div>
-        <label for="username">이메일 주소</label>
+        <label for="email">이메일 주소</label>
         <div class="flex flex-row w-full h-auto">
           <input
             class="input-email flex-grow rounded-l-md h-11 min-w-0"
             type="email"
             placeholder="이메일을 입력하세요"
-            v-model="member.username"
+            v-model="member.email"
           />
           <button
             class="btn rounded-r-md w-24 h-11 text-white whitespace-nowrap"
-            @click="checkUsername"
+            @click="checkEmail"
             type="button"
           >
             인증
@@ -75,7 +87,7 @@ const registerUser = async () => {
       </div>
       <div>
         <label for="name">이름</label>
-        <input class="w-full h-11 rounded-md" type="text" placeholder="이름을 입력하세요" />
+        <input class="w-full h-11 rounded-md" type="text" placeholder="이름을 입력하세요" v-model="member.name"/>
       </div>
       <div>
         <label for="password">비밀번호</label>

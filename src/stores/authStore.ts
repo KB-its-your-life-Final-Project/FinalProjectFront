@@ -3,25 +3,21 @@ import { ref, computed } from "vue";
 import apiClient from "@/api/apiClient";
 
 interface User {
-  username: string;
   email: string;
   roles: string[];
 }
 
 interface AuthState {
-  token: string;
   user: User;
 }
 
 interface Member {
-  username: string;
+  email: string;
   password: string;
 }
 
 const initState: AuthState = {
-  token: "",
   user: {
-    username: "",
     email: "",
     roles: [],
   },
@@ -30,52 +26,54 @@ const initState: AuthState = {
 export const authStore = defineStore("auth", () => {
   const state = ref<AuthState>({ ...initState });
 
-  const isLoggedIn = computed(() => !!state.value.user.username); // 로그인 여부
+  const isLoggedIn = computed(() => !!state.value.user.email); // 로그인 여부
 
-  const getUsername = computed(() => state.value.user.username); // 로그인 사용자 ID
+  const getUsername = computed(() => state.value.user.email); // 로그인 사용자 ID
 
-  const getEmail = computed(() => state.value.user.email); // 로그인 사용자 email
-
+  // 로그인 (토큰은 쿠키에 있으므로 응답에서 사용자 정보만 받아서 상태에 저장)
   const loginUser = async (member: Member): Promise<void> => {
-    // api 호출
-    const { data } = await apiClient.post<AuthState>("/api/auth/login", member);
-    state.value = { ...data };
-    console.log(state);
-    localStorage.setItem("auth", JSON.stringify(state.value));
-  };
-
-  const logoutUser = (): void => {
-    localStorage.clear();
-    state.value = { ...initState };
-  };
-
-  const getToken = (): string => state.value.token;
-
-  const load = (): void => {
-    const auth = localStorage.getItem("auth");
-    if (auth != null) {
-      state.value = JSON.parse(auth);
-      console.log(state.value);
+    try {
+      const { data } = await apiClient.post<User>("/api/auth/login", member, { withCredentials: true });
+      state.value.user = data;
+      localStorage.setItem("authUser", JSON.stringify(data));  // 사용자 정보만 저장
+    } catch (error) {
+      throw error;
     }
   };
 
+  // 로그아웃
+  // const logoutUser = async (): Promise<void> => {
+  //   try {
+  //     await apiClient.post("/api/auth/logout", null, { withCredentials: true });
+  //   } finally {
+  //     localStorage.removeItem("authUser");
+  //     state.value = { ...initState };
+  //   }
+  // };
+
+  // 로컬 스토리지에서 사용자 정보 로드 (페이지 새로고침 시 유지용)
+  const load = (): void => {
+    const storedUser = localStorage.getItem("authUser");
+    if (storedUser) {
+      state.value.user = JSON.parse(storedUser);
+    }
+  };
   load();
 
-  const changeProfile = (member: Partial<User>): void => {
-    if (member.email) {
-      state.value.user.email = member.email;
-      localStorage.setItem("auth", JSON.stringify(state.value));
-    }
-  };
+  // 사용자 정보 업데이트
+  // const changeProfile = (member: Partial<User>): void => {
+  //   if (member.email) {
+  //     state.value.user.email = member.email;
+  //     localStorage.setItem("authUser", JSON.stringify(state.value.user));
+  //   }
+  // };
 
   return {
     state,
     isLoggedIn,
     getUsername,
-    getEmail,
     loginUser,
-    logoutUser,
-    getToken,
-    changeProfile,
+    // logoutUser,
+    // changeProfile,
   };
 });

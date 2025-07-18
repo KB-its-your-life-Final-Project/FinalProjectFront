@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { onMounted, computed, reactive, ref } from "vue";
 import { authStore } from "@/stores/authStore.ts";
 import { useRoute, useRouter } from "vue-router";
 import type { RouteLocationNormalizedLoaded } from "vue-router";
 import type { AxiosError } from "axios";
 
 interface MemberLoginForm {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -14,14 +14,20 @@ const route: RouteLocationNormalizedLoaded = useRoute();
 const router = useRouter();
 const auth = authStore();
 const member = reactive<MemberLoginForm>({
-  username: "",
+  email: "",
   password: "",
 });
 const error = ref<string>("");
-const disableSubmit = computed(() => !(member.username && member.password));
+const disableSubmit = computed(() => !(member.email && member.password));
 
+onMounted(() => {
+  const savedEmail = localStorage.getItem("savedEmail");
+  if (savedEmail) {
+    member.email = savedEmail;
+  }
+})
 const loginUser = async () => {
-  console.log(member);
+  console.log("사용자 input: ", member);
   try {
     await auth.loginUser(member);
     const nextRoute = route.query.next as string | undefined;
@@ -54,7 +60,7 @@ const loginUser = async () => {
           class="w-full h-11 rounded-md"
           type="email"
           placeholder="이메일을 입력하세요"
-          v-model="member.username"
+          v-model="member.email"
         />
       </div>
       <div>

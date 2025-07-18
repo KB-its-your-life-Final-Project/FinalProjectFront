@@ -7,6 +7,7 @@ const router = useRouter();
 onMounted(async () => {
   const route = useRoute();
   const code = route.query.code as string;
+  console.log("code: ", code);
 
   if (!code) {
     alert("인가 코드가 없습니다.");
@@ -18,10 +19,11 @@ onMounted(async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code }),
     });
+    console.log("response", response);
 
     const data = await response.json();
 
-    if (data.success) {
+    if (response.ok) {
       router.push("/"); // 로그인 성공 시 홈으로 이동
     } else {
       alert(data.message || "카카오 로그인 실패");
@@ -33,7 +35,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen text-xl font-semibold">
+  <div class="flex items-center justify-center min-h-screen text-xl font-pretendard-black">
     카카오 로그인 처리 중입니다...
   </div>
 </template>
