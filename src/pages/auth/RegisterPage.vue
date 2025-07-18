@@ -34,6 +34,7 @@ const checkEmail = async () => {
 };
 
 const registerUser = async () => {
+  checkEmail();
   if (!member.name) {
     alert("이름을 입력하세요");
     return;
