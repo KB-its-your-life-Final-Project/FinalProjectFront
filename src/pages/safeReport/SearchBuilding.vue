@@ -27,8 +27,12 @@ function search() {
   new (window as any).daum.Postcode({
     oncomplete(data: any) {
       // 주소 조합해서 건물명으로 바꾸기
+      (window as any).__DAUM_ADDR__=data;
+      alert("데이터 저장됨!");
       let roadAddr = data.roadAddress || '';
       let extraRoadAddr = '';
+
+
       if (data.bname && /[동|로|가]$/.test(data.bname)) extraRoadAddr += data.bname;
       if (data.buildingName && data.apartment === 'Y') {
         extraRoadAddr += (extraRoadAddr ? `, ${data.buildingName}` : data.buildingName);
@@ -69,8 +73,9 @@ function next(){
       <input
         v-model="BuildingName"
         type="text"
-        placeholder="건물명 입력"
-        class="flex-1 border border-gray-300 rounded-full py-2 pl-4 focus:outline-none"
+        placeholder="주소 찾기로 입력"
+        class="flex-1 border border-gray-300 rounded-full py-2 pl-4 focus:outline-none cursor-not-allowed"
+        disabled
       />
       <button
         @click="search"
