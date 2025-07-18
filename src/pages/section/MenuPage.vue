@@ -9,7 +9,7 @@ import { useSearch } from '@/utils/useSearch'
 
 <template>
 
-  <Header :title="'전체 메뉴'" :showAlarm="true" />
+  <Header :title="'전체 메뉴'" :showBack="false":showAlarm="true" />
 
     <h1 class="text-xl font-bold">전체 메뉴</h1>
     <ul class="mt-4 space-y-2">
