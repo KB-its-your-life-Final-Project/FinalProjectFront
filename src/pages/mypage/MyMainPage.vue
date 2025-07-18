@@ -18,7 +18,7 @@ function goToEditPage() {
 
     <Header :title="'마이페이지'" :showBack="true" :showAlarm="true" />
 
-    <div class="bg-white mx-4 mt-4 p-4 rounded-xl shadow-md flex items-center space-x-4">
+    <div class="bg-kb-ui-11 mx-4 mt-4 p-4 rounded-xl shadow-md flex items-center space-x-4">
       <img
         src="@/assets/imgs/profile.jpg"
         alt="Profile"
@@ -26,28 +26,28 @@ function goToEditPage() {
       />
       <div class="flex-1">
         <p class="font-semibold text-sm">{{"name"}}</p>
-        <p class="text-xs text-gray-500">{{"email"}}</p>
+        <p class="text-xs text-kb-ui-07">{{"email"}}</p>
       </div>
-      <button class="text-xs text-blue-600 font-medium" @click="goToEditPage">회원정보 수정</button>
+      <button class="text-xs text-positive font-medium" @click="goToEditPage">회원정보 수정</button>
     </div>
 
 
-    <div class="bg-white mx-4 mt-4 p-4 rounded-xl shadow-md">
+    <div class="bg-kb-ui-11 mx-4 mt-4 p-4 rounded-xl shadow-md">
       <h3 class="text-sm font-semibold mb-1">계약 만료 정보</h3>
       <p class="text-sm">2024-08-15</p>
-      <p class="text-xs text-gray-500">5일 남음</p>
+      <p class="text-xs text-kb-ui-07">5일 남음</p>
     </div>
 
 
-    <div class="bg-white mx-4 mt-4 p-4 rounded-xl shadow-md">
+    <div class="bg-kb-ui-11 mx-4 mt-4 p-4 rounded-xl shadow-md">
       <h3 class="text-sm font-semibold mb-1">시세 변화</h3>
       <p class="text-sm">₩300,000,000</p>
-      <p class="text-xs text-gray-500">+5% (지난주 대비)</p>
+      <p class="text-xs text-kb-ui-07">+5% (지난주 대비)</p>
     </div>
 
 
     <div class="mx-4 mt-4">
-      <button class="w-full py-3 bg-gray-100 text-sm rounded-full shadow-inner">
+      <button class="w-full py-3 bg-kb-ui-09 text-sm rounded-full shadow-inner">
         알림 설정
       </button>
     </div>

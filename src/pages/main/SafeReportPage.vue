@@ -18,7 +18,7 @@ import Section from "@/components/common/Section.vue";
     <section class="flex flex-col items-center mt-[-50px]">
       <div class="w-28 h-28 rounded-full bg-yellow-100 flex flex-col items-center justify-center shadow-md">
         <p class="text-xl font-bold text-yellow-600">85/<span class="text-sm">100</span></p>
-        <p class="text-sm text-gray-700 mt-1">주의</p>
+        <p class="text-sm text-kb-ui-06 mt-1">주의</p>
       </div>
     </section>
 

@@ -38,7 +38,7 @@ const favoriteApts = [
 
 
       <div class="text-center mt-3">
-        <p class="text-sm text-black">원룸, 빌라, 오피스텔, 아파트</p>
+        <p class="text-sm text-kb-ui-01">원룸, 빌라, 오피스텔, 아파트</p>
       </div>
 
       <div class="absolute left-1/2 bottom-0 translate-y-1/2 -translate-x-1/2 w-[85%]">
@@ -66,12 +66,12 @@ const favoriteApts = [
             <font-awesome-icon
                 :icon="[region.liked ? 'fas' : 'far', 'star']"
                 class="cursor-pointer"
-                :class="region.liked ? 'text-yellow-400' : 'text-gray-400'"
+                :class="region.liked ? 'text-kb-yellow' : 'text-kb-ui-05'"
                 @click="toggleLike(index)"
             />
             <span>{{ region.name }}</span>
           </div>
-          <button class="text-black-500 text-xs" @click="removeRegion(index)">
+          <button class="text-kb-ui-01 text-xs" @click="removeRegion(index)">
             해제
           </button>
         </li>
@@ -85,10 +85,10 @@ const favoriteApts = [
         <div
             v-for="apt in favoriteApts"
             :key="apt.id"
-            class="min-w-[180px] rounded-xl border p-4 shadow-md bg-white"
+            class="min-w-[180px] rounded-xl border p-4 shadow-md bg-kb-ui-11"
         >
           <p class="text-sm font-semibold">{{ apt.name }}</p>
-          <p class="text-xs text-gray-500">{{ apt.address }}</p>
+          <p class="text-xs text-kb-ui-05">{{ apt.address }}</p>
           <p class="mt-2 text-sm font-bold">{{ apt.price }}</p>
         </div>
       </div>
@@ -102,13 +102,13 @@ const favoriteApts = [
 <!-- 여기도 임의의 데이터         -->
           <div>
             <p>YY아파트 5층</p>
-            <p class="text-xs text-gray-500">₩200,000,000</p>
+            <p class="text-xs text-kb-ui-06">₩200,000,000</p>
           </div>
         </li>
         <li class="flex items-center space-x-3 text-sm">
           <div>
             <p>ZZ아파트 1층</p>
-            <p class="text-xs text-gray-500">₩300,000,000</p>
+            <p class="text-xs text-kb-ui-06">₩300,000,000</p>
           </div>
         </li>
       </ul>

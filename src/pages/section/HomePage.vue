@@ -20,7 +20,7 @@ const { searchQuery, clearSearch } = useSearch()
 <!--
   home type =props 그대로 둘 건데, 과정을 어떻게 변화시킬 것인지
 -->
-  <div class="min-h-screen flex flex-col items-center bg-gray-50">
+  <div class="min-h-screen flex flex-col items-center bg-kb-ui-11">
 
     <div class="w-full flex flex-col flex-1">
 <!--      max-w-md-->
@@ -28,7 +28,7 @@ const { searchQuery, clearSearch } = useSearch()
       <Header :showAlarm="true">
 
         <div class="mt-0 pl-[1.5rem]">
-          <h2 class="text-sm text-gray-800 font-semibold">원룸, 빌라, 오피스텔, 아파트</h2>
+          <h2 class="text-sm text-kb-ui-01 font-semibold">원룸, 빌라, 오피스텔, 아파트</h2>
           <h1 class="text-lg font-bold mt-[0.25rem]">집에 대한 모든 정보를 찾아보세요!</h1>
         </div>
 
@@ -50,8 +50,8 @@ const { searchQuery, clearSearch } = useSearch()
 
       </RouterLink>
     </div>
-      <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 text-center mt-6 min-h-[15.625rem]">
-      <p class="text-gray-700 text-sm">Recent news events coverage</p>
+      <div class="bg-kb-ui-11 rounded-xl shadow-md p-4 sm:p-6 text-center mt-6 min-h-[15.625rem]">
+      <p class="text-kb-ui-01 text-sm">Recent news events coverage</p>
     </div>
 
     <Footer />
