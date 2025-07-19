@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import axios from "axios";
 const props = defineProps({ formData: Object })
 const emit = defineEmits(['update','next','prev'])
 
@@ -9,13 +10,20 @@ watch(budget, val => {
   emit('update', { budget: val })
 })
 
-function next() {
+async function next() {
   const budget_val = Number(budget.value)
   if(budget.value==null||budget_val<=0||!Number.isFinite(budget_val)){
     alert('예산을 올바르게 입력해주세요!')
     return
   }
-  emit('next')
+  try{
+    const response = await axios.post('/api/report/formdata',props.formData)
+    console.log('서버 응답:', response.data)
+    emit('next')
+  }catch (error){
+    console.error('전송 실패:', error)
+    alert('서버 통신 오류 발생')
+  }
 }
 
 function prev(){
