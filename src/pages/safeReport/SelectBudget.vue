@@ -17,7 +17,8 @@ async function next() {
     return
   }
   try{
-    const response = await axios.post('/api/report/formdata',props.formData)
+    console.log("보낼 데이터",{...props.formData})
+    const response = await axios.post('/api/report/formdata',{...props.formData})//반응형 객체라서 그대로 전송하면 서버에서 직렬화 문제 생김 -> 얕은 복사로 보내기
     console.log('서버 응답:', response.data)
     emit('next')
   }catch (error){
