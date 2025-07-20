@@ -14,7 +14,7 @@ const formData = reactive({
   buildingName: '',
   roadAddress: '', //도로명주소
   jibunAddress: '', //지번주소
-  extraAddress: '',
+  dongName: '',//법정동주소
   budget: null,
   // 필요하면 추가 필드
 })
