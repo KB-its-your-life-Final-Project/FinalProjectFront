@@ -6,6 +6,7 @@ const emit = defineEmits(['update','next','prev'])
 
 const budget = ref<number | null>(props.formData.budget)
 
+
 watch(budget, val => {
   emit('update', { budget: val })
 })
@@ -20,7 +21,10 @@ async function next() {
     console.log("보낼 데이터",{...props.formData})
     const response = await axios.post('/api/report/formdata',{...props.formData})//반응형 객체라서 그대로 전송하면 서버에서 직렬화 문제 생김 -> 얕은 복사로 보내기
     console.log('서버 응답:', response.data)
-    emit('next')
+    emit('next',{
+      formData: props.formData,
+      resultData: response.data
+    })
   }catch (error){
     console.error('전송 실패:', error)
     alert('서버 통신 오류 발생')

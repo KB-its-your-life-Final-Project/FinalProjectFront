@@ -19,13 +19,18 @@ const formData = reactive({
   // 필요하면 추가 필드
 })
 
+const resultData = ref(null)
 function onUpdate(updated) {
   Object.assign(formData, updated)
 }
 
-function nextStep() {
+function nextStep(payload?:any) {
+  if (payload?.resultData) {
+    resultData.value = payload.resultData
+  }
   currentStep.value++
 }
+
 function prevStep() {
   const from = currentStep.value;
   currentStep.value--;
@@ -51,6 +56,7 @@ function prevStep() {
   <component
     :is="steps[currentStep]"
     :form-data="formData"
+    :result-data="resultData"
     @update="onUpdate"
     @next="nextStep"
     @prev="prevStep"
