@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useRouter} from 'vue-router'
-import { ref,computed } from 'vue'
+import { computed } from 'vue'
 
 interface FormData{
   buildingName: string
