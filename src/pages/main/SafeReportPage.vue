@@ -40,6 +40,7 @@ function prevStep() {
   } else if (from === 2) {
     // 2→1
     formData.budget = null;
+    console.log("초기화된 budget 값:", formData.budget);
   }
 }
 </script>
