@@ -86,7 +86,7 @@ const pretendardFontList = fontList
         <tbody>
           <tr v-for="font in pretendardFontList" :key="font.name">
             <td :style="{ fontFamily: font.value }">{{ font.value }}</td>
-            <td class="text-center">text-{{ font.name }}</td>
+            <td class="text-center">font-{{ font.name }}</td>
           </tr>
         </tbody>
       </table>

@@ -112,15 +112,15 @@ npm run lint
 
 | 폰트 이름               | 클래스명 예시                |
 | ----------------------- | ---------------------------- |
-| "Pretendard-Thin"       | `text-pretendard-thin`       |
-| "Pretendard-ExtraLight" | `text-pretendard-extralight` |
-| "Pretendard-Light"      | `text-pretendard-light`      |
-| "Pretendard-Medium"     | `text-pretendard-medium`     |
-| "Pretendard-Regular"    | `text-pretendard-regular`    |
-| "Pretendard-SemiBold"   | `text-pretendard-semibold`   |
-| "Pretendard-Bold"       | `text-pretendard-bold`       |
-| "Pretendard-ExtraBold"  | `text-pretendard-extrabold`  |
-| "Pretendard-Black"      | `text-pretendard-black`      |
+| "Pretendard-Thin"       | `font-pretendard-thin`       |
+| "Pretendard-ExtraLight" | `font-pretendard-extralight` |
+| "Pretendard-Light"      | `font-pretendard-light`      |
+| "Pretendard-Medium"     | `font-pretendard-medium`     |
+| "Pretendard-Regular"    | `font-pretendard-regular`    |
+| "Pretendard-SemiBold"   | `font-pretendard-semibold`   |
+| "Pretendard-Bold"       | `font-pretendard-bold`       |
+| "Pretendard-ExtraBold"  | `font-pretendard-extrabold`  |
+| "Pretendard-Black"      | `font-pretendard-black`      |
 
 ![폰트값 사진](src/assets/imgs/fonts.png)
 
