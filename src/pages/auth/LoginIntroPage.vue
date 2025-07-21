@@ -17,7 +17,8 @@ const loginKakao = async () => {
   const REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
   const REDIRECT_URI = encodeURIComponent(import.meta.env.VITE_KAKAO_REDIRECT_URI);
   // prompt=consent 동의 화면 강제 호출
-   console.log("REST_API_KEY", REST_API_KEY)
+  console.log("REST_API_KEY", REST_API_KEY);
+  console.log("REDIRECT_URI", REDIRECT_URI);
   const AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&prompt=consent`;
   window.location.href = AUTH_URL;
 };

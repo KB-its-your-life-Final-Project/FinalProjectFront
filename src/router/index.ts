@@ -8,7 +8,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "splash",
-    component: () => import("@/pages/SplashScreenPage.vue")
+    component: () => import("@/pages/SplashScreenPage.vue"),
   },
   // 홈 화면
   {
@@ -51,7 +51,7 @@ router.beforeEach(async (to, from, next) => {
 
   try {
     const res = await apiClient.get("/api/member/loggedin", {
-      mwithCredentials: true,  // HttpOnly 쿠키 포함 요청
+      withCredentials: true, // HttpOnly 쿠키 포함 요청
     });
     if (res.status === 200) {
       next(); // 인증 성공 -> 화면 이동
@@ -59,8 +59,8 @@ router.beforeEach(async (to, from, next) => {
       next("/auth/login"); // 인증 실패 -> 로그인 화면 이동
     }
   } catch (e) {
-    console.error("인증 실패: ", e)
-    next("/auth/login")
+    console.error("인증 실패: ", e);
+    next("/auth/login");
   }
 });
 

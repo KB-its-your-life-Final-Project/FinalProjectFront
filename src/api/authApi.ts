@@ -5,19 +5,14 @@ const headers = { headers: { "Content-Type": "multipart/form-data" } };
 
 export interface Member {
   email: string;
+  verificationCode: string;
   name: string;
   password1: string;
 }
 
-export interface ChangePasswordDTO {
-  email: string;
-  currentPassword: string;
-  newPassword: string;
-}
-
 export default {
   // 이메일 중복 확인
-  async checkEmail(email: string): Promise<boolean> {
+  async checkDuplicateEmail(email: string): Promise<boolean> {
     const { data } = await apiClient.get<boolean>(`${BASE_URL}/checkemail/${email}`);
     console.log("AUTH GET CHECKEMAIL", data === false ? "이메일 사용 가능" : "이메일 사용 불가");
     return data;
@@ -27,6 +22,7 @@ export default {
   async registerUser(member: Member): Promise<any> {
     const formData = new FormData();
     formData.append("email", member.email);
+    formData.append("verificationCode", member.verificationCode);
     formData.append("name", member.name);
     formData.append("password", member.password1);
     console.log("formData - email: ", formData.get("email"));
@@ -44,12 +40,12 @@ export default {
   },
 
   // 카카오 로그인
-  async kakaoLogin (code: string): Promise<any> {
+  async kakaoLogin(code: string): Promise<any> {
     try {
-      const {data} = await apiClient.post(
+      const { data } = await apiClient.post(
         `${BASE_URL}/register/kakao`,
-        {code},
-        {withCredentials: true}
+        { code },
+        { withCredentials: true },
       );
       console.log("AUTH POST (kakaoLogin): ", data);
       return data;
@@ -58,26 +54,5 @@ export default {
       console.error("response: ", error.response?.data);
       console.error("status code:", error.response?.status);
     }
-
-  // // 사용자 수정
-  // async updateUser(member: Member): Promise<any> {
-  //   const formData = new FormData();
-  //   formData.append("email", member.email);
-  //   formData.append("password", member.password1);
-
-  //   const { data } = await apiClient.put(`${BASE_URL}/${member.email}`, formData, headers);
-  //   console.log("AUTH PUT: ", data);
-  //   return data;
-  // },
-
-  // // 비밀번호 변경
-  // async changePassword(formData: ChangePasswordDTO): Promise<any> {
-  //   const { data } = await apiClient.put(
-  //     `${BASE_URL}/${formData.email}/changepassword`,
-  //     formData,
-  //   );
-  //   console.log(`AUTH PUT (Change Password): `, data);
-  //   return data;
-  // },
-  }
-}
+  },
+};

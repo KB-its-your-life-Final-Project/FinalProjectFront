@@ -25,12 +25,12 @@ onMounted(() => {
   if (savedEmail) {
     member.email = savedEmail;
   }
-})
+});
 const loginUser = async () => {
   console.log("사용자 input: ", member);
   try {
     await auth.loginUser(member);
-    console.log("로그인 성공")
+    console.log("로그인 성공");
     const nextRoute = route.query.next as string | undefined;
     if (nextRoute) {
       router.push({ name: nextRoute });
@@ -54,7 +54,7 @@ const loginUser = async () => {
     <h1 class="text-2xl font-pretendard-bold">로그인</h1>
   </header>
   <div class="flex flex-col items-center">
-    <form @submit.prevent="loginUser" method="post" class="w-5/6 h-auto flex flex-col gap-5">
+    <form @submit.prevent="loginUser" method="post" class="w-5/6 h-auto flex flex-col gap-7">
       <div>
         <label for="username">이메일 주소</label>
         <input

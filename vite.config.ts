@@ -8,6 +8,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   const backendPort = env.VITE_BACKEND_PORT || "8080";
+  console.log("backendPort: ", backendPort);
   return {
     plugins: [vue(), vueDevTools(), tailwindcss()],
     resolve: {

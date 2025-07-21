@@ -63,14 +63,26 @@ const pretendardFontList = fontList
         </thead>
         <tbody>
           <tr class="h-20" v-for="color in kbColorList" :key="color.name">
-            <td class="flex flex-col items-center justify-center border" :style="{borderColor: color.value}">
+            <td
+              class="flex flex-col items-center justify-center border"
+              :style="{ borderColor: color.value }"
+            >
               <div class="w-7 h-7 rounded-full" :style="{ backgroundColor: color.value }"></div>
-              <div :style ="{color: color.value === '#ffffff' || color.value === '#f7f7f8'? '#484b51' : color.value}">{{ color.name }}</div>
+              <div
+                :style="{
+                  color:
+                    color.value === '#ffffff' || color.value === '#f7f7f8'
+                      ? '#484b51'
+                      : color.value,
+                }"
+              >
+                {{ color.name }}
+              </div>
             </td>
             <td class="text-center">{{ color.value }}</td>
             <td class="text-center">
-              bg-{{ color.name }}<br>
-              text-{{ color.name }}<br>
+              bg-{{ color.name }}<br />
+              text-{{ color.name }}<br />
               border border-{{ color.name }}
             </td>
           </tr>

@@ -15,7 +15,7 @@ onMounted(async () => {
     return;
   }
   try {
-    const response =  await apiClient.post("/api/member/register/kakao", { code });
+    const response = await apiClient.post("/api/member/register/kakao", { code });
     console.log("response: ", response);
 
     const data = await response.data;
