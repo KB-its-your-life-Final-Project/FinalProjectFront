@@ -39,6 +39,7 @@ const myPageRouteRecordRaw: RouteRecordRaw[] = [
         path: "/mypage/main",
         name: myPageRouteName.myPageMain,
         component: myPageRouteMap.myPageMain,
+
       },
     ],
   },
