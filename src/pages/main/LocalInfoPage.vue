@@ -1,20 +1,26 @@
 <!-- LocalInfoPage.vue 동네.zip  레이아웃 -->
 
 <script setup lang="ts">
-import BackHeader from '@/components/layouts/BackHeader.vue';
-import NavBar from '@/components/layouts/NavBar.vue';
-
+import BackHeader from "@/components/layouts/BackHeader.vue";
+// import NavBar from "@/components/layouts/NavBar.vue";
+import SearchCard from "@/components/localinfo/SearchCard.vue";
+import InfoCard from "@/components/localinfo/InfoCard.vue";
+import { InfoCardList } from "@/components/localinfo/InfoCard.ts";
+import WeatherCard from "@/components/localinfo/WeatherCard.vue";
 </script>
 <template>
+  <BackHeader>
+    <SearchCard />
+  </BackHeader>
+  <div class="px-4">
+    <!-- 날씨 정보 박스 -->
+    <div class="gap-8 mt-8">
+      <WeatherCard />
+    </div>
 
-    <BackHeader title="동네.ZIP"/>
-    <h1 class="text-xl font-bold">동네정보</h1>
-    <ul class="mt-4 space-y-2">
-      <li>실거래가 조회</li>
-      <li>안심 정보</li>
-      <li>찜한 매물</li>
-      <li>서비스 소개</li>
-      <!-- 실제 라우팅 연결은 필요에 따라 RouterLink 사용 -->
-    </ul>
-
+    <!-- 카드 4개 2x2 그리드로 표시 -->
+    <div class="grid grid-cols-2 gap-8 mt-8">
+      <InfoCard v-for="(card, i) in InfoCardList" :key="i" :info="card" />
+    </div>
+  </div>
 </template>
