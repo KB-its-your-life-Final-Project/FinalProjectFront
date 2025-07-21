@@ -79,4 +79,5 @@ export default {
   //   console.log(`AUTH PUT (Change Password): `, data);
   //   return data;
   // },
-};
+  }
+}

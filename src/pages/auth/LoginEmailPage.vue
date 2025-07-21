@@ -30,6 +30,7 @@ const loginUser = async () => {
   console.log("사용자 input: ", member);
   try {
     await auth.loginUser(member);
+    console.log("로그인 성공")
     const nextRoute = route.query.next as string | undefined;
     if (nextRoute) {
       router.push({ name: nextRoute });

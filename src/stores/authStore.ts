@@ -42,14 +42,14 @@ export const authStore = defineStore("auth", () => {
   };
 
   // 로그아웃
-  // const logoutUser = async (): Promise<void> => {
-  //   try {
-  //     await apiClient.post("/api/auth/logout", null, { withCredentials: true });
-  //   } finally {
-  //     localStorage.removeItem("authUser");
-  //     state.value = { ...initState };
-  //   }
-  // };
+  const logoutUser = async (): Promise<void> => {
+    try {
+      await apiClient.post("/api/member/logout", null, { withCredentials: true });
+    } finally {
+      localStorage.removeItem("authUser");
+      state.value = { ...initState };
+    }
+  };
 
   // 로컬 스토리지에서 사용자 정보 로드 (페이지 새로고침 시 유지용)
   const load = (): void => {
@@ -60,20 +60,11 @@ export const authStore = defineStore("auth", () => {
   };
   load();
 
-  // 사용자 정보 업데이트
-  // const changeProfile = (member: Partial<User>): void => {
-  //   if (member.email) {
-  //     state.value.user.email = member.email;
-  //     localStorage.setItem("authUser", JSON.stringify(state.value.user));
-  //   }
-  // };
-
   return {
     state,
     isLoggedIn,
     getUsername,
     loginUser,
-    // logoutUser,
-    // changeProfile,
+    logoutUser,
   };
 });

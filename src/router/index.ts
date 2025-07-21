@@ -4,12 +4,18 @@ import mypageRoutes from "./mypageRoutes";
 import apiClient from "@/api/apiClient";
 
 const routes: RouteRecordRaw[] = [
-  // 홈 화면
+  // Splash 화면
   {
     path: "/",
+    name: "splash",
+    component: () => import("@/pages/SplashScreenPage.vue")
+  },
+  // 홈 화면
+  {
+    path: "/home",
     name: "home",
     component: () => import("@/pages/HomePage.vue"),
-    meta: { requiresAuth: true }, // 테스트용으로 넣어놈
+    // meta: { requiresAuth: true }, // 테스트용으로 넣어놈
   },
 
   ...authRoutes, // 인증 관련 화면 라우트 연결

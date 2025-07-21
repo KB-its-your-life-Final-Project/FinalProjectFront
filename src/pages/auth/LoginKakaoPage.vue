@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import apiClient from "@/api/apiClient";
 
 const router = useRouter();
 
@@ -14,17 +15,14 @@ onMounted(async () => {
     return;
   }
   try {
-    const response = await fetch("/api/member/register/kakao", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
-    });
-    console.log("response", response);
+    const response =  await apiClient.post("/api/member/register/kakao", { code });
+    console.log("response: ", response);
 
-    const data = await response.json();
+    const data = await response.data;
+    console.log("response's data: ", data);
 
-    if (response.ok) {
-      router.push("/"); // 로그인 성공 시 홈으로 이동
+    if (response.status == 200) {
+      router.push("/home"); // 로그인 성공 시 홈으로 이동
     } else {
       alert(data.message || "카카오 로그인 실패");
     }

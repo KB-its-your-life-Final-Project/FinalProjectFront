@@ -27,8 +27,10 @@ const loginKakao = async () => {
   <div class="flex flex-col items-center justify-center min-h-screen gap-20">
     <!-- 로고 및 문구 영역 -->
     <div class="flex flex-col items-center gap-5">
-      <h1 class="w-50"><img class="w-full" src="@/assets/imgs/logo.svg" alt="로고" /></h1>
-      <h2 class="flex flex-col items-center text-3xl font-pretendard-bold">
+      <h1 class="w-50">
+        <img class="w-full" src="@/assets/imgs/logo.svg" alt="로고" />
+      </h1>
+      <h2 class="flex flex-col items-center text-3xl font-pretendard-bold gap-2">
         <div>로그인하시고</div>
         <div>안전한 방을 찾으세요!</div>
       </h2>
