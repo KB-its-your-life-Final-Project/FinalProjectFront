@@ -1,10 +1,10 @@
 <!--관심매물 레이아웃-->
 <script setup lang="ts">
-import Header from "@/components/layout/Header.vue";
+import Header from "@/components/layout/header/Header.vue";
 import { ref } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import Section from "@/components/common/Section.vue";
-import LogoSearchBar from "@/components/common/LogoSearchBar.vue";
+import Section from "@/components/nav/BottomNav.vue";
+import LogoSearchBar from "@/pages/home/_component/LogoSearchBar.vue";
 import { useSearch } from "@/utils/useSearch";
 
 const { searchQuery, clearSearch } = useSearch();

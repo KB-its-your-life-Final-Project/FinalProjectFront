@@ -3,26 +3,26 @@ import { RouteRecordRaw } from "vue-router";
 //라우트 파일 위치
 const mainRouteMap: Record<string, () => Promise<any>> = {
   //홈
-  homeMain: () => import("@/pages/section/HomeMain.vue"),
+  homeMain: () => import("@/pages/home/HomeMain.vue"),
 
   //지도
-  mapSearch: () => import("@/pages/section/MapSearch.vue"),
+  mapSearch: () => import("@/pages/mapSearch/MapSearch.vue"),
 
   //찜
-  myLike: () => import("@/pages/section/MyLike.vue"),
+  myLike: () => import("@/pages/myLike/MyLike.vue"),
 
   //메인 메뉴
-  mainMenu: () => import("@/pages/section/MainMenu.vue"),
+  mainMenu: () => import("@/pages/mainMenu/MainMenu.vue"),
 
   //안심 진단
-  safeReport: () => import("@/pages/main/SafeReport.vue"),
+  safeReport: () => import("@/pages/safeReport/SafeReport.vue"),
 
   //알람
   myAlarm: () => import("@/pages/alarm/myAlarm.vue"),
 
   //안심진단
-  localInfo: () => import("@/pages/main/LocalInfo.vue"),
-  LocalInfoSearch: () => import("@/pages/main/LocalInfoSearch.vue"),
+  localInfo: () => import("@/pages/localInfo/LocalInfo.vue"),
+  LocalInfoSearch: () => import("@/pages/localInfo/LocalInfoSearch.vue"),
 };
 
 //라우트 이름
@@ -57,22 +57,22 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
   {
     path: "/mainMenu",
     name: mainRouteName.mainMenu,
-    component: () => import("@/pages/section/MainMenu.vue"),
+    component: () => import("@/pages/mainMenu/MainMenu.vue"),
   },
   {
     path: "/safeReport",
     name: mainRouteName.safeReport,
-    component: () => import("@/pages/main/SafeReport.vue"),
+    component: () => import("@/pages/safeReport/SafeReport.vue"),
   },
   {
     path: "/localInfo",
     name: mainRouteName.localInfo,
-    component: () => import("@/pages/main/LocalInfo.vue"),
+    component: () => import("@/pages/localInfo/LocalInfo.vue"),
   },
   {
     path: "/localInfoSearch",
     name: mainRouteName.localInfoSearch,
-    component: () => import("@/pages/main/LocalInfoSearch.vue"),
+    component: () => import("@/pages/localInfo/LocalInfoSearch.vue"),
   },
   {
     path: "/myAlarm",

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Section from "@/components/common/Section.vue";
-import Header from "@/components/layout/Header.vue";
+import Section from "@/components/nav/BottomNav.vue";
+import Header from "@/components/layout/header/Header.vue";
 </script>
 
 <template>

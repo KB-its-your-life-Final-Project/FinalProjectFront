@@ -1,12 +1,13 @@
 <!-- MenuPage.vue 레이아웃 -->
 <script setup lang="ts">
 // 필요 시 기능 추가
-import Header from "@/components/layout/Header.vue";
-import Section from "@/components/common/Section.vue";
+import Header from "@/components/layout/header/Header.vue";
+import Section from "@/components/nav/BottomNav.vue";
+import { mainRouteName } from "@/router/mainRoute";
 </script>
 
 <template>
-  <Header :title="'전체 메뉴'" :showBack="false" :showAlarm="true" />
+  <Header :headerShowtype="mainRouteName.mainMenu" />
 
   <h1 class="text-xl font-bold">전체 메뉴</h1>
   <ul class="mt-4 space-y-2">

@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { RouterLink } from "vue-router";
-import HomeCard from "@/components/home/HomeCard.vue";
+import HomeCard from "@/pages/home/_component/HomeCard.vue";
 
-import Header from "@/components/layout/Header.vue";
+import Header from "@/components/layout/header/Header.vue";
 import Footer from "@/components/layout/Footer.vue";
-import LogoSearchBar from "@/components/common/LogoSearchBar.vue";
+import LogoSearchBar from "@/pages/home/_component/LogoSearchBar.vue";
 
-import { HomeCardTypes } from "@/components/home/HomeMenu.ts";
-import lighthouseIcon from "@/assets/imgs/lighthouse.png";
+import { HomeCardTypes } from "@/pages/home/_component/HomeMenu";
+import { mainRouteName } from "@/router/mainRoute";
 </script>
 
 <template>
   <!-- home type =props 그대로 둘 건데, 과정을 어떻게 변화시킬 것인지 -->
   <div class="min-h-screen flex flex-col items-center bg-kb-ui-11">
     <div class="w-full flex flex-col flex-1">
-      <Header :showAlarm="true">
+      <Header :headerShowtype="mainRouteName.homeMain">
         <div class="mt-0 pl-[1.5rem]">
           <h2 class="text-sm text-kb-ui-01 font-semibold">원룸, 빌라, 오피스텔, 아파트</h2>
           <h1 class="text-lg font-bold mt-[0.25rem]">집에 대한 모든 정보를 찾아보세요!</h1>
@@ -28,7 +27,7 @@ import lighthouseIcon from "@/assets/imgs/lighthouse.png";
 
       <main class="flex-1 px-4 pt-4 space-y-4 overflow-auto pb-24">
         <div class="grid grid-cols-2 gap-4 mt-15">
-          <RouterLink v-for="(menu, idx) in HomeCardTypes" :key="idx" :to="menu.path">
+          <RouterLink v-for="(menu, idx) in HomeCardTypes" :key="idx" :to="{ name: menu.name }">
             <HomeCard :data="menu" />
           </RouterLink>
         </div>

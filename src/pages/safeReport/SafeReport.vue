@@ -1,13 +1,14 @@
 <!--예시입니다.... -->
 
 <script setup lang="ts">
-import Header from "@/components/layout/Header.vue";
-import Section from "@/components/common/Section.vue";
+import Header from "@/components/layout/header/Header.vue";
+import Section from "@/components/nav/BottomNav.vue";
+import { mainRouteName } from "@/router/mainRoute";
 </script>
 
 <template>
   <div class="pb-24">
-    <Header :showBack="true" :showAlarm="true">
+    <Header :headerShowtype="mainRouteName.safeReport">
       <font-awesome-icon :icon="['fas', 'arrow-left']" />
       <span class="text-sm font-semibold">AI 안심 진단 리포트</span>
     </Header>

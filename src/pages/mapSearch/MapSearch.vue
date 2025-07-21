@@ -1,18 +1,19 @@
 <!--MapPage 레이아웃-->
 <script setup lang="ts">
-import Header from "@/components/layout/Header.vue";
-import Section from "@/components/common/Section.vue";
-import LogoSearchBar from "@/components/common/LogoSearchBar.vue";
+import Header from "@/components/layout/header/Header.vue";
+import Section from "@/components/nav/BottomNav.vue";
+import LogoSearchBar from "@/pages/home/_component/LogoSearchBar.vue";
+import { mainRouteName } from "@/router/mainRoute";
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col items-center bg-kb-ui-11">
     <div class="w-full flex flex-col flex-1 pb-[6rem]">
       <!--  max-w-md  :늘리고 싶지 않으면  -->
-      <Header :title="'아파트 검색'" :showBack="true" :showAlarm="true">
+      <Header :headerShowtype="mainRouteName.mapSearch">
         <!-- 검색창 -->
         <div class="relative mt-[3rem] px-[1rem]">
-          <LogoSearchBar/>
+          <LogoSearchBar />
         </div>
       </Header>
       <!-- 지도부분 넣어주세요!!!! -->

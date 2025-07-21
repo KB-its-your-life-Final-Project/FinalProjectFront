@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Section from "@/components/common/Section.vue";
+import Section from "@/components/nav/BottomNav.vue";
 import movePage from "@/utils/movePage";
-import Header from "@/components/layout/Header.vue";
+import Header from "@/components/layout/header/Header.vue";
 
 /*회원가입한 데이터를 받아오기!*/
 /* (예시) const userStore = useUserStore()

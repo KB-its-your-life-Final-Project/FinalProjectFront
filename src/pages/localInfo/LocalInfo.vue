@@ -1,12 +1,13 @@
 <!-- LocalInfoPage.vue 동네.zip  레이아웃 -->
 
 <script setup lang="ts">
-import Section from "@/components/common/Section.vue";
-import Header from "@/components/layout/Header.vue";
+import Section from "@/components/nav/BottomNav.vue";
+import Header from "@/components/layout/header/Header.vue";
+import { mainRouteName } from "@/router/mainRoute";
 </script>
 <template>
   <!--제목에 . 이 들어가는 게 좋지 않아서,.. 나중에 db 로 불러오는 걸로 바꿔주세여-->
-  <Header :title="'동네.ZIP'" :showBack="true" :showAlarm="true"> </Header>
+  <Header :headerShowtype="mainRouteName.mapSearch" />
 
   <h1 class="text-xl font-bold">동네정보</h1>
   <ul class="mt-4 space-y-2">
