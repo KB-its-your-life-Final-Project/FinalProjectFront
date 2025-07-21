@@ -53,6 +53,12 @@ const routes: RouteRecordRaw[] = [
     name: "alarmpage",
     component: () => import("@/pages/alarm/AlarmPage.vue"),
   },
+  {
+    path: "/transaction/:aptName",
+    name: "TransactionDetail",
+    component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
+    props: true,
+  },
   ...authRoutes,        // 인증 관련 화면 라우트 연결
   ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결
   // ...대메뉴1Routes,

@@ -50,4 +50,4 @@ const instance: AxiosInstance = axios.create({
 //     return Promise.reject(error);
 //   }
 // );
-// export default instance
+ export default instance
