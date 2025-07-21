@@ -3,22 +3,16 @@ import { ref } from "vue";
 import { RouterLink } from "vue-router";
 import HomeCard from "@/components/home/HomeCard.vue";
 
-import Header from "@/components/common/Header.vue";
-import Footer from "@/components/common/Footer.vue";
-import Section from "@/components/common/Section.vue";
+import Header from "@/components/layout/Header.vue";
+import Footer from "@/components/layout/Footer.vue";
 import LogoSearchBar from "@/components/common/LogoSearchBar.vue";
 
-import { useSearch } from "@/utils/useSearch";
 import { HomeCardTypes } from "@/components/home/HomeMenu.ts";
 import lighthouseIcon from "@/assets/imgs/lighthouse.png";
-
-const { searchQuery, clearSearch } = useSearch();
 </script>
 
 <template>
-  <!--
-  home type =props 그대로 둘 건데, 과정을 어떻게 변화시킬 것인지
--->
+  <!-- home type =props 그대로 둘 건데, 과정을 어떻게 변화시킬 것인지 -->
   <div class="min-h-screen flex flex-col items-center bg-kb-ui-11">
     <div class="w-full flex flex-col flex-1">
       <Header :showAlarm="true">
@@ -28,7 +22,7 @@ const { searchQuery, clearSearch } = useSearch();
         </div>
 
         <div class="px-4 mt-3">
-          <LogoSearchBar v-model="searchQuery" placeholder="어떤 주소가 궁금하세요?" />
+          <LogoSearchBar />
         </div>
       </Header>
 
@@ -44,8 +38,6 @@ const { searchQuery, clearSearch } = useSearch();
 
         <Footer />
       </main>
-
-      <Section />
     </div>
   </div>
 </template>

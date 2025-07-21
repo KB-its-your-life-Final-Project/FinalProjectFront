@@ -3,7 +3,6 @@
 import type {HomeCardType} from "@/components/home/HomeMenu.ts";
 
 defineProps<{
-
   data: HomeCardType;
 }>();
 </script>
