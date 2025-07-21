@@ -110,41 +110,43 @@ npm run lint
 
 ##### 폰트 (Pretendard)
 
-| 폰트 이름               | 클래스명                       |
-| ----------------------- | ------------------------------ |
-| "Pretendard-Thin"       | `--font-pretendard-thin`       |
-| "Pretendard-ExtraLight" | `--font-pretendard-extralight` |
-| "Pretendard-Light"      | `--font-pretendard-light`      |
-| "Pretendard-Medium"     | `--font-pretendard-medium`     |
-| "Pretendard-Regular"    | `--font-pretendard-regular`    |
-| "Pretendard-SemiBold"   | `--font-pretendard-semibold`   |
-| "Pretendard-Bold"       | `--font-pretendard-bold`       |
-| "Pretendard-ExtraBold"  | `--font-pretendard-extrabold`  |
-| "Pretendard-Black"      | `--font-pretendard-black`      |
+| 폰트 이름               | 클래스명 예시                |
+| ----------------------- | ---------------------------- |
+| "Pretendard-Thin"       | `text-pretendard-thin`       |
+| "Pretendard-ExtraLight" | `text-pretendard-extralight` |
+| "Pretendard-Light"      | `text-pretendard-light`      |
+| "Pretendard-Medium"     | `text-pretendard-medium`     |
+| "Pretendard-Regular"    | `text-pretendard-regular`    |
+| "Pretendard-SemiBold"   | `text-pretendard-semibold`   |
+| "Pretendard-Bold"       | `text-pretendard-bold`       |
+| "Pretendard-ExtraBold"  | `text-pretendard-extrabold`  |
+| "Pretendard-Black"      | `text-pretendard-black`      |
+
+![폰트값 사진](src/assets/imgs/fonts.png)
 
 ##### 색상값 (KB 색상 팔레트)
 
-| 색상값  | 클래스명 예시             |
-| ------- | ------------------------- |
-| #ffbc00 | `--bg-kb-yellow-positive` |
-| #ffd338 | `--bg-kb-yellow`          |
-| #ffcc00 | `--bg-kb-yellow-native`   |
-| #60584c | `--bg-kb-gray-dark`       |
-| #918274 | `--bg-kb-gray-light`      |
-| #000000 | `--bg-kb-ui-01`           |
-| #26282c | `--bg-kb-ui-02`           |
-| #484b51 | `--bg-kb-ui-03`           |
-| #696e76 | `--bg-kb-ui-04`           |
-| #8c949e | `--bg-kb-ui-05`           |
-| #aab0b8 | `--bg-kb-ui-06`           |
-| #c6cbd0 | `--bg-kb-ui-07`           |
-| #dde1e4 | `--bg-kb-ui-08`           |
-| #ebeef0 | `--bg-kb-ui-09`           |
-| #f7f7f8 | `--bg-kb-ui-10`           |
-| #ffffff | `--bg-kb-ui-11`           |
-| #287eff | `--bg-positive`           |
-| #f23f3f | `--bg-error`              |
-| #ff5858 | `--bg-error-input`        |
-| #ffd338 | `--bg-caution`            |
+| 색상값  | 클래스명 예시           |
+| ------- | ----------------------- |
+| #ffbc00 | `bg-kb-yellow-positive` |
+| #ffd338 | `bg-kb-yellow`          |
+| #ffcc00 | `bg-kb-yellow-native`   |
+| #60584c | `bg-kb-gray-dark`       |
+| #918274 | `bg-kb-gray-light`      |
+| #000000 | `bg-kb-ui-01`           |
+| #26282c | `bg-kb-ui-02`           |
+| #484b51 | `bg-kb-ui-03`           |
+| #696e76 | `bg-kb-ui-04`           |
+| #8c949e | `bg-kb-ui-05`           |
+| #aab0b8 | `bg-kb-ui-06`           |
+| #c6cbd0 | `bg-kb-ui-07`           |
+| #dde1e4 | `bg-kb-ui-08`           |
+| #ebeef0 | `bg-kb-ui-09`           |
+| #f7f7f8 | `bg-kb-ui-10`           |
+| #ffffff | `bg-kb-ui-11`           |
+| #287eff | `bg-positive`           |
+| #f23f3f | `bg-error`              |
+| #ff5858 | `bg-error-input`        |
+| #ffd338 | `bg-caution`            |
 
 ![색상값 사진](src/assets/imgs/colors.png)
