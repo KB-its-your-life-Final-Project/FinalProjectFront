@@ -14,16 +14,20 @@ const headerTitleList = {
   [mainRouteName.safeReport]: "안심 진단 레포트",
   [mainRouteName.localInfoSearch]: "동네.ZIP",
   [mainRouteName.myAlarm]: "알람",
+  [mainRouteName.myLike]: "내 찜 목록",
+  [mainRouteName.mainMenu]: "전체 메뉴",
 };
 
 //헤더에 따라 표기해야할 것 정의
 const headerShowList = {
-  [mainRouteName.homeMain]: ["showAlarm", "showBack"],
+  [mainRouteName.homeMain]: ["showAlarm"],
   [mainRouteName.mapSearch]: ["showAlarm", "showBack"],
   [mainRouteName.localInfo]: ["showAlarm", "showBack"],
   [mainRouteName.safeReport]: ["showAlarm", "showBack"],
   [mainRouteName.localInfoSearch]: ["showAlarm", "showBack"],
   [mainRouteName.myAlarm]: ["showBack"],
+  [mainRouteName.myLike]: ["showBack", "showAlarm"],
+  [mainRouteName.mainMenu]: ["showAlarm"],
 };
 type headerShowtype = keyof typeof headerShowList;
 

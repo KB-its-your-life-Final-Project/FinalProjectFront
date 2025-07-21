@@ -5,9 +5,13 @@ import { ref } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Section from "@/components/nav/BottomNav.vue";
 import LogoSearchBar from "@/pages/home/_component/LogoSearchBar.vue";
-import { useSearch } from "@/utils/useSearch";
+import { mainRouteName } from "@/router/mainRoute";
 
-const { searchQuery, clearSearch } = useSearch();
+const searchQuery = ref("");
+
+function clearSearch() {
+  searchQuery.value = "";
+}
 // 관심 지역 리스트 (임시 데이터)
 const favoriteRegions = ref([
   // 여기에 사용자가 설정한 찜들이 뜰 수 있도록 연동할 것!
@@ -32,7 +36,10 @@ const favoriteApts = [
 
 <template>
   <div class="pb-24">
+    <Header :headerShowtype="mainRouteName.myLike" >
+<!--
     <Header :title="'관심 목록'" :showBack="true" :showAlarm="true">
+-->
       <div class="text-center mt-3">
         <p class="text-sm text-kb-ui-01">원룸, 빌라, 오피스텔, 아파트</p>
       </div>

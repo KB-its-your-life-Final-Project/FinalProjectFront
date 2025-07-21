@@ -16,7 +16,7 @@ const title = ref(headerTitleList[props.headerShowtype]);
 
 // 자동으로 모든 항목에 대한 boolean 변수들 생성
 const showItems = reactive(
-  headerShowList[props.headerShowtype].reduce(
+  (headerShowList[props.headerShowtype] ?? []).reduce(
     (acc, item) => {
       acc[item] = true;
       return acc;
