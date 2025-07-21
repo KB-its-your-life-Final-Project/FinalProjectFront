@@ -43,10 +43,6 @@ const routes: RouteRecordRaw[] = [
     path: "/localinfo",
     name: "localinfo",
     component: () => import("@/pages/main/LocalInfoPage.vue"),
-  },  {
-    path: "/localinfosearch",
-    name: "localinfosearch",
-    component: () => import("@/pages/main/LocalInfoSearchPage.vue"),
   },
   {
     path: "/alarmpage",
