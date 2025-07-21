@@ -43,14 +43,18 @@ const routes: RouteRecordRaw[] = [
     path: "/localinfo",
     name: "localinfo",
     component: () => import("@/pages/main/LocalInfoPage.vue"),
+  },  {
+    path: "/localinfosearch",
+    name: "localinfosearch",
+    component: () => import("@/pages/main/LocalInfoSearchPage.vue"),
   },
   {
     path: "/alarmpage",
     name: "alarmpage",
     component: () => import("@/pages/alarm/AlarmPage.vue"),
   },
-  ...authRoutes, // 인증 관련 화면 라우트 연결
-  ...mypageRoutes, // 마이페이지 관련 화면 라우트 연결
+  ...authRoutes,        // 인증 관련 화면 라우트 연결
+  ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결
   // ...대메뉴1Routes,
   // ...대메뉴2Routes,
 
@@ -72,6 +76,6 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-});
+})
 
 export default router;
