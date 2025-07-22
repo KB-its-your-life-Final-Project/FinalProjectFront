@@ -1,3 +1,6 @@
+
+@tailwind utilities;
+
 @import "tailwindcss";
 @import "./fonts.css";
 @import "./colors.css";
@@ -10,9 +13,15 @@
 }
 html,
 body {
+  /*
+  width:100%;
+  */
   height: 100%;
+  /*
   max-width: 400px;
+  */
   font-family: "Pretendard-Regular", sans-serif;
+  font-size: 14px;
   color: #000;
   background-color: #fff;
 }
@@ -44,4 +53,8 @@ a {
 ul,
 ol {
   list-style: none;
+}
+.Footer {
+  background: #ffffff;
+  justify-items: center;
 }

@@ -36,6 +36,9 @@
   src: url("@/assets/fonts/Pretendard-SemiBold/Pretendard-Black.otf") format("opentype");
 }
 
+.font-italic::placeholder {
+  font-style: italic;
+}
 @theme {
   --font-pretendard-thin: "Pretendard-Thin";
   --font-pretendard-extralight: "Pretendard-ExtraLight";

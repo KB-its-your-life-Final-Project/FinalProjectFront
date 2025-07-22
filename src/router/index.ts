@@ -1,17 +1,13 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
-import authRoutes from "./authRoutes";
-import mypageRoutes from "./mypageRoutes";
+import authRoutes from "@/router/authRoutes";
+import { myPageRouteRecordRaw } from "@/router/mypageRoutes";
+import { mainRouteRecordRaw } from "@/router/mainRoute";
 
 const routes: RouteRecordRaw[] = [
-  // 홈 화면
-  {
-    path: "/",
-    name: "home",
-    component: () => import("@/pages/HomePage.vue"),
-  },
-
-  ...authRoutes,        // 인증 관련 화면 라우트 연결
-  ...mypageRoutes,      // 마이페이지 관련 화면 라우트 연결
+  //메인 라우트
+  ...mainRouteRecordRaw,
+  ...authRoutes, // 인증 관련 화면 라우트 연결
+  ...myPageRouteRecordRaw, // 마이페이지 관련 화면 라우트 연결
   // ...대메뉴1Routes,
   // ...대메뉴2Routes,
 
@@ -19,7 +15,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/:paths(.*)*",
     name: "NotFound",
-    component: () => import("@/pages/NotFoundPage.vue"),
+    component: () => import("@/components/layout/NotFoundPage.vue"),
   },
   // 테스트 화면
   {
@@ -33,6 +29,6 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-})
+});
 
 export default router;
