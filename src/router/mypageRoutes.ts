@@ -1,25 +1,47 @@
 import type { RouteRecordRaw } from "vue-router";
 
-const mypageRoutes: RouteRecordRaw[] = [
+//라우트 파일 위치
+const myPageRouteMap: Record<string, () => Promise<any>> = {
+  //마이페이지 메인
+  myPageMain: () => import("../pages/mypage/MyMainPage.vue"),
+
+  //프로필
+  myProfile: () => import("@/pages/mypage/ProfilePage.vue"),
+
+  //프로필 수정
+  editProfile: () => import("@/pages/mypage/EditPage.vue"),
+};
+
+//라우트 이름
+const myPageRouteName = {
+  mypage: "mypage",
+  myProfile: "myProfile",
+  editProfile: "editProfile",
+  myPageMain: "myPageMain",
+};
+
+//라우트 설정
+const myPageRouteRecordRaw: RouteRecordRaw[] = [
   {
     path: "/mypage",
-    // component: () => import("뷰파일.vue"),
     children: [
       {
-        path: "/mypage/profile",
-        name: "profile",
-        component: () => import("../pages/mypage/ProfilePage.vue"),
+        path: "/profile",
+        name: myPageRouteName.myProfile,
+        component: myPageRouteMap.myProfile,
       },
       {
         path: "/mypage/edit",
-        name: "edit",
-        component: () => import("../pages/mypage/EditPage.vue"),
-      }, {
+        name: myPageRouteName.editProfile,
+        component: myPageRouteMap.editProfile,
+      },
+      {
         path: "/mypage/main",
-        name: "edit",
-        component: () => import("../pages/mypage/MyMainPage.vue"),
+        name: myPageRouteName.myPageMain,
+        component: myPageRouteMap.myPageMain,
+
       },
     ],
   },
 ];
-export default mypageRoutes;
+export { myPageRouteMap, myPageRouteName, myPageRouteRecordRaw };
