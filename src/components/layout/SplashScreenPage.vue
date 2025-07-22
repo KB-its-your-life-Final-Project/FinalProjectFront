@@ -7,7 +7,7 @@ const router = useRouter();
 onMounted(() => {
   setTimeout(() => {
     router.push("/home");
-  }, 2000); // 2초 후 /home 이동
+  }, 2000); // 2초 후 / = 홈 화면 이동
 });
 </script>
 

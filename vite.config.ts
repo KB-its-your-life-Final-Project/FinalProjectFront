@@ -4,11 +4,11 @@ import vue from "@vitejs/plugin-vue";
 import vueDevTools from "vite-plugin-vue-devtools";
 import tailwindcss from "@tailwindcss/vite";
 
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   const backendPort = env.VITE_BACKEND_PORT || "8080";
-  console.log("backendPort: ", backendPort);
   return {
     plugins: [vue(), vueDevTools(), tailwindcss()],
     resolve: {
@@ -22,9 +22,6 @@ export default defineConfig(({ mode }) => {
           target: `http://localhost:${backendPort}`,
         },
       },
-    },
-    build: {
-      outDir: "../FinalProjectBack/src/main/webapp/resources",
     },
   };
 });

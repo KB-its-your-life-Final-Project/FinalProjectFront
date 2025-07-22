@@ -2,7 +2,7 @@
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import authApi from "@/api/authApi";
-import { isEmpty, isValidEmailFormat } from "@/utils/validate";
+import { isEmpty, isValidEmailFormat, isValidPasswordChk, isValidPasswordFormat } from "@/utils/validate";
 
 const router = useRouter();
 
@@ -28,6 +28,7 @@ const member = reactive<MemberRegisterForm>({
 });
 
 const sendCode = async () => {
+  checkSubmitMsg.value = "";
   if (isEmpty(member.email)) {
     disableSend.value = true;
     checkEmailMsg.value = "이메일을 입력하세요";
@@ -44,33 +45,43 @@ const sendCode = async () => {
     checkEmailMsg.value = "사용중인 이메일입니다";
     return;
   }
-  // 인증코드 발송 함수 작성
+  // 인증코드 전송
   emailChecked.value = member.email;
   disableSend.value = false;
+  const { data } = await authApi.sendVerificationCode(member.email);
   checkEmailMsg.value = "인증번호를 발송했습니다";
   return;
 };
 
 const registerUser = async () => {
-  if (member.email !== emailChecked.value) {
+  checkEmailMsg.value = "";
+  if (isEmpty(member.email) || member.email !== emailChecked.value) {
     checkSubmitMsg.value = "이메일을 인증하세요";
     return;
   }
-  // 추후 인증코드 검증 로직 작성
-  if (!member.verificationCode) {
-    checkSubmitMsg.value = "올바른 인증코드를 입력하세요";
+  if (isEmpty(member.verificationCode)) {
+    checkSubmitMsg.value = "올바른 인증번호를 입력하세요";
     return;
   }
-  if (!member.name) {
+  const isVerifiedCode = await authApi.verifyCode(member.email, member.verificationCode)
+  if (!isVerifiedCode?.data) {
+    checkSubmitMsg.value = "인증번호가 일치하지 않습니다";
+    return;
+  }
+  if (isEmpty(member.name)) {
     checkSubmitMsg.value = "이름을 입력하세요";
     return;
   }
-  if (!member.password1 || !member.password2) {
+  if (isEmpty(member.password1) || isEmpty(member.password2)) {
     checkSubmitMsg.value = "비밀번호를 입력하세요";
     return;
   }
-  if (member.password1 !== member.password2) {
+  if (!isValidPasswordChk(member.password1, member.password2)) {
     checkSubmitMsg.value = "비밀번호가 일치하지 않습니다";
+    return;
+  }
+  if (!isValidPasswordFormat(member.password1)) {
+    checkSubmitMsg.value = "영문 대·소문자, 숫자, 특수문자를 각각 포함한 8자 이상의 비밀번호를 입력하세요";
     return;
   }
   try {

@@ -14,8 +14,36 @@ export default {
   // 이메일 중복 확인
   async checkDuplicateEmail(email: string): Promise<boolean> {
     const { data } = await apiClient.get<boolean>(`${BASE_URL}/checkemail/${email}`);
-    console.log("AUTH GET CHECKEMAIL", data === false ? "이메일 사용 가능" : "이메일 사용 불가");
-    return data;
+    console.log("RESPONSE: ", data);
+    console.log("RESPONSE.message: ", data.message);
+    console.log("RESPONSE.data: ", data.data);
+    console.log("AUTH GET CHECKEMAIL", data.data === false ? "이메일 사용 가능" : "이메일 사용 불가");
+    return data.data;
+  },
+
+  // 인증번호 전송
+  async sendVerificationCode(email: string): Promise<any> {
+    try {
+      const { data } = await apiClient.post(`/api/member/sendcode`, null, {
+        params: { email },
+      });
+      return data;
+    } catch (error: any) {
+      console.error("인증코드 전송 실패", error);
+    }
+  },
+
+  // 인증번호 검증
+  async verifyCode(email: string, verificationCode: string): Promise<any> {
+    try {
+      const { data } = await apiClient.post(`/api/member/verifycode`, null, {
+        params: { email, verificationCode },
+      });
+      return data;
+    } catch (err) {
+      console.error("인증코드 확인 실패", err);
+      throw err;
+    }
   },
 
   // 이메일 회원가입

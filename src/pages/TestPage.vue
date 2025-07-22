@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import colorList from "@/assets/styles/colors.css?raw";
 import fontList from "@/assets/styles/fonts.css?raw";
+import LogoutBtn from "@/components/common/LogoutBtn.vue";
 
 const kbColorList = colorList
   .split("\n")
@@ -34,6 +35,7 @@ const pretendardFontList = fontList
 </script>
 
 <template>
+      <LogoutBtn />
   <div>
     <h1 class="text-center text-3xl font-bold underline text-red-300 mb-12">Testing Tailwind</h1>
     <br />
