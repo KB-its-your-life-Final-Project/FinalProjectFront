@@ -35,6 +35,9 @@ const movePage = {
   localInfo: makeRoute(mainRouteName.localInfo),
   // mainRouteName end
 
+//실거래가 상세페이지
+  transactionDetail: makeRoute(mainRouteName.transactionDetail),
+
   // myPageRouteName start
   mypage: makeRoute(myPageRouteName.mypage),
   myProfile: makeRoute(myPageRouteName.myProfile),
