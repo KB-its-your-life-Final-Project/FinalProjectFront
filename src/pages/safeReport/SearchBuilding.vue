@@ -32,15 +32,13 @@ onMounted(() => {
     naverReady.value = true
   }
 });
-// 주소 자동 완성 api
+
+// 주소 검색
 function search() {
   if (!(window as any).daum) return;
 
   const postcode = new (window as any).daum.Postcode({
     oncomplete(data: any) {
-      // (window as any).__DAUM_ADDR__=data;
-      // alert("데이터 저장됨!");
-
       console.log('선택된 주소 데이터: ',data);
 
       roadAddress.value = data.roadAddress||'';
@@ -55,7 +53,7 @@ function search() {
 
       //도로명 주소 -> 위/경도로
       if(roadAddress.value&&naverReady.value){
-        searchAddressToCoordinate(roadAddress.value);
+        searchAddressToCoordinate(jibunAddress.value);
       }
       emit('update', {
         roadAddress: roadAddress.value,
@@ -68,6 +66,7 @@ function search() {
   postcode.open();
 }
 
+// 지번 주소 -> 위도/경도
 function searchAddressToCoordinate(address: string) {
   if (!window.naver?.maps?.Service) {
     alert("네이버 지도 API가 아직 로드되지 않았습니다.");
@@ -91,16 +90,18 @@ function searchAddressToCoordinate(address: string) {
       }
 
       const { x, y } = result.addresses[0];
-      const lat = parseFloat(y);
-      const lng = parseFloat(x);
+      const latVal = parseFloat(y);
+      const lngVal = parseFloat(x);
 
       console.log("✅ 위도:", lat, "경도:", lng);
 
-      // 필요 시 위도/경도 값을 emit 또는 reactive 객체에 저장
+      Object.assign(props.formData, {
+        lat: latVal,
+        lng: lngVal,
+      });
+
       emit("update", {
-        ...props.formData,
-        lat,
-        lng,
+        ...props.formData,  // 여기서 완전한 최신값을 emit
       });
     }
   );
@@ -130,12 +131,12 @@ function next(){
         v-model="buildingName"
         type="text"
         placeholder="주소 찾기로 입력"
-        class="flex-1 border border-gray-300 rounded-full py-2 pl-4 focus:outline-none cursor-not-allowed"
+        class="flex-1 border accent-kb-ui-05 rounded-full py-2 pl-4 focus:outline-none cursor-not-allowed"
         disabled
       />
       <button
         @click="search"
-        class="px-4 py-2 border border-gray-300 rounded-full text-gray-600 disabled:opacity-50"
+        class="px-4 py-2 border accent-kb-ui-05 rounded-full text-kb-ui-03 disabled:opacity-50"
       >
         주소 찾기
       </button>

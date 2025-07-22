@@ -56,7 +56,7 @@ const gradeColor = computed(() => {
 
 
 function goHome(){
-  router.push({name:'home'})
+  router.push({name:'homeMain'})
 }
 </script>
 
