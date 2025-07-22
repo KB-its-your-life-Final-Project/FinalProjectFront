@@ -52,19 +52,23 @@ function prevStep() {
 <template>
   <div class="pb-24">
     <Header :headerShowtype="mainRouteName.safeReport">
-      <font-awesome-icon :icon="['fas', 'arrow-left']" />
-      <span class="text-sm font-semibold">안심 진단 리포트</span>
+
+<!--      <font-awesome-icon :icon="['fas', 'arrow-left']" />-->
+<!--      <span class="text-sm font-semibold">안심 진단 리포트</span>-->
+
     </Header>
 
 
-    <component
-      :is="steps[currentStep]"
-      :form-data="formData"
-      :result-data="resultData"
-      @update="onUpdate"
-      @next="nextStep"
-      @prev="prevStep"
-    />
+    <div class="mt-6">
+      <component
+        :is="steps[currentStep]"
+        :form-data="formData"
+        :result-data="resultData"
+        @update="onUpdate"
+        @next="nextStep"
+        @prev="prevStep"
+      />
+    </div>
   </div>
   <Section />
 </template>
