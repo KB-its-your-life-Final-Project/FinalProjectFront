@@ -20,7 +20,7 @@ import { HomeCardTypes } from '@/components/home/HomeMenu.ts';
     <div class="w-full flex flex-col flex-1">
 <!--      max-w-md-->
 
-    <Header />
+    <HomeHeader />
     <main class="flex-1 px-4 pt-4 space-y-4 overflow-auto pb-24">
     <div class="grid grid-cols-2 gap-4 mt-15">
       <RouterLink

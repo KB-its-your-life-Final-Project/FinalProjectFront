@@ -54,3 +54,7 @@ ul,
 ol {
   list-style: none;
 }
+.Footer {
+  background: #ffffff;
+  justify-items: center;
+}
