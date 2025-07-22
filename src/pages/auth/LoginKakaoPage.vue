@@ -4,25 +4,19 @@ import { useRoute, useRouter } from "vue-router";
 import apiClient from "@/api/apiClient";
 
 const router = useRouter();
+const route = useRoute();
 
 onMounted(async () => {
-  const route = useRoute();
   const code = route.query.code as string;
   console.log("code: ", code);
-
-  if (!code) {
-    alert("인가 코드가 없습니다.");
-    return;
-  }
   try {
     const response = await apiClient.post("/api/member/register/kakao", { code });
-    console.log("response: ", response);
-
     const data = await response.data;
+    console.log("response: ", response);
     console.log("response's data: ", data);
-
+    // 카카오 로그인 성공 시 홈으로 이동
     if (response.status == 200) {
-      router.push("/home"); // 로그인 성공 시 홈으로 이동
+      router.push("/home"); 
     } else {
       alert(data.message || "카카오 로그인 실패");
     }
