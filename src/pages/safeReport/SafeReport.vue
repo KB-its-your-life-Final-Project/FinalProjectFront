@@ -17,6 +17,8 @@ const formData = reactive({
   roadAddress: '', //도로명주소
   jibunAddress: '', //지번주소
   dongName: '',//법정동주소
+  lat:' ',//위도
+  lng:' ',//경도
   budget: null,
   // 필요하면 추가 필드
 })
@@ -52,12 +54,7 @@ function prevStep() {
 <template>
   <div class="pb-24">
     <Header :headerShowtype="mainRouteName.safeReport">
-
-<!--      <font-awesome-icon :icon="['fas', 'arrow-left']" />-->
-<!--      <span class="text-sm font-semibold">안심 진단 리포트</span>-->
-
     </Header>
-
 
     <div class="mt-6">
       <component

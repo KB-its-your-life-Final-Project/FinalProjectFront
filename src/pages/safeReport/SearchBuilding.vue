@@ -7,13 +7,29 @@ const buildingName = ref(props.formData.buildingName)
 const roadAddress = ref(props.formData.roadAddress)
 const jibunAddress = ref(props.formData.jibunAddress)
 const dongName = ref(props.formData.dongname)
+const lat = ref(props.formData.lat)
+const lng = ref(props.formData.lng)
+const naverReady = ref(false)
 
-// 주소 api 로드
+// DAUM 우편 번호 API + Naver Maps API 호출
 onMounted(() => {
+  // Daum 우편번호 API
   if (!window.daum) {
     const script = document.createElement('script');
     script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
     document.head.appendChild(script);
+  }
+  // Naver Maps API 호출
+  if (!window.naver?.maps) {
+    const naverScript = document.createElement("script")
+    naverScript.src = "https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=55s76chbvh&submodules=geocoder"
+    naverScript.async = true
+    naverScript.onload = () => {
+      naverReady.value = true
+    }
+    document.head.appendChild(naverScript)
+  } else {
+    naverReady.value = true
   }
 });
 // 주소 자동 완성 api
@@ -37,6 +53,10 @@ function search() {
       dongName.value = /[동|로|가]$/.test(data.bname)?data.bname:'';
       buildingName.value = data.buildingName||'';
 
+      //도로명 주소 -> 위/경도로
+      if(roadAddress.value&&naverReady.value){
+        searchAddressToCoordinate(roadAddress.value);
+      }
       emit('update', {
         roadAddress: roadAddress.value,
         jibunAddress: jibunAddress.value,
@@ -46,6 +66,44 @@ function search() {
     }
   });
   postcode.open();
+}
+
+function searchAddressToCoordinate(address: string) {
+  if (!window.naver?.maps?.Service) {
+    alert("네이버 지도 API가 아직 로드되지 않았습니다.");
+    return;
+  }
+
+  naver.maps.Service.geocode(
+    {
+      query: address,
+    },
+    function (status, response) {
+      if (status !== naver.maps.Service.Status.OK) {
+        alert("주소를 좌표로 변환하는 데 실패했습니다.");
+        return;
+      }
+
+      const result = response.v2;
+      if (result.meta.totalCount === 0) {
+        alert("결과가 없습니다.");
+        return;
+      }
+
+      const { x, y } = result.addresses[0];
+      const lat = parseFloat(y);
+      const lng = parseFloat(x);
+
+      console.log("✅ 위도:", lat, "경도:", lng);
+
+      // 필요 시 위도/경도 값을 emit 또는 reactive 객체에 저장
+      emit("update", {
+        ...props.formData,
+        lat,
+        lng,
+      });
+    }
+  );
 }
 
 
