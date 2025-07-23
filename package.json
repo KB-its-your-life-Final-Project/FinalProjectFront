@@ -4,17 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npm run generate-types & vite",
+    "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
-    "generate-types": "node scripts/generate-types.js",
-    "pm2:start": "npm run generate-types && pm2 start node_modules/vite/bin/vite.js --name kb-final-frontend",
+    "pm2:start": "pm2 start node_modules/vite/bin/vite.js --name kb-final-frontend",
     "pm2:stop": "pm2 stop kb-final-frontend",
-    "pm2:restart": "npm run generate-types && pm2 restart kb-final-frontend",
+    "pm2:restart": "pm2 restart kb-final-frontend",
     "pm2:delete": "pm2 delete kb-final-frontend",
     "pm2:log": "pm2 logs",
     "pm2:status": "pm2 status",
@@ -30,7 +29,6 @@
     "axios": "^1.10.0",
     "pinia": "^3.0.3",
     "pm2": "^6.0.8",
-    "swagger-typescript-api": "^13.2.7",
     "tailwindcss": "^4.1.11",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
@@ -51,8 +49,6 @@
     "typescript": "~5.8.0",
     "vite": "^7.0.0",
     "vite-plugin-vue-devtools": "^7.7.7",
-    "vue-tsc": "^2.2.10",
-    "dotenv-cli": "^8.0.0",
-    "cross-env": "^7.0.3"
+    "vue-tsc": "^2.2.10"
   }
 }
