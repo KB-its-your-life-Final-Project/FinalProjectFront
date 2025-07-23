@@ -23,11 +23,13 @@ const bottomNavList: BottomNavList = {
     { title: "전체 메뉴", url: "/mainMenu", icon: ["fas", "bars"] },
   ],
   withoutBottomNavPages: [
-    { name: "splashScreen"},
-    { name: "login"},
-    { name: "loginEmail"},
-    { name: "loginKakao"},
-    { name: "register"}
+    { name: "splashScreen" },
+    { name: "login" },
+    { name: "loginEmail" },
+    { name: "loginKakao" },
+    { name: "loginGoogle" },
+    { name: "register" },
+    { name: "test" }
   ],
 };
 

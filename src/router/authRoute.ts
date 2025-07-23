@@ -11,6 +11,9 @@ const authRouteMap: Record<string, () => Promise<any>> = {
   //카카오 로그인
   loginKakao: () => import("@/pages/auth/LoginKakaoPage.vue"),
 
+  //구글 로그인
+  loginGoogle: () => import("@/pages/auth/LoginGooglePage.vue"),
+
   // 회원가입
   register: () => import("@/pages/auth/RegisterPage.vue"),
 };
@@ -20,6 +23,7 @@ const authRouteName = {
   login: "login",
   loginEmail: "loginEmail",
   loginKakao: "loginKakao",
+  loginGoogle: "loginGoogle",
   register: "register",
 };
 
@@ -42,6 +46,12 @@ const authRouteRecordRaw: RouteRecordRaw[] = [
         path: "loginKakao",
         name: authRouteName.loginKakao,
         component: authRouteMap.loginKakao,
+
+      },
+      {
+        path: "loginGoogle",
+        name: authRouteName.loginGoogle,
+        component: authRouteMap.loginGoogle,
 
       },
       {
