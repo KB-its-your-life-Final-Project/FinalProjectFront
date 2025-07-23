@@ -1,6 +1,6 @@
 type WithoutBottomNavPageItem = {
   name: string;
-}
+};
 
 type BottomNavMenuItem = {
   title: string;
@@ -29,7 +29,7 @@ const bottomNavList: BottomNavList = {
     { name: "loginKakao" },
     { name: "loginGoogle" },
     { name: "register" },
-    { name: "test" }
+    { name: "test" },
   ],
 };
 

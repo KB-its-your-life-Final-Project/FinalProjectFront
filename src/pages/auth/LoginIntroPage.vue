@@ -26,11 +26,13 @@ const loginKakao = async () => {
 const loginGoogle = async () => {
   const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const REDIRECT_URI = encodeURIComponent(import.meta.env.VITE_GOOGLE_REDIRECT_URI);
-  const SCOPE = encodeURIComponent('https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile')
-  const STATE = 'xyz'; // CSRF 방지용
+  const SCOPE = encodeURIComponent(
+    "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
+  );
+  const STATE = "xyz"; // CSRF 방지용
   const AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}&state=${STATE}&access_type=offline&prompt=consent`;
   window.location.href = AUTH_URL;
-}
+};
 </script>
 
 <template>
@@ -61,7 +63,8 @@ const loginGoogle = async () => {
         </button>
         <button
           class="google-sec w-full h-14 flex flex-column justify-center rounded-xl"
-          @click="loginGoogle">
+          @click="loginGoogle"
+        >
           <div class="flex flex-row items-center gap-3">
             <img class="size-5" src="@/assets/imgs/google.svg" alt="구글 로고" />
             <span>Google로 시작하기</span>

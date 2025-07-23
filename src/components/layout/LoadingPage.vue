@@ -1,6 +1,4 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
   <div class="flex flex-col items-center justify-center h-screen gap-15">
@@ -17,5 +15,4 @@
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

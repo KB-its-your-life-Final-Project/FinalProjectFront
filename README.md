@@ -46,12 +46,12 @@ src/
 │   └── index.ts
 
 ├── pages/                     # 화면
-│   ├── alarm/                 
+│   ├── alarm/
 │   ├── auth/                  # 예시) 인증 관련 화면
-│   ├── info/   
-│   ├── main/  
-│   ├── mypage/    
-│   ├── navbar/   
+│   ├── info/
+│   ├── main/
+│   ├── mypage/
+│   ├── navbar/
 │   ├── LoadingPage.vue
 │   ├── NotFoundPage.vue
     └── TestPage.vue       # 404 Not Found 화면
@@ -114,11 +114,14 @@ npm run lint
 ```
 
 ## 6 커스텀 스타일 클래스명 (tailwind)
+
 ## 7. font awesome 설치
+
 ```sh
 npm install @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/free-regular-svg-icons @fortawesome/vue-fontawesome
 
 ```
+
 ##### 폰트 (Pretendard)
 
 | 폰트 이름               | 클래스명 예시                |

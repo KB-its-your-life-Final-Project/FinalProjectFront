@@ -16,7 +16,7 @@ onMounted(async () => {
     console.log("response's data: ", data);
     // 카카오 로그인 성공 시 홈으로 이동
     if (response.status == 200) {
-      router.push("/home"); 
+      router.push("/home");
     } else {
       alert(data.message || "카카오 로그인 실패");
     }

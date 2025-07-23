@@ -35,7 +35,7 @@ const pretendardFontList = fontList
 </script>
 
 <template>
-      <LogoutBtn />
+  <LogoutBtn />
   <div>
     <h1 class="text-center text-3xl font-bold underline text-red-300 mb-12">Testing Tailwind</h1>
     <br />

@@ -46,19 +46,16 @@ const authRouteRecordRaw: RouteRecordRaw[] = [
         path: "loginKakao",
         name: authRouteName.loginKakao,
         component: authRouteMap.loginKakao,
-
       },
       {
         path: "loginGoogle",
         name: authRouteName.loginGoogle,
         component: authRouteMap.loginGoogle,
-
       },
       {
         path: "register",
         name: authRouteName.register,
         component: authRouteMap.register,
-
       },
     ],
   },
