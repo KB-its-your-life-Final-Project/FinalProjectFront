@@ -64,7 +64,7 @@ function prevStep() {
         @prev="prevStep"
       />
     </div>
-    <Section />
+
   </div>
 
 </template>

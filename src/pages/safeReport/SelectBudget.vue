@@ -139,7 +139,7 @@ function prev(){
       만원
     </span>
     </div>
-    <div class="fixed z-10 inset-x-0 bottom-6 flex justify-between px-6 pb-24">
+    <div class="fixed z-auto inset-x-0 bottom-6 flex justify-between px-6 pb-24">
       <button
         @click="prev"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11"
