@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { Api } from "@/api/autoLoad/Api.ts";
 import axios from "axios";
+//import axios from "axios";
 
 const props = defineProps({ formData: Object })
 const emit = defineEmits(['update','next','prev'])
+const api = new Api()
 
 const rawInput = ref('')           // 사용자가 입력한 숫자 문자열
 const budget = ref<number | null>(null)
