@@ -34,6 +34,7 @@ const myPageRouteRecordRaw: RouteRecordRaw[] = [
         path: "/mypage/edit",
         name: myPageRouteName.editProfile,
         component: myPageRouteMap.editProfile,
+        meta: { requiresAuth: true },
       },
       {
         path: "/mypage/main",

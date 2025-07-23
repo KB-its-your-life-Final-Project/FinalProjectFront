@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import apiClient from "@/api/apiClient";
+import authApi from "@/api/authApi";
 
 interface User {
   email: string;
@@ -33,9 +33,7 @@ export const authStore = defineStore("auth", () => {
   // 로그인 (토큰은 쿠키에 있으므로 응답에서 사용자 정보만 받아서 상태에 저장)
   const loginUser = async (member: Member): Promise<void> => {
     try {
-      const { data } = await apiClient.post<User>("/api/auth/login", member, {
-        withCredentials: true,
-      });
+      const { data } = await authApi.loginEmail;
       state.value.user = data;
       console.log("data: ", data);
       localStorage.setItem("authUser", JSON.stringify(data)); // 사용자 정보만 저장

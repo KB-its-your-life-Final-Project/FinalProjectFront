@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import apiClient from "@/api/apiClient";
+import authApi from "@/api/authApi";
 
 const router = useRouter();
 const route = useRoute();
@@ -10,15 +10,13 @@ onMounted(async () => {
   const code = route.query.code as string;
   console.log("code: ", code);
   try {
-    const response = await apiClient.post("/api/member/register/kakao", { code });
-    const data = await response.data;
+    const response = await authApi.kakaoLogin(code);
     console.log("response: ", response);
-    console.log("response's data: ", data);
-    // 카카오 로그인 성공 시 홈으로 이동
-    if (response.status == 200) {
+    // 카카오 로그인 성공 시 홈 이동
+    if (response.success === true) {
       router.push("/home");
     } else {
-      alert(data.message || "카카오 로그인 실패");
+      alert(response.message || "카카오 로그인 실패");
     }
   } catch (error) {
     alert(error + ": 카카오 로그인 처리 중 오류가 발생했습니다.");

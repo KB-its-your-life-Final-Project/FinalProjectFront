@@ -17,8 +17,8 @@ const member = reactive<MemberLoginForm>({
   email: "",
   password: "",
 });
-const error = ref<string>("");
-const disableSubmit = computed(() => !(member.email && member.password));
+// const checkSubmitMsg = ref<string>("");
+// const disableSubmit = ref<boolean>(true);
 
 onMounted(() => {
   const savedEmail = localStorage.getItem("savedEmail");
@@ -26,25 +26,16 @@ onMounted(() => {
     member.email = savedEmail;
   }
 });
+
 const loginUser = async () => {
   console.log("사용자 input: ", member);
   try {
     await auth.loginUser(member);
     console.log("로그인 성공");
-    const nextRoute = route.query.next as string | undefined;
-    if (nextRoute) {
-      router.push({ name: nextRoute });
-    } else {
-      router.push("/");
-    }
-  } catch (e) {
-    const err = e as AxiosError;
+    router.push("/");
+  } catch (error) {
+    const err = error as AxiosError;
     console.error("로그인 에러:", err);
-    if (err.response?.data) {
-      error.value = err.response.data as string;
-    } else {
-      error.value = "알 수 없는 오류가 발생했습니다.";
-    }
   }
 };
 </script>
@@ -73,7 +64,11 @@ const loginUser = async () => {
           v-model="member.password"
         />
       </div>
-      <button class="btn w-full h-12 rounded-xl text-white" type="submit" :disabled="disableSubmit">
+      <p class="w-full h-2 text-center text-error">
+        <!-- {{ checkSubmitMsg }} -->
+      </p>
+      <!-- <button class="btn w-full h-12 rounded-xl text-white" type="submit" :disabled="disableSubmit"> -->
+      <button class="btn w-full h-12 rounded-xl text-white" type="submit">
         로그인
       </button>
     </form>
@@ -93,7 +88,7 @@ input {
 }
 .btn {
   background-color: #ffbc00;
-  margin-top: 5rem;
+  margin-top: 1rem;
 }
 form {
   margin-top: 3rem;

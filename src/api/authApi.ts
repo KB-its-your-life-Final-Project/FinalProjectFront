@@ -10,6 +10,11 @@ export interface Member {
   password1: string;
 }
 
+export interface MemberEmail {
+  email: string;
+  password: string;
+}
+
 export default {
   /**
    * 이메일 중복 확인
@@ -77,7 +82,11 @@ export default {
     formData.append("name", member.name);
     formData.append("password", member.password1);
     try {
-      const { data } = await apiClient.post(`${BASE_URL}/register/email`, formData, headers);
+      const { data } = await apiClient.post(
+        `${BASE_URL}/register/email`,
+        formData,
+        headers,
+      );
       console.log("이메일 회원가입 응답 (authApi.registerUser()): ", data);
       return data.data;
     } catch (error: any) {
@@ -87,8 +96,31 @@ export default {
     }
   },
 
-  // 카카오 로그인
-  async kakaoLogin(code: string): Promise<any> {
+  /**
+   * 이메일 로그인
+   * @param code 카카오에서 제공하는 인가 코드
+   * @returns 서버 응답
+   */  async loginEmail(member: MemberEmail): Promise<any> {
+    try {
+      const { data } = await apiClient.post(
+        `/api/auth/login`,
+        member,
+        { withCredentials: true },
+      );
+      console.log("AUTH POST (loginEmail): ", data);
+      console.log("data.success: ", data.success);
+      return data;
+    } catch (error: any) {
+      console.error("이메일 로그인 실패: ", error);
+      console.error("response: ", error.response?.data);
+    }
+  },
+
+  /**
+   * 카카오 회원가입/로그인
+   * @param code 카카오에서 제공하는 인가 코드
+   * @returns 서버 응답
+   */  async kakaoLogin(code: string): Promise<any> {
     try {
       const { data } = await apiClient.post(
         `${BASE_URL}/register/kakao`,
@@ -96,9 +128,30 @@ export default {
         { withCredentials: true },
       );
       console.log("AUTH POST (kakaoLogin): ", data);
-      return data.data;
+      console.log("data.success: ", data.success);
+      return data;
     } catch (error: any) {
       console.error("카카오 로그인 실패: ", error);
+      console.error("response: ", error.response?.data);
+    }
+  },
+
+    /**
+   * 구글 회원가입/로그인
+   * @param code 구글에서 제공하는 인가 코드
+   * @returns 서버 응답
+   */  async googleLogin(code: string): Promise<any> {
+    try {
+      const { data } = await apiClient.post(
+        `${BASE_URL}/register/google`,
+        { code },
+        { withCredentials: true },
+      );
+      console.log("AUTH POST (googleLogin): ", data);
+      console.log("data.success: ", data.success);
+      return data;
+    } catch (error: any) {
+      console.error("구글 로그인 실패: ", error);
       console.error("response: ", error.response?.data);
     }
   },
