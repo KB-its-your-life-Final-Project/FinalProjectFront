@@ -50,9 +50,10 @@ import Header from "@/components/layout/header/Header.vue"
 import TransactionGraph from "@/components/TransactionGraph.vue"
 import { onMounted, ref, watch } from "vue"
 import { useTransactionStore } from "@/stores/useTransactionStore"
+import axios from "axios"
 import {mainRouteName} from "@/router/mainRoute.ts";
 // 백엔드 작업전 임의의 더미 데이터를 설정한 것
-
+/*
 const dummyData = [
   // ✅ 2020년 (5년 전)
   { date: "2020-03", price: 2.5, type: "매매" },
@@ -113,11 +114,26 @@ const dummyData = [
   { date: "2025-06", price: 4.15, type: "매매" },
   { date: "2025-07", price: 4.2, type: "매매" },
 
-]
+]*/
 
 const selectedType = ref("전체")
 const selectedYear = ref(1)
-const graphData = ref(dummyData)
+/*const graphData = ref(dummyData)*/
+const graphData = ref<{ date: string; price: number; type: string }[]>([])
+const allData = ref<{ date: string; price: number; type: string }[]>([])
+
+const fetchTransactionData = async () => {
+  try {
+    const res = await axios.get('/api/transactions') // 전체 데이터 가져오기
+    allData.value = res.data
+    filterByYear()
+  } catch (error) {
+    console.error("데이터 가져오기 실패", error)
+  }
+}
+
+
+/*
 
 const filterByYear = () => {
   if (selectedYear.value === "전체") {
@@ -132,6 +148,32 @@ const filterByYear = () => {
     const date = new Date(item.date + "-01")
     return date >= start && date <= now
   })
+}
+
+*/
+
+// 연도 및 유형 필터 적용
+const filterByYear = () => {
+  let filtered = [...allData.value]
+
+  // 연도 필터
+  if (selectedYear.value !== '전체') {
+    const now = new Date()
+    const start = new Date()
+    start.setFullYear(now.getFullYear() - Number(selectedYear.value))
+
+    filtered = filtered.filter(item => {
+      const date = new Date(item.date + "-01") // "2023-05" -> "2023-05-01"
+      return date >= start && date <= now
+    })
+  }
+
+  // 유형 필터
+  if (selectedType.value !== "전체") {
+    filtered = filtered.filter(item => item.type === selectedType.value)
+  }
+
+  graphData.value = filtered
 }
 
 
@@ -175,4 +217,9 @@ watch(() => route.params.aptName, (newName) => {
 })
 
 const graphData = store.graphData*/
+
+// 초기 마운트 시 전체 데이터 불러오기
+onMounted(() => {
+  fetchTransactionData()
+})
 </script>

@@ -36,7 +36,13 @@ const props = defineProps<{
 
 
 const chartData = computed(() => {
-  const grouped = props.graphData.reduce((acc, cur) => {
+  const filteredData =
+    props.selectedType === "전체"
+      ? props.graphData
+      : props.graphData.filter((item) => item.type === props.selectedType)
+
+
+  const grouped = filteredData.reduce((acc, cur) => {
     acc[cur.type] = acc[cur.type] || { labels: [], data: [] }
     acc[cur.type].labels.push(cur.date)
     acc[cur.type].data.push(cur.price)
@@ -57,20 +63,20 @@ const chartData = computed(() => {
   }
 })*/
   return {
- /*   labels,*/
+    labels,
     datasets: Object.entries(grouped).map(([type, d], idx) => ({
-    /*  label: type,
-      data: d.data,*/
-     /* borderColor: ["#4caf50", "#ff9800", "#3f51b5"][idx],*/
-  /*    backgroundColor: [
+      label: type,
+      data: d.data,
+      borderColor: ["#4caf50", "#ff9800", "#3f51b5"][idx],
+      backgroundColor: [
         "rgba(76, 175, 80, 0.1)",
         "rgba(255, 152, 0, 0.1)",
         "rgba(63, 81, 181, 0.1)"
       ][idx],
-      fill: 'origin',*/
 
+    /*  fill: 'origin',*/
+/*
       const baseColor = ["#4caf50", "#ff9800"][idx]
-
       return {
         label: type,
         data: d.data,
@@ -81,11 +87,12 @@ const chartData = computed(() => {
         if (!chartArea) return null
 
         const gradient = canvasCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
-        gradient.addColorStop(0, baseColor + "4D")  // 0.3 불투명 (#4D = 약 30% alpha)
-        gradient.addColorStop(1, baseColor + "00")  // 완전 투명
+        gradient.addColorStop(0, baseColor + "4D")
+        gradient.addColorStop(1, baseColor + "00")
 
         return gradient
-      },
+      },*/
+
       fill: true,
       tension: 0.1,              // 곡선 라인
      /* fill: idx === 0 ? true : false,*/
