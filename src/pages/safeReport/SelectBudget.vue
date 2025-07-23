@@ -95,7 +95,7 @@ async function next() {
   }
   try{
     console.log("보낼 데이터",{...props.formData})
-    const response = await axios.post('/api/report/formdata',{...props.formData})
+    const response = await axios.post('/api/report/requestData',{...props.formData})
     console.log('서버 응답:', response.data)
     emit('next',{
       formData: props.formData,

@@ -49,8 +49,6 @@ function prevStep() {
 }
 </script>
 
-
-
 <template>
   <div class="pb-24">
     <Header :headerShowtype="mainRouteName.safeReport">
@@ -66,6 +64,7 @@ function prevStep() {
         @prev="prevStep"
       />
     </div>
+    <Section />
   </div>
-  <Section />
+
 </template>
