@@ -2,7 +2,6 @@ import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import dotenv from "dotenv";
-import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,18 +19,6 @@ const outputPath = join(__dirname, "../src/api/autoLoad");
 const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-type`;
 
 try {
-  if (fs.existsSync(outputPath)) {
-    const files = fs.readdirSync(outputPath);
-    files.forEach((file) => {
-      const filePath = `${outputPath}/${file}`;
-      if (fs.statSync(filePath).isFile()) {
-        fs.unlinkSync(filePath);
-        console.log("File removed:", filePath);
-      }
-    });
-    console.log("All files in directory removed:", outputPath);
-  }
-
   execSync(command, { stdio: "inherit" });
   console.log("Modular types generated successfully!");
 } catch (error) {
