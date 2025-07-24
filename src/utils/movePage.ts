@@ -33,6 +33,7 @@ const movePage = {
   safeReport: makeRoute(mainRouteName.safeReport),
   myAlarm: makeRoute(mainRouteName.myAlarm),
   localInfo: makeRoute(mainRouteName.localInfo),
+  localInfoSearch: makeRoute(mainRouteName.localInfoSearch),
   // mainRouteName end
 
   // myPageRouteName start

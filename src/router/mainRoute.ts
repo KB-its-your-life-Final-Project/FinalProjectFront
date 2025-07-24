@@ -35,6 +35,7 @@ const mainRouteName = {
   myAlarm: "myAlarm",
   localInfo: "localInfo",
   localInfoSearch: "localInfoSearch",
+  myPage: "myPage",
 };
 
 //라우트 설정
