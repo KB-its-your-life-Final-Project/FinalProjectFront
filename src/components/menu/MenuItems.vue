@@ -5,7 +5,7 @@
   >
     <font-awesome-icon :icon="icon" class="w-5 text-kb-yellow" />
     <span class="ml-3">{{ label }}</span>
-    <font-awesome-icon :icon="['fas', 'chevron-right']" class="ml-auto text-gray-400" />
+    <font-awesome-icon :icon="['fas', 'chevron-right']" class="ml-auto text-kb-ui-06" />
   </div>
 </template>
 
