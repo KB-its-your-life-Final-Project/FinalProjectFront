@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 const props = defineProps({ formData: Object })
 const emit = defineEmits(['update','next','prev'])
 
@@ -7,19 +7,16 @@ const buildingName = ref(props.formData.buildingName)
 const roadAddress = ref(props.formData.roadAddress)
 const jibunAddress = ref(props.formData.jibunAddress)
 const dongName = ref(props.formData.dongname)
-const lat = ref(props.formData.lat)
-const lng = ref(props.formData.lng)
 const naverReady = ref(false)
+const showPostcode = ref(false)
 
 // DAUM 우편 번호 API + Naver Maps API 호출
 onMounted(() => {
-  // Daum 우편번호 API
   if (!window.daum) {
     const script = document.createElement('script');
     script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
     document.head.appendChild(script);
   }
-  // Naver Maps API 호출
   if (!window.naver?.maps) {
     const naverScript = document.createElement("script")
     naverScript.src = "https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=55s76chbvh&submodules=geocoder"
@@ -33,40 +30,45 @@ onMounted(() => {
   }
 });
 
-// 주소 검색
 function search() {
-  if (!(window as any).daum) return;
+  showPostcode.value = true;
 
-  const postcode = new (window as any).daum.Postcode({
-    oncomplete(data: any) {
-      console.log('선택된 주소 데이터: ',data);
+  nextTick(() => {
+    const container = document.getElementById('postcodeContainer');
+    if (!container || !(window as any).daum?.Postcode) return;
 
-      roadAddress.value = data.roadAddress||'';
-      jibunAddress.value =
-        data.jibunAddress && data.jibunAddress.trim() !== ''
-          ? data.jibunAddress
-          : data.userSelectedType === 'R'
-            ? '(지번 주소 없음)'
-            : '';
-      dongName.value = /[동|로|가]$/.test(data.bname)?data.bname:'';
-      buildingName.value = data.buildingName||'';
+    const postcode = new (window as any).daum.Postcode({
+      oncomplete(data: any) {
+        console.log('선택된 주소 데이터: ', data);
 
-      //도로명 주소 -> 위/경도로
-      if(roadAddress.value&&naverReady.value){
-        searchAddressToCoordinate(jibunAddress.value);
-      }
-      emit('update', {
-        roadAddress: roadAddress.value,
-        jibunAddress: jibunAddress.value,
-        buildingName: buildingName.value,
-        dongName: dongName.value
-      });
-    }
+        roadAddress.value = data.roadAddress || '';
+        jibunAddress.value = data.jibunAddress || '';
+        dongName.value = /[동|로|가]$/.test(data.bname) ? data.bname : '';
+        buildingName.value = data.buildingName || '';
+        showPostcode.value = false;
+
+        if (jibunAddress.value && naverReady.value) {
+          searchAddressToCoordinate(jibunAddress.value);
+        }
+
+        emit('update', {
+          roadAddress: roadAddress.value,
+          jibunAddress: jibunAddress.value,
+          buildingName: buildingName.value,
+          dongName: dongName.value,
+        });
+      },
+      onclose: () => {
+        showPostcode.value = false;
+      },
+      width: '100%',
+      height: '100%',
+    });
+
+    postcode.embed(container);
   });
-  postcode.open();
 }
 
-// 지번 주소 -> 위도/경도
 function searchAddressToCoordinate(address: string) {
   if (!window.naver?.maps?.Service) {
     alert("네이버 지도 API가 아직 로드되지 않았습니다.");
@@ -74,9 +76,7 @@ function searchAddressToCoordinate(address: string) {
   }
 
   naver.maps.Service.geocode(
-    {
-      query: address,
-    },
+    { query: address },
     function (status, response) {
       if (status !== naver.maps.Service.Status.OK) {
         alert("주소를 좌표로 변환하는 데 실패했습니다.");
@@ -85,7 +85,7 @@ function searchAddressToCoordinate(address: string) {
 
       const result = response.v2;
       if (result.meta.totalCount === 0) {
-        alert("결과가 없습니다.");
+        alert("DB에 해당하는 주소 데이터가 없습니다.");
         return;
       }
 
@@ -93,7 +93,7 @@ function searchAddressToCoordinate(address: string) {
       const latVal = parseFloat(y);
       const lngVal = parseFloat(x);
 
-      console.log("✅ 위도:", lat, "경도:", lng);
+      console.log("✅ 위도:", latVal, "경도:", lngVal);
 
       Object.assign(props.formData, {
         lat: latVal,
@@ -101,17 +101,15 @@ function searchAddressToCoordinate(address: string) {
       });
 
       emit("update", {
-        ...props.formData,  // 여기서 완전한 최신값을 emit
+        ...props.formData,
       });
     }
   );
 }
 
-
-function next(){
+function next() {
   emit('next')
 }
-
 
 </script>
 
@@ -142,7 +140,23 @@ function next(){
       </button>
     </div>
 
-    <div class="fixed z-auto inset-x-0 bottom-6 flex justify-end px-6 pb-24">
+  <!--    주소 검색 창 -->
+    <teleport to="body">
+      <div
+        v-if="showPostcode"
+        class="fixed left-0 top-0 w-screen h-screen z-[9999] bg-white flex items-center justify-center"
+      >
+        <div id="postcodeContainer" class="w-full h-full" style="min-height: 400px"></div>
+        <button
+          class="absolute top-2 right-2 z-[10000] bg-white text-sm border px-2 py-1 rounded"
+          @click="showPostcode = false"
+        >
+          닫기
+        </button>
+      </div>
+    </teleport>
+
+    <div class="fixed z-0 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
         :disabled="!buildingName.trim()"
@@ -151,9 +165,7 @@ function next(){
         다음
       </button>
     </div>
-
   </div>
-
 </template>
 
 <style scoped>

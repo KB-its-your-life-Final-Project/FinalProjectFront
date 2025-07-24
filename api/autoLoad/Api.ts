@@ -11,9 +11,9 @@
  */
 
 import {
+  ApiResponseFormData,
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
-  FormData,
   SafeReportRequestDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
@@ -61,7 +61,7 @@ export class Api<
     dto: SafeReportRequestDto,
     params: RequestParams = {},
   ) =>
-    this.request<FormData, void>({
+    this.request<ApiResponseFormData, void>({
       path: `/api/report/requestData`,
       method: "POST",
       body: dto,

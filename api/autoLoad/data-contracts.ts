@@ -59,6 +59,15 @@ export interface SafeReportRequestDto {
   roadAddress?: string;
 }
 
+/** ApiResponse«FormData» */
+export interface ApiResponseFormData {
+  /** @format int32 */
+  code?: number;
+  data?: FormData;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«List«MemberDTO»» */
 export interface ApiResponseListMemberDTO {
   /** @format int32 */
