@@ -8,12 +8,15 @@ import InfoCard from "@/pages/localInfo/_component/InfoCard.vue";
 import { InfoCardList } from "@/pages/localInfo/_component/InfoCard.ts";
 </script>
 <template>
-   <Header headerShowtype="localInfo">
-      <SearchCard />
-   </Header>
-  <div class="px-4">
+  <Header headerShowtype="localInfo">
+    <SearchCard />
+    <div class="px-10 mt-8">
+      <div class="font-pretendard-bold text-5xl text-kb-ui-10">화양동 동네이야기</div>
+    </div>
+  </Header>
+  <div class="px-4 mt-16">
     <!-- 날씨 정보 박스 -->
-    <div class="gap-8 mt-8">
+    <div class="mt-8">
       <WeatherCard />
     </div>
 
