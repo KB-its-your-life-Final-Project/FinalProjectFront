@@ -81,13 +81,11 @@ const loginGoogle = async () => {
       </div>
       <!-- // 로그인 버튼 영역 -->
       <!-- 회원가입 영역 -->
-      <div>
-        <div class="flex gap-3">
-          <span class="text-kb-ui-04">아직 회원이 아니신가요?</span>
-          <router-link to="/auth/register">
-            <span class="text-positive">가입하기</span>
-          </router-link>
-        </div>
+      <div class="flex gap-3">
+        <span class="text-kb-ui-04">아직 회원이 아니신가요?</span>
+        <router-link to="/auth/register">
+          <span class="text-positive">가입하기</span>
+        </router-link>
       </div>
       <!-- // 회원가입 영역 -->
     </div>

@@ -8,6 +8,7 @@ import {
   isValidPasswordChk,
   isValidPasswordFormat,
 } from "@/utils/validate";
+import GoBackBtn from "@/components/common/GoBackBtn.vue";
 
 const router = useRouter();
 
@@ -52,8 +53,8 @@ const sendCode = async () => {
   }
   // 인증코드 전송
   emailChecked.value = member.email;
-  disableSend.value = false;
   const { data } = await authApi.sendVerificationCode(member.email);
+  disableSend.value = false;
   checkEmailMsg.value = "인증번호를 발송했습니다";
   return;
 };
@@ -69,7 +70,7 @@ const registerUser = async () => {
     return;
   }
   const isVerifiedCode = await authApi.verifyCode(member.email, member.verificationCode);
-  if (!isVerifiedCode?.data) {
+  if (isVerifiedCode?.data) {
     checkSubmitMsg.value = "인증번호가 일치하지 않습니다";
     return;
   }
@@ -96,18 +97,20 @@ const registerUser = async () => {
     localStorage.setItem("savedEmail", member.email);
     router.push({ name: "loginEmail" });
   } catch (e) {
+    checkSubmitMsg.value = "서버 오류: 회웝가입에 실패했습니다. 잠시 후 시도해주세요.";
     console.error(e);
   }
 };
 </script>
 
 <template>
-  <header class="bg-kb-yellow w-full h-[6rem]">
+  <header class="p-[1rem] bg-kb-yellow w-full h-[6rem] flex items-center gap-2">
+    <GoBackBtn/>
     <h1 class="text-2xl font-pretendard-bold">회원가입</h1>
   </header>
   <div class="flex flex-col items-center">
     <form
-      class="w-5/6 h-auto flex flex-col gap-7"
+      class="form"
       method="post"
       @submit.prevent="registerUser"
       novalidate
@@ -147,6 +150,9 @@ const registerUser = async () => {
       </div>
       <div>
         <label for="password1">비밀번호</label>
+        <span class="ml-2 h-2 text-kb-ui-06 text-[0.7rem]">
+          *영문 대·소문자, 숫자, 특수문자를 각각 포함한 8자 이상
+        </span>
         <input
           class="input-box"
           type="password"
@@ -168,36 +174,27 @@ const registerUser = async () => {
       <p class="w-full h-2 text-center text-error">
         {{ checkSubmitMsg }}
       </p>
-      <button class="btn btn-form w-full rounded-xl" type="submit">회원가입</button>
+      <button class="btn-form" type="submit">회원가입</button>
     </form>
   </div>
 </template>
 
 <style scoped>
 @reference "@/assets/styles/main.css";
-header {
-  padding: 2rem;
+.form {
+  @apply mt-[3rem] w-5/6 h-auto flex flex-col gap-7
 }
 .input-box {
-  @apply w-full h-11 rounded-md;
-  border: 1px solid #c2c2c2;
-  padding: 0.7rem;
-  margin-bottom: 0.3rem;
+  @apply p-[0.7rem] border-[1px] border-solid border-kb-ui-07 w-full h-11 rounded-md;
 }
 .input-email {
-  @apply flex-grow rounded-l-md h-11 min-w-0;
-  border: 1px solid #c2c2c2;
+  @apply p-[0.7rem] border-[1px] border-solid border-kb-ui-07 flex-grow rounded-l-md h-11 min-w-0;
   border-right: transparent;
-  padding: 0.7rem;
-  margin-bottom: 0.3rem;
 }
 .btn {
   @apply h-11 bg-kb-yellow-positive text-white whitespace-nowrap cursor-pointer;
 }
 .btn-form {
-  margin-top: 1rem;
-}
-form {
-  margin-top: 3rem;
+  @apply mt-[0rem] bg-kb-yellow-positive w-full h-12 rounded-xl text-white whitespace-nowrap cursor-pointer
 }
 </style>
