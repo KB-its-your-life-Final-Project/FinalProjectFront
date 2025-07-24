@@ -21,6 +21,10 @@ watch(searchInput, () => {
     xiconShow.value = false;
   }
 });
+
+defineProps<{
+  placeholder: string;
+}>();
 </script>
 
 <template>
@@ -35,7 +39,7 @@ watch(searchInput, () => {
     />
     <input
       v-model="searchInput"
-      placeholder="어떤 주소가 궁금하세요?"
+      :placeholder="placeholder || '어떤 주소가 궁금하세요?'"
       class="w-full font-italic focus:outline-none placeholder-kb-ui-07 text-sm"
       type="text"
     />

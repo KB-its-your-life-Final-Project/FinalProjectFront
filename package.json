@@ -34,6 +34,7 @@
     "swagger-typescript-api": "^13.2.7",
     "tailwindcss": "^4.1.11",
     "vue": "^3.5.17",
+    "vue-datepicker-next": "^1.0.3",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
