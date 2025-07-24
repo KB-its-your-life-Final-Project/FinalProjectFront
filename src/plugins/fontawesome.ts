@@ -9,7 +9,7 @@ import {
   faVideo,
   faUsers,
   faShop,
-  faUtensils,
+  faUtensils, faShieldHalved, faAngleRight
 } from "@fortawesome/free-solid-svg-icons";
 import { faMap, faStar as farStar, faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -28,6 +28,8 @@ library.add(
   faUsers,
   faShop,
   faUtensils,
+  faShieldHalved,
+  faAngleRight
 );
 
 export { FontAwesomeIcon };

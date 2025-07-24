@@ -6,7 +6,7 @@ import axios from "axios";
 
 const props = defineProps({ formData: Object })
 const emit = defineEmits(['update','next','prev'])
-const api = new Api()
+
 
 const rawInput = ref('')           // 사용자가 입력한 숫자 문자열
 const budget = ref<number | null>(null)
@@ -34,6 +34,21 @@ function handleBackspace(e: KeyboardEvent) {
     rawInput.value = rawInput.value.slice(0, -1)
     updateDisplay()
     e.preventDefault()
+  }
+}
+
+function handleInput(e: Event) {
+  const val = (e.target as HTMLInputElement).value;
+  // 숫자가 아닌 문자가 하나라도 포함되어 있으면 전체 삭제
+  if (/[^0-9]/.test(val)) {
+    // input 값을 강제로 ''로 만듦
+    (e.target as HTMLInputElement).value = '';
+    rawInput.value = '';
+    displayValue.value = '';
+    budget.value = null;
+  } else {
+    rawInput.value = val;
+    updateDisplay();
   }
 }
 
@@ -92,8 +107,17 @@ function numberToKorean(num: number, removeUnit = ''): string {
 
 async function next() {
   const budget_val = Number(budget.value)
+  // 100만원(=100) 이하 또는 100억원(=1,000,000) 이상은 불가
   if(budget.value==null||budget_val<=0||!Number.isFinite(budget_val)){
     alert('예산을 올바르게 입력해주세요!')
+    return
+  }
+  if (budget_val < 10) {
+    alert('예산은 100만원(1백만원) 이상이어야 합니다!')
+    return
+  }
+  if (budget_val >= 1000000) {
+    alert('예산은 100억원 미만이어야 합니다!')
     return
   }
   try{
@@ -102,11 +126,11 @@ async function next() {
     console.log('서버 응답:', response.data)
     emit('next',{
       formData: props.formData,
-      resultData: response.data
+      resultData: response.data.data
     })
   }catch (error){
     console.error('전송 실패:', error)
-    alert('서버 통신 오류 발생')
+    alert('DB에 데이터가 없습니다')
   }
 }
 
@@ -133,8 +157,8 @@ function prev(){
         :value="displayValue"
         @keydown="handleKeydown"
         @keydown.backspace="handleBackspace"
+        @input="handleInput"
         type="text"
-
         placeholder="보증금 예산 입력"
         class="w-full border border-kb-ui-06 rounded-full py-2 pl-4 pr-12 focus:outline-none bg-white cursor-text"
       />

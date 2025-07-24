@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useRouter} from 'vue-router'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 interface FormData{
   buildingName: string
@@ -13,12 +13,15 @@ interface ResultData{
   score:number
 }
 const emit = defineEmits(['update', 'next', 'prev']);
-const props = defineProps<{formData:FormData, resultData:ResultData}>()
+const props = defineProps<{formData:FormData, resultData:ResultData|null}>()
 
 const {formData, resultData} = props
 const router = useRouter()
+const showModal_financial = ref(false)
+const showModal_building = ref(false)
 
 const gradeText = computed(() => {
+  if (!resultData || typeof resultData.score !== 'number') return '-';
   if (resultData.score >= 8) return '위험'
   if (resultData.score >= 5) return '주의'
   if (resultData.score >= 3) return '안전'
@@ -26,6 +29,13 @@ const gradeText = computed(() => {
 })
 
 const gradeColor = computed(() => {
+  if (!resultData || typeof resultData.score !== 'number') {
+    return {
+      bg: 'bg-gray-100',
+      text: 'text-gray-400',
+      label: '-'
+    }
+  }
   if (resultData.score >= 8) {
     return {
       bg: 'bg-red-100',
@@ -58,26 +68,39 @@ const gradeColor = computed(() => {
 function goHome(){
   router.push({name:'homeMain'})
 }
+function goToKB(){
+  window.open('https://m.naver.com/')
+  // window.open('https://obank.kbstar.com/quics?page=C103557#loading', '_blank')
+}
 </script>
 
 <template>
 
-  <section class="flex flex-col gap-3 items-center mt">
-    <div class="text-center text-lg foont-semibold">{{ formData.buildingName }}의 안심 진단 리포트입니다.</div>
+  <section class="flex flex-col gap-9 items-center mt">
+    <div class="text-center font-pretendard-bold text-lg foont-semibold">{{ formData.buildingName }}의 안심 진단 리포트입니다.</div>
     <div
       class="w-28 h-28 rounded-full flex flex-col items-center justify-center shadow-md"
       :class="gradeColor.bg"
     >
-      <p class="text-xl font-bold" :class="gradeColor.text">
-        {{ resultData.score }}<span class="text-sm">/10</span>
-      </p>
-      <p class="text-sm mt-1" :class="gradeColor.text">
-        {{ gradeText }}
-      </p>
+      <div class="flex flex-col items-center">
+        <font-awesome-icon :icon="['fas', 'shield-halved']" class="mb-1 text-4xl" :class="gradeColor.text" />
+        <span class="text-xl font-bold" :class="gradeColor.text">
+      {{ resultData?.score ?? '-' }}<span class="text-sm">/10</span>
+    </span>
+      </div>
+
+    </div>
+    <div
+      class="w-16 h-8 rounded-full flex items-center justify-center mt-2"
+      :class="gradeColor.bg"
+      style="margin-top:-1.5rem;"
+    >
+      <span class="text-base font-semibold" :class="gradeColor.text">{{ gradeText }}</span>
     </div>
   </section>
 
   <section class="flex justify-center gap-4 px-4 mt-6 text-center text-xs font-medium">
+<!--    박스1-->
     <div
       class="flex flex-col items-center justify-center w-28 h-20 rounded"
       :class="gradeColor.bg"
@@ -106,21 +129,20 @@ function goHome(){
     </div>
   </section>
 
-  <ul class="space-y-2">
-    <li>💰 예산: {{ formData.budget }} 만원</li>
-  </ul>
-  <section class="px-4 mt-6 flex flex-col gap-2 text-sm">
+
+  <div class="text-base font-semibold text-left px-4 mt-6 mb-2">상세 분석 결과</div>
+  <section class="px-4 mt-6 flex flex-col gap-3 text-sm">
     <div
-      class="border rounded-lg px-4 py-3 flex justify-between items-center shadow-sm bg-kb-ui-11"
+      class="border rounded-lg px-4 py-5 flex justify-between items-center shadow-sm bg-kb-ui-11"
     >
       <span>재정적 안전성 분석</span>
-      <font-awesome-icon :icon="['fas', 'chevron-right']" />
+      <font-awesome-icon :icon="['fas', 'fa-angle-right']" class="cursor-pointer" @click.stop="showModal_financial=true"/>
     </div>
     <div
-      class="border rounded-lg px-4 py-3 flex justify-between items-center shadow-sm bg-kb-ui-11"
+      class="border rounded-lg px-4 py-5 flex justify-between items-center shadow-sm bg-kb-ui-11"
     >
       <span>건축물 정보</span>
-      <font-awesome-icon :icon="['fas', 'chevron-right']" />
+      <font-awesome-icon :icon="['fas', 'fa-angle-right']" class="cursor-pointer" @click.stop="showModal_building=true"/>
     </div>
   </section>
 
@@ -131,9 +153,27 @@ function goHome(){
     >
       확인
     </button>
-    <button class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-sm font-semibold">
+    <button
+      @click="goToKB"
+      class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-sm font-semibold">
       KB 금융 상품 안내
     </button>
+  </div>
+
+<!--  모달-->
+  <div v-if="showModal_financial" class="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-40">
+    <div class="rounded-lg shadow-lg p-6 w-100 h-80 relative bg-kb-ui-07">
+      <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl" @click="showModal_financial = false">×</button>
+      <h2 class="text-lg font-bold mb-4">재정적 안전성 분석</h2>
+      <p>이곳에 재정적 안전성 분석에 대한 상세 설명이나 데이터를 보여줄 수 있습니다.</p>
+    </div>
+  </div>
+  <div v-if="showModal_building" class="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-40">
+    <div class="rounded-lg shadow-lg p-6 w-100 h-80 relative bg-kb-ui-07">
+      <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl" @click="showModal_building = false">×</button>
+      <h2 class="text-lg font-bold mb-4">건축물 정보</h2>
+      <p>이곳에 건축물 정보에 대한 상세 설명이나 데이터를 보여줄 수 있습니다.</p>
+    </div>
   </div>
 </template>
 
