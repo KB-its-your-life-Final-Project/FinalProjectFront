@@ -13,7 +13,14 @@ import {
   faShieldAlt, 
   faChevronRight, 
   faShieldHalved, 
-  faAngleRight
+  faAngleRight,
+  faChevronDown,
+  faChevronUp,
+  faCheck,
+  faKey,
+  faDeleteLeft,
+  faUserPen,
+  faCamera,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
@@ -44,7 +51,14 @@ library.add(
   faHeart,
   faFileLines,
   faEnvelope,
-  faUser
+  faUser,
+  faChevronDown,
+  faChevronUp,
+  faCheck,
+  faKey,
+  faDeleteLeft,
+  faUserPen,
+  faCamera,
 );
 
 export { FontAwesomeIcon };
