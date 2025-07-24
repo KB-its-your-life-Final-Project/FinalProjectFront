@@ -10,7 +10,8 @@ const __dirname = dirname(__filename);
 dotenv.config();
 
 //백엔드 설정
-const backendUrl = process.env.VITE_BACKEND_PORT || "http://localhost:8080";
+const backendPort = process.env.VITE_BACKEND_PORT || 8080
+const backendUrl = `http://localhost:${backendPort}`;
 
 //파일 생성 위치
 const outputPath = join(__dirname, "../api/autoLoad");
