@@ -45,7 +45,7 @@ library.add(
   faShop,
   faUtensils,
   faShieldHalved,
-  faAngleRight
+  faAngleRight,
   faShieldAlt,
   faChevronRight,
   faHeart,
