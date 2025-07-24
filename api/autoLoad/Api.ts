@@ -10,13 +10,11 @@
  * ---------------------------------------------------------------
  */
 
-import {
-  ApiResponseFormData,
+
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
-  SafeReportRequestDto,
 } from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { HttpClient, RequestParams } from "./http-client";
 
 export class Api<
   SecurityDataType = unknown,
@@ -47,25 +45,6 @@ export class Api<
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags safe-report-controller
-   * @name ReceiveFormUsingPost
-   * @summary receiveForm
-   * @request POST:/api/report/requestData
-   */
-  receiveFormUsingPost = (
-    dto: SafeReportRequestDto,
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseFormData, void>({
-      path: `/api/report/requestData`,
-      method: "POST",
-      body: dto,
-      type: ContentType.Json,
       ...params,
     });
 }

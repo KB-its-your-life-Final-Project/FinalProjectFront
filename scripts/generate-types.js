@@ -10,10 +10,10 @@ const __dirname = dirname(__filename);
 dotenv.config();
 
 //백엔드 설정
-const backendUrl = process.env.BACKEND_URL || "http://localhost:8080";
+const backendUrl = `http://localhost:${process.env.VITE_BACKEND_PORT}` || "http://localhost:8080";
 
 //파일 생성 위치
-const outputPath = join(__dirname, "../api/autoLoad");
+const outputPath = join(__dirname, "../src/api/autoLoad");
 
 //swagger로 api 가져오기 명령어
 const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-type`;

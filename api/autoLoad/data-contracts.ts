@@ -10,16 +10,6 @@
  * ---------------------------------------------------------------
  */
 
-/** FormData */
-export interface FormData {
-  /** @format int32 */
-  buildYear?: number;
-  /** @format int32 */
-  dealAmount?: number;
-  /** @format int32 */
-  score?: number;
-}
-
 /** MemberDTO */
 export interface MemberDTO {
   /** @format int32 */
@@ -43,29 +33,6 @@ export interface MemberDTO {
   /** @format date-time */
   regDate?: string;
   regIp?: string;
-}
-
-/** SafeReportRequestDto */
-export interface SafeReportRequestDto {
-  /** @format int32 */
-  budget?: number;
-  buildingName?: string;
-  dongName?: string;
-  jibunAddress?: string;
-  /** @format double */
-  lat?: number;
-  /** @format double */
-  lng?: number;
-  roadAddress?: string;
-}
-
-/** ApiResponse«FormData» */
-export interface ApiResponseFormData {
-  /** @format int32 */
-  code?: number;
-  data?: FormData;
-  message?: string;
-  success?: boolean;
 }
 
 /** ApiResponse«List«MemberDTO»» */
