@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import authApi from "@/api/authApi";
+import apiClient from "@/api/apiClient";
 
 interface User {
   email: string;
@@ -33,7 +34,7 @@ export const authStore = defineStore("auth", () => {
   // 로그인 (토큰은 쿠키에 있으므로 응답에서 사용자 정보만 받아서 상태에 저장)
   const loginUser = async (member: Member): Promise<void> => {
     try {
-      const { data } = await authApi.loginEmail;
+      const { data } = await authApi.loginEmail(member);
       state.value.user = data;
       console.log("data: ", data);
       localStorage.setItem("authUser", JSON.stringify(data)); // 사용자 정보만 저장
@@ -55,8 +56,13 @@ export const authStore = defineStore("auth", () => {
   // 로컬 스토리지에서 사용자 정보 로드 (페이지 새로고침 시 유지용)
   const load = (): void => {
     const storedUser = localStorage.getItem("authUser");
-    if (storedUser) {
-      state.value.user = JSON.parse(storedUser);
+    try {
+      if (storedUser) {
+        state.value.user = JSON.parse(storedUser);
+      }
+    } catch (error) {
+      console.error("Invalid JSON in localStorage:", storedUser);
+      localStorage.removeItem("authUser"); // 잘못된 값 제거
     }
   };
   load();
