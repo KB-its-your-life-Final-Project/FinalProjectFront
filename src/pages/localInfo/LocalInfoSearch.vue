@@ -6,10 +6,9 @@ import { mainRouteName } from "@/router/mainRoute";
 </script>
 <template>
   <Header :headerShowtype="mainRouteName.localInfoSearch" />
-  <div class="w-full h-full flex-col px-4 mt-8">
-    <div class="font-pretendard-bold text-3xl text-kb-ui-01">지역을</div>
-    <div class="font-pretendard-bold text-3xl text-kb-ui-01">검색해주세요</div>
-    <div class="w-ful h-full mt-8">
+  <div class="w-full h-full flex-col px-8 mt-10">
+    <div class="font-pretendard-bold text-3xl text-kb-ui-01">원하는 지역을 검색해주세요</div>
+    <div class="w-ful h-full mt-10">
       <input
         type="text"
         placeholder="검색"

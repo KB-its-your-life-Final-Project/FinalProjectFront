@@ -10,6 +10,9 @@ import { InfoCardList } from "@/pages/localInfo/_component/InfoCard.ts";
 <template>
   <Header headerShowtype="localInfo">
     <SearchCard />
+    <div class="px-10 mt-8">
+      <div class="font-pretendard-bold text-5xl text-kb-ui-10">화양동 동네이야기</div>
+    </div>
   </Header>
   <div class="px-4 mt-16">
     <!-- 날씨 정보 박스 -->
