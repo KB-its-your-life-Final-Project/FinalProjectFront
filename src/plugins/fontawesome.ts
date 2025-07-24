@@ -10,6 +10,13 @@ import {
   faUsers,
   faShop,
   faUtensils,
+  faChevronDown,
+  faChevronUp,
+  faCheck,
+  faKey,
+  faDeleteLeft,
+  faUserPen,
+  faCamera,
 } from "@fortawesome/free-solid-svg-icons";
 import { faMap, faStar as farStar, faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -28,6 +35,13 @@ library.add(
   faUsers,
   faShop,
   faUtensils,
+  faChevronDown,
+  faChevronUp,
+  faCheck,
+  faKey,
+  faDeleteLeft,
+  faUserPen,
+  faCamera,
 );
 
 export { FontAwesomeIcon };
