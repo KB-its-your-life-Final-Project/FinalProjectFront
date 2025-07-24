@@ -114,7 +114,11 @@ npm run lint
 ```
 
 ## 6 커스텀 스타일 클래스명 (tailwind)
+## 7. font awesome 설치
+```sh
+npm install @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/free-regular-svg-icons @fortawesome/vue-fontawesome
 
+```
 ##### 폰트 (Pretendard)
 
 | 폰트 이름               | 클래스명                       |
