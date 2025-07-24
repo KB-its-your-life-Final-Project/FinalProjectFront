@@ -38,31 +38,22 @@ function handleBackspace(e: KeyboardEvent) {
 }
 
 function handleInput(e: Event) {
-  const val = (e.target as HTMLInputElement).value;
+  let val = (e.target as HTMLInputElement).value;
   // 숫자가 아닌 문자가 하나라도 포함되어 있으면 전체 삭제
   if (/[^0-9]/.test(val)) {
-    // input 값을 강제로 ''로 만듦
-    (e.target as HTMLInputElement).value = '';
-    rawInput.value = '';
-    displayValue.value = '';
-    budget.value = null;
-  } else {
-    rawInput.value = val;
-    updateDisplay();
+    val = '';
   }
+  rawInput.value = val;
+  updateDisplay();
 }
 
-// rawInput → 한글 금액으로 변환
 function updateDisplay() {
   if (rawInput.value === '') {
-    budget.value = null
-    displayValue.value = ''
-    return
+    displayValue.value = '';
+    return;
   }
-
-  const numeric = Number(rawInput.value)
-  budget.value = numeric * 100;
-  displayValue.value = numberToKorean(numeric * 1000000,'만')
+  const numeric = Number(rawInput.value);
+  displayValue.value = numberToKorean(numeric , '만');
 }
 
 watch(budget, val => {
@@ -151,16 +142,18 @@ function prev(){
       </h1>
     </div>
 
+
     <div class="relative w-full max-w-lg mx-auto">
       <!--  search bar -->
+      <span v-if="displayValue" class="absolute right-4 -top-6 text-s text-kb-ui-04 mt-1">
+          {{ displayValue }}만원
+    </span>
       <input
-        :value="displayValue"
-        @keydown="handleKeydown"
-        @keydown.backspace="handleBackspace"
+        v-model="rawInput"
         @input="handleInput"
         type="text"
         placeholder="보증금 예산 입력"
-        class="w-full border border-kb-ui-06 rounded-full py-2 pl-4 pr-12 focus:outline-none bg-white cursor-text"
+        class="w-full border border-kb-ui-06 rounded-full py-2 pl-4 pr-12 focus:outline-none bg-white cursor-text mt-1"
       />
       <span class="absolute inset-y-0 right-4 flex items-center text-kb-ui-04 pointer-events-none">
       만원

@@ -129,8 +129,9 @@ function next() {
         v-model="buildingName"
         type="text"
         placeholder="주소 찾기로 입력"
-        class="flex-1 border accent-kb-ui-05 rounded-full py-2 pl-4 focus:outline-none cursor-not-allowed"
-        disabled
+        class="flex-1 border accent-kb-ui-05 rounded-full py-2 pl-4 focus:outline-none"
+        readonly
+        @click="search"
       />
       <button
         @click="search"
