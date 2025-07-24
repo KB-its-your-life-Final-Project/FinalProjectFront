@@ -10,15 +10,10 @@
  * ---------------------------------------------------------------
  */
 
-import {
-  ApiResponseListMemberDTO,
-  ApiResponseMemberDTO,
-} from "./data-contracts";
+import { ApiResponseListMemberDTO, ApiResponseMemberDTO } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
-export class Api<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
