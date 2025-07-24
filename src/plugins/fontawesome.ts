@@ -9,7 +9,11 @@ import {
   faVideo,
   faUsers,
   faShop,
-  faUtensils, faShieldAlt, faChevronRight
+  faUtensils, 
+  faShieldAlt, 
+  faChevronRight, 
+  faShieldHalved, 
+  faAngleRight
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
@@ -33,6 +37,8 @@ library.add(
   faUsers,
   faShop,
   faUtensils,
+  faShieldHalved,
+  faAngleRight
   faShieldAlt,
   faChevronRight,
   faHeart,

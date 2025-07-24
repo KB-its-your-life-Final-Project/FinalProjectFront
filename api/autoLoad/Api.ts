@@ -10,7 +10,7 @@
  * ---------------------------------------------------------------
  */
 
-import {
+
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
 } from "./data-contracts";
