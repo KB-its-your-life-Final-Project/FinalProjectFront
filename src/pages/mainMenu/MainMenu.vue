@@ -4,7 +4,8 @@
 // 필요 시 기능 추가
 import Header from '@/components/layout/header/Header.vue'
 import MenuItem from '@/pages/mainMenu/_component/MenuItems.vue'
-import MenuSection from '@/pages/mainMenu/_component/MenuSection.vue';
+import MenuSection from '@/pages/mainMenu/_component/MenuSection.vue'
+import Footer from '@/components/layout/Footer.vue'
 /*임의로 로그아웃, 회원탈퇴 부분 넣겠습니다.*/
 
 import { mainRouteName } from "@/router/mainRoute";
@@ -70,6 +71,6 @@ function openInquiry() {
     <button @click="withdraw" class="underline">회원탈퇴</button>
     <button @click="logout" class="underline">로그아웃</button>
   </div>
-
+  <Footer />
   <div class ="h-15"></div>
 </template>
