@@ -45,7 +45,7 @@ function openInquiry() {
   <div class="p-4 space-y-6">
 
     <MenuSection title="계정">
-      <MenuItem :icon="['far', 'user']" label="마이페이지" to="/" />
+      <MenuItem :icon="['far', 'user']" label="마이페이지" to="/mypage/main" />
       <MenuItem :icon="['fas', 'house']" label="실거래가 조회" to="/mapSearch" />
       <MenuItem :icon="['fas', 'shield-alt']" label="안심 정보" to="/safereport" />
       <MenuItem :icon="['far', 'heart']" label="찜한 매물" to="/myLike" />
