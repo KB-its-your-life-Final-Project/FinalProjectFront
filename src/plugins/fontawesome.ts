@@ -15,7 +15,7 @@ import {
   faMap,
   faStar as farStar,
   faCircleXmark,
-  faHeart, faFileLines, faEnvelope
+  faHeart, faFileLines, faEnvelope,faUser
 } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -37,7 +37,8 @@ library.add(
   faChevronRight,
   faHeart,
   faFileLines,
-  faEnvelope
+  faEnvelope,
+  faUser
 );
 
 export { FontAwesomeIcon };
