@@ -3,7 +3,7 @@ import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { AxiosError } from "axios";
 import { authStore } from "@/stores/authStore.ts";
-import GoBackBtn from "@/components/common/GoBackBtn.vue"
+import GoBackBtn from "@/components/common/GoBackBtn.vue";
 import { isEmpty, isValidEmailFormat } from "@/utils/validate";
 import authApi from "@/api/authApi";
 
@@ -64,7 +64,7 @@ const loginUser = async () => {
 
 <template>
   <header class="p-[1rem] bg-kb-yellow w-full h-[6rem] flex items-center gap-2">
-    <GoBackBtn/>
+    <GoBackBtn />
     <h1 class="text-2xl font-pretendard-bold">로그인</h1>
   </header>
   <div class="flex flex-col items-center">
@@ -90,16 +90,14 @@ const loginUser = async () => {
       <p class="w-full h-2 text-center text-error">
         {{ checkSubmitMsg }}
       </p>
-      <button class="btn" type="submit">
-        로그인
-      </button>
+      <button class="btn" type="submit">로그인</button>
     </form>
     <div class="flex gap-3 mt-[2rem]">
-          <span class="text-kb-ui-04">아직 회원이 아니신가요?</span>
-          <router-link to="/auth/register">
-            <span class="text-positive">가입하기</span>
-          </router-link>
-      </div>
+      <span class="text-kb-ui-04">아직 회원이 아니신가요?</span>
+      <router-link to="/auth/register">
+        <span class="text-positive">가입하기</span>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -107,12 +105,12 @@ const loginUser = async () => {
 @reference "@/assets/styles/main.css";
 
 .form {
-  @apply mt-[3rem] w-5/6 h-auto flex flex-col gap-7
+  @apply mt-[3rem] w-5/6 h-auto flex flex-col gap-7;
 }
 .input-box {
   @apply p-[0.7rem] border-[1px] border-solid border-kb-ui-07 w-full h-11 rounded-md;
 }
 .btn {
-  @apply mt-[0rem] bg-kb-yellow-positive w-full h-12 rounded-xl text-white whitespace-nowrap cursor-pointer
+  @apply mt-[0rem] bg-kb-yellow-positive w-full h-12 rounded-xl text-white whitespace-nowrap cursor-pointer;
 }
 </style>

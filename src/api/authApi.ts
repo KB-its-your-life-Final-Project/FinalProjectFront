@@ -82,11 +82,7 @@ export default {
     formData.append("name", member.name);
     formData.append("password", member.password1);
     try {
-      const { data } = await apiClient.post(
-        `${BASE_URL}/register/email`,
-        formData,
-        headers,
-      );
+      const { data } = await apiClient.post(`${BASE_URL}/register/email`, formData, headers);
       console.log("이메일 회원가입 응답 (authApi.registerUser()): ", data);
       return data.data;
     } catch (error: any) {
@@ -100,13 +96,9 @@ export default {
    * 이메일 로그인
    * @param code 카카오에서 제공하는 인가 코드
    * @returns 서버 응답
-   */  async loginEmail(member: MemberEmail): Promise<any> {
+   */ async loginEmail(member: MemberEmail): Promise<any> {
     try {
-      const { data } = await apiClient.post(
-        `/api/auth/login`,
-        member,
-        { withCredentials: true },
-      );
+      const { data } = await apiClient.post(`/api/auth/login`, member, { withCredentials: true });
       console.log("AUTH POST (loginEmail): ", data);
       console.log("data.success: ", data.success);
       return data;
@@ -120,7 +112,7 @@ export default {
    * 카카오 회원가입/로그인
    * @param code 카카오에서 제공하는 인가 코드
    * @returns 서버 응답
-   */  async kakaoLogin(code: string): Promise<any> {
+   */ async kakaoLogin(code: string): Promise<any> {
     try {
       const { data } = await apiClient.post(
         `${BASE_URL}/register/kakao`,
@@ -136,11 +128,11 @@ export default {
     }
   },
 
-    /**
+  /**
    * 구글 회원가입/로그인
    * @param code 구글에서 제공하는 인가 코드
    * @returns 서버 응답
-   */  async googleLogin(code: string): Promise<any> {
+   */ async googleLogin(code: string): Promise<any> {
     try {
       const { data } = await apiClient.post(
         `${BASE_URL}/register/google`,

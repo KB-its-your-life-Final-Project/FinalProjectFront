@@ -105,16 +105,11 @@ const registerUser = async () => {
 
 <template>
   <header class="p-[1rem] bg-kb-yellow w-full h-[6rem] flex items-center gap-2">
-    <GoBackBtn/>
+    <GoBackBtn />
     <h1 class="text-2xl font-pretendard-bold">회원가입</h1>
   </header>
   <div class="flex flex-col items-center">
-    <form
-      class="form"
-      method="post"
-      @submit.prevent="registerUser"
-      novalidate
-    >
+    <form class="form" method="post" @submit.prevent="registerUser" novalidate>
       <div>
         <label for="email">이메일 주소</label>
         <div class="flex flex-row w-full h-auto">
@@ -182,7 +177,7 @@ const registerUser = async () => {
 <style scoped>
 @reference "@/assets/styles/main.css";
 .form {
-  @apply mt-[3rem] w-5/6 h-auto flex flex-col gap-7
+  @apply mt-[3rem] w-5/6 h-auto flex flex-col gap-7;
 }
 .input-box {
   @apply p-[0.7rem] border-[1px] border-solid border-kb-ui-07 w-full h-11 rounded-md;
@@ -195,6 +190,6 @@ const registerUser = async () => {
   @apply h-11 bg-kb-yellow-positive text-white whitespace-nowrap cursor-pointer;
 }
 .btn-form {
-  @apply mt-[0rem] bg-kb-yellow-positive w-full h-12 rounded-xl text-white whitespace-nowrap cursor-pointer
+  @apply mt-[0rem] bg-kb-yellow-positive w-full h-12 rounded-xl text-white whitespace-nowrap cursor-pointer;
 }
 </style>

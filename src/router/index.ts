@@ -40,7 +40,7 @@ const router = createRouter({
 
 // 로그인 인증 가드
 router.beforeEach(async (to, from, next) => {
-  if(!to.meta.requiresAuth) {
+  if (!to.meta.requiresAuth) {
     return next(); // 통과
   }
   try {
@@ -55,6 +55,6 @@ router.beforeEach(async (to, from, next) => {
       next("/auth/login"); // 로그인 화면 이동
     }
   }
-})
+});
 
 export default router;
