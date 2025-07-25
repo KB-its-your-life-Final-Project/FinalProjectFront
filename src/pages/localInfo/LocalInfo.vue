@@ -6,6 +6,7 @@ import SearchCard from "@/pages/localInfo/_component/SearchCard.vue";
 import WeatherCard from "@/pages/localInfo/_component/WeatherCard.vue";
 import InfoCard from "@/pages/localInfo/_component/InfoCard.vue";
 import { InfoCardList } from "@/pages/localInfo/_component/InfoCard.ts";
+import Footer from "@/components/layout/Footer.vue";
 </script>
 <template>
   <Header headerShowtype="localInfo">
@@ -25,4 +26,6 @@ import { InfoCardList } from "@/pages/localInfo/_component/InfoCard.ts";
       <InfoCard v-for="(card, i) in InfoCardList" :key="i" :info="card" />
     </div>
   </div>
+  <Footer />
+  <div class="h-15"></div>
 </template>
