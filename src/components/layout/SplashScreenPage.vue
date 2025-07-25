@@ -1,4 +1,15 @@
-<script setup></script>
+<script setup lang="ts">
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+onMounted(() => {
+  setTimeout(() => {
+    router.push("/home");
+  }, 2000); // 2초 후 / = 홈 화면 이동
+});
+</script>
 
 <template>
   <div class="flex flex-col items-center justify-center h-screen gap-15">

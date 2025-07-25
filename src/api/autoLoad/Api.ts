@@ -10,21 +10,27 @@
  * ---------------------------------------------------------------
  */
 
-import { ApiResponseListMemberDTO, ApiResponseMemberDTO } from "./data-contracts";
-import { HttpClient, RequestParams } from "./http-client";
+import {
+  ApiResponseBoolean,
+  ApiResponseListMemberDTO,
+  ApiResponseMemberDTO,
+  RegisterGoogleDTO,
+  RegisterKakaoDTO,
+} from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
    * @tags member-controller
-   * @name FindAllUsingGet
-   * @summary findAll
-   * @request GET:/api/member/
+   * @name FindAllUsersUsingGet
+   * @summary findAllUsers
+   * @request GET:/api/member
    */
-  findAllUsingGet = (params: RequestParams = {}) =>
+  findAllUsersUsingGet = (params: RequestParams = {}) =>
     this.request<ApiResponseListMemberDTO, void>({
-      path: `/api/member/`,
+      path: `/api/member`,
       method: "GET",
       ...params,
     });
@@ -32,11 +38,172 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * No description
    *
    * @tags member-controller
-   * @name FindByIdUsingGet
-   * @summary findById
+   * @name CheckDuplicateEmailUsingGet
+   * @summary checkDuplicateEmail
+   * @request GET:/api/member/checkemail/{email}
+   */
+  checkDuplicateEmailUsingGet = (email: string, params: RequestParams = {}) =>
+    this.request<ApiResponseBoolean, void>({
+      path: `/api/member/checkemail/${email}`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name FindLoggedinUserUsingGet
+   * @summary findLoggedinUser
+   * @request GET:/api/member/loggedin
+   */
+  findLoggedinUserUsingGet = (
+    query?: {
+      authenticated?: boolean;
+      "authorities[0].authority"?: string;
+      credentials?: object;
+      details?: object;
+      principal?: object;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseMemberDTO, void>({
+      path: `/api/member/loggedin`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name LogoutMemberUsingPost
+   * @summary logoutMember
+   * @request POST:/api/member/logout
+   */
+  logoutMemberUsingPost = (params: RequestParams = {}) =>
+    this.request<ApiResponseBoolean, void>({
+      path: `/api/member/logout`,
+      method: "POST",
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name RegisterMemberByEmailUsingPost
+   * @summary registerMemberByEmail
+   * @request POST:/api/member/register/email
+   */
+  registerMemberByEmailUsingPost = (
+    query?: {
+      email?: string;
+      name?: string;
+      password?: string;
+      verificationCode?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseMemberDTO, void>({
+      path: `/api/member/register/email`,
+      method: "POST",
+      query: query,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name RegisterOrLoginMemberByGoogleUsingPost
+   * @summary registerOrLoginMemberByGoogle
+   * @request POST:/api/member/register/google
+   */
+  registerOrLoginMemberByGoogleUsingPost = (
+    registerDto: RegisterGoogleDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseMemberDTO, void>({
+      path: `/api/member/register/google`,
+      method: "POST",
+      body: registerDto,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name RegisterOrLoginMemberByKakaoUsingPost
+   * @summary registerOrLoginMemberByKakao
+   * @request POST:/api/member/register/kakao
+   */
+  registerOrLoginMemberByKakaoUsingPost = (
+    registerDto: RegisterKakaoDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseMemberDTO, void>({
+      path: `/api/member/register/kakao`,
+      method: "POST",
+      body: registerDto,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name SendVerificationCodeUsingPost
+   * @summary sendVerificationCode
+   * @request POST:/api/member/sendcode
+   */
+  sendVerificationCodeUsingPost = (
+    query: {
+      /** email */
+      email: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseBoolean, void>({
+      path: `/api/member/sendcode`,
+      method: "POST",
+      query: query,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name VerifyCodeUsingPost
+   * @summary verifyCode
+   * @request POST:/api/member/verifycode
+   */
+  verifyCodeUsingPost = (
+    query: {
+      /** email */
+      email: string;
+      /** verificationCode */
+      verificationCode: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseBoolean, void>({
+      path: `/api/member/verifycode`,
+      method: "POST",
+      query: query,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name FindMemberByIdUsingGet
+   * @summary findMemberById
    * @request GET:/api/member/{id}
    */
-  findByIdUsingGet = (id: string, params: RequestParams = {}) =>
+  findMemberByIdUsingGet = (id: number, params: RequestParams = {}) =>
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
