@@ -47,24 +47,32 @@ function prevStep() {
     console.log("초기화된 budget 값:", formData.budget);
   }
 }
+
 </script>
 
 <template>
-  <div class="pb-24">
-    <Header :headerShowtype="mainRouteName.safeReport">
-    </Header>
-
-    <div class="mt-6">
-      <component
-        :is="steps[currentStep]"
-        :form-data="formData"
-        :result-data="resultData"
-        @update="onUpdate"
-        @next="nextStep"
-        @prev="prevStep"
-      />
+  <Header :headerShowtype="mainRouteName.safeReport">
+    <div class="mt-23">
+      <img
+      src="@/assets/imgs/safereport.png"
+      alt="AI 안심 진단 리포트"
+      class="absolute right-1 top-13/20 -translate-y-1/2 h-30"
+      style="z-index:1;"
+    />
     </div>
 
+  </Header>
+
+  <div class="mt-6">
+    <component
+      :is="steps[currentStep]"
+      :form-data="formData"
+      :result-data="resultData"
+      @update="onUpdate"
+      @next="nextStep"
+      @prev="prevStep"
+    />
   </div>
+
 
 </template>

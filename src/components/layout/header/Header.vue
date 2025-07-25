@@ -24,6 +24,18 @@ const showItems = reactive(
     {} as Record<string, boolean>,
   ),
 );
+
+// function handleBackClick() {
+//   // 부모에서 @back을 전달하면 emit, 아니면 기본 동작
+//   // (Vue 3의 $emit은 setup에서 defineEmits 사용)
+//   if (typeof (emit as any) === 'function' && (emit as any).length > 0) {
+//     // @back 리스너가 있으면 emit
+//     emit('back');
+//   } else {
+//     // 없으면 기본 동작
+//     movePage.back();
+//   }
+// }
 </script>
 
 <template>
