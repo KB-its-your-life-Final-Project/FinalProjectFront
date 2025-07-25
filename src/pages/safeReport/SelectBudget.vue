@@ -52,8 +52,7 @@ function handleInput(e: Event) {
   }
   if (Number(val) > 999999) {
     showError.value = true;
-    val = '999999';
-    rawInput.value = val;
+    rawInput.value = '999999'; // val이 아니라 바로 999999로!
     updateDisplay();
     return; // 여기서 return!
   } else {
@@ -162,23 +161,34 @@ function prev(){
 
     <div class="relative w-full max-w-lg mx-auto">
       <!-- 한글 금액 표시 (input 위) -->
-      <span v-if="displayValue" class="absolute right-4 -top-6 text-s text-kb-ui-04 mt-1">
+      <span
+        v-if="rawInput.length >= 3"
+        class="absolute right-4 -top-6 text-s text-kb-ui-04 mt-1"
+      >
         {{ displayValue }}원
       </span>
-      <input
+      <div class="flex items-center w-full">
+        <input
         v-model="rawInput"
         @input="handleInput"
         type="text"
         maxlength="6"
         placeholder="보증금 예산 입력"
-        class="w-full border border-kb-ui-06 rounded-full py-2 pl-4 pr-12 focus:outline-none bg-white cursor-text mt-1"
+        class="w-full border border-kb-ui-06 rounded-full pl-4 pr-14 focus:outline-none bg-white cursor-text mt-1 text-base"
+        style="height: 2.5rem; line-height: 2.5rem; padding-top: 0; padding-bottom: 0;"
       />
-      <span class="absolute inset-y-0 right-4 flex items-center text-kb-ui-04 pointer-events-none">
+      <!-- input의 오른쪽 안에 "만원"을 배치 -->
+      <span
+        class="absolute right-4 top-0 bottom-0 flex items-center text-kb-ui-04 pointer-events-none text-base"
+        style="height: 3.0rem; line-height: 2.5rem;"
+      >
         만원
       </span>
+      </div>
+
       <!-- 경고 메시지는 input 아래에 block으로! -->
-      <div v-if="showError" class="text-xs text-red-500 mt-2 text-right">
-        예산은 100억원 미만이어야 합니다!
+      <div class="text-xs text-kb-ui-04 mt-2 text-right">
+        예산은 100억원 미만이어야 합니다
       </div>
     </div>
     <div class="fixed z-auto inset-x-0 bottom-6 flex justify-between px-6 pb-24">
