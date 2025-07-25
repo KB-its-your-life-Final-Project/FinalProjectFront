@@ -1,3 +1,5 @@
+
+
 <script setup lang="ts">
 // 필요 시 기능 추가
 import Header from '@/components/layout/header/Header.vue'
@@ -8,33 +10,51 @@ import Footer from '@/components/layout/Footer.vue'
 
 import { mainRouteName } from "@/router/mainRoute";
 
+
 function logout() {
-  alert("로그아웃 처리합니다.");
+  alert("로그아웃 처리합니다.")
   // 로그아웃의 로직을 추가해주세요
 }
 
 function withdraw() {
-  alert("요청 중...");
+  alert("요청 중...")
   // 회원탈퇴의 로직을 추가해주세요
 }
 
 function openInquiry() {
-  alert("lighthouse@gmail.com 로 문의 주세요!");
+  alert('lighthouse@gmail.com 로 문의 주세요!')
 }
+
+
 </script>
+
 
 <!-- MenuPage.vue 레이아웃 -->
 <template>
-  <Header :headerShowtype="mainRouteName.mainMenu">
+
+  <Header :headerShowtype="mainRouteName.mainMenu" >
     <!--Header 부분에 회원 정보가 크게 띄게 수정-->
-    <div class="p-4">
+
+
+    <div class ="pl-3 pr-8 pt-8 pb-8">
+      <div class="mt-[1.5rem] flex items-center justify-center text-center">
+        <!-- 프로필 사진 넣어주세요! 회원부분이랑 연동해서      -->
+        <img
+          src="@/assets/imgs/profile.jpg"
+          class="w-[6rem] h-[6rem] rounded-full object-cover"
+        />
       <!--어떤 식으로 회원 정보를 받아올 것인지 - 홍길동은 예시임 + 업로드 기능 (사진 추가해야 함)   -->
-      <div class="text-lg font-bold text-kb-ui-01 items-center">{{ "홍길동" }}</div>
-      <div class="text-sm text-kb-ui-01">{{ "GILLDONG@MAIL.COM" }}</div>
+        <div class="flex flex-col justify-center mt-3  ml-[1rem]">
+      <div class="font-pretendard text-2xl  font-bold text-kb-ui-01">{{ "홍길동" }}</div>
+      <div class="text-xl font-bold text-kb-ui-01">{{ "GILLDONG@MAIL.COM" }}</div>
+    </div>
+        </div>
     </div>
   </Header>
 
+
   <div class="p-4 space-y-6">
+
     <MenuSection title="계정">
       <MenuItem :icon="['far', 'user']" label="마이페이지" to="/mypage/main" />
       <MenuItem :icon="['fas', 'house']" label="실거래가 조회" to="/mapSearch" />
@@ -44,9 +64,11 @@ function openInquiry() {
       <!--      -->
     </MenuSection>
 
+
     <MenuSection title="설정">
       <MenuItem :icon="['fas', 'bell']" label="알림 설정" to="/myAlarm" />
     </MenuSection>
+
 
     <MenuSection title="고객지원 및 안내">
       <div @click="openInquiry">
@@ -54,6 +76,7 @@ function openInquiry() {
       </div>
     </MenuSection>
   </div>
+
 
   <div class="mt-8 flex justify-center gap-40 text-sm text-kb-ui-05 pb-6">
     <button @click="withdraw" class="underline">회원탈퇴</button>
