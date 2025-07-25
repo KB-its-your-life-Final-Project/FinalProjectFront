@@ -11,6 +11,7 @@ const emit = defineEmits(['update','next','prev'])
 const rawInput = ref('')           // 사용자가 입력한 숫자 문자열
 const budget = ref<number | null>(null)
 const displayValue = ref('')       // 변환된 한글 금액
+const showError = ref(false)
 
 // 숫자 입력 처리
 function handleKeydown(e: KeyboardEvent) {
@@ -39,9 +40,24 @@ function handleBackspace(e: KeyboardEvent) {
 
 function handleInput(e: Event) {
   let val = (e.target as HTMLInputElement).value;
-  // 숫자가 아닌 문자가 하나라도 포함되어 있으면 전체 삭제
+  // 숫자 이외 입력 불가
   if (/[^0-9]/.test(val)) {
-    val = '';
+    val = val.replace(/[^0-9]/g, '');
+  }
+  if (val === '') {
+    rawInput.value = '';
+    showError.value = false;
+    updateDisplay();
+    return;
+  }
+  if (Number(val) > 999999) {
+    showError.value = true;
+    val = '999999';
+    rawInput.value = val;
+    updateDisplay();
+    return; // 여기서 return!
+  } else {
+    showError.value = false;
   }
   rawInput.value = val;
   updateDisplay();
@@ -50,10 +66,12 @@ function handleInput(e: Event) {
 function updateDisplay() {
   if (rawInput.value === '') {
     displayValue.value = '';
+    budget.value = null;
     return;
   }
   const numeric = Number(rawInput.value);
-  displayValue.value = numberToKorean(numeric , '만');
+  displayValue.value = numberToKorean(numeric * 10000);
+  budget.value = numeric;
 }
 
 watch(budget, val => {
@@ -62,37 +80,36 @@ watch(budget, val => {
 
 // 한글 금액 변환
 function numberToKorean(num: number, removeUnit = ''): string {
-  if (num === 0) return removeUnit ? '' : '영원'
-
-  const unitWords = ['', '만', '억', '조', '경']
-  const smallUnitWords = ['', '십', '백', '천']
-  const numberWords = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구']
-  const result = []
-  let unitPos = 0
-
+  if (num === 0) return removeUnit ? '' : '영원';
+  const unitWords = ['', '만', '억', '조', '경'];
+  const smallUnitWords = ['', '십', '백', '천'];
+  const numberWords = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+  const result = [];
+  let unitPos = 0;
   while (num > 0) {
-    const part = num % 10000
+    const part = num % 10000;
     if (part > 0) {
-      let section = ''
-      const digits = part.toString().padStart(4, '0').split('').map(Number)
+      let section = '';
+      const digits = part.toString().padStart(4, '0').split('').map(Number);
       digits.forEach((digit, idx) => {
         if (digit !== 0) {
-          section += numberWords[digit] + smallUnitWords[3 - idx]
+          if (!(digit === 1 && idx !== 3)) {
+            section += numberWords[digit];
+          }
+          section += smallUnitWords[3 - idx];
         }
-      })
-
-      const unit = unitWords[unitPos]
+      });
+      const unit = unitWords[unitPos];
       if (unit !== removeUnit) {
-        result.unshift(section + unit)
+        result.unshift(section + unit);
       } else {
-        result.unshift(section)
+        result.unshift(section);
       }
     }
-    unitPos++
-    num = Math.floor(num / 10000)
+    unitPos++;
+    num = Math.floor(num / 10000);
   }
-
-  return result.join('')
+  return result.join('');
 }
 
 
@@ -144,20 +161,25 @@ function prev(){
 
 
     <div class="relative w-full max-w-lg mx-auto">
-      <!--  search bar -->
+      <!-- 한글 금액 표시 (input 위) -->
       <span v-if="displayValue" class="absolute right-4 -top-6 text-s text-kb-ui-04 mt-1">
-          {{ displayValue }}만원
-    </span>
+        {{ displayValue }}원
+      </span>
       <input
         v-model="rawInput"
         @input="handleInput"
         type="text"
+        maxlength="6"
         placeholder="보증금 예산 입력"
         class="w-full border border-kb-ui-06 rounded-full py-2 pl-4 pr-12 focus:outline-none bg-white cursor-text mt-1"
       />
       <span class="absolute inset-y-0 right-4 flex items-center text-kb-ui-04 pointer-events-none">
-      만원
-    </span>
+        만원
+      </span>
+      <!-- 경고 메시지는 input 아래에 block으로! -->
+      <div v-if="showError" class="text-xs text-red-500 mt-2 text-right">
+        예산은 100억원 미만이어야 합니다!
+      </div>
     </div>
     <div class="fixed z-auto inset-x-0 bottom-6 flex justify-between px-6 pb-24">
       <button
@@ -168,7 +190,7 @@ function prev(){
       </button>
       <button
         @click="next"
-        :disabled="!budget"
+        :disabled="!budget || showError || budget < 100"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
       >
         레포트 보기
