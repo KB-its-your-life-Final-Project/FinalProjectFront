@@ -63,14 +63,20 @@ const gradeColor = computed(() => {
   }
 })
 
-
-
 function goHome(){
   router.push({name:'homeMain'})
 }
 function goToKB(){
   window.open('https://m.naver.com/')
   // window.open('https://obank.kbstar.com/quics?page=C103557#loading', '_blank')
+}
+
+function handleBack() {
+  if (currentStep.value === 1 || currentStep.value === 2) {
+    router.push({ name: 'homeMain' });
+  } else {
+    prevStep();
+  }
 }
 </script>
 
@@ -79,7 +85,7 @@ function goToKB(){
   <section class="flex flex-col gap-9 items-center mt">
     <div class="text-center font-pretendard-bold text-lg foont-semibold">{{ formData.buildingName }}의 안심 진단 리포트입니다.</div>
     <div
-      class="w-28 h-28 rounded-full flex flex-col items-center justify-center shadow-md"
+      class="w-32 h-32 rounded-full flex flex-col items-center justify-center shadow-md"
       :class="gradeColor.bg"
     >
       <div class="flex flex-col items-center">
@@ -91,7 +97,7 @@ function goToKB(){
 
     </div>
     <div
-      class="w-16 h-8 rounded-full flex items-center justify-center mt-2"
+      class="w-20 h-10 rounded-full flex items-center justify-center mt-2"
       :class="gradeColor.bg"
       style="margin-top:-1.5rem;"
     >
@@ -102,29 +108,29 @@ function goToKB(){
   <section class="flex justify-center gap-4 px-4 mt-6 text-center text-xs font-medium">
 <!--    박스1-->
     <div
-      class="flex flex-col items-center justify-center w-28 h-20 rounded"
+      class="flex flex-col items-center justify-center w-32 h-24 rounded"
       :class="gradeColor.bg"
     >
-      <svg class="w-5 h-5 mb-1" fill="currentColor" viewBox="0 0 20 20" :class="gradeColor.text">
+      <svg class="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20" :class="gradeColor.text">
         <path
           d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.597c.75 1.336-.213 2.998-1.742 2.998H3.48c-1.529 0-2.492-1.662-1.742-2.998L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 012 0v3a1 1 0 01-1 1z"
         />
       </svg>
-      <span :class="gradeColor.text">깡통전세</span>
+      <span :class="gradeColor.text" class="text-md">깡통전세</span>
       <span class="text-[11px]" :class="gradeColor.text">{{ gradeText }}</span>
     </div>
 
 
     <!-- 박스 2 -->
     <div
-      class="flex flex-col items-center justify-center w-28 h-20 bg-green-100 text-green-700 rounded"
+      class="flex flex-col items-center justify-center w-32 h-24 bg-green-100 text-green-700 rounded"
     >
-      <svg class="w-5 h-5 mb-1" fill="currentColor" viewBox="0 0 20 20">
+      <svg class="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20">
         <path
           d="M3 2a1 1 0 011-1h12a1 1 0 011 1v15h-5v-4H8v4H3V2zm2 3v2h2V5H5zm0 4v2h2V9H5zm0 4v2h2v-2H5zm4-8v2h2V5H9zm0 4v2h2V9H9zm0 4v2h2v-2H9zm4-8v2h2V5h-2zm0 4v2h2V9h-2zm0 4v2h2v-2h-2z"
         />
       </svg>
-      <span>불법건축물</span>
+      <span class="text-md">불법건축물</span>
       <span class="text-[11px] text-gray-600">없음</span>
     </div>
   </section>
@@ -135,13 +141,13 @@ function goToKB(){
     <div
       class="border rounded-lg px-4 py-5 flex justify-between items-center shadow-sm bg-kb-ui-11"
     >
-      <span>재정적 안전성 분석</span>
+      <span class="text-lg">재정적 안전성 분석</span>
       <font-awesome-icon :icon="['fas', 'fa-angle-right']" class="cursor-pointer" @click.stop="showModal_financial=true"/>
     </div>
     <div
       class="border rounded-lg px-4 py-5 flex justify-between items-center shadow-sm bg-kb-ui-11"
     >
-      <span>건축물 정보</span>
+      <span class="text-lg">건축물 정보</span>
       <font-awesome-icon :icon="['fas', 'fa-angle-right']" class="cursor-pointer" @click.stop="showModal_building=true"/>
     </div>
   </section>
@@ -149,13 +155,13 @@ function goToKB(){
   <div class="px-4 mt-8 flex flex-col gap-2">
     <button
       @click="goHome"
-      class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-sm font-semibold"
+      class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-lg font-semibold"
     >
       확인
     </button>
     <button
       @click="goToKB"
-      class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-sm font-semibold">
+      class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-lg font-semibold">
       KB 금융 상품 안내
     </button>
   </div>

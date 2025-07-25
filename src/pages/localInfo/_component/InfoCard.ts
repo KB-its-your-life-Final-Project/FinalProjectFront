@@ -1,4 +1,4 @@
-export type InfoCardType= {
+export type InfoCardType = {
   icon: string; // FontAwesome 아이콘 이름
   title: string; // 카드 제목
   value: string; // api로 각각 불러올 값들, 현재는 임시로 표시

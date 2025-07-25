@@ -24,13 +24,25 @@ const showItems = reactive(
     {} as Record<string, boolean>,
   ),
 );
+
+// function handleBackClick() {
+//   // 부모에서 @back을 전달하면 emit, 아니면 기본 동작
+//   // (Vue 3의 $emit은 setup에서 defineEmits 사용)
+//   if (typeof (emit as any) === 'function' && (emit as any).length > 0) {
+//     // @back 리스너가 있으면 emit
+//     emit('back');
+//   } else {
+//     // 없으면 기본 동작
+//     movePage.back();
+//   }
+// }
 </script>
 
 <template>
-  <header class="bg-kb-yellow w-full px-[1rem] pt-[4rem] pb-[4.375rem] relative">
+  <header class="bg-kb-yellow w-full p-[1rem] relative">
     <!-- 왼쪽: 뒤로가기 아이콘 or 타이틀 -->
     <div
-      class="absolute top-[1rem] left-[1rem] flex items-center space-x-[1rem] text-kb-ui-01 text-[1.25rem]"
+      class="absolute top-4 left-4 flex items-center space-x-[1rem] text-kb-ui-01 text-[1.25rem]"
     >
       <font-awesome-icon
         v-if="showItems.showBack"
@@ -48,7 +60,7 @@ const showItems = reactive(
 
     <div
       v-if="showItems.showAlarm"
-      class="absolute top-[1rem] right-[1rem] flex items-center space-x-[1rem] text-kb-ui-01 text-xl"
+      class="absolute top-4 right-4 flex items-center space-x-[1rem] text-kb-ui-01 text-xl"
     >
       <font-awesome-icon
         :icon="['fas', 'bell']"
@@ -56,7 +68,6 @@ const showItems = reactive(
         @click="movePage.myAlarm()"
       />
     </div>
-
-    <slot />
+      <slot />
   </header>
 </template>
