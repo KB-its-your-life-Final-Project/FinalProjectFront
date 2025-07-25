@@ -57,3 +57,13 @@ ol {
   background: #ffffff;
   justify-items: center;
 }
+
+.hide-scrollbar {
+  overflow: auto;
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

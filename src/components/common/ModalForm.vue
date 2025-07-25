@@ -34,17 +34,20 @@ async function onConfirm() {
 </script>
 <template>
   <!-- Dim -->
-  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-10">
+  <div
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-10"
+    @click.self="emit('close')"
+  >
     <!-- Modal -->
-    <div class="bg-white rounded-xl shadow-lg w-full p-6 max-w-md mx-4">
+    <div class="bg-white rounded-xl shadow-lg w-full p-8 max-w-md mx-4 relative">
       <h2 class="text-xl font-pretendard-bold mb-4">{{ title }}</h2>
       <!-- 컨텐츠 최대 높이 = 화면 1/2 초과 시 스크롤 생성 -->
-      <div class="max-h-[50vh] overflow-y-auto pt-1">
+      <div class="max-h-[50vh] overflow-y-auto pt-1 hide-scrollbar">
         <slot></slot>
       </div>
       <div class="flex justify-end gap-2 mt-8">
         <button
-          class="rounded-xl w-1/2 py-2 bg-blue-500 text-white rounded cursor-pointer"
+          class="rounded-xl w-1/2 py-2 bg-kb-yellow-positive text-white rounded cursor-pointer"
           @click="onConfirm"
         >
           완료

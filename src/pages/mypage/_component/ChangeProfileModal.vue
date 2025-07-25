@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ModalForm from "../common/ModalForm.vue";
+import ModalForm from "@/components/common/ModalForm.vue";
 const props = defineProps<{
   profile: string;
   name: string;
