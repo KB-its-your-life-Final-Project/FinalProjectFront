@@ -21,6 +21,8 @@ import {
   faDeleteLeft,
   faUserPen,
   faCamera,
+  faTriangleExclamation,
+  faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
@@ -62,6 +64,8 @@ library.add(
   faDeleteLeft,
   faUserPen,
   faCamera,
+  faTriangleExclamation,
+  faCircleInfo,
 );
 
 export { FontAwesomeIcon };

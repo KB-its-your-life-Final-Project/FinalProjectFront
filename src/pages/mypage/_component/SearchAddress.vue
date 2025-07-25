@@ -1,20 +1,34 @@
 <template>
-  <div class="space-y-2 mt-4 w-4/5">
-    <input v-model="roadAddress" placeholder="도로명주소" class="border p-2 w-full" readonly />
-    <input v-model="jibunAddress" placeholder="지번주소" class="border p-2 w-full" readonly />
-    <div class="flex">
-      <input v-model="extraAddress" placeholder="참고 항목" class="border p-2 flex-[3]" readonly />
-      <button
-        @click="openPostcode"
-        class="bg-blue-500 text-white px-4 rounded flex-[1] cursor-pointer"
-      >
-        주소 찾기
-      </button>
-    </div>
-    <div ref="layer" class="fixed hidden z-50 bg-white rounded-lg">
-      <div class="flex justify-start p-2 border-b">
-        <button class="text-lg px-3 py-1 cursor-pointer" @click="closeLayer">X</button>
+  <div class="border border-gray-300 mt-4 rounded-md">
+    <div class="space-y-2">
+      <input v-model="roadAddress" placeholder="도로명주소" class="p-2 w-full" readonly />
+      <input
+        v-model="jibunAddress"
+        placeholder="지번주소"
+        class="border-y border-gray-300 p-2 w-full"
+        readonly
+      />
+      <div class="relative">
+        <input v-model="extraAddress" placeholder="참고 항목" class="p-2" readonly />
+        <button
+          @click="openPostcode"
+          class="bg-kb-yellow-positive text-white px-4 rounded-rb absolute right-0 h-1/1 cursor-pointer"
+        >
+          주소 찾기
+        </button>
       </div>
+    </div>
+  </div>
+  <div></div>
+  <div
+    ref="layerContainer"
+    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white w-full h-full rounded-md hidden"
+  >
+    <div class="bg-kb-yellow rounded-t-lg h-12">
+      <button class="px-5 py-3 text-lg cursor-pointer" @click="closeLayer">X</button>
+    </div>
+    <div ref="layerContent" class="h-[calc(100%-48px)]">
+      <!-- 여기에 postcode iframe이 embed 됩니다 -->
     </div>
   </div>
 </template>
@@ -25,11 +39,18 @@ import { ref, onMounted } from "vue";
 const roadAddress = ref("");
 const jibunAddress = ref("");
 const extraAddress = ref("");
-const layer = ref<HTMLElement | null>(null);
+const layerContainer = ref<HTMLElement | null>(null);
+const layerContent = ref<HTMLElement | null>(null);
 let postcodeRef: any = null;
+function openLayer() {
+  if (layerContainer.value) {
+    layerContainer.value.classList.remove("hidden");
+  }
+}
+
 function closeLayer() {
-  if (layer.value) {
-    layer.value.style.display = "none";
+  if (layerContainer.value) {
+    layerContainer.value.classList.add("hidden");
   }
 }
 onMounted(() => {
@@ -59,33 +80,24 @@ function openPostcode() {
       jibunAddress.value = data.jibunAddress;
       extraAddress.value = extra;
 
-      layer.value!.style.display = "none";
+      closeLayer();
     },
     width: "100%",
     height: "100%",
     maxSuggestItems: 5,
   });
-  postcodeRef.embed(layer.value!);
-
-  setTimeout(() => {
-    if (layer.value) {
-      const width = 400;
-      const height = 500;
-      const borderWidth = 1;
-
-      layer.value.style.display = "block";
-      layer.value.style.width = width + "px";
-      layer.value.style.height = height + "px";
-      layer.value.style.border = borderWidth + "px solid #333";
-      layer.value.style.left =
-        ((window.innerWidth || document.documentElement.clientWidth) - width) / 2 -
-        borderWidth +
-        "px";
-      layer.value.style.top =
-        ((window.innerHeight || document.documentElement.clientHeight) - height) / 2 -
-        borderWidth +
-        "px";
-    }
-  }, 100); // 레이어 위치 조정을 위한 딜레이
+  if (layerContent.value) {
+    postcodeRef.embed(layerContent.value);
+  }
+  openLayer();
 }
 </script>
+<style>
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+</style>

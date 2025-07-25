@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import ModalForm from "../common/ModalForm.vue";
-import CustomInput from "./CustomInput.vue";
+import ModalForm from "@/components/common/ModalForm.vue";
+import DefaultInput from "@/components/common/DefaultInput.vue";
 import { ref } from "vue";
 import { useToast } from "@/utils/useToast";
-import { isEmpty, isValidPassword } from "@/utils/validate";
+import { isEmpty, isValidPasswordFormat } from "@/utils/validate";
 import movePage from "@/utils/movePage";
 
 const emit = defineEmits(["close"]);
@@ -23,7 +23,7 @@ function handleConfirm(): { success: boolean; message: string } {
   return { success: true, message: "탈퇴가 완료되었습니다" };
 }
 function checkPassword(password: string) {
-  if (isEmpty(password) || !isValidPassword(password)) {
+  if (isEmpty(password) || !isValidPasswordFormat(password)) {
     addToast(createToast("입력이 되지 않거나 올바르지 않은 형식의 비밀번호 입니다", "error"));
     return;
   }
@@ -34,15 +34,16 @@ function checkPassword(password: string) {
 </script>
 <template>
   <ModalForm :title="'회원 탈퇴'" @close="emit('close')" :handle-confirm="handleConfirm">
-    <div class="flex gap-3 items-center">
-      <CustomInput :label="'기존 비밀번호'" v-model="password" :type="'password'"></CustomInput>
-      <div
-        class="cursor-pointer text-sm hover:underline"
-        @click="validation ? null : checkPassword(password)"
-      >
-        비밀번호 확인
-      </div>
+    <div class="relative">
+      <DefaultInput
+        :label="'기존 비밀번호'"
+        v-model="password"
+        :type="'password'"
+        show-button
+        :button-label="'인증'"
+        @button-click="checkPassword(password)"
+      ></DefaultInput>
     </div>
-    <div v-if="validation" class="text-sm text-success mt-1 ml-1">* 비밀번호 확인 성공</div>
+    <div v-if="validation" class="text-sm text-success mt-1 ml-1">* 인증 완료</div>
   </ModalForm>
 </template>
