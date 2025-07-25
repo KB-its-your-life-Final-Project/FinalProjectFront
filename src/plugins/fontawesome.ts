@@ -9,10 +9,10 @@ import {
   faVideo,
   faUsers,
   faShop,
-  faUtensils, 
-  faShieldAlt, 
-  faChevronRight, 
-  faShieldHalved, 
+  faUtensils,
+  faShieldAlt,
+  faChevronRight,
+  faShieldHalved,
   faAngleRight,
   faChevronDown,
   faChevronUp,
@@ -26,7 +26,10 @@ import {
   faMap,
   faStar as farStar,
   faCircleXmark,
-  faHeart, faFileLines, faEnvelope,faUser
+  faHeart,
+  faFileLines,
+  faEnvelope,
+  faUser,
 } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 

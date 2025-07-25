@@ -17,14 +17,14 @@ export interface MemberDTO {
   /** @format int32 */
   createdType?: number;
   email?: string;
+  googleId?: string;
   /** @format int32 */
   id?: number;
   /** @format int32 */
   isDelete?: number;
   /** @format int32 */
   isDisable?: number;
-  /** @format int32 */
-  kakaoUserId?: number;
+  kakaoId?: string;
   name?: string;
   phone?: string;
   profileImg?: string;
@@ -33,6 +33,16 @@ export interface MemberDTO {
   /** @format date-time */
   regDate?: string;
   regIp?: string;
+}
+
+/** RegisterGoogleDTO */
+export interface RegisterGoogleDTO {
+  code?: string;
+}
+
+/** RegisterKakaoDTO */
+export interface RegisterKakaoDTO {
+  code?: string;
 }
 
 /** ApiResponse«List«MemberDTO»» */
@@ -49,6 +59,15 @@ export interface ApiResponseMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«boolean» */
+export interface ApiResponseBoolean {
+  /** @format int32 */
+  code?: number;
+  data?: boolean;
   message?: string;
   success?: boolean;
 }
