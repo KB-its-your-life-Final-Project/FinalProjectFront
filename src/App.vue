@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
 import DefaultLayout from "./components/layout/DefaultLayout.vue";
-
 </script>
 
 <template>
@@ -10,6 +9,4 @@ import DefaultLayout from "./components/layout/DefaultLayout.vue";
   </DefaultLayout>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

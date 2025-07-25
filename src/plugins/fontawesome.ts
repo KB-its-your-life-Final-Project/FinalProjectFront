@@ -10,8 +10,27 @@ import {
   faUsers,
   faShop,
   faUtensils,
+  faShieldAlt,
+  faChevronRight,
+  faShieldHalved,
+  faAngleRight,
+  faChevronDown,
+  faChevronUp,
+  faCheck,
+  faKey,
+  faDeleteLeft,
+  faUserPen,
+  faCamera,
 } from "@fortawesome/free-solid-svg-icons";
-import { faMap, faStar as farStar, faCircleXmark } from "@fortawesome/free-regular-svg-icons";
+import {
+  faMap,
+  faStar as farStar,
+  faCircleXmark,
+  faHeart,
+  faFileLines,
+  faEnvelope,
+  faUser,
+} from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(
@@ -28,6 +47,21 @@ library.add(
   faUsers,
   faShop,
   faUtensils,
+  faShieldHalved,
+  faAngleRight,
+  faShieldAlt,
+  faChevronRight,
+  faHeart,
+  faFileLines,
+  faEnvelope,
+  faUser,
+  faChevronDown,
+  faChevronUp,
+  faCheck,
+  faKey,
+  faDeleteLeft,
+  faUserPen,
+  faCamera,
 );
 
 export { FontAwesomeIcon };
