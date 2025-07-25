@@ -6,7 +6,6 @@ import SearchBuilding from "@/pages/safeReport/SearchBuilding.vue";
 import SelectBudget from "@/pages/safeReport/SelectBudget.vue";
 import SafeReportResult from "@/pages/safeReport/SafeReportResult.vue";
 import Header from "@/components/layout/header/Header.vue";
-import Section from "@/components/nav/BottomNav.vue";
 import { mainRouteName } from "@/router/mainRoute";
 
 const steps = [SearchBuilding, SelectBudget, SafeReportResult]
