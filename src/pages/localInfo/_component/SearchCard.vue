@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import LogoSearchBar from "@/pages/home/_component/LogoSearchBar.vue";
+import movePage from "@/utils/movePage";
 </script>
 
 <template>
   <div class="w-full flex items-center justify-start pl-6">
-    <span class="font-pretendard-extrabold text-5xl text-kb-ui-11">화양동 </span>
-    <LogoSearchBar />
+    <LogoSearchBar
+      placeholder="어느 지역이 궁금하세요?"
+      @click="movePage.localInfoSearch({ searchInput: searchInput })"
+    />
   </div>
 </template>

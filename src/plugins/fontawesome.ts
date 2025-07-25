@@ -12,6 +12,15 @@ import {
   faUtensils,
   faShieldAlt,
   faChevronRight,
+  faShieldHalved,
+  faAngleRight,
+  faChevronDown,
+  faChevronUp,
+  faCheck,
+  faKey,
+  faDeleteLeft,
+  faUserPen,
+  faCamera,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
@@ -38,12 +47,21 @@ library.add(
   faUsers,
   faShop,
   faUtensils,
+  faShieldHalved,
+  faAngleRight,
   faShieldAlt,
   faChevronRight,
   faHeart,
   faFileLines,
   faEnvelope,
   faUser,
+  faChevronDown,
+  faChevronUp,
+  faCheck,
+  faKey,
+  faDeleteLeft,
+  faUserPen,
+  faCamera,
 );
 
 export { FontAwesomeIcon };

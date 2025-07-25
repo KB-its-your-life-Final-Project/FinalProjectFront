@@ -1,21 +1,18 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="flex flex-col items-center">
-    <div
-      class="p-6 rounded-xl border-2 border-kb-yellow bg-gray-400 shadow-sm w-full flex flex-col items-center"
-    >
-      <!--      <div class="text-3xl font-pretendard-bold text-white mb-1">{{ currentTemp }}°</div>-->
-      <div class="text-3xl font-pretendard-bold text-white mb-1">25°</div>
-
-      <div class="text-xs font-pretendard-regular text-white/80 mb-1">
-        <!--        최고 {{ maxTemp }}° / 최저 {{ minTemp }}°api로 받아올 정보들 -->
-        최고 27/최저 18
+  <div class="flex items-center rounded-2xl border-1 border-blue-200 bg-white shadow-sm w-full">
+    <!-- 온도 정보 -->
+    <div class="flex flex-col items-center w-full mt-8">
+      <div class="font-pretendard-bold text-6xl text-gray-800 mb-2">34°</div>
+      <div class="text-lg font-pretendard-regular mb-2">
+        <div class="font-pretendard-bold text-kb-ui-04">최고 36°</div>
+        <div class="font-pretendard-bold text-kb-ui-04">최저 26°</div>
       </div>
     </div>
-    <div class="mt-2">
-      <span class="text-white text-sm font-pretendard-semibold">맑음</span>
-      <!--      <span class="text-white text-sm font-pretendard-semibold">{{ weatherStatus }}</span>-->
+    <div class="flex flex-col items-center w-full">
+      <div class="text-7xl mb-2">🌤️</div>
+      <div class="text-xs text-kb-ui-05 mt-5">출처 : 기상청</div>
     </div>
   </div>
 </template>

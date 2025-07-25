@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // 필요 시 기능 추가
-import Header from "@/components/layout/header/Header.vue";
-import MenuItem from "@/components/menu/MenuItems.vue";
-import MenuSection from "@/components/menu/MenuSection.vue";
+import Header from '@/components/layout/header/Header.vue'
+import MenuItem from '@/pages/mainMenu/_component/MenuItems.vue'
+import MenuSection from '@/pages/mainMenu/_component/MenuSection.vue'
+import Footer from '@/components/layout/Footer.vue'
 /*임의로 로그아웃, 회원탈퇴 부분 넣겠습니다.*/
 
 import { mainRouteName } from "@/router/mainRoute";
@@ -35,7 +36,7 @@ function openInquiry() {
 
   <div class="p-4 space-y-6">
     <MenuSection title="계정">
-      <MenuItem :icon="['far', 'user']" label="마이페이지" to="/" />
+      <MenuItem :icon="['far', 'user']" label="마이페이지" to="/mypage/main" />
       <MenuItem :icon="['fas', 'house']" label="실거래가 조회" to="/mapSearch" />
       <MenuItem :icon="['fas', 'shield-alt']" label="안심 정보" to="/safereport" />
       <MenuItem :icon="['far', 'heart']" label="찜한 매물" to="/myLike" />
@@ -58,4 +59,6 @@ function openInquiry() {
     <button @click="withdraw" class="underline">회원탈퇴</button>
     <button @click="logout" class="underline">로그아웃</button>
   </div>
+  <Footer />
+  <div class ="h-15"></div>
 </template>
