@@ -141,7 +141,7 @@ scales: {
   y: {
     beginAtZero: true,
     min: 0,              // 최소값 (직접 지정 가능)
-    max: 10,
+    max: 100,
     ticks: {
       stepSize: 0.5
     }

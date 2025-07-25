@@ -33,6 +33,7 @@ const movePage = {
   safeReport: makeRoute(mainRouteName.safeReport),
   myAlarm: makeRoute(mainRouteName.myAlarm),
   localInfo: makeRoute(mainRouteName.localInfo),
+
   // mainRouteName end
 
 //실거래가 상세페이지

@@ -90,7 +90,12 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     name: mainRouteName.transactionDetail,
     component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
   },
+  {
+    path: '/transactionDetail/:aptName',
+    name: 'transactionDetailAptName',
+    component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
 
+  }
 ];
 
 export { mainRouteMap, mainRouteName, mainRouteRecordRaw };
