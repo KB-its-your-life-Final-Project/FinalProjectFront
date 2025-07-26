@@ -40,14 +40,21 @@ src/
 ├── components/                # 컴포넌트
 │   ├── common/                # 공통 UI 컴포넌트 (버튼, 모달 등)
 │   ├── layouts/               # 레이아웃 관련 컴포넌트
-│   └── auth/                  # 예시) 인증 관련 컴포넌트
+│   └── home/                  # 예시) 인증 관련 컴포넌트
 
 ├── config/                    # 설정 파일
 │   └── index.ts
 
 ├── pages/                     # 화면
+│   ├── alarm/
 │   ├── auth/                  # 예시) 인증 관련 화면
-│   └── NotFoundPage.vue       # 404 Not Found 화면
+│   ├── info/
+│   ├── main/
+│   ├── mypage/
+│   ├── navbar/
+│   ├── LoadingPage.vue
+│   ├── NotFoundPage.vue
+    └── TestPage.vue       # 404 Not Found 화면
 
 ├── router/                    # Router
 │   ├── index.ts               # 라우터 생성 및 설정
@@ -108,43 +115,52 @@ npm run lint
 
 ## 6 커스텀 스타일 클래스명 (tailwind)
 
+## 7. font awesome 설치
+
+```sh
+npm install @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/free-regular-svg-icons @fortawesome/vue-fontawesome
+
+```
+
 ##### 폰트 (Pretendard)
 
-| 폰트 이름               | 클래스명                       |
-| ----------------------- | ------------------------------ |
-| "Pretendard-Thin"       | `--font-pretendard-thin`       |
-| "Pretendard-ExtraLight" | `--font-pretendard-extralight` |
-| "Pretendard-Light"      | `--font-pretendard-light`      |
-| "Pretendard-Medium"     | `--font-pretendard-medium`     |
-| "Pretendard-Regular"    | `--font-pretendard-regular`    |
-| "Pretendard-SemiBold"   | `--font-pretendard-semibold`   |
-| "Pretendard-Bold"       | `--font-pretendard-bold`       |
-| "Pretendard-ExtraBold"  | `--font-pretendard-extrabold`  |
-| "Pretendard-Black"      | `--font-pretendard-black`      |
+| 폰트 이름               | 클래스명 예시                |
+| ----------------------- | ---------------------------- |
+| "Pretendard-Thin"       | `font-pretendard-thin`       |
+| "Pretendard-ExtraLight" | `font-pretendard-extralight` |
+| "Pretendard-Light"      | `font-pretendard-light`      |
+| "Pretendard-Medium"     | `font-pretendard-medium`     |
+| "Pretendard-Regular"    | `font-pretendard-regular`    |
+| "Pretendard-SemiBold"   | `font-pretendard-semibold`   |
+| "Pretendard-Bold"       | `font-pretendard-bold`       |
+| "Pretendard-ExtraBold"  | `font-pretendard-extrabold`  |
+| "Pretendard-Black"      | `font-pretendard-black`      |
+
+![폰트값 사진](src/assets/imgs/fonts.png)
 
 ##### 색상값 (KB 색상 팔레트)
 
-| 색상값  | 클래스명 예시             |
-| ------- | ------------------------- |
-| #ffbc00 | `--bg-kb-yellow-positive` |
-| #ffd338 | `--bg-kb-yellow`          |
-| #ffcc00 | `--bg-kb-yellow-native`   |
-| #60584c | `--bg-kb-gray-dark`       |
-| #918274 | `--bg-kb-gray-light`      |
-| #000000 | `--bg-kb-ui-01`           |
-| #26282c | `--bg-kb-ui-02`           |
-| #484b51 | `--bg-kb-ui-03`           |
-| #696e76 | `--bg-kb-ui-04`           |
-| #8c949e | `--bg-kb-ui-05`           |
-| #aab0b8 | `--bg-kb-ui-06`           |
-| #c6cbd0 | `--bg-kb-ui-07`           |
-| #dde1e4 | `--bg-kb-ui-08`           |
-| #ebeef0 | `--bg-kb-ui-09`           |
-| #f7f7f8 | `--bg-kb-ui-10`           |
-| #ffffff | `--bg-kb-ui-11`           |
-| #287eff | `--bg-positive`           |
-| #f23f3f | `--bg-error`              |
-| #ff5858 | `--bg-error-input`        |
-| #ffd338 | `--bg-caution`            |
+| 색상값  | 클래스명 예시           |
+| ------- | ----------------------- |
+| #ffbc00 | `bg-kb-yellow-positive` |
+| #ffd338 | `bg-kb-yellow`          |
+| #ffcc00 | `bg-kb-yellow-native`   |
+| #60584c | `bg-kb-gray-dark`       |
+| #918274 | `bg-kb-gray-light`      |
+| #000000 | `bg-kb-ui-01`           |
+| #26282c | `bg-kb-ui-02`           |
+| #484b51 | `bg-kb-ui-03`           |
+| #696e76 | `bg-kb-ui-04`           |
+| #8c949e | `bg-kb-ui-05`           |
+| #aab0b8 | `bg-kb-ui-06`           |
+| #c6cbd0 | `bg-kb-ui-07`           |
+| #dde1e4 | `bg-kb-ui-08`           |
+| #ebeef0 | `bg-kb-ui-09`           |
+| #f7f7f8 | `bg-kb-ui-10`           |
+| #ffffff | `bg-kb-ui-11`           |
+| #287eff | `bg-positive`           |
+| #f23f3f | `bg-error`              |
+| #ff5858 | `bg-error-input`        |
+| #ffd338 | `bg-caution`            |
 
 ![색상값 사진](src/assets/imgs/colors.png)
