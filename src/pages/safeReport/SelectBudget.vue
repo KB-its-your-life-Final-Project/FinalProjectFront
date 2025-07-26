@@ -80,7 +80,7 @@ watch(budget, val => {
 // 한글 금액 변환
 function numberToKorean(num: number, removeUnit = ''): string {
   if (num === 0) return removeUnit ? '' : '영원';
-  const unitWords = ['', '만', '억', '조', '경'];
+  const unitWords = ['', '만', '억'];
   const smallUnitWords = ['', '십', '백', '천'];
   const numberWords = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
   const result = [];
@@ -133,7 +133,8 @@ async function next() {
     console.log('서버 응답:', response.data)
     emit('next',{
       formData: props.formData,
-      resultData: response.data.data
+      resultData: response.data.data.rentalRatioAndBuildyear,
+      buildingInfo: response.data.data.buildingTypeAndPurpose
     })
   }catch (error){
     console.error('전송 실패:', error)

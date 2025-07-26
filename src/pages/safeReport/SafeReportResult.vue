@@ -14,10 +14,19 @@ interface ResultData {
   score: number;
 }
 
-const emit = defineEmits(["update", "next", "prev"]);
-const props = defineProps<{ formData: FormData; resultData: ResultData | null }>();
+interface BuildingInfo {
+  buildingPurpose: string;
+  violationStatus: string;
+}
 
-const { formData, resultData } = props;
+const emit = defineEmits(["update", "next", "prev"]);
+const props = defineProps<{
+  formData: FormData;
+  resultData: ResultData | null;
+  buildingInfo: BuildingInfo | null;
+}>();
+
+const { formData, resultData, buildingInfo } = props;
 const router = useRouter();
 const showModal_financial = ref(false);
 const showModal_building = ref(false);
@@ -218,8 +227,11 @@ function goToKB() {
         ×
       </button>
       <h2 class="text-lg font-bold mb-4">건축물 정보</h2>
-      <p>이곳에 건축물 정보에 대한 상세 설명이나 데이터를 보여줄 수 있습니다.</p>
+      <hr/>
+      <p>{{ formData.buildingName }}은 {{resultData?.buildYear}}년에 건축되었습니다. </p>
     </div>
   </div>
 </template>
 <style scoped></style>
+
+

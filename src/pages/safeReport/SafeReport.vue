@@ -23,6 +23,7 @@ const formData = reactive({
 })
 
 const resultData = ref(null)
+const buildingInfo = ref(null)
 function onUpdate(updated) {
   Object.assign(formData, updated)
 }
@@ -30,6 +31,9 @@ function onUpdate(updated) {
 function nextStep(payload?:any) {
   if (payload?.resultData) {
     resultData.value = payload.resultData
+  }
+  if (payload?.buildingInfo) {
+    buildingInfo.value = payload.buildingInfo
   }
   currentStep.value++
 }
@@ -67,6 +71,7 @@ function prevStep() {
       :is="steps[currentStep]"
       :form-data="formData"
       :result-data="resultData"
+      :building-info="buildingInfo"
       @update="onUpdate"
       @next="nextStep"
       @prev="prevStep"
