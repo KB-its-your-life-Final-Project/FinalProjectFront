@@ -33,11 +33,6 @@ function prevStep() {
 
 function handleSafeReportBack() {
   router.push({ name: "homeMain" });
-  // if(store.currentStep > 0){
-  //   store.prevStep()
-  // }else{
-  //   router.back()
-  // }
 }
 </script>
 
