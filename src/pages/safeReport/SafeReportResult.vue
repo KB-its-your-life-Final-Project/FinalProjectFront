@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { computed, ref } from "vue";
-
-interface FormData {
-  buildingName: string;
-  budget: number | null;
-}
+import { safeReportStore } from '@/stores/safeReportStore'
 
 interface ResultData {
   dealAmount: number;
@@ -20,13 +16,9 @@ interface BuildingInfo {
 }
 
 const emit = defineEmits(["update", "next", "prev"]);
-const props = defineProps<{
-  formData: FormData;
-  resultData: ResultData | null;
-  buildingInfo: BuildingInfo | null;
-}>();
+const store = safeReportStore()
 
-const { formData, resultData, buildingInfo } = props;
+const { formData, resultData, buildingInfo } = store;
 const router = useRouter();
 const showModal_financial = ref(false);
 const showModal_building = ref(false);
