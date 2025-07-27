@@ -43,7 +43,9 @@ function checkServerStatus(url) {
 const outputPath = join(__dirname, "../src/api/autoLoad");
 
 //swagger로 api 가져오기 명령어
-const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-type`;
+// const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-type`;
+// const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-type --modular-name Api`;
+const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-name Api`;
 
 //타입 생성 시작
 async function generateTypes() {
