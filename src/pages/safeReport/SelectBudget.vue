@@ -126,18 +126,8 @@ async function next() {
     alert('예산은 100억원 미만이어야 합니다!')
     return
   }
-  try{
-    console.log("보낼 데이터",{...store.formData})
-    const response = await axios.post('/api/report/requestData',{...store.formData})
-    console.log('서버 응답:', response.data)
-    emit('next',{
-      resultData: response.data.data.rentalRatioAndBuildyear,
-      buildingInfo: response.data.data.buildingTypeAndPurpose
-    })
-  }catch (error){
-    console.error('전송 실패:', error)
-    alert('DB에 데이터가 없습니다')
-  }
+
+  emit('next')
 }
 
 function prev(){

@@ -1,7 +1,8 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { computed, ref } from "vue";
 import { safeReportStore } from '@/stores/safeReportStore'
+import axios from 'axios'
 
 interface ResultData {
   dealAmount: number;
@@ -75,6 +76,20 @@ const riskText = computed(() => {
   return "";
 });
 
+onMounted(async () => {
+  try{
+    console.log("보낼 데이터", {...store.formData})
+    const response = await axios.post('/api/report/requestData', {...store.formData})
+    console.log('서버 응답:', response.data)
+
+    store.resultData = response.data.data.rentalRatioAndBuildyear
+    store.buildingInfo = response.data.data.buildingTypeAndPurpose
+  }catch (error){
+    console.error('전송 실패: ', error)
+    alert('DB에 데이터가 없습니다.')
+  }
+
+})
 function goHome() {
   router.push({ name: "homeMain" });
 }
@@ -82,9 +97,137 @@ function goToKB() {
   window.open("https://m.naver.com/");
   // window.open('https://obank.kbstar.com/quics?page=C103557#loading', '_blank')
 }
+</script> -->
+
+<script setup lang="ts">
+import { useRouter } from "vue-router";
+import { computed, ref, onMounted } from "vue"; // onMounted 추가
+import { safeReportStore } from '@/stores/safeReportStore'
+import axios from 'axios'
+
+interface ResultData {
+  dealAmount: number;
+  buildYear: number;
+  reverse_rental_ratio: number;
+  score: number;
+}
+
+interface BuildingInfo {
+  buildingPurpose: string;
+  violationStatus: string;
+}
+
+const emit = defineEmits(["update", "next", "prev"]);
+const store = safeReportStore()
+
+const { formData, resultData, buildingInfo } = store;
+const router = useRouter();
+const showModal_financial = ref(false);
+const showModal_building = ref(false);
+const isLoading = ref(true); // 로딩 상태 추가
+
+// 기존 computed 함수들은 그대로 유지
+const gradeText = computed(() => {
+  if (!resultData || typeof resultData.score !== "number") return "-";
+  if (resultData.score >= 8) return "위험";
+  if (resultData.score >= 5) return "주의";
+  if (resultData.score >= 3) return "안전";
+  return "매우 안전";
+});
+
+const gradeColor = computed(() => {
+  if (!resultData || typeof resultData.score !== "number") {
+    return {
+      bg: "bg-gray-100",
+      text: "text-gray-400",
+      label: "-",
+    };
+  }
+  if (resultData.score >= 8) {
+    return {
+      bg: "bg-red-100",
+      text: "text-red-600",
+      label: "위험",
+    };
+  } else if (resultData.score >= 5) {
+    return {
+      bg: "bg-orange-100",
+      text: "text-orange-500",
+      label: "주의",
+    };
+  } else if (resultData.score >= 3) {
+    return {
+      bg: "bg-yellow-100",
+      text: "text-yellow-600",
+      label: "안전",
+    };
+  } else {
+    return {
+      bg: "bg-blue-100",
+      text: "text-blue-600",
+      label: "매우 안전",
+    };
+  }
+});
+
+const riskText = computed(() => {
+  if (gradeText.value === "위험" || gradeText.value === "주의") {
+    return "보증금 회수에 대한 리스크가 있습니다.";
+  } else if (gradeText.value === "안전" || gradeText.value === "매우 안전") {
+    return "보증금 회수에 대한 리스크가 없습니다.";
+  }
+  return "";
+});
+
+onMounted(async () => {
+  try {
+    console.log("보낼 데이터", {...store.formData})
+    const response = await axios.post('/api/report/requestData', {...store.formData})
+    console.log('서버 응답:', response.data)
+
+    store.resultData = response.data.data.rentalRatioAndBuildyear
+    store.buildingInfo = response.data.data.buildingTypeAndPurpose
+
+    console.log('저장된 resultData:', store.resultData)
+    console.log('저장된 buildingInfo:', store.buildingInfo)
+    console.log('resultData.score:', store.resultData.score)
+    console.log('resultData.buildYear:', store.resultData.buildYear)
+  } catch (error) {
+    console.error('전송 실패: ', error)
+    alert('DB에 데이터가 없습니다.')
+  } finally {
+    // 항상 3초 후에 로딩 완료
+    setTimeout(() => {
+      isLoading.value = false
+    }, 3000)
+  }
+})
+
+// 기존 함수들은 그대로 유지
+function goHome() {
+  router.push({ name: "homeMain" });
+}
+function goToKB() {
+  window.open("https://m.naver.com/");
+}
 </script>
 
 <template>
+  <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen">
+    <div class="text-center">
+      <!-- 로딩 스피너 -->
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-kb-yellow mx-auto mb-4"></div>
+
+      <!-- 로딩 메시지 -->
+      <h2 class="text-xl font-pretendard-bold text-kb-ui-01 mb-2">
+        레포트를 생성 중입니다
+      </h2>
+      <p class="text-kb-ui-05 text-sm">
+        잠시만 기다려주세요...
+      </p>
+    </div>
+  </div>
+  <div v-else>
   <section class="flex flex-col gap-9 items-center mt">
     <div class="text-center font-pretendard-bold text-lg foont-semibold">
       {{ formData.buildingName }}의 안심 진단 리포트입니다.
@@ -222,6 +365,7 @@ function goToKB() {
       <hr/>
       <p>{{ formData.buildingName }}은 {{resultData?.buildYear}}년에 건축되었습니다. </p>
     </div>
+  </div>
   </div>
 </template>
 <style scoped></style>
