@@ -73,6 +73,14 @@ export const safeReportStore = defineStore("safeReport", () => {
     buildingInfo.value = null;
   };
 
+  const updateResultData = (data: ResultData) => {
+    resultData.value = data;
+  };
+
+  const updateBuildingInfo = (data: BuildingInfo) => {
+    buildingInfo.value = data;
+  };
+
   return {
     currentStep,
     formData,
@@ -83,5 +91,7 @@ export const safeReportStore = defineStore("safeReport", () => {
     nextStep,
     prevStep,
     resetStore,
+    updateResultData,
+    updateBuildingInfo,
   };
 });

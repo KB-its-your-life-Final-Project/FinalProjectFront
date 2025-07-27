@@ -120,7 +120,7 @@ interface BuildingInfo {
 const emit = defineEmits(["update", "next", "prev"]);
 const store = safeReportStore()
 
-const { formData, resultData, buildingInfo } = store;
+// 구조분해할당 제거 - 반응성 유지
 const router = useRouter();
 const showModal_financial = ref(false);
 const showModal_building = ref(false);
@@ -128,34 +128,34 @@ const isLoading = ref(true); // 로딩 상태 추가
 
 // 기존 computed 함수들은 그대로 유지
 const gradeText = computed(() => {
-  if (!resultData || typeof resultData.score !== "number") return "-";
-  if (resultData.score >= 8) return "위험";
-  if (resultData.score >= 5) return "주의";
-  if (resultData.score >= 3) return "안전";
+  if (!store.resultData || typeof store.resultData.score !== "number") return "-";
+  if (store.resultData.score >= 8) return "위험";
+  if (store.resultData.score >= 5) return "주의";
+  if (store.resultData.score >= 3) return "안전";
   return "매우 안전";
 });
 
 const gradeColor = computed(() => {
-  if (!resultData || typeof resultData.score !== "number") {
+  if (!store.resultData || typeof store.resultData.score !== "number") {
     return {
       bg: "bg-gray-100",
       text: "text-gray-400",
       label: "-",
     };
   }
-  if (resultData.score >= 8) {
+  if (store.resultData.score >= 8) {
     return {
       bg: "bg-red-100",
       text: "text-red-600",
       label: "위험",
     };
-  } else if (resultData.score >= 5) {
+  } else if (store.resultData.score >= 5) {
     return {
       bg: "bg-orange-100",
       text: "text-orange-500",
       label: "주의",
     };
-  } else if (resultData.score >= 3) {
+  } else if (store.resultData.score >= 3) {
     return {
       bg: "bg-yellow-100",
       text: "text-yellow-600",
@@ -185,21 +185,20 @@ onMounted(async () => {
     const response = await axios.post('/api/report/requestData', {...store.formData})
     console.log('서버 응답:', response.data)
 
-    store.resultData = response.data.data.rentalRatioAndBuildyear
-    store.buildingInfo = response.data.data.buildingTypeAndPurpose
+    // 새로운 업데이트 메서드 사용
+    store.updateResultData(response.data.data.rentalRatioAndBuildyear)
+    store.updateBuildingInfo(response.data.data.buildingTypeAndPurpose)
 
     console.log('저장된 resultData:', store.resultData)
     console.log('저장된 buildingInfo:', store.buildingInfo)
-    console.log('resultData.score:', store.resultData.score)
-    console.log('resultData.buildYear:', store.resultData.buildYear)
+    console.log('resultData.score:', store.resultData?.score)
+    console.log('resultData.buildYear:', store.resultData?.buildYear)
+
+    isLoading.value = false
   } catch (error) {
     console.error('전송 실패: ', error)
     alert('DB에 데이터가 없습니다.')
-  } finally {
-    // 항상 3초 후에 로딩 완료
-    setTimeout(() => {
-      isLoading.value = false
-    }, 3000)
+    isLoading.value = false
   }
 })
 
@@ -230,7 +229,7 @@ function goToKB() {
   <div v-else>
   <section class="flex flex-col gap-9 items-center mt">
     <div class="text-center font-pretendard-bold text-lg foont-semibold">
-      {{ formData.buildingName }}의 안심 진단 리포트입니다.
+      {{ store.formData.buildingName }}의 안심 진단 리포트입니다.
     </div>
     <div
       class="w-32 h-32 rounded-full flex flex-col items-center justify-center shadow-md"
@@ -243,7 +242,7 @@ function goToKB() {
           :class="gradeColor.text"
         />
         <span class="text-xl font-bold" :class="gradeColor.text">
-          {{ resultData?.score ?? "-" }}<span class="text-sm">/10</span>
+          {{ store.resultData?.score ?? "-" }}<span class="text-sm">/10</span>
         </span>
       </div>
     </div>
@@ -335,17 +334,17 @@ function goToKB() {
       </button>
       <h2 class="text-lg font-bold mb-4">재정적 안전성 분석</h2>
       <hr />
-      <p>000님의 예산 금액 {{ formData.budget }} 만원에 기반하여 분석한 결과는 다음과 같습니다.</p>
+      <p>000님의 예산 금액 {{ store.formData.budget }} 만원에 기반하여 분석한 결과는 다음과 같습니다.</p>
       <p />
       <p>
-        {{ formData.buildingName }}의 최근 거래 가격은 {{ resultData?.dealAmount }}만원 입니다. 이에
+        {{ store.formData.buildingName }}의 최근 거래 가격은 {{ store.resultData?.dealAmount }}만원 입니다. 이에
         따라 역전세율은
         {{
-          resultData?.reverse_rental_ratio != null &&
-          !isNaN(Number(resultData.reverse_rental_ratio))
-            ? Number(resultData.reverse_rental_ratio).toFixed(2)
+          store.resultData?.reverse_rental_ratio != null &&
+          !isNaN(Number(store.resultData.reverse_rental_ratio))
+            ? Number(store.resultData.reverse_rental_ratio).toFixed(2)
             : "-"
-        }}%이며 깡통 전세 위험 점수는 {{ resultData?.score }}/10점 입니다. 이 수치는
+        }}%이며 깡통 전세 위험 점수는 {{ store.resultData?.score }}/10점 입니다. 이 수치는
         {{ gradeText }} 구간으로 평가되며 {{ riskText }}
       </p>
     </div>
@@ -363,7 +362,7 @@ function goToKB() {
       </button>
       <h2 class="text-lg font-bold mb-4">건축물 정보</h2>
       <hr/>
-      <p>{{ formData.buildingName }}은 {{resultData?.buildYear}}년에 건축되었습니다. </p>
+      <p>{{ store.formData.buildingName }}은 {{store.resultData?.buildYear}}년에 건축되었습니다. </p>
     </div>
   </div>
   </div>
