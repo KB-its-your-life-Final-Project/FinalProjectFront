@@ -12,14 +12,18 @@
 
 import {
   ApiResponseBoolean,
+  ApiResponseFormData,
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
   RegisterGoogleDTO,
   RegisterKakaoDTO,
+  SafeReportRequestDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -207,6 +211,25 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags safe-report-controller
+   * @name ReceiveFormUsingPost
+   * @summary receiveForm
+   * @request POST:/api/report/requestData
+   */
+  receiveFormUsingPost = (
+    dto: SafeReportRequestDto,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseFormData, void>({
+      path: `/api/report/requestData`,
+      method: "POST",
+      body: dto,
+      type: ContentType.Json,
       ...params,
     });
 }
