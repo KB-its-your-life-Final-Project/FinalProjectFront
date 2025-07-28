@@ -2,14 +2,13 @@
 import { ref, watch } from 'vue'
 import { Api } from "@/api/autoLoad/Api.ts";
 import axios from "axios";
-//import axios from "axios";
+import { safeReportStore } from '@/stores/safeReportStore'
 
-const props = defineProps({ formData: Object })
+const store = safeReportStore()
 const emit = defineEmits(['update','next','prev'])
 
-
 const rawInput = ref('')           // 사용자가 입력한 숫자 문자열
-const budget = ref<number | null>(null)
+const budget = ref<number | null>(store.formData.budget)
 const displayValue = ref('')       // 변환된 한글 금액
 const showError = ref(false)
 
@@ -74,13 +73,13 @@ function updateDisplay() {
 }
 
 watch(budget, val => {
-  emit('update', { budget: val })
+  store.updateFormData({ budget: val })
 })
 
 // 한글 금액 변환
 function numberToKorean(num: number, removeUnit = ''): string {
   if (num === 0) return removeUnit ? '' : '영원';
-  const unitWords = ['', '만', '억', '조', '경'];
+  const unitWords = ['', '만', '억'];
   const smallUnitWords = ['', '십', '백', '천'];
   const numberWords = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
   const result = [];
@@ -127,18 +126,8 @@ async function next() {
     alert('예산은 100억원 미만이어야 합니다!')
     return
   }
-  try{
-    console.log("보낼 데이터",{...props.formData})
-    const response = await axios.post('/api/report/requestData',{...props.formData})
-    console.log('서버 응답:', response.data)
-    emit('next',{
-      formData: props.formData,
-      resultData: response.data.data
-    })
-  }catch (error){
-    console.error('전송 실패:', error)
-    alert('DB에 데이터가 없습니다')
-  }
+
+  emit('next')
 }
 
 function prev(){
