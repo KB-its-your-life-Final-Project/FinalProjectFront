@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-const props = defineProps({ formData: Object })
+import { safeReportStore } from '@/stores/safeReportStore'
+
+const store = safeReportStore()
 const emit = defineEmits(['update','next','prev'])
 
-const buildingName = ref(props.formData.buildingName)
-const roadAddress = ref(props.formData.roadAddress)
-const jibunAddress = ref(props.formData.jibunAddress)
-const dongName = ref(props.formData.dongname)
+const buildingName = ref(store.formData.buildingName)
+const roadAddress = ref(store.formData.roadAddress)
+const jibunAddress = ref(store.formData.jibunAddress)
+const dongName = ref(store.formData.dongName)
+const lat = ref<number>(store.formData.lat)
+const lng = ref<number>(store.formData.lng)
 const naverReady = ref(false)
 const showPostcode = ref(false)
 
@@ -39,30 +43,35 @@ function search() {
 
     const postcode = new (window as any).daum.Postcode({
       oncomplete(data: any) {
-        console.log('선택된 주소 데이터: ', data);
-
-        roadAddress.value = data.roadAddress || '';
-        jibunAddress.value = data.jibunAddress || '';
-        dongName.value = /[동|로|가]$/.test(data.bname) ? data.bname : '';
+        console.log('전체 주소 데이터:', data);
+        roadAddress.value = data.roadAddress || data.autoRoadAddress || '';
+        jibunAddress.value = data.jibunAddress || data.autoJibunAddress || '';
         buildingName.value = data.buildingName || '';
-        showPostcode.value = false;
+        dongName.value = /[동|로|가]$/.test(data.bname) ? data.bname : '';
 
-        if (jibunAddress.value && naverReady.value) {
-          searchAddressToCoordinate(jibunAddress.value);
-        }
-
-        emit('update', {
+        store.updateFormData({
           roadAddress: roadAddress.value,
           jibunAddress: jibunAddress.value,
           buildingName: buildingName.value,
           dongName: dongName.value,
+
         });
+
+        if(roadAddress.value && naverReady.value){
+          searchAddressToCoordinate(jibunAddress.value);
+        }
+
       },
       onclose: () => {
         showPostcode.value = false;
+        // 주소 선택 없이 닫으면 초기화
+        if (!buildingName.value.trim()) {
+          resetFormData()
+        }
       },
       width: '100%',
       height: '100%',
+
     });
 
     postcode.embed(container);
@@ -95,20 +104,36 @@ function searchAddressToCoordinate(address: string) {
 
       console.log("✅ 위도:", latVal, "경도:", lngVal);
 
-      Object.assign(props.formData, {
+      store.updateFormData({
         lat: latVal,
         lng: lngVal,
       });
-
-      emit("update", {
-        ...props.formData,
-      });
+      console.log('store 업데이트 후 formData:', store.formData);
     }
   );
 }
 
 function next() {
   emit('next')
+}
+
+function resetFormData() {
+  // store 초기화
+  store.resetStore()
+
+  // 로컬 ref들도 초기화
+  buildingName.value = ''
+  roadAddress.value = ''
+  jibunAddress.value = ''
+  dongName.value = ''
+  lat.value = 0
+  lng.value = 0
+}
+
+// 닫기 버튼 클릭 시 초기화
+function handleClose() {
+  showPostcode.value = false
+  resetFormData()
 }
 
 </script>
@@ -129,8 +154,9 @@ function next() {
         v-model="buildingName"
         type="text"
         placeholder="주소 찾기로 입력"
-        class="flex-1 border accent-kb-ui-05 rounded-full py-2 pl-4 focus:outline-none cursor-not-allowed"
-        disabled
+        class="flex-1 border accent-kb-ui-05 rounded-full py-2 pl-4 focus:outline-none"
+        readonly
+        @click="search"
       />
       <button
         @click="search"
@@ -149,7 +175,7 @@ function next() {
         <div id="postcodeContainer" class="w-full h-full" style="min-height: 400px"></div>
         <button
           class="absolute top-2 right-2 z-[10000] bg-white text-sm border px-2 py-1 rounded"
-          @click="showPostcode = false"
+          @click="handleClose"
         >
           닫기
         </button>
@@ -159,7 +185,7 @@ function next() {
     <div class="fixed z-0 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
-        :disabled="!buildingName.trim()"
+        :disabled="!buildingName.trim() || !roadAddress.trim() || !jibunAddress.trim()"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
       >
         다음

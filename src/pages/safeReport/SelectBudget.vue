@@ -2,15 +2,15 @@
 import { ref, watch } from 'vue'
 import { Api } from "@/api/autoLoad/Api.ts";
 import axios from "axios";
-//import axios from "axios";
+import { safeReportStore } from '@/stores/safeReportStore'
 
-const props = defineProps({ formData: Object })
+const store = safeReportStore()
 const emit = defineEmits(['update','next','prev'])
 
-
 const rawInput = ref('')           // 사용자가 입력한 숫자 문자열
-const budget = ref<number | null>(null)
+const budget = ref<number | null>(store.formData.budget)
 const displayValue = ref('')       // 변환된 한글 금액
+const showError = ref(false)
 
 // 숫자 입력 처리
 function handleKeydown(e: KeyboardEvent) {
@@ -38,70 +38,76 @@ function handleBackspace(e: KeyboardEvent) {
 }
 
 function handleInput(e: Event) {
-  const val = (e.target as HTMLInputElement).value;
-  // 숫자가 아닌 문자가 하나라도 포함되어 있으면 전체 삭제
+  let val = (e.target as HTMLInputElement).value;
+  // 숫자 이외 입력 불가
   if (/[^0-9]/.test(val)) {
-    // input 값을 강제로 ''로 만듦
-    (e.target as HTMLInputElement).value = '';
-    rawInput.value = '';
-    displayValue.value = '';
-    budget.value = null;
-  } else {
-    rawInput.value = val;
-    updateDisplay();
+    val = val.replace(/[^0-9]/g, '');
   }
+  if (val === '') {
+    rawInput.value = '';
+    showError.value = false;
+    updateDisplay();
+    return;
+  }
+  if (Number(val) > 999999) {
+    showError.value = true;
+    rawInput.value = '999999'; // val이 아니라 바로 999999로!
+    updateDisplay();
+    return; // 여기서 return!
+  } else {
+    showError.value = false;
+  }
+  rawInput.value = val;
+  updateDisplay();
 }
 
-// rawInput → 한글 금액으로 변환
 function updateDisplay() {
   if (rawInput.value === '') {
-    budget.value = null
-    displayValue.value = ''
-    return
+    displayValue.value = '';
+    budget.value = null;
+    return;
   }
-
-  const numeric = Number(rawInput.value)
-  budget.value = numeric * 100;
-  displayValue.value = numberToKorean(numeric * 1000000,'만')
+  const numeric = Number(rawInput.value);
+  displayValue.value = numberToKorean(numeric * 10000);
+  budget.value = numeric;
 }
 
 watch(budget, val => {
-  emit('update', { budget: val })
+  store.updateFormData({ budget: val })
 })
 
 // 한글 금액 변환
 function numberToKorean(num: number, removeUnit = ''): string {
-  if (num === 0) return removeUnit ? '' : '영원'
-
-  const unitWords = ['', '만', '억', '조', '경']
-  const smallUnitWords = ['', '십', '백', '천']
-  const numberWords = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구']
-  const result = []
-  let unitPos = 0
-
+  if (num === 0) return removeUnit ? '' : '영원';
+  const unitWords = ['', '만', '억'];
+  const smallUnitWords = ['', '십', '백', '천'];
+  const numberWords = ['영', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+  const result = [];
+  let unitPos = 0;
   while (num > 0) {
-    const part = num % 10000
+    const part = num % 10000;
     if (part > 0) {
-      let section = ''
-      const digits = part.toString().padStart(4, '0').split('').map(Number)
+      let section = '';
+      const digits = part.toString().padStart(4, '0').split('').map(Number);
       digits.forEach((digit, idx) => {
         if (digit !== 0) {
-          section += numberWords[digit] + smallUnitWords[3 - idx]
+          if (!(digit === 1 && idx !== 3)) {
+            section += numberWords[digit];
+          }
+          section += smallUnitWords[3 - idx];
         }
-      })
-
-      const unit = unitWords[unitPos]
+      });
+      const unit = unitWords[unitPos];
       if (unit !== removeUnit) {
-        result.unshift(section + unit)
+        result.unshift(section + unit);
       } else {
-        result.unshift(section)
+        result.unshift(section);
       }
     }
-    unitPos++
-    num = Math.floor(num / 10000)
+    unitPos++;
+    num = Math.floor(num / 10000);
   }
-
-  return result.join('')
+  return result.join('');
 }
 
 
@@ -120,18 +126,8 @@ async function next() {
     alert('예산은 100억원 미만이어야 합니다!')
     return
   }
-  try{
-    console.log("보낼 데이터",{...props.formData})
-    const response = await axios.post('/api/report/requestData',{...props.formData})
-    console.log('서버 응답:', response.data)
-    emit('next',{
-      formData: props.formData,
-      resultData: response.data.data
-    })
-  }catch (error){
-    console.error('전송 실패:', error)
-    alert('DB에 데이터가 없습니다')
-  }
+
+  emit('next')
 }
 
 function prev(){
@@ -151,20 +147,38 @@ function prev(){
       </h1>
     </div>
 
+
     <div class="relative w-full max-w-lg mx-auto">
-      <!--  search bar -->
-      <input
-        :value="displayValue"
-        @keydown="handleKeydown"
-        @keydown.backspace="handleBackspace"
+      <!-- 한글 금액 표시 (input 위) -->
+      <span
+        v-if="rawInput.length >= 3"
+        class="absolute right-4 -top-6 text-s text-kb-ui-04 mt-1"
+      >
+        {{ displayValue }}원
+      </span>
+      <div class="flex items-center w-full">
+        <input
+        v-model="rawInput"
         @input="handleInput"
         type="text"
+        maxlength="6"
         placeholder="보증금 예산 입력"
-        class="w-full border border-kb-ui-06 rounded-full py-2 pl-4 pr-12 focus:outline-none bg-white cursor-text"
+        class="w-full border border-kb-ui-06 rounded-full pl-4 pr-14 focus:outline-none bg-white cursor-text mt-1 text-base"
+        style="height: 2.5rem; line-height: 2.5rem; padding-top: 0; padding-bottom: 0;"
       />
-      <span class="absolute inset-y-0 right-4 flex items-center text-kb-ui-04 pointer-events-none">
-      만원
-    </span>
+      <!-- input의 오른쪽 안에 "만원"을 배치 -->
+      <span
+        class="absolute right-4 top-0 bottom-0 flex items-center text-kb-ui-04 pointer-events-none text-base"
+        style="height: 3.0rem; line-height: 2.5rem;"
+      >
+        만원
+      </span>
+      </div>
+
+      <!-- 경고 메시지는 input 아래에 block으로! -->
+      <div class="text-xs text-kb-ui-04 mt-2 text-right">
+        예산은 100억원 미만이어야 합니다
+      </div>
     </div>
     <div class="fixed z-auto inset-x-0 bottom-6 flex justify-between px-6 pb-24">
       <button
@@ -175,7 +189,7 @@ function prev(){
       </button>
       <button
         @click="next"
-        :disabled="!budget"
+        :disabled="!budget || showError || budget < 100"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
       >
         레포트 보기

@@ -5,6 +5,11 @@ import { defineProps, ref, reactive } from "vue";
 import movePage from "@/utils/movePage";
 import { headerTitleList, headerShowList } from "./header";
 import type { headerShowtype } from "./header";
+import { useRoute } from "vue-router";
+
+const route = useRoute()
+
+const emit = defineEmits(['back-click'])
 
 //헤더 받아오기
 const props = defineProps<{
@@ -24,6 +29,19 @@ const showItems = reactive(
     {} as Record<string, boolean>,
   ),
 );
+
+function handleBackClick() {
+  console.log('뒤로가기 버튼 클릭됨!')
+  console.log('현재 route.name:', route.name)
+
+  if (route.name === 'safeReport') {
+    console.log('SafeReport 페이지 - emit 실행')
+    emit('back-click');
+  } else {
+    console.log('다른 페이지 - movePage.back() 실행')
+    movePage.back();
+  }
+}
 </script>
 
 <template>
@@ -36,7 +54,7 @@ const showItems = reactive(
         v-if="showItems.showBack"
         :icon="['fas', 'arrow-left']"
         class="text-[1.125rem] cursor-pointer"
-        @click="movePage.back()"
+        @click="handleBackClick"
       />
       <span
         v-if="title"

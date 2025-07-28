@@ -38,9 +38,7 @@ const movePage = {
 
   // myPageRouteName start
   mypage: makeRoute(myPageRouteName.mypage),
-  myProfile: makeRoute(myPageRouteName.myProfile),
-  editProfile: makeRoute(myPageRouteName.editProfile),
-  myPageMain: makeRoute(myPageRouteName.myPageMain),
+  mypageStetting: makeRoute(myPageRouteName.alarmSetting),
   // myPageRouteName end
 };
 export default movePage;

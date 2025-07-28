@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ModalForm from "../common/ModalForm.vue";
-import CustomInput from "./CustomInput.vue";
+import ModalForm from "@/components/common/ModalForm.vue";
+import DefaultInput from "@/components/common/DefaultInput.vue";
 import { isEmpty } from "@/utils/validate";
-defineProps<{
+const props = defineProps<{
   oldName: string;
 }>();
 
@@ -19,18 +19,13 @@ function handleConfirm(): { success: boolean; message: string } {
 </script>
 <template>
   <ModalForm :title="'이름 변경'" :handle-confirm="handleConfirm" @close="emit('close')">
-    <CustomInput
-      class="w-2/3"
-      :label="'기존 이름'"
-      :disabled="true"
-      :old-data="oldName"
-      :type="'text'"
-    ></CustomInput>
-    <CustomInput
-      class="mt-5 w-2/3"
-      :label="'변경 이름'"
+    <DefaultInput label="기존 이름" :old-data="oldName" type="text" disabled />
+    <DefaultInput
+      class="mt-5"
+      label="변경 이름"
+      placeholder="변경할 이름을 입력해주세요"
       v-model="newName"
-      type="'text'"
-    ></CustomInput>
+      type="text"
+    ></DefaultInput>
   </ModalForm>
 </template>

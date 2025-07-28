@@ -4,13 +4,13 @@ import Header from "@/components/layout/header/Header.vue";
 import Section from "@/components/nav/BottomNav.vue";
 
 // 마이 페이지 컴포넌트
-import EditItem from "@/components/mypage/EditItem.vue";
-import InfoCard from "@/components/mypage/InfoCard.vue";
-import ChangeNameModal from "@/components/mypage/ChangeNameModal.vue";
-import ChangePasswordModal from "@/components/mypage/ChangePasswordModal.vue";
-import ChangeProfileModal from "@/components/mypage/ChangeProfileModal.vue";
-import ChangeHouseModal from "@/components/mypage/ChangeHouseModal.vue";
-import DeleteAcoountModal from "@/components/mypage/DeleteAcoountModal.vue";
+import EditItem from "./_component/EditItem.vue";
+import InfoCard from "./_component/InfoCard.vue";
+import ChangeNameModal from "./_component/ChangeNameModal.vue";
+import ChangePasswordModal from "./_component/ChangePasswordModal.vue";
+import ChangeProfileModal from "./_component/ChangeProfileModal.vue";
+import ChangeHouseModal from "./_component/ChangeHouseModal.vue";
+import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
 import ToastList from "@/components/common/ToastList.vue";
 
@@ -18,6 +18,7 @@ import { markRaw, ref, reactive } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
 import defaultProfile from "@/assets/imgs/profile.jpg";
+import ProfileImage from "@/components/common/ProfileImage.vue";
 
 const modalMap = {
   name: markRaw(ChangeNameModal),
@@ -81,14 +82,14 @@ const email = userStore.email*/
 </script>
 
 <template>
-  <Header :headerShowtype="mainRouteName.myPage" />
+  <Header :headerShowtype="mainRouteName.myPage" class="h-25" />
   <div class="relative">
     <div class="absolute w-full h-2/5 bg-kb-yellow"></div>
     <div
       class="relative bg-white mx-4 p-4 rounded-xl shadow-md items-center space-x-4 flex flex-col gap-[1vh] z-2"
     >
       <div class="relative">
-        <img :src="user.imagePath" alt="Profile" class="aspect-square w-25 rounded-full" />
+        <ProfileImage :src="user.imagePath" />
         <button
           class="absolute bottom-0 right-0 cursor-pointer p-1 bg-gray-300 rounded-full"
           @click="openModal('profile', { profile: user.imagePath, name: user.name })"
@@ -168,7 +169,7 @@ const email = userStore.email*/
   <div v-else class="h-100 flex flex-col items-center justify-center">
     <div class="font-pretendard-bold text-xl">나의 집을 등록하고 정보를 받아보세요!</div>
     <button
-      class="mt-10 cursor-pointer bg-kb-yellow text-white px-10 py-3 rounded-md"
+      class="mt-10 cursor-pointer bg-kb-yellow-positive text-white px-10 py-3 rounded-md"
       @click="openModal('newHouse', { type: 'regist' })"
     >
       나의 집 등록하기
@@ -177,7 +178,7 @@ const email = userStore.email*/
   <div class="mx-4 mt-4">
     <button
       class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
-      @click="movePage.myAlarm()"
+      @click="movePage.mypageStetting()"
     >
       알림 설정
     </button>

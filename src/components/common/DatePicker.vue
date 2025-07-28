@@ -26,7 +26,8 @@ watch(internalDate, (newVal) => {
     <DatePicker
       v-model:value="internalDate"
       :format="format ?? 'YYYY-MM-DD'"
-      :input-class="inputClass ?? 'border p-2 rounded w-full'"
+      :input-class="inputClass ?? 'border border-gray-300 p-2 rounded w-full'"
+      style="width: 100%"
     />
   </div>
 </template>
