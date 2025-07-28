@@ -10,6 +10,12 @@
  * ---------------------------------------------------------------
  */
 
+/** BuildingTypeAndPurpose */
+export interface BuildingTypeAndPurpose {
+  buildingPurpose?: string;
+  violationStatus?: string;
+}
+
 /** MemberDTO */
 export interface MemberDTO {
   /** @format int32 */
@@ -45,6 +51,40 @@ export interface RegisterKakaoDTO {
   code?: string;
 }
 
+/** RentalRatioAndBuildyear */
+export interface RentalRatioAndBuildyear {
+  /** @format int32 */
+  buildYear?: number;
+  /** @format int32 */
+  buildyear_score?: number;
+  /** @format int32 */
+  dealAmount?: number;
+  /** @format double */
+  reverse_rental_ratio?: number;
+  /** @format int32 */
+  score?: number;
+}
+
+/** SafeReportRequestDto */
+export interface SafeReportRequestDto {
+  /** @format int32 */
+  budget?: number;
+  buildingName?: string;
+  dongName?: string;
+  jibunAddress?: string;
+  /** @format double */
+  lat?: number;
+  /** @format double */
+  lng?: number;
+  roadAddress?: string;
+}
+
+/** SafeReportResponseDto */
+export interface SafeReportResponseDto {
+  buildingTypeAndPurpose?: BuildingTypeAndPurpose;
+  rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
+}
+
 /** ApiResponse«List«MemberDTO»» */
 export interface ApiResponseListMemberDTO {
   /** @format int32 */
@@ -59,6 +99,15 @@ export interface ApiResponseMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«SafeReportResponseDto» */
+export interface ApiResponseSafeReportResponseDto {
+  /** @format int32 */
+  code?: number;
+  data?: SafeReportResponseDto;
   message?: string;
   success?: boolean;
 }
