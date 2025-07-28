@@ -77,6 +77,29 @@ export interface ApiResponseFormData {
   success?: boolean;
 }
 
+/** SafeReportRequestDto */
+export interface SafeReportRequestDto {
+  /** @format int32 */
+  budget?: number;
+  buildingName?: string;
+  dongName?: string;
+  jibunAddress?: string;
+  /** @format double */
+  lat?: number;
+  /** @format double */
+  lng?: number;
+  roadAddress?: string;
+}
+
+/** ApiResponse«FormData» */
+export interface ApiResponseFormData {
+  /** @format int32 */
+  code?: number;
+  data?: FormData;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«List«MemberDTO»» */
 export interface ApiResponseListMemberDTO {
   /** @format int32 */
