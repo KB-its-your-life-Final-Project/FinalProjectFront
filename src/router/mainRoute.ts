@@ -24,10 +24,8 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
   localInfo: () => import("@/pages/localInfo/LocalInfo.vue"),
   LocalInfoSearch: () => import("@/pages/localInfo/LocalInfoSearch.vue"),
 
-
   //실거래가 상세페이지
- transactionDetail: () => import("@/pages/transaction/TransactionDetailPage.vue"),
-
+  transactionDetail: () => import("@/pages/transaction/TransactionDetailPage.vue"),
 };
 
 //라우트 이름
@@ -40,7 +38,7 @@ const mainRouteName = {
   myAlarm: "myAlarm",
   localInfo: "localInfo",
   localInfoSearch: "localInfoSearch",
-  transactionDetail:"transactionDetail"
+  transactionDetail: "transactionDetail",
 };
 
 //라우트 설정
@@ -91,11 +89,10 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
   },
   {
-    path: '/transactionDetail/:aptName',
-    name: 'transactionDetailAptName',
+    path: "/transactionDetail/:aptName",
+    name: "transactionDetailAptName",
     component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
-
-  }
+  },
 ];
 
 export { mainRouteMap, mainRouteName, mainRouteRecordRaw };
