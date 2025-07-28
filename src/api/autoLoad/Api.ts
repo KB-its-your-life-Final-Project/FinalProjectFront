@@ -12,9 +12,9 @@
 
 import {
   ApiResponseBoolean,
+  ApiResponseFormData,
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
-  ApiResponseSafeReportResponseDto,
   RegisterGoogleDTO,
   RegisterKakaoDTO,
   SafeReportRequestDto,
@@ -216,7 +216,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags SafeReport
+   * @tags safe-report-controller
    * @name ReceiveFormUsingPost
    * @summary receiveForm
    * @request POST:/api/report/requestData
@@ -225,7 +225,7 @@ export class Api<
     dto: SafeReportRequestDto,
     params: RequestParams = {},
   ) =>
-    this.request<ApiResponseSafeReportResponseDto, void>({
+    this.request<ApiResponseFormData, void>({
       path: `/api/report/requestData`,
       method: "POST",
       body: dto,
