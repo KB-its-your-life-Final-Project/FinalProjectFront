@@ -43,9 +43,7 @@ function checkServerStatus(url) {
 const outputPath = join(__dirname, "../src/api/autoLoad");
 
 //swagger로 api 가져오기 명령어
-// const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-type`;
-// const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-type --modular-name Api`;
-const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --modular --modular-name Api`;
+const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --http-client axios --modular --modular-type`;
 
 //타입 생성 시작
 async function generateTypes() {
@@ -57,18 +55,15 @@ async function generateTypes() {
     //응답없음
     if (!isRunning) {
       console.log("Backend Server is not responding");
-      process.exit(1);
+    } else {
+      console.log("Backend Server is currently running");
+      console.log("Generating Types...");
+      //커맨드 실행
+      execSync(command, { studio: "inherit" });
+      console.log("Modular types generated successfully!");
     }
-
-    console.log("Backend Server is currently running");
-    console.log("Generating Types...");
-
-    //커맨드 실행
-    execSync(command, { studio: "inherit" });
-    console.log("Modular types generated successfully!");
   } catch (error) {
     console.error("Failed generate-types process", error.message);
-    process.exit(1);
   }
 }
 
