@@ -33,7 +33,7 @@ const movePage = {
   safeReport: makeRoute(mainRouteName.safeReport),
   myAlarm: makeRoute(mainRouteName.myAlarm),
   localInfo: makeRoute(mainRouteName.localInfo),
-
+  localInfoSearch: makeRoute(mainRouteName.localInfoSearch),
   // mainRouteName end
 
 //실거래가 상세페이지
@@ -41,9 +41,7 @@ const movePage = {
 
   // myPageRouteName start
   mypage: makeRoute(myPageRouteName.mypage),
-  myProfile: makeRoute(myPageRouteName.myProfile),
-  editProfile: makeRoute(myPageRouteName.editProfile),
-  myPageMain: makeRoute(myPageRouteName.myPageMain),
+  mypageStetting: makeRoute(myPageRouteName.alarmSetting),
   // myPageRouteName end
 };
 export default movePage;

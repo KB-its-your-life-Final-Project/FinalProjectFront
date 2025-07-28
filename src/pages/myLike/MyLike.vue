@@ -36,8 +36,8 @@ const favoriteApts = [
 
 <template>
   <div class="pb-24">
-    <Header :headerShowtype="mainRouteName.myLike" >
-<!--
+    <Header :headerShowtype="mainRouteName.myLike">
+      <!--
     <Header :title="'관심 목록'" :showBack="true" :showAlarm="true">
 -->
       <div class="text-center mt-3">

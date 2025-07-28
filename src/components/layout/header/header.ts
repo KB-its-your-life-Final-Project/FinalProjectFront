@@ -17,6 +17,7 @@ const headerTitleList = {
   [mainRouteName.myLike]: "내 찜 목록",
   [mainRouteName.mainMenu]: "전체 메뉴",
   [mainRouteName.transactionDetail]: "",
+  [mainRouteName.myPage]: "마이 페이지",
 };
 
 //헤더에 따라 표기해야할 것 정의
@@ -30,6 +31,7 @@ const headerShowList = {
   [mainRouteName.myLike]: ["showBack", "showAlarm"],
   [mainRouteName.mainMenu]: ["showAlarm"],
   [mainRouteName.transactionDetail]: ["showAlarm", "showBack"],
+  [mainRouteName.myPage]: ["showAlarm", "showBack"],
 };
 type headerShowtype = keyof typeof headerShowList;
 

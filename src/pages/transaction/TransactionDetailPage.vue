@@ -2,8 +2,11 @@
   <div class="pb-24">
     <!-- 동적 헤더: 아파트명 -->
     <Header :headerShowtype="mainRouteName.transactionDetail"
-    :title="selectedAptName"/>
+    :title="selectedAptName">
 
+      <div class ="pl-3 pr-8 pt-8 pb-8"></div>
+
+    </Header>
     <div class="w-[85%] mx-auto mt-4">
 
       <p class="text-base mb-1 text-kb-ui-04">거래 형식</p>
@@ -76,7 +79,7 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router"
 import Header from "@/components/layout/header/Header.vue"
-import TransactionGraph from "@/components/TransactionGraph.vue"
+import TransactionGraph from "@/pages/transaction/TransactionGraph.vue"
 import { onMounted, ref, watch } from "vue"
 import axios from "axios"
 import {mainRouteName} from "@/router/mainRoute.ts";
@@ -113,7 +116,7 @@ const fetchTransactionData = async () => {
   try {
     const res = await axios.get('/api/transactions') // 전체 데이터 가져오기
     const rawData = res.data.map((item:any) => {
-      const date = `${item.dealYear}-${String(item.dealMonth).padStart(2, '0')}`
+      const date = `${item.dealYear}-${String(item.dealMonth).padStart(2, '0')} -${String(item.dealDay).padStart(2, '0')}`
       const type = item.tradeType === 1 ? "매매" : "전월세"
       const price = type === "매매"
         ? item.dealAmount / 10000
@@ -125,6 +128,7 @@ const fetchTransactionData = async () => {
     allData.value = selectedAptName.value
       ? rawData.filter(item => item.buildingName === selectedAptName.value)
       : rawData
+
 
     filterByDate()
     console.log(res.data)
@@ -150,8 +154,8 @@ const filterByDate = () => {
   if (selectedType.value !== '전체') {
     filtered = filtered.filter(item => item.type === selectedType.value)
   }
+  graphData.value = filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
-  graphData.value = filtered
 }
 
 //연도 버튼 클릭으로 필터링 기능

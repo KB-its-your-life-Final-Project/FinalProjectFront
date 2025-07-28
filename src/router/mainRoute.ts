@@ -38,13 +38,14 @@ const mainRouteName = {
   myAlarm: "myAlarm",
   localInfo: "localInfo",
   localInfoSearch: "localInfoSearch",
+  myPage: "myPage",
   transactionDetail: "transactionDetail",
 };
 
 //라우트 설정
 const mainRouteRecordRaw: RouteRecordRaw[] = [
   {
-    path: "/",
+    path: "/home",
     name: mainRouteName.homeMain,
     component: mainRouteMap.homeMain,
   },

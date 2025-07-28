@@ -1,21 +1,28 @@
 <!-- LocalInfoPage.vue 동네.zip  레이아웃 -->
 
 <script setup lang="ts">
-import Section from "@/components/nav/BottomNav.vue";
 import Header from "@/components/layout/header/Header.vue";
-import { mainRouteName } from "@/router/mainRoute";
+import SearchCard from "@/pages/localInfo/_component/SearchCard.vue";
+import WeatherCard from "@/pages/localInfo/_component/WeatherCard.vue";
+import InfoCard from "@/pages/localInfo/_component/InfoCard.vue";
+import { InfoCardList } from "@/pages/localInfo/_component/InfoCard.ts";
 </script>
 <template>
-  <!--제목에 . 이 들어가는 게 좋지 않아서,.. 나중에 db 로 불러오는 걸로 바꿔주세여-->
-  <Header :headerShowtype="mainRouteName.mapSearch" />
+  <Header headerShowtype="localInfo">
+    <SearchCard />
+    <div class="px-10 mt-8">
+      <div class="font-pretendard-bold text-5xl text-kb-ui-10">화양동 동네이야기</div>
+    </div>
+  </Header>
+  <div class="px-4 mt-16">
+    <!-- 날씨 정보 박스 -->
+    <div class="mt-8">
+      <WeatherCard />
+    </div>
 
-  <h1 class="text-xl font-bold">동네정보</h1>
-  <ul class="mt-4 space-y-2">
-    <li>실거래가 조회</li>
-    <li>안심 정보</li>
-    <li>찜한 매물</li>
-    <li>서비스 소개</li>
-    <!-- 실제 라우팅 연결은 필요에 따라 RouterLink 사용 -->
-  </ul>
-  <Section />
+    <!-- 카드 4개 2x2 그리드로 표시 -->
+    <div class="grid grid-cols-2 gap-8 mt-8">
+      <InfoCard v-for="(card, i) in InfoCardList" :key="i" :info="card" />
+    </div>
+  </div>
 </template>
