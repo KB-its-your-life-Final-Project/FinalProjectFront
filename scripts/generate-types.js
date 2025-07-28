@@ -55,18 +55,15 @@ async function generateTypes() {
     //응답없음
     if (!isRunning) {
       console.log("Backend Server is not responding");
-      process.exit(1);
+    } else {
+      console.log("Backend Server is currently running");
+      console.log("Generating Types...");
+      //커맨드 실행
+      execSync(command, { studio: "inherit" });
+      console.log("Modular types generated successfully!");
     }
-
-    console.log("Backend Server is currently running");
-    console.log("Generating Types...");
-
-    //커맨드 실행
-    execSync(command, { studio: "inherit" });
-    console.log("Modular types generated successfully!");
   } catch (error) {
     console.error("Failed generate-types process", error.message);
-    process.exit(1);
   }
 }
 
