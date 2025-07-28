@@ -86,15 +86,16 @@ export class Api<
    * No description
    *
    * @tags member-controller
-   * @name RegisterMemberByEmailUsingPost
-   * @summary registerMemberByEmail
+   * @name RegisterByEmailUsingPost
+   * @summary registerByEmail
    * @request POST:/api/member/register/email
    */
-  registerMemberByEmailUsingPost = (
+  registerByEmailUsingPost = (
     query?: {
       email?: string;
       name?: string;
-      password?: string;
+      password1?: string;
+      password2?: string;
       verificationCode?: string;
     },
     params: RequestParams = {},

@@ -68,6 +68,6 @@ const showItems = reactive(
         @click="movePage.myAlarm()"
       />
     </div>
-      <slot />
+    <slot />
   </header>
 </template>

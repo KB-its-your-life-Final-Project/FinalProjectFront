@@ -1,13 +1,16 @@
 <script setup>
 import { authStore } from "@/stores/authStore";
+import { Api } from "@/api/autoLoad/Api";
 
-const auth = authStore();
+const auth = new authStore();
+const api = new Api();
 
 const logout = async () => {
-  if (auth.logout) {
-    await auth.logout();
-  } else {
-    console.error("logoutUser is undefined");
+  try {
+    await api.logoutUsingPost();
+    console.log("LogoutVBtrn으로 로그아웃 성공!");
+  } catch (error) {
+    console.error("로그아웃 실패:", error);
   }
 };
 </script>

@@ -10,9 +10,10 @@ export interface Member {
   password1: string;
 }
 
-export interface MemberEmail {
+export interface LoginDTO {
   email: string;
   password: string;
+  code: string;
   createdType: number;
 }
 
@@ -94,17 +95,16 @@ export default {
   },
 
   /**
-   * 이메일 로그인
-   * @param code 카카오에서 제공하는 인가 코드
+   *  로그인
    * @returns 서버 응답
-   */ async loginEmail(member: MemberEmail): Promise<any> {
+   */ async login(member: LoginDTO): Promise<any> {
     try {
-      const { data } = await apiClient.post(`/api/member/login`, member, { withCredentials: true });
-      console.log("AUTH POST (loginEmail): ", data);
+      const { data } = await apiClient.post(`${BASE_URL}/login`, member, { withCredentials: true });
+      console.log("AUTH POST RESPONSE (login): ", data);
       console.log("data.success: ", data.success);
       return data;
     } catch (error: any) {
-      console.error("이메일 로그인 실패: ", error);
+      console.error("로그인 실패: ", error);
       console.error("response: ", error.response?.data);
     }
   },
@@ -113,13 +113,9 @@ export default {
    * 카카오 회원가입/로그인
    * @param code 카카오에서 제공하는 인가 코드
    * @returns 서버 응답
-   */ async kakaoLogin(code: string): Promise<any> {
+   */ async kakaoLogin(member: LoginDTO): Promise<any> {
     try {
-      const { data } = await apiClient.post(
-        `${BASE_URL}/register/kakao`,
-        { code },
-        { withCredentials: true },
-      );
+      const { data } = await apiClient.post(`${BASE_URL}/login`, member, { withCredentials: true });
       console.log("AUTH POST (kakaoLogin): ", data);
       console.log("data.success: ", data.success);
       return data;

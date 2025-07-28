@@ -2,10 +2,19 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import authApi from "@/api/authApi";
 import apiClient from "@/api/apiClient";
+import { Api } from "@/api/autoLoad/Api"
+import ApiResponseMemberDTO from "@/api/autoLoad/data-contracts";
+
+const api = new Api();
 
 interface User {
   email: string;
-  roles: string[];
+  kakaoId: string;
+  googleId: string;
+  name: string;
+  phone: string;
+  profileImg: string;
+  createdType: number;
 }
 
 interface AuthState {
@@ -15,12 +24,19 @@ interface AuthState {
 interface Member {
   email: string;
   password: string;
+  code: string;
+  createdType: number;
 }
 
 const initState: AuthState = {
   user: {
     email: "",
-    roles: [],
+    kakaoId: "",
+    googleId: "",
+    name: "",
+    phone: "",
+    profileImg: "",
+    createdType: 0,
   },
 };
 
@@ -34,10 +50,24 @@ export const authStore = defineStore("auth", () => {
   // 로그인 (토큰은 쿠키에 있으므로 응답에서 사용자 정보만 받아서 상태에 저장)
   const login = async (member: Member): Promise<void> => {
     try {
-      const { data } = await authApi.loginEmail(member);
-      state.value.user = data;
-      console.log("data: ", data);
-      localStorage.setItem("authUser", JSON.stringify(data)); // 사용자 정보만 저장
+      // const response = await authApi.login(member);
+      const response = await api.loginUsingPost(member);
+      state.value.user = response.data;
+      console.log("data: ", response.data);
+      if (response.success === true) {
+        const createdType = response.data.createdType;
+        localStorage.setItem("authUser", JSON.stringify(response.data)); // 사용자 정보만 저장
+        if (createdType === 1) {
+          console.log("이메일 로그인 성공");
+        } else if (createdType === 2) {
+          console.log("카카오 로그인 성공");
+        } else if (createdType === 3) {
+          console.log("구글 로그인 성공");
+        } else {
+          console.log("알 수 없는 로그인 방식");
+        }
+      }
+      return response.data;
     } catch (error) {
       throw error;
     }

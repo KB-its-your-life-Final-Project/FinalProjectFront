@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
+import RegisterLink from "@/components/common/RegisterLink.vue";
 
 onMounted(() => {
   const kakao = (window as any).Kakao;
@@ -52,25 +53,19 @@ const loginGoogle = async () => {
     <div class="flex flex-col items-center w-full gap-8">
       <!-- 로그인 버튼 영역 -->
       <div class="flex flex-col items-center w-5/6 h-auto gap-3">
-        <button
-          class="kakao-sec w-full h-14 flex flex-column justify-center rounded-xl"
-          @click="loginKakao"
-        >
+        <button class="login-btn kakao-sec" @click="loginKakao">
           <div class="flex flex-row items-center gap-3">
             <img class="size-5" src="@/assets/imgs/kakao.svg" alt="카카오 로고" />
             <span>카카오톡으로 시작하기</span>
           </div>
         </button>
-        <button
-          class="google-sec w-full h-14 flex flex-column justify-center rounded-xl"
-          @click="loginGoogle"
-        >
+        <button class="login-btn google-sec" @click="loginGoogle">
           <div class="flex flex-row items-center gap-3">
             <img class="size-5" src="@/assets/imgs/google.svg" alt="구글 로고" />
             <span>Google로 시작하기</span>
           </div>
         </button>
-        <button class="email-sec w-full h-14 flex flex-column justify-center rounded-xl">
+        <button class="login-btn email-sec">
           <div class="flex flex-row items-center gap-3">
             <img class="size-5" src="@/assets/imgs/email.svg" alt="이메일 이미지" />
             <router-link to="/auth/loginEmail">
@@ -81,12 +76,7 @@ const loginGoogle = async () => {
       </div>
       <!-- // 로그인 버튼 영역 -->
       <!-- 회원가입 영역 -->
-      <div class="flex gap-3">
-        <span class="text-kb-ui-04">아직 회원이 아니신가요?</span>
-        <router-link to="/auth/register">
-          <span class="text-positive">가입하기</span>
-        </router-link>
-      </div>
+      <RegisterLink />
       <!-- // 회원가입 영역 -->
     </div>
     <!-- // 로그인 버튼 및 회원가입 영역 -->
@@ -94,21 +84,33 @@ const loginGoogle = async () => {
 </template>
 
 <style scoped>
-.google-sec {
-  background-color: #4285f4;
-  color: #fff;
+@reference "@/assets/styles/main.css";
+.login-btn {
+  @apply w-full h-14 flex justify-center rounded-xl cursor-pointer;
 }
 .kakao-sec {
-  background-color: #fee500;
+  @apply bg-[#fee500];
+}
+.google-sec {
+  @apply bg-[#4285f4] text-white;
 }
 .email-sec {
-  box-sizing: border-box;
-  background-color: #fff;
-  border: 0.1rem solid #c2c2c2;
+  @apply bg-white border-[0.1rem] border-solid border-kb-ui-07;
+}
+.kakao-sec:hover {
+  @apply bg-kb-yellow-native;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+.google-sec:hover {
+  @apply bg-[#3661a7];
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 .email-sec:hover {
-  background-color: #d6deeb;
-  border: 0.1rem solid #d6deeb;
+  @apply bg-[#d6deeb] border-[0.1rem] border-solid;
   transition:
     background-color 0.3s ease,
     color 0.3s ease;

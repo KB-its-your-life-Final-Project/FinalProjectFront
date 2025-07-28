@@ -4,21 +4,18 @@ import { useRouter } from "vue-router";
 import type { AxiosError } from "axios";
 import { authStore } from "@/stores/authStore.ts";
 import GoBackBtn from "@/components/common/GoBackBtn.vue";
+import RegisterLink from "@/components/common/RegisterLink.vue";
 import { isEmpty, isValidEmailFormat } from "@/utils/validate";
 import authApi from "@/api/authApi";
+import { LoginDTO } from "@/api/autoLoad";
 
-interface MemberLoginForm {
-  email: string;
-  password: string;
-  createdType: number;
-}
+const router = new useRouter();
+const auth = new authStore();
 
-const router = useRouter();
-const auth = authStore();
-
-const member = reactive<MemberLoginForm>({
+const member = reactive<LoginDTO>({
   email: "",
   password: "",
+  code: "",
   createdType: 1,
 });
 
@@ -54,8 +51,9 @@ const login = async () => {
     return;
   }
   try {
-    await auth.login(member);
+    const response = await auth.login(member);
     console.log("로그인 성공");
+    console.log("response", response);
     router.push("/");
   } catch (error) {
     const err = error as AxiosError;
@@ -95,12 +93,7 @@ const login = async () => {
       </p>
       <button class="btn" type="submit">로그인</button>
     </form>
-    <div class="flex gap-3 mt-[2rem]">
-      <span class="text-kb-ui-04">아직 회원이 아니신가요?</span>
-      <router-link to="/auth/register">
-        <span class="text-positive">가입하기</span>
-      </router-link>
-    </div>
+    <RegisterLink />
   </div>
 </template>
 
