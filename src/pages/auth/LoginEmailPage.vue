@@ -10,6 +10,7 @@ import authApi from "@/api/authApi";
 interface MemberLoginForm {
   email: string;
   password: string;
+  createdType: number;
 }
 
 const router = useRouter();
@@ -18,6 +19,7 @@ const auth = authStore();
 const member = reactive<MemberLoginForm>({
   email: "",
   password: "",
+  createdType: 1,
 });
 
 const checkSubmitMsg = ref<string>("");
@@ -29,8 +31,9 @@ onMounted(() => {
   }
 });
 
-const loginUser = async () => {
+const login = async () => {
   checkSubmitMsg.value = "";
+  localStorage.setItem("savedEmail", member.email);
   console.log("사용자 input: ", member);
   if (isEmpty(member.email)) {
     checkSubmitMsg.value = "이메일을 입력하세요";
@@ -51,7 +54,7 @@ const loginUser = async () => {
     return;
   }
   try {
-    await auth.loginUser(member);
+    await auth.login(member);
     console.log("로그인 성공");
     router.push("/");
   } catch (error) {
@@ -68,7 +71,7 @@ const loginUser = async () => {
     <h1 class="text-2xl font-pretendard-bold">로그인</h1>
   </header>
   <div class="flex flex-col items-center">
-    <form class="form" method="post" @submit.prevent="loginUser" novalidate>
+    <form class="form" method="post" @submit.prevent="login" novalidate>
       <div>
         <label for="username">이메일 주소</label>
         <input

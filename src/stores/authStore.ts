@@ -32,7 +32,7 @@ export const authStore = defineStore("auth", () => {
   const getUsername = computed(() => state.value.user.email); // 로그인 사용자 ID
 
   // 로그인 (토큰은 쿠키에 있으므로 응답에서 사용자 정보만 받아서 상태에 저장)
-  const loginUser = async (member: Member): Promise<void> => {
+  const login = async (member: Member): Promise<void> => {
     try {
       const { data } = await authApi.loginEmail(member);
       state.value.user = data;
@@ -44,7 +44,7 @@ export const authStore = defineStore("auth", () => {
   };
 
   // 로그아웃
-  const logoutUser = async (): Promise<void> => {
+  const logout = async (): Promise<void> => {
     try {
       await apiClient.post("/api/member/logout", null, { withCredentials: true });
     } finally {
@@ -71,7 +71,7 @@ export const authStore = defineStore("auth", () => {
     state,
     isLoggedIn,
     getUsername,
-    loginUser,
-    logoutUser,
+    login,
+    logout,
   };
 });

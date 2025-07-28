@@ -12,14 +12,17 @@
 
 import {
   ApiResponseBoolean,
+  ApiResponseFormData,
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
-  RegisterGoogleDTO,
-  RegisterKakaoDTO,
+  LoginDTO,
+  SafeReportRequestDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -52,35 +55,27 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * No description
    *
    * @tags member-controller
-   * @name FindLoggedinUserUsingGet
-   * @summary findLoggedinUser
-   * @request GET:/api/member/loggedin
+   * @name LoginUsingPost
+   * @summary login
+   * @request POST:/api/member/login
    */
-  findLoggedinUserUsingGet = (
-    query?: {
-      authenticated?: boolean;
-      "authorities[0].authority"?: string;
-      credentials?: object;
-      details?: object;
-      principal?: object;
-    },
-    params: RequestParams = {},
-  ) =>
+  loginUsingPost = (loginDto: LoginDTO, params: RequestParams = {}) =>
     this.request<ApiResponseMemberDTO, void>({
-      path: `/api/member/loggedin`,
-      method: "GET",
-      query: query,
+      path: `/api/member/login`,
+      method: "POST",
+      body: loginDto,
+      type: ContentType.Json,
       ...params,
     });
   /**
    * No description
    *
    * @tags member-controller
-   * @name LogoutMemberUsingPost
-   * @summary logoutMember
+   * @name LogoutUsingPost
+   * @summary logout
    * @request POST:/api/member/logout
    */
-  logoutMemberUsingPost = (params: RequestParams = {}) =>
+  logoutUsingPost = (params: RequestParams = {}) =>
     this.request<ApiResponseBoolean, void>({
       path: `/api/member/logout`,
       method: "POST",
@@ -108,44 +103,6 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
       path: `/api/member/register/email`,
       method: "POST",
       query: query,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags member-controller
-   * @name RegisterOrLoginMemberByGoogleUsingPost
-   * @summary registerOrLoginMemberByGoogle
-   * @request POST:/api/member/register/google
-   */
-  registerOrLoginMemberByGoogleUsingPost = (
-    registerDto: RegisterGoogleDTO,
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseMemberDTO, void>({
-      path: `/api/member/register/google`,
-      method: "POST",
-      body: registerDto,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags member-controller
-   * @name RegisterOrLoginMemberByKakaoUsingPost
-   * @summary registerOrLoginMemberByKakao
-   * @request POST:/api/member/register/kakao
-   */
-  registerOrLoginMemberByKakaoUsingPost = (
-    registerDto: RegisterKakaoDTO,
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseMemberDTO, void>({
-      path: `/api/member/register/kakao`,
-      method: "POST",
-      body: registerDto,
       type: ContentType.Json,
       ...params,
     });
@@ -207,6 +164,25 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags safe-report-controller
+   * @name ReceiveFormUsingPost
+   * @summary receiveForm
+   * @request POST:/api/report/requestData
+   */
+  receiveFormUsingPost = (
+    dto: SafeReportRequestDto,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseFormData, void>({
+      path: `/api/report/requestData`,
+      method: "POST",
+      body: dto,
+      type: ContentType.Json,
       ...params,
     });
 }

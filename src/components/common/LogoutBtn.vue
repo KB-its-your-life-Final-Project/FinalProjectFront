@@ -3,9 +3,9 @@ import { authStore } from "@/stores/authStore";
 
 const auth = authStore();
 
-const logoutUser = async () => {
-  if (auth.logoutUser) {
-    await auth.logoutUser();
+const logout = async () => {
+  if (auth.logout) {
+    await auth.logout();
   } else {
     console.error("logoutUser is undefined");
   }
@@ -13,7 +13,7 @@ const logoutUser = async () => {
 </script>
 
 <template>
-  <button class="btn" type="button" @click="logoutUser">로그아웃</button>
+  <button class="btn" type="button" @click="logout">로그아웃</button>
 </template>
 
 <style scoped>

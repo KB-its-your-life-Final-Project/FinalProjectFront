@@ -13,6 +13,7 @@ export interface Member {
 export interface MemberEmail {
   email: string;
   password: string;
+  createdType: number;
 }
 
 export default {
@@ -25,7 +26,7 @@ export default {
     try {
       const { data } = await apiClient.get<boolean>(`${BASE_URL}/checkemail/${email}`);
       console.log("이메일 중복 확인 응답 (authApi.checkDuplicateEmail()):", data);
-      console.log(data.data === false ? "이메일 사용 가능" : "이메일 사용 불가");
+      console.log(data.data === false ? "이메일 사용 가능" : "사용중인 이메일");
       return data.data;
     } catch (error: any) {
       console.error("이메일 중복 확인 실패: ", error);
@@ -98,7 +99,7 @@ export default {
    * @returns 서버 응답
    */ async loginEmail(member: MemberEmail): Promise<any> {
     try {
-      const { data } = await apiClient.post(`/api/auth/login`, member, { withCredentials: true });
+      const { data } = await apiClient.post(`/api/member/login`, member, { withCredentials: true });
       console.log("AUTH POST (loginEmail): ", data);
       console.log("data.success: ", data.success);
       return data;
