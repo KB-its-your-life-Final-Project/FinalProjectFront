@@ -16,7 +16,6 @@ import {
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
   LoginDTO,
-  MemberDTO,
   SafeReportRequestDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
@@ -91,12 +90,10 @@ export class Api<
    * @summary checkLoginStatus
    * @request GET:/api/member/me
    */
-  checkLoginStatusUsingGet = (dto: MemberDTO, params: RequestParams = {}) =>
+  checkLoginStatusUsingGet = (params: RequestParams = {}) =>
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/me`,
       method: "GET",
-      body: dto,
-      type: ContentType.Json,
       ...params,
     });
   /**
@@ -113,7 +110,6 @@ export class Api<
       name?: string;
       password1?: string;
       password2?: string;
-      verificationCode?: string;
     },
     params: RequestParams = {},
   ) =>
