@@ -15,7 +15,7 @@ import zoomPlugin from "chartjs-plugin-zoom"
 import { computed } from "vue"
 
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement,Filler)
+ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement,Filler, zoomPlugin)
 
 
 const props = defineProps<{
@@ -32,38 +32,41 @@ const chartData = computed(() => {
       : props.graphData.filter((item) => item.type === props.selectedType)
 // 날짜순으로 나열
   filteredData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  //모든 날짜들 구하기
+  const allDates = [...new Set(filteredData.map(item => item.date))].sort()
 
   const grouped = filteredData.reduce((acc, cur) => {
-    acc[cur.type] = acc[cur.type] || { labels: [], data: [] }
-    acc[cur.type].labels.push(cur.date)
-    acc[cur.type].data.push(cur.price)
+    if (!acc[cur.type]) acc[cur.type] = {}
+    acc[cur.type][cur.date] = cur.price
     return acc
-  }, {} as any)
+  }, {} as Record<string, Record<string, number>>)
 
-  const firstGroup = Object.values(grouped)[0]
-  const labels = firstGroup?.labels || []
+
+  // 모든 거래 유형에 대해 가격 데이터 정리
+  const datasets = Object.entries(grouped).map(([type, dateMap], idx) => ({
+    label: type,
+    data: allDates.map(date => dateMap[date] ?? null),
+    borderColor: ["#4caf50", "#ff9800", "#3f51b5"][idx],
+    backgroundColor: ["rgba(76, 175, 80, 0.1)", "rgba(255, 152, 0, 0.1)", "rgba(63, 81, 181, 0.1)"][idx],
+    fill: true,
+    tension: 0.1, // 곡선
+    pointRadius: 4,
+    pointHoverRadius: 6,
+    borderWidth: 1,
+    spanGaps: true
+
+  }))
+
 
   return {
-    labels,
-    datasets: Object.entries(grouped).map(([type, d], idx) => ({
-      label: type,
-      data: d.data,
-      borderColor: ["#4caf50", "#ff9800", "#3f51b5"][idx],
-      backgroundColor: [
-        "rgba(76, 175, 80, 0.1)",
-        "rgba(255, 152, 0, 0.1)",
-        "rgba(63, 81, 181, 0.1)"
-      ][idx],
-      fill: true,
-      tension: 0.1,              // 곡선
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      borderWidth: 1
-    })),
+    labels: allDates,
+    datasets: datasets
   }
 })
 
-// y축 범위 + 줌인 기능
+
+
+// y축 + 줌인 기능
 const chartOptions = computed(() =>  {
 
     const prices = props.graphData.map(item => item.price)
@@ -128,70 +131,3 @@ scales: {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
-<template>
-  <div class="mt-4">
-    <Line :data="chartData" :options="chartOptions" />
-  </div>
-</template>
-
-<script setup lang="ts">
-import { Line } from "vue-chartjs"
-import {
-  Chart as ChartJS,
-  Title, Tooltip, Legend, LineElement,
-  CategoryScale, LinearScale, PointElement
-} from "chart.js"
-ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement)
-
-import { computed } from "vue"
-
-const props = defineProps<{
-  graphData: { date: string; price: number; type: string }[]
-}>()
-
-const chartData = computed(() => {
-  const grouped = props.graphData.reduce((acc, cur) => {
-    acc[cur.type] = acc[cur.type] || { labels: [], data: [] }
-    acc[cur.type].labels.push(cur.date)
-    acc[cur.type].data.push(cur.price)
-    return acc
-  }, {} as any)
-
-  return {
-    labels: grouped["매매"]?.labels || [],
-    datasets: Object.entries(grouped).map(([type, d], idx) => ({
-      label: type,
-      data: d.data,
-      borderColor: ["#4caf50", "#ff9800", "#2196f3"][idx],
-      fill: false
-    }))
-  }
-})
-
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: { position: 'top' },
-    tooltip: { enabled: true }
-  },
-  scales: {
-    y: { beginAtZero: false }
-  }
-}
-</script>
--->
