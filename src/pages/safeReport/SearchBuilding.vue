@@ -17,20 +17,21 @@ const showPostcode = ref(false)
 // DAUM 우편 번호 API + Naver Maps API 호출
 onMounted(() => {
   if (!window.daum) {
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
     document.head.appendChild(script);
   }
   if (!window.naver?.maps) {
-    const naverScript = document.createElement("script")
-    naverScript.src = "https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=55s76chbvh&submodules=geocoder"
-    naverScript.async = true
+    const naverScript = document.createElement("script");
+    naverScript.src =
+      "https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=55s76chbvh&submodules=geocoder";
+    naverScript.async = true;
     naverScript.onload = () => {
-      naverReady.value = true
-    }
-    document.head.appendChild(naverScript)
+      naverReady.value = true;
+    };
+    document.head.appendChild(naverScript);
   } else {
-    naverReady.value = true
+    naverReady.value = true;
   }
 });
 
@@ -38,7 +39,7 @@ function search() {
   showPostcode.value = true;
 
   nextTick(() => {
-    const container = document.getElementById('postcodeContainer');
+    const container = document.getElementById("postcodeContainer");
     if (!container || !(window as any).daum?.Postcode) return;
 
     const postcode = new (window as any).daum.Postcode({
@@ -110,11 +111,32 @@ function searchAddressToCoordinate(address: string) {
       });
       console.log('store 업데이트 후 formData:', store.formData);
     }
-  );
+
+    const result = response.v2;
+    if (result.meta.totalCount === 0) {
+      alert("DB에 해당하는 주소 데이터가 없습니다.");
+      return;
+    }
+
+    const { x, y } = result.addresses[0];
+    const latVal = parseFloat(y);
+    const lngVal = parseFloat(x);
+
+    console.log("✅ 위도:", latVal, "경도:", lngVal);
+
+    Object.assign(props.formData, {
+      lat: latVal,
+      lng: lngVal,
+    });
+
+    emit("update", {
+      ...props.formData,
+    });
+  });
 }
 
 function next() {
-  emit('next')
+  emit("next");
 }
 
 function resetFormData() {
@@ -135,18 +157,13 @@ function handleClose() {
   showPostcode.value = false
   resetFormData()
 }
-
 </script>
 
 <template>
   <div class="relative flex flex-col flex-1 px-6 gap-6">
     <div>
-      <h1 class="text-2xl font-pretendard-bold mb-1">
-        진단받고자 하는 곳이 어디인가요?
-      </h1>
-      <p class="text-kb-ui-05">
-        건물명을 입력해주세요.
-      </p>
+      <h1 class="text-2xl font-pretendard-bold mb-1">진단받고자 하는 곳이 어디인가요?</h1>
+      <p class="text-kb-ui-05">건물명을 입력해주세요.</p>
     </div>
 
     <div class="w-full max-w-lg mx-auto flex gap-4 items-center space-x-2">
@@ -166,7 +183,7 @@ function handleClose() {
       </button>
     </div>
 
-  <!--    주소 검색 창 -->
+    <!--    주소 검색 창 -->
     <teleport to="body">
       <div
         v-if="showPostcode"
@@ -194,6 +211,4 @@ function handleClose() {
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

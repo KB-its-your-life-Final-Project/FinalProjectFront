@@ -20,6 +20,15 @@ export interface FormData {
   score?: number;
 }
 
+/** LoginDTO */
+export interface LoginDTO {
+  code?: string;
+  /** @format int32 */
+  createdType?: number;
+  email?: string;
+  password?: string;
+}
+
 /** MemberDTO */
 export interface MemberDTO {
   /** @format int32 */
@@ -43,16 +52,6 @@ export interface MemberDTO {
   /** @format date-time */
   regDate?: string;
   regIp?: string;
-}
-
-/** RegisterGoogleDTO */
-export interface RegisterGoogleDTO {
-  code?: string;
-}
-
-/** RegisterKakaoDTO */
-export interface RegisterKakaoDTO {
-  code?: string;
 }
 
 /** SafeReportRequestDto */
