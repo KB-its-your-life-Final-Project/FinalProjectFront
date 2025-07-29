@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import Header from "@/components/layout/header/Header.vue";
 import AlarmSettingItem from "./_component/AlarmSettingItem.vue";
-import { mainRouteName } from "@/router/mainRoute";
 import { ref } from "vue";
 import ToolTip from "@/components/common/ToolTip.vue";
 import TermsAndConditions from "./_component/TermsAndConditions.vue";
+import { myPageRouteName } from "@/router/mypageRoutes";
 // 개별 상태 변수
 const setting1 = ref(false);
 const setting2 = ref(true);
@@ -20,7 +20,7 @@ const content2 =
 </script>
 
 <template>
-  <Header :headerShowtype="mainRouteName.myPage" class="h-25" />
+  <Header :headerShowtype="myPageRouteName.alarmSetting" class="h-25" />
   <div class="mx-4 mt-10">
     <AlarmSettingItem
       :main="'계약 진행 단계별 알림'"
