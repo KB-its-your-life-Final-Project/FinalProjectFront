@@ -7,9 +7,9 @@ import { headerTitleList, headerShowList } from "./header";
 import type { headerShowtype } from "./header";
 import { useRoute } from "vue-router";
 
-const route = useRoute()
+const route = useRoute();
 
-const emit = defineEmits(['back-click'])
+const emit = defineEmits(["back-click"]);
 
 //헤더 받아오기
 const props = defineProps<{
@@ -31,14 +31,14 @@ const showItems = reactive(
 );
 
 function handleBackClick() {
-  console.log('뒤로가기 버튼 클릭됨!')
-  console.log('현재 route.name:', route.name)
+  console.log("뒤로가기 버튼 클릭됨!");
+  console.log("현재 route.name:", route.name);
 
-  if (route.name === 'safeReport') {
-    console.log('SafeReport 페이지 - emit 실행')
-    emit('back-click');
+  if (route.name === "safeReport") {
+    console.log("SafeReport 페이지 - emit 실행");
+    emit("back-click");
   } else {
-    console.log('다른 페이지 - movePage.back() 실행')
+    console.log("다른 페이지 - movePage.back() 실행");
     movePage.back();
   }
 }
@@ -74,6 +74,6 @@ function handleBackClick() {
         @click="movePage.myAlarm()"
       />
     </div>
-      <slot />
+    <slot />
   </header>
 </template>

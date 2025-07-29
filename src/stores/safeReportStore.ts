@@ -30,10 +30,10 @@ interface ViolationStatusVO {
 }
 
 const initFormData: FormData = {
-  buildingName: '',
-  roadAddress: '',
-  jibunAddress: '',
-  dongName: '',
+  buildingName: "",
+  roadAddress: "",
+  jibunAddress: "",
+  dongName: "",
   lat: 0,
   lng: 0,
   budget: null,
@@ -63,7 +63,7 @@ export const safeReportStore = defineStore("safeReport", () => {
 
     if (from === 1) {
       // 1→0: 건물 정보 초기화
-      formData.buildingName = '';
+      formData.buildingName = "";
     } else if (from === 2) {
       // 2→1: 예산 정보 초기화
       formData.budget = null;
