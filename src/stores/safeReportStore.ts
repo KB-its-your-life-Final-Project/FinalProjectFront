@@ -92,7 +92,7 @@ export const safeReportStore = defineStore("safeReport", () => {
   };
 
   const updateViolationStatusVO = (data: ViolationStatusVO | null) => {
-    violationStatus.value = data?.violationStatus || null;
+    violationStatus.value = data?.violationStatus ?? null;
   };
 
   return {

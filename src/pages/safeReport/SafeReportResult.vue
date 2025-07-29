@@ -79,10 +79,6 @@ const riskText = computed(() => {
 });
 
 onMounted(async () => {
-  // 이전 데이터 초기화
-  store.updateResultData(null);
-  store.updateViolationStatus(null);
-  store.updateFloorAndPurposeList(null);
   isLoading.value = true;
 
   try {
@@ -122,6 +118,7 @@ onMounted(async () => {
 
 // 기존 함수들은 그대로 유지
 function goHome() {
+  store.resetStore();
   router.push({ name: "homeMain" });
 }
 function goToKB() {
@@ -140,19 +137,21 @@ const illegalBox = computed(() => {
     };
   }
   // 위험 (위반건축물)
-  if (status === '위반건축물') {
+  else if (status === '위반건축물') {
     return {
       bg: 'bg-red-100',
       text: 'text-red-600',
       label: '있음',
     };
   }
-  // 안전 (빈 문자열이거나 다른 값)
-  return {
+  // 안전 (기타 값)
+  else {
+    return {
     bg: 'bg-green-100',
     text: 'text-green-700',
     label: '없음',
   };
+}
 });
 </script>
 
