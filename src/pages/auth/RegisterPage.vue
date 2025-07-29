@@ -2,7 +2,7 @@
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { authStore } from "@/stores/authStore.ts";
-import { Api } from "@/api/autoLoad/Api"
+import { Api } from "@/api/autoLoad/Api";
 import {
   isEmpty,
   isValidEmailFormat,
@@ -169,9 +169,7 @@ const registerUser = async () => {
       </div>
       <div>
         <label for="password1">비밀번호</label>
-        <span class="guide-msg">
-          *영문 대·소문자, 숫자, 특수문자를 각각 포함한 8자 이상
-        </span>
+        <span class="guide-msg"> *영문 대·소문자, 숫자, 특수문자를 각각 포함한 8자 이상 </span>
         <input
           class="input-box"
           type="password"

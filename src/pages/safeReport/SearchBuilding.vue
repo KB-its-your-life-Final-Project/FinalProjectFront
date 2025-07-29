@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
-const props = defineProps({ formData: Object });
-const emit = defineEmits(["update", "next", "prev"]);
+import { ref, onMounted, nextTick } from 'vue'
+import { safeReportStore } from '@/stores/safeReportStore'
 
-const buildingName = ref(props.formData.buildingName);
-const roadAddress = ref(props.formData.roadAddress);
-const jibunAddress = ref(props.formData.jibunAddress);
-const dongName = ref(props.formData.dongname);
-const naverReady = ref(false);
-const showPostcode = ref(false);
+const store = safeReportStore()
+const emit = defineEmits(['update','next','prev'])
+
+const buildingName = ref(store.formData.buildingName)
+const roadAddress = ref(store.formData.roadAddress)
+const jibunAddress = ref(store.formData.jibunAddress)
+const dongName = ref(store.formData.dongName)
+const lat = ref<number>(store.formData.lat)
+const lng = ref<number>(store.formData.lng)
+const naverReady = ref(false)
+const showPostcode = ref(false)
 
 // DAUM 우편 번호 API + Naver Maps API 호출
 onMounted(() => {
@@ -40,30 +44,35 @@ function search() {
 
     const postcode = new (window as any).daum.Postcode({
       oncomplete(data: any) {
-        console.log("선택된 주소 데이터: ", data);
+        console.log('전체 주소 데이터:', data);
+        roadAddress.value = data.roadAddress || data.autoRoadAddress || '';
+        jibunAddress.value = data.jibunAddress || data.autoJibunAddress || '';
+        buildingName.value = data.buildingName || '';
+        dongName.value = /[동|로|가]$/.test(data.bname) ? data.bname : '';
 
-        roadAddress.value = data.roadAddress || "";
-        jibunAddress.value = data.jibunAddress || "";
-        dongName.value = /[동|로|가]$/.test(data.bname) ? data.bname : "";
-        buildingName.value = data.buildingName || "";
-        showPostcode.value = false;
-
-        if (jibunAddress.value && naverReady.value) {
-          searchAddressToCoordinate(jibunAddress.value);
-        }
-
-        emit("update", {
+        store.updateFormData({
           roadAddress: roadAddress.value,
           jibunAddress: jibunAddress.value,
           buildingName: buildingName.value,
           dongName: dongName.value,
+
         });
+
+        if(roadAddress.value && naverReady.value){
+          searchAddressToCoordinate(jibunAddress.value);
+        }
+
       },
       onclose: () => {
         showPostcode.value = false;
+        // 주소 선택 없이 닫으면 초기화
+        if (!buildingName.value.trim()) {
+          resetFormData()
+        }
       },
-      width: "100%",
-      height: "100%",
+      width: '100%',
+      height: '100%',
+
     });
 
     postcode.embed(container);
@@ -76,10 +85,31 @@ function searchAddressToCoordinate(address: string) {
     return;
   }
 
-  naver.maps.Service.geocode({ query: address }, function (status, response) {
-    if (status !== naver.maps.Service.Status.OK) {
-      alert("주소를 좌표로 변환하는 데 실패했습니다.");
-      return;
+  naver.maps.Service.geocode(
+    { query: address },
+    function (status, response) {
+      if (status !== naver.maps.Service.Status.OK) {
+        alert("주소를 좌표로 변환하는 데 실패했습니다.");
+        return;
+      }
+
+      const result = response.v2;
+      if (result.meta.totalCount === 0) {
+        alert("DB에 해당하는 주소 데이터가 없습니다.");
+        return;
+      }
+
+      const { x, y } = result.addresses[0];
+      const latVal = parseFloat(y);
+      const lngVal = parseFloat(x);
+
+      console.log("✅ 위도:", latVal, "경도:", lngVal);
+
+      store.updateFormData({
+        lat: latVal,
+        lng: lngVal,
+      });
+      console.log('store 업데이트 후 formData:', store.formData);
     }
 
     const result = response.v2;
@@ -107,6 +137,25 @@ function searchAddressToCoordinate(address: string) {
 
 function next() {
   emit("next");
+}
+
+function resetFormData() {
+  // store 초기화
+  store.resetStore()
+
+  // 로컬 ref들도 초기화
+  buildingName.value = ''
+  roadAddress.value = ''
+  jibunAddress.value = ''
+  dongName.value = ''
+  lat.value = 0
+  lng.value = 0
+}
+
+// 닫기 버튼 클릭 시 초기화
+function handleClose() {
+  showPostcode.value = false
+  resetFormData()
 }
 </script>
 
@@ -143,7 +192,7 @@ function next() {
         <div id="postcodeContainer" class="w-full h-full" style="min-height: 400px"></div>
         <button
           class="absolute top-2 right-2 z-[10000] bg-white text-sm border px-2 py-1 rounded"
-          @click="showPostcode = false"
+          @click="handleClose"
         >
           닫기
         </button>
@@ -153,7 +202,7 @@ function next() {
     <div class="fixed z-0 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
-        :disabled="!buildingName.trim()"
+        :disabled="!buildingName.trim() || !roadAddress.trim() || !jibunAddress.trim()"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
       >
         다음
