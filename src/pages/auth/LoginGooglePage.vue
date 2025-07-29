@@ -9,7 +9,6 @@ const route = useRoute();
 const router = useRouter();
 const auth = authStore();
 
-
 const member = reactive<LoginDTO>({
   email: "",
   password: "",

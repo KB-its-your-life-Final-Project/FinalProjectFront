@@ -16,6 +16,7 @@ import {
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
   LoginDTO,
+  MemberDTO,
   SafeReportRequestDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
@@ -86,6 +87,22 @@ export class Api<
    * No description
    *
    * @tags member-controller
+   * @name CheckLoginStatusUsingGet
+   * @summary checkLoginStatus
+   * @request GET:/api/member/me
+   */
+  checkLoginStatusUsingGet = (dto: MemberDTO, params: RequestParams = {}) =>
+    this.request<ApiResponseMemberDTO, void>({
+      path: `/api/member/me`,
+      method: "GET",
+      body: dto,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
    * @name RegisterByEmailUsingPost
    * @summary registerByEmail
    * @request POST:/api/member/register/email
@@ -111,60 +128,20 @@ export class Api<
    * No description
    *
    * @tags member-controller
-   * @name SendVerificationCodeUsingPost
-   * @summary sendVerificationCode
-   * @request POST:/api/member/sendcode
-   */
-  sendVerificationCodeUsingPost = (
-    query: {
-      /** email */
-      email: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseBoolean, void>({
-      path: `/api/member/sendcode`,
-      method: "POST",
-      query: query,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags member-controller
-   * @name VerifyCodeUsingPost
-   * @summary verifyCode
-   * @request POST:/api/member/verifycode
-   */
-  verifyCodeUsingPost = (
-    query: {
-      /** email */
-      email: string;
-      /** verificationCode */
-      verificationCode: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseBoolean, void>({
-      path: `/api/member/verifycode`,
-      method: "POST",
-      query: query,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags member-controller
    * @name FindMemberByIdUsingGet
    * @summary findMemberById
    * @request GET:/api/member/{id}
    */
-  findMemberByIdUsingGet = (id: number, params: RequestParams = {}) =>
+  findMemberByIdUsingGet = (
+    id: string,
+    data: number,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
+      body: data,
+      type: ContentType.Json,
       ...params,
     });
   /**

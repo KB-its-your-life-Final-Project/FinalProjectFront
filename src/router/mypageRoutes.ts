@@ -20,6 +20,7 @@ const myPageRouteRecordRaw: RouteRecordRaw[] = [
     path: "/mypage",
     name: myPageRouteName.mypage,
     component: myPageRouteMap.myPageMain,
+    meta: { requiresAuth: true },
   },
   {
     path: "/mypage/setting",

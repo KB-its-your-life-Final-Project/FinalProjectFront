@@ -37,36 +37,36 @@ const loginGoogle = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen gap-20">
+  <div class="wrapper">
     <!-- 로고 및 문구 영역 -->
-    <div class="flex flex-col items-center gap-5">
+    <div class="logo-content-wrapper">
       <h1 class="w-50">
         <img class="w-full" src="@/assets/imgs/logo.svg" alt="로고" />
       </h1>
-      <h2 class="flex flex-col items-center text-3xl font-pretendard-bold gap-2">
+      <h2 class="h2-wrapper">
         <div>로그인하시고</div>
         <div>안전한 방을 찾으세요!</div>
       </h2>
     </div>
     <!-- // 로고 및 문구 영역 -->
     <!-- 로그인 버튼 및 회원가입 영역 -->
-    <div class="flex flex-col items-center w-full gap-8">
+    <div class="login-register-wrapper">
       <!-- 로그인 버튼 영역 -->
-      <div class="flex flex-col items-center w-5/6 h-auto gap-3">
+      <div class="login-btn-wrapper">
         <button class="login-btn kakao-sec" @click="loginKakao">
-          <div class="flex flex-row items-center gap-3">
+          <div class="snslogo-text-wrapper">
             <img class="size-5" src="@/assets/imgs/kakao.svg" alt="카카오 로고" />
             <span>카카오톡으로 시작하기</span>
           </div>
         </button>
         <button class="login-btn google-sec" @click="loginGoogle">
-          <div class="flex flex-row items-center gap-3">
+          <div class="snslogo-text-wrapper">
             <img class="size-5" src="@/assets/imgs/google.svg" alt="구글 로고" />
             <span>Google로 시작하기</span>
           </div>
         </button>
         <button class="login-btn email-sec">
-          <div class="flex flex-row items-center gap-3">
+          <div class="snslogo-text-wrapper">
             <img class="size-5" src="@/assets/imgs/email.svg" alt="이메일 이미지" />
             <router-link to="/auth/loginEmail">
               <span>E-mail로 시작하기</span>
@@ -85,8 +85,27 @@ const loginGoogle = async () => {
 
 <style scoped>
 @reference "@/assets/styles/main.css";
+
+.wrapper {
+  @apply flex flex-col items-center justify-center min-h-screen gap-20;
+}
+.logo-content-wrapper {
+  @apply flex flex-col items-center gap-5;
+}
+.h2-wrapper {
+  @apply flex flex-col items-center text-3xl font-pretendard-bold gap-2;
+}
+.login-register-wrapper {
+  @apply flex flex-col items-center w-full gap-8;
+}
+.login-btn-wrapper {
+  @apply flex flex-col items-center w-5/6 h-auto gap-3;
+}
+.snslogo-text-wrapper {
+  @apply flex flex-row items-center gap-3;
+}
 .login-btn {
-  @apply w-full h-14 flex justify-center rounded-xl cursor-pointer;
+  @apply w-full h-14 flex justify-center rounded-xl cursor-pointer transition-all duration-300 ease-in-out;
 }
 .kakao-sec {
   @apply bg-[#fee500];
@@ -99,20 +118,11 @@ const loginGoogle = async () => {
 }
 .kakao-sec:hover {
   @apply bg-kb-yellow-native;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
 }
 .google-sec:hover {
   @apply bg-[#3661a7];
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
 }
 .email-sec:hover {
   @apply bg-[#d6deeb] border-[0.1rem] border-solid;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
 }
 </style>
