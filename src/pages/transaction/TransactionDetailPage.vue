@@ -150,9 +150,9 @@ const filteredData = async (aptName: string) => {
     });
 
     const res = await axios.post("/api/transactions/detail", body)
-    console.log("✅ 백엔드 응답 받음:", res.data);
+    console.log("백엔드 응답 받음:", res.data);
     graphData.value = res.data
-    console.log("✅ 응답 결과:", res.data);
+
   } catch (error) {
     console.error("데이터 가져오기 실패", error);
   }
@@ -178,7 +178,7 @@ const setYear = (year) => {
 };
 
 const setType = (type: string) => {
-  console.log("✅ 거래 형식 선택됨:", type);
+  console.log("거래 형식 선택됨:", type);
   selectedType.value = type;
   filteredData(selectedAptName.value);
 };
