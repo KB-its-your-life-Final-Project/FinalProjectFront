@@ -120,6 +120,14 @@ const toggleFavorite = () => {
 
 //const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([]);
 
+//날짜 달력
+const formatDateLocal = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 
 
 const getTradeTypeCode = (label: string | null): number | null => {
@@ -134,21 +142,16 @@ const getTradeTypeCode = (label: string | null): number | null => {
 const filteredData = async (aptName: string) => {
   console.log("실제 axios 요청 발생!", selectedAptName.value, startDate.value, endDate.value);
 
-
-
   const body = {
     buildingName: selectedAptName.value,
-    tradeType:  getTradeTypeCode(selectedType.value),
-    startDate: startDate.value ? startDate.value.toISOString().slice(0, 10) : null,
-    endDate: endDate.value ? endDate.value.toISOString().slice(0, 10) : null,
-  }
-  try {
-    console.log("Sending POST request:", {
-      method: 'POST',
-      url: '/api/transactions/detail',
-      data: body
-    });
+    tradeType: getTradeTypeCode(selectedType.value),
+    startDate: startDate.value ? formatDateLocal(startDate.value) : null,
+    endDate: endDate.value ? formatDateLocal(endDate.value) : null,
+  };
 
+
+
+  try {
     const res = await axios.post("/api/transactions/detail", body)
     console.log("백엔드 응답 받음:", res.data);
     graphData.value = res.data
