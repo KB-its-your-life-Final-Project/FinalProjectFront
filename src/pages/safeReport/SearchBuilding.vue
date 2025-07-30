@@ -45,6 +45,10 @@ function search() {
     const postcode = new (window as any).daum.Postcode({
       oncomplete(data: any) {
         console.log("전체 주소 데이터:", data);
+        if(!data.buildingName || data.buildingName.trim()==""){
+          alert("해당 주소에 건물이 없습니다.");
+          return;
+        }
         roadAddress.value = data.roadAddress || data.autoRoadAddress || "";
         jibunAddress.value = data.jibunAddress || data.autoJibunAddress || "";
         buildingName.value = data.buildingName || "";

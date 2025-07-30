@@ -13,16 +13,19 @@ interface ResultData {
 }
 
 const store = safeReportStore();
+const emit = defineEmits(["update", "next", "prev"]);
 
 // 구조분해할당 제거 - 반응성 유지
 const router = useRouter();
 const showModal_financial = ref(false);
 const showModal_building = ref(false);
 const showNoDataModal = ref(false); // 데이터 없음 모달 추가
+const showHighRatioModal = ref(false); // 전세가율 높음 모달 추가
 const isLoading = ref(true); // 로딩 상태 추가
 
 // dealAmount가 0인지 체크하는 computed
 const isNoData = computed(() => {
+  // dealAmount가 0일 때 데이터 없음으로 처리
   return store.resultData?.dealAmount === 0;
 });
 
@@ -79,6 +82,9 @@ const riskText = computed(() => {
 });
 
 onMounted(async () => {
+  // 모달 상태 초기화
+  showNoDataModal.value = false;
+  showHighRatioModal.value = false;
   isLoading.value = true;
 
   try {
@@ -103,6 +109,13 @@ onMounted(async () => {
       showNoDataModal.value = true;
     }
 
+    // reverse_rental_ratio가 100 이상인지 체크
+    console.log("reverse_rental_ratio 체크:", response.data.data.rentalRatioAndBuildyear?.reverse_rental_ratio);
+    if (response.data.data.rentalRatioAndBuildyear?.reverse_rental_ratio >= 100) {
+      console.log("전세가율 100% 이상 - 모달 표시");
+      showHighRatioModal.value = true;
+    }
+
     console.log("저장된 resultData:", store.resultData);
     console.log("저장된 violationStatus:", store.violationStatus);
     console.log("저장된 floorAndPurposeList:", store.floorAndPurposeList);
@@ -116,10 +129,25 @@ onMounted(async () => {
   }
 });
 
-// 기존 함수들은 그대로 유지
+function getFloorLabel(floor: string) {
+  if (floor.startsWith("지")) {
+    return "지하" + floor.slice(1) + "층";
+  }
+  if (floor.startsWith("상")) {
+    return "지상" + floor.slice(1) + "층";
+  }
+  return floor;
+}
+
 function goHome() {
   store.resetStore();
   router.push({ name: "homeMain" });
+}
+function goToSelectBudget() {
+  // 예산만 초기화하고 건물 정보는 유지
+  store.updateFormData({ budget: null });
+  store.updateResultData(null);
+  emit("prev"); // 이전 단계(SelectBudget)로 이동
 }
 function goToKB() {
   window.open("https://m.naver.com/");
@@ -301,19 +329,19 @@ const illegalBox = computed(() => {
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
       @close="showModal_building = false"
     >
-              <div v-if="store.violationStatus && store.floorAndPurposeList && store.floorAndPurposeList.length">
+              <div v-if="store.floorAndPurposeList && store.floorAndPurposeList.length">
           <p>
             <span :class="store.violationStatus === '위반건축물' ? 'text-red-600 font-extrabold' : 'text-green-600 font-extrabold'">
               위반 건축물 여부: {{ store.violationStatus === '위반건축물' ? '위반 건축물' : '정상 건축물' }}
             </span>
           </p>
           <p class="mt-2">
-            각 층의 용도는 다음과 같습니다. <span class="text-red-600 font-semibold">주거용이 아닌 층의 경우 거래에 조심하세요!</span>
+            각 층의 용도는 다음과 같습니다. 주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-red-600 font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
           </p>
           <div class="mt-4">
             <div v-for="(info, idx) in store.floorAndPurposeList" :key="idx" class="mb-2">
-              {{ info.resFloor }}의 용도: {{ info.resUseType }}
-              <span class="text-sm text-gray-500">({{ info.resStructure }}, {{ info.resArea }}㎡)</span>
+              {{ getFloorLabel(info.resFloor) }}: {{ info.resUseType }}
+              <!-- <span class="text-sm text-gray-500">({{ info.resStructure }})</span> -->
             </div>
           </div>
         </div>
@@ -346,6 +374,35 @@ const illegalBox = computed(() => {
             class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-lg font-semibold"
           >
             확인
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 전세가율 높음 모달 -->
+    <div
+      v-if="showHighRatioModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="rounded-lg shadow-lg p-6 w-80 bg-white">
+        <div class="text-center">
+          <div class="mb-4">
+            <svg class="mx-auto h-12 w-12 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            전세가율 초과
+          </h3>
+          <p class="text-sm text-gray-500 mb-6">
+            전세가율이 100%를 초과했습니다.<br>
+            입력하신 예산 금액이 현실적인지 다시 확인해 주세요.
+          </p>
+          <button
+            @click="goToSelectBudget"
+            class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-lg font-semibold"
+          >
+            예산 재입력
           </button>
         </div>
       </div>
