@@ -277,7 +277,7 @@ const illegalBox = computed(() => {
       @close="showModal_financial = false"
     >
       <p>
-        000님의 예산 금액 {{ store.formData.budget }} 만원에 기반하여 분석한 결과는 다음과
+        예산 금액 {{ store.formData.budget }}만원에 기반하여 분석한 결과는 다음과
         같습니다.
       </p>
               <p class="mt-4">
@@ -301,24 +301,26 @@ const illegalBox = computed(() => {
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
       @close="showModal_building = false"
     >
-              <p>
-          <span :class="store.violationStatus === '위반건축물' ? 'text-red-600 font-extrabold' : 'text-green-600 font-extrabold'">
-            위반 건축물 여부: {{ store.violationStatus === '위반건축물' ? '위반 건축물' : '정상 건축물' }}
-          </span>
-          <hr />
-        </p>
-        <p class="mt-2">
-          각 층의 용도는 다음과 같습니다. <span class="text-red-600 font-semibold">주거용이 아닌 층의 경우 거래에 조심하세요!</span>
-        </p>
-      <div v-if="store.floorAndPurposeList && store.floorAndPurposeList.length" class="mt-4">
-        <div v-for="(info, idx) in store.floorAndPurposeList" :key="idx" class="mb-2">
-          {{ info.resFloor }}의 용도: {{ info.resUseType }}
-          <span class="text-sm text-gray-500">({{ info.resStructure }}, {{ info.resArea }}㎡)</span>
+              <div v-if="store.violationStatus && store.floorAndPurposeList && store.floorAndPurposeList.length">
+          <p>
+            <span :class="store.violationStatus === '위반건축물' ? 'text-red-600 font-extrabold' : 'text-green-600 font-extrabold'">
+              위반 건축물 여부: {{ store.violationStatus === '위반건축물' ? '위반 건축물' : '정상 건축물' }}
+            </span>
+            <hr />
+          </p>
+          <p class="mt-2">
+            각 층의 용도는 다음과 같습니다. <span class="text-red-600 font-semibold">주거용이 아닌 층의 경우 거래에 조심하세요!</span>
+          </p>
+          <div class="mt-4">
+            <div v-for="(info, idx) in store.floorAndPurposeList" :key="idx" class="mb-2">
+              {{ info.resFloor }}의 용도: {{ info.resUseType }}
+              <span class="text-sm text-gray-500">({{ info.resStructure }}, {{ info.resArea }}㎡)</span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div v-else class="mt-4 text-gray-500">
-        건축물 정보가 없습니다.
-      </div>
+        <div v-else class="text-center text-gray-500">
+          건축물 정보가 없습니다.
+        </div>
     </ModalForm>
 
     <!-- 데이터 없음 모달 -->
