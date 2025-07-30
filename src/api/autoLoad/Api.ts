@@ -12,15 +12,17 @@
 
 import {
   ApiResponseBoolean,
-  ApiResponseFormData,
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
+  ApiResponseSafeReportResponseDto,
   LoginDTO,
   SafeReportRequestDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -126,7 +128,11 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary findMemberById
    * @request GET:/api/member/{id}
    */
-  findMemberByIdUsingGet = (id: string, data: number, params: RequestParams = {}) =>
+  findMemberByIdUsingGet = (
+    id: string,
+    data: number,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
@@ -137,13 +143,16 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
   /**
    * No description
    *
-   * @tags safe-report-controller
+   * @tags SafeReport
    * @name ReceiveFormUsingPost
    * @summary receiveForm
    * @request POST:/api/report/requestData
    */
-  receiveFormUsingPost = (dto: SafeReportRequestDto, params: RequestParams = {}) =>
-    this.request<ApiResponseFormData, void>({
+  receiveFormUsingPost = (
+    dto: SafeReportRequestDto,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseSafeReportResponseDto, void>({
       path: `/api/report/requestData`,
       method: "POST",
       body: dto,

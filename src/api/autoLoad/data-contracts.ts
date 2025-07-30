@@ -10,14 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-/** FormData */
-export interface FormData {
-  /** @format int32 */
-  buildYear?: number;
-  /** @format int32 */
-  dealAmount?: number;
-  /** @format int32 */
-  score?: number;
+/** FloorAndPurpose */
+export interface FloorAndPurpose {
+  resArea?: string;
+  resFloor?: string;
+  resStructure?: string;
+  resUseType?: string;
 }
 
 /** LoginDTO */
@@ -54,6 +52,20 @@ export interface MemberDTO {
   regIp?: string;
 }
 
+/** RentalRatioAndBuildyear */
+export interface RentalRatioAndBuildyear {
+  /** @format int32 */
+  buildYear?: number;
+  /** @format int32 */
+  buildyear_score?: number;
+  /** @format int32 */
+  dealAmount?: number;
+  /** @format double */
+  reverse_rental_ratio?: number;
+  /** @format int32 */
+  score?: number;
+}
+
 /** SafeReportRequestDto */
 export interface SafeReportRequestDto {
   /** @format int32 */
@@ -68,13 +80,16 @@ export interface SafeReportRequestDto {
   roadAddress?: string;
 }
 
-/** ApiResponse«FormData» */
-export interface ApiResponseFormData {
-  /** @format int32 */
-  code?: number;
-  data?: FormData;
-  message?: string;
-  success?: boolean;
+/** SafeReportResponseDto */
+export interface SafeReportResponseDto {
+  floorAndPurposeList?: FloorAndPurpose[];
+  rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
+  violationStatus?: ViolationStatusVO;
+}
+
+/** ViolationStatusVO */
+export interface ViolationStatusVO {
+  violationStatus?: string;
 }
 
 /** ApiResponse«List«MemberDTO»» */
@@ -91,6 +106,15 @@ export interface ApiResponseMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«SafeReportResponseDto» */
+export interface ApiResponseSafeReportResponseDto {
+  /** @format int32 */
+  code?: number;
+  data?: SafeReportResponseDto;
   message?: string;
   success?: boolean;
 }

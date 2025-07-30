@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import HomeCard from "@/pages/home/_component/HomeCard.vue";
+import HomeNews from "@/pages/home/_component/HomeNews.vue";
 
 import Header from "@/components/layout/header/Header.vue";
 import Footer from "@/components/layout/Footer.vue";
@@ -28,16 +29,13 @@ import { mainRouteName } from "@/router/mainRoute";
         </div>
       </Header>
 
-      <main class="flex-1 px-4 pt-4 space-y-4 overflow-auto pb-24">
+      <main class="flex-1 px-4 pt-4 space-y-4 overflow-auto pb-24 bg-black">
         <div class="grid grid-cols-2 gap-4 mt-15">
           <RouterLink v-for="(menu, idx) in HomeCardTypes" :key="idx" :to="{ name: menu.name }">
             <HomeCard :data="menu" />
           </RouterLink>
         </div>
-        <div class="bg-kb-ui-11 rounded-xl shadow-md p-4 sm:p-6 text-center mt-6 min-h-[15.625rem]">
-          <p class="text-kb-ui-01 text-sm">Recent news events coverage</p>
-        </div>
-
+        <HomeNews />
         <Footer />
       </main>
     </div>
