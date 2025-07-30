@@ -306,7 +306,6 @@ const illegalBox = computed(() => {
             <span :class="store.violationStatus === '위반건축물' ? 'text-red-600 font-extrabold' : 'text-green-600 font-extrabold'">
               위반 건축물 여부: {{ store.violationStatus === '위반건축물' ? '위반 건축물' : '정상 건축물' }}
             </span>
-            <hr />
           </p>
           <p class="mt-2">
             각 층의 용도는 다음과 같습니다. <span class="text-red-600 font-semibold">주거용이 아닌 층의 경우 거래에 조심하세요!</span>
