@@ -13,6 +13,7 @@ import {
 } from "chart.js"
 import zoomPlugin from "chartjs-plugin-zoom"
 import { computed } from "vue"
+import type { TooltipItem } from 'chart.js'
 
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement,Filler, zoomPlugin)
@@ -26,16 +27,18 @@ const props = defineProps<{
 
 
 const chartData = computed(() => {
-  const filteredData =
+  console.log(" [그래프 데이터 확인]", props.graphData)
+  const filtered =
     props.selectedType === "전체"
       ? props.graphData
       : props.graphData.filter((item) => item.type === props.selectedType)
 // 날짜순으로 나열
-  filteredData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   //모든 날짜들 구하기
-  const allDates = [...new Set(filteredData.map(item => item.date))].sort()
+  const allDates = [...new Set(filtered.map(item => item.date))].sort()
 
-  const grouped = filteredData.reduce((acc, cur) => {
+
+  const grouped = filtered.reduce((acc, cur) => {
     if (!acc[cur.type]) acc[cur.type] = {}
     acc[cur.type][cur.date] = cur.price
     return acc
@@ -65,7 +68,6 @@ const chartData = computed(() => {
 })
 
 
-
 // y축 + 줌인 기능
 const chartOptions = computed(() =>  {
 
@@ -89,7 +91,7 @@ const chartOptions = computed(() =>  {
       mode: "index",
       intersect: false,
       callbacks: {
-        label: (tooltipItem: any) =>
+        label: (tooltipItem: TooltipItem<'line'>) =>
           `${tooltipItem.dataset.label} ${tooltipItem.raw}`
         },
       },
@@ -110,6 +112,7 @@ const chartOptions = computed(() =>  {
       },
     },
 interaction: {
+  //타입충돌예방
   mode: "index",
   intersect: false
 },

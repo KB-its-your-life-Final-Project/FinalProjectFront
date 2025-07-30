@@ -93,6 +93,17 @@ import { mainRouteName } from "@/router/mainRoute.ts";
 
 import DatePicker from "@/components/common/DatePicker.vue";
 
+const route = useRoute();
+const selectedAptName = ref<string>((route.params.aptName as string) || "");
+
+const selectedType = ref("전체");
+const selectedYear = ref<number | '전체'>(1);
+
+//날짜의 기본값- 아무것도 없는 값
+const startDate = ref<Date | null>(null);
+const endDate = ref<Date | null>(null);
+const graphData = ref<{ date: string; price: number; type: string }[]>([]);
+
 const isFavorite = ref(false);
 
 const toggleFavorite = () => {
@@ -104,77 +115,47 @@ const toggleFavorite = () => {
     // 찜 해제
   }
 };
-const route = useRoute();
-const selectedAptName = ref<string>((route.params.aptName as string) || "");
-
-const selectedType = ref("전체");
-const selectedYear = ref(1);
-
-//날짜의 기본값- 아무것도 없는 값
-const startDate = ref<string | null>(null);
-const endDate = ref<string | null>(null);
-
-// 오늘 날찌를 기본값으로 하고 싶다면?
-/*
-const today = new Date()
-const formatDate = (date: Date) => date.toISOString().slice(0, 10)
-const startDate = ref<string>(formatDate(today))
-const endDate = ref<string>(formatDate(today))
-*/
 
 //전체 거래 데이터 및 그래프들 데이터
 
-const graphData = ref<{ date: string; price: number; type: string }[]>([]);
-const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([]);
+//const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([]);
 
-//수동으로 버튼 누르면... 해제
-const handleDateChange = () => {
-  selectedYear.value = "전체";
-  filterByDate();
+
+
+const getTradeTypeCode = (label: string | null): number | null => {
+  console.log("getTradeTypeCode 호출:", label);
+  if (label === "매매") return 1;
+  if (label === "전월세") return 2;
+  return null; // "전체" 혹은 그 외
 };
-const fetchTransactionData = async () => {
+
+
+
+const filteredData = async (aptName: string) => {
+  console.log("실제 axios 요청 발생!", selectedAptName.value, startDate.value, endDate.value);
+
+
+
+  const body = {
+    buildingName: selectedAptName.value,
+    tradeType:  getTradeTypeCode(selectedType.value),
+    startDate: startDate.value ? startDate.value.toISOString().slice(0, 10) : null,
+    endDate: endDate.value ? endDate.value.toISOString().slice(0, 10) : null,
+  }
   try {
-    const res = await axios.get("/api/transactions"); // 전체 데이터 가져오기
-    const rawData = res.data.map((item: any) => {
-      const date = `${item.dealYear}-${String(item.dealMonth).padStart(2, "0")}-${String(item.dealDay).padStart(2, "0")}`;
-      const type = item.tradeType === 1 ? "매매" : "전월세";
-      const price =
-        type === "매매" ? item.dealAmount / 10000 : item.deposit != null ? item.deposit / 10000 : 0;
-
-      return { date, price, type, buildingName: item.buildingName };
+    console.log("Sending POST request:", {
+      method: 'POST',
+      url: '/api/transactions/detail',
+      data: body
     });
-    allData.value = selectedAptName.value
-      ? rawData.filter((item) => item.buildingName === selectedAptName.value)
-      : rawData;
 
-    filterByDate();
-    console.log(res.data);
+    const res = await axios.post("/api/transactions/detail", body)
+
+    graphData.value = res.data
+    console.log("✅ 응답 결과:", res.data);
   } catch (error) {
     console.error("데이터 가져오기 실패", error);
   }
-};
-
-// 연도 및 유형 필터 적용
-const filterByDate = () => {
-  let filtered = [...allData.value];
-
-  if (startDate.value && endDate.value) {
-    const start = new Date(startDate.value);
-    const end = new Date(endDate.value);
-    end.setHours(23, 59, 59, 999);
-
-    filtered = filtered.filter(item => {
-      const itemDate = new Date(item.date);
-      return itemDate >= start && itemDate <= end;
-    });
-  }
-
-  if (selectedType.value !== "전체") {
-    filtered = filtered.filter((item) => item.type === selectedType.value);
-  }
-  graphData.value = filtered.sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-  );
 };
 
 //연도 버튼 클릭으로 필터링 기능
@@ -189,28 +170,44 @@ const setYear = (year) => {
     const past = new Date();
     past.setFullYear(now.getFullYear() - Number(year));
 
-    // 년-월-일 형식으로 만들어줌
-    startDate.value = past.toISOString().slice(0, 10);
-    endDate.value = now.toISOString().slice(0, 10);
+    startDate.value = past;
+    endDate.value = now;
   }
-  filterByDate();
+  filteredData(selectedAptName.value);
+  //filteredData();
 };
 
 const setType = (type: string) => {
+  console.log("✅ 거래 형식 선택됨:", type);
   selectedType.value = type;
-  filterByDate();
+  filteredData(selectedAptName.value);
+};
+//수동으로 버튼 누르면... 해제
+const handleDateChange = () => {
+  selectedYear.value = "전체";
+  //startDate.value = null
+  // endDate.value = null
+  filteredData(selectedAptName.value);
 };
 
 //url은 변경되어있지만, 컴포넌트는 남아있는 경우를 방지
 watch(
   () => route.params.aptName,
   (newName) => {
-    selectedAptName.value = newName as string;
-    fetchTransactionData();
-  },
+    if (newName) {
+      selectedAptName.value = newName as string;
+      filteredData(newName as string);
+    }
+
+}
+
 );
 
 onMounted(() => {
-  fetchTransactionData();
+  const aptName = route.params.aptName as string;
+  if (aptName) {
+    selectedAptName.value = aptName;
+    filteredData(aptName);
+  }
 });
 </script>
