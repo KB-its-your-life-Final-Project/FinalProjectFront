@@ -2,7 +2,6 @@
 import { computed, ref, watch } from "vue";
 const props = defineProps<{
   label: string;
-  oldData?: string;
   modelValue?: string;
   disabled?: boolean;
   placeholder?: string;
@@ -48,7 +47,6 @@ watch(
 );
 
 const displayValue = computed(() => {
-  if (props.disabled) return props.oldData ?? "";
   if (props.type === "money") return rawValue.value;
   return rawValue.value;
 });

@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { defineProps, defineEmits } from "vue";
+import { defineEmits } from "vue";
 
 const props = defineProps<{
   modelValue: string;
   options: { label: string; value: string }[];
+  rounded?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -19,17 +20,20 @@ const isLast = (idx: number) => idx === props.options.length - 1;
 </script>
 
 <template>
-  <div class="flex w-full border border-gray-300 rounded-full overflow-hidden">
+  <div
+    class="flex w-full border border-gray-300 overflow-hidden"
+    :class="{ 'rounded-full': rounded }"
+  >
     <button
       v-for="(option, idx) in options"
       :key="option.value"
-      class="flex-1 py-2 text-center transition-all duration-200 border-r last:border-r-0"
+      class="flex-1 py-2 text-center transition-all duration-200 cursor-pointer"
       :class="[
         modelValue === option.value
           ? 'bg-kb-yellow-positive text-white border border-gray-300'
           : 'bg-gray-100 text-gray-700 border-transparent',
-        isFirst(idx) ? 'rounded-l-full' : '',
-        isLast(idx) ? 'rounded-r-full' : '',
+        isFirst(idx) && rounded ? 'rounded-l-full' : '',
+        isLast(idx) && rounded ? 'rounded-r-full' : '',
       ]"
       @click="select(option.value)"
     >
