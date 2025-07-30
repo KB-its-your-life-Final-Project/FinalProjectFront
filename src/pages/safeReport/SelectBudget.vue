@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { Api } from "@/api/autoLoad/Api.ts";
+import axios from "axios";
 import { safeReportStore } from "@/stores/safeReportStore";
 
 const store = safeReportStore();

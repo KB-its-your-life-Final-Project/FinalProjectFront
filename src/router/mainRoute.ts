@@ -39,6 +39,7 @@ const mainRouteName = {
   localInfo: "localInfo",
   localInfoSearch: "localInfoSearch",
   myPage: "myPage",
+  settingAlarm: "settingAlarm",
   transactionDetail: "transactionDetail",
 };
 

@@ -150,7 +150,7 @@ const filteredData = async (aptName: string) => {
     });
 
     const res = await axios.post("/api/transactions/detail", body)
-
+    console.log("✅ 백엔드 응답 받음:", res.data);
     graphData.value = res.data
     console.log("✅ 응답 결과:", res.data);
   } catch (error) {
