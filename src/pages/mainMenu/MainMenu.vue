@@ -60,7 +60,7 @@ function openInquiry() {
     </MenuSection>
 
     <MenuSection title="설정">
-      <MenuItem :icon="['fas', 'bell']" label="알림 설정" to="/myAlarm" />
+      <MenuItem :icon="['fas', 'bell']" label="알림 설정" to="/mypage/setting" />
     </MenuSection>
 
     <MenuSection title="고객지원 및 안내">

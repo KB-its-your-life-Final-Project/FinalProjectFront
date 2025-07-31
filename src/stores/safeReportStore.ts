@@ -12,14 +12,21 @@ interface FormData {
   budget: number | null;
 }
 
-interface BuildingInfo {
-  // 건물 정보 (위반 건축물 여부부, 건물 용도)
-  [key: string]: unknown;
-}
-
 interface ResultData {
   // 결과 데이터  (건축년도, 역전세율)
   [key: string]: unknown;
+}
+
+// 새로운 타입 정의 추가
+interface FloorAndPurpose {
+  resFloor: string;
+  resUseType: string;
+  resStructure: string;
+  resArea: string;
+}
+
+interface ViolationStatusVO {
+  violationStatus: string;
 }
 
 const initFormData: FormData = {
@@ -36,7 +43,8 @@ export const safeReportStore = defineStore("safeReport", () => {
   const currentStep = ref(0);
   const formData = reactive<FormData>({ ...initFormData });
   const resultData = ref<ResultData | null>(null);
-  const buildingInfo = ref<BuildingInfo | null>(null);
+  const violationStatus = ref<string | null>(null);
+  const floorAndPurposeList = ref<FloorAndPurpose[] | null>(null);
 
   const updateFormData = (updated: Partial<FormData>) => {
     Object.assign(formData, updated);
@@ -45,9 +53,6 @@ export const safeReportStore = defineStore("safeReport", () => {
   const nextStep = (payload?: { resultData?: unknown; buildingInfo?: unknown }) => {
     if (payload?.resultData) {
       resultData.value = payload.resultData as ResultData;
-    }
-    if (payload?.buildingInfo) {
-      buildingInfo.value = payload.buildingInfo as BuildingInfo;
     }
     currentStep.value++;
   };
@@ -70,28 +75,40 @@ export const safeReportStore = defineStore("safeReport", () => {
     currentStep.value = 0;
     Object.assign(formData, initFormData);
     resultData.value = null;
-    buildingInfo.value = null;
+    violationStatus.value = null;
+    floorAndPurposeList.value = null;
   };
 
-  const updateResultData = (data: ResultData) => {
+  const updateResultData = (data: ResultData | null) => {
     resultData.value = data;
   };
 
-  const updateBuildingInfo = (data: BuildingInfo) => {
-    buildingInfo.value = data;
+  const updateViolationStatus = (status: string | null) => {
+    violationStatus.value = status;
+  };
+
+  const updateFloorAndPurposeList = (data: FloorAndPurpose[] | null) => {
+    floorAndPurposeList.value = data;
+  };
+
+  const updateViolationStatusVO = (data: ViolationStatusVO | null) => {
+    violationStatus.value = data?.violationStatus ?? null;
   };
 
   return {
     currentStep,
     formData,
     resultData,
-    buildingInfo,
+    violationStatus,
+    floorAndPurposeList,
 
     updateFormData,
     nextStep,
     prevStep,
     resetStore,
     updateResultData,
-    updateBuildingInfo,
+    updateViolationStatus,
+    updateFloorAndPurposeList,
+    updateViolationStatusVO,
   };
 });
