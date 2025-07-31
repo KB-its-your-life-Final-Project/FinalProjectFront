@@ -28,7 +28,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name FindAllUsersUsingGet
    * @summary findAllUsers
    * @request GET:/api/member
@@ -42,7 +42,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name CheckDuplicateEmailUsingGet
    * @summary checkDuplicateEmail
    * @request GET:/api/member/checkemail/{email}
@@ -125,7 +125,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name FindMemberByIdUsingGet
    * @summary findMemberById
    * @request GET:/api/member/{id}
