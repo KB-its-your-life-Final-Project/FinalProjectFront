@@ -17,6 +17,10 @@ import {
   ApiResponseMemberDTO,
   LoginDTO,
   SafeReportRequestDto,
+  ApiResponseListLocalInfoResponseDTO,
+  ApiResponseWeatherDTO,
+  ApiResponsePopulationDTO,
+  ApiResponseReverseGeocodeResponseDTO,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
@@ -148,6 +152,92 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
       method: "POST",
       body: dto,
       type: ContentType.Json,
+      ...params,
+    });
+
+  // LocalInfo API 메서드들
+  /**
+   * 지역 검색
+   *
+   * @tags local-info-controller
+   * @name SearchRegionsUsingGet
+   * @summary 지역 검색
+   * @request GET:/api/localinfo/search
+   */
+  searchRegionsUsingGet = (
+    query?: {
+      keyword?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListLocalInfoResponseDTO, void>({
+      path: `/api/localinfo/search`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * 날씨 조회
+   *
+   * @tags local-info-controller
+   * @name GetWeatherUsingGet
+   * @summary 법정동코드로 날씨 조회
+   * @request GET:/api/localinfo/weather
+   */
+  getWeatherUsingGet = (
+    query?: {
+      regionCd?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseWeatherDTO, void>({
+      path: `/api/localinfo/weather`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * 인구 조회
+   *
+   * @tags local-info-controller
+   * @name GetPopulationUsingGet
+   * @summary 법정동코드로 인구 조회
+   * @request GET:/api/localinfo/population
+   */
+  getPopulationUsingGet = (
+    query?: {
+      regionCd?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponsePopulationDTO, void>({
+      path: `/api/localinfo/population`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * 좌표로 주소 조회
+   *
+   * @tags local-info-controller
+   * @name ReverseGeocodeUsingGet
+   * @summary 좌표로 법정동 주소 조회
+   * @request GET:/api/localinfo/reverse-geocode
+   */
+  reverseGeocodeUsingGet = (
+    query?: {
+      latitude?: number;
+      longitude?: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseReverseGeocodeResponseDTO, void>({
+      path: `/api/localinfo/reverse-geocode`,
+      method: "GET",
+      query: query,
       ...params,
     });
 }

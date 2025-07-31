@@ -68,6 +68,43 @@ export interface SafeReportRequestDto {
   roadAddress?: string;
 }
 
+// LocalInfo 관련 타입들
+export interface LocalInfoResponseDTO {
+  region?: string;
+  regionCd?: string;
+  /** @format int32 */
+  gridX?: number;
+  /** @format int32 */
+  gridY?: number;
+  locataddNm?: string;
+}
+
+export interface WeatherDTO {
+  temperature?: string;
+  maxTemperature?: string;
+  minTemperature?: string;
+  skyCondition?: string;
+}
+
+export interface PopulationDTO {
+  regionCd?: string;
+  regionName?: string;
+  locataddNm?: string;
+  /** @format int64 */
+  populationTotal?: number;
+  /** @format int64 */
+  populationYouth?: number;
+}
+
+export interface ReverseGeocodeResponseDTO {
+  address?: string;
+  regionCd?: string;
+  /** @format double */
+  latitude?: number;
+  /** @format double */
+  longitude?: number;
+}
+
 /** ApiResponse«FormData» */
 export interface ApiResponseFormData {
   /** @format int32 */
@@ -100,6 +137,39 @@ export interface ApiResponseBoolean {
   /** @format int32 */
   code?: number;
   data?: boolean;
+  message?: string;
+  success?: boolean;
+}
+
+// LocalInfo API 응답 타입들
+export interface ApiResponseListLocalInfoResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: LocalInfoResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseWeatherDTO {
+  /** @format int32 */
+  code?: number;
+  data?: WeatherDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponsePopulationDTO {
+  /** @format int32 */
+  code?: number;
+  data?: PopulationDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseReverseGeocodeResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: ReverseGeocodeResponseDTO;
   message?: string;
   success?: boolean;
 }
