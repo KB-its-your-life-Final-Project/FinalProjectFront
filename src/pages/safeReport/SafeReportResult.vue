@@ -132,6 +132,12 @@ function getFloorLabel(floor: string) {
   if (floor.startsWith("상")) {
     return "지상" + floor.slice(1) + "층";
   }
+  if (floor.startsWith("하")) {
+    return "지하" + floor.slice(1) + "층";
+  }
+  if (floor.startsWith("탑")) {
+    return "옥탑" + floor.slice(1) + "층";
+  }
   return floor;
 }
 
@@ -176,6 +182,14 @@ const illegalBox = computed(() => {
     label: '없음',
   };
 }
+});
+
+// resUseType이 빈 문자열이 아닌 항목만 필터링
+const filteredFloorAndPurposeList = computed(() => {
+  if (!store.floorAndPurposeList) return [];
+  return store.floorAndPurposeList.filter(info =>
+    info.resUseType && info.resUseType.trim() !== ''
+  );
 });
 </script>
 
@@ -333,7 +347,7 @@ const illegalBox = computed(() => {
             각 층의 용도는 다음과 같습니다. 주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-red-600 font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
           </p>
           <div class="mt-4">
-            <div v-for="(info, idx) in store.floorAndPurposeList" :key="idx" class="mb-2">
+            <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2">
               {{ getFloorLabel(info.resFloor) }}: {{ info.resUseType }}
               <!-- <span class="text-sm text-gray-500">({{ info.resStructure }})</span> -->
             </div>
