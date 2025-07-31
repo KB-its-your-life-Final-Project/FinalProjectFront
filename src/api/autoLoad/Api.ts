@@ -12,9 +12,9 @@
 
 import {
   ApiResponseBoolean,
-  ApiResponseFormData,
   ApiResponseListMemberDTO,
   ApiResponseMemberDTO,
+  ApiResponseSafeReportResponseDto,
   RegisterGoogleDTO,
   RegisterKakaoDTO,
   SafeReportRequestDto,
@@ -27,7 +27,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name FindAllUsersUsingGet
    * @summary findAllUsers
    * @request GET:/api/member
@@ -41,7 +41,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name CheckDuplicateEmailUsingGet
    * @summary checkDuplicateEmail
    * @request GET:/api/member/checkemail/{email}
@@ -55,7 +55,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name FindLoggedinUserUsingGet
    * @summary findLoggedinUser
    * @request GET:/api/member/loggedin
@@ -79,7 +79,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name LogoutMemberUsingPost
    * @summary logoutMember
    * @request POST:/api/member/logout
@@ -94,7 +94,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name RegisterMemberByEmailUsingPost
    * @summary registerMemberByEmail
    * @request POST:/api/member/register/email
@@ -118,7 +118,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name RegisterOrLoginMemberByGoogleUsingPost
    * @summary registerOrLoginMemberByGoogle
    * @request POST:/api/member/register/google
@@ -137,7 +137,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name RegisterOrLoginMemberByKakaoUsingPost
    * @summary registerOrLoginMemberByKakao
    * @request POST:/api/member/register/kakao
@@ -156,7 +156,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name SendVerificationCodeUsingPost
    * @summary sendVerificationCode
    * @request POST:/api/member/sendcode
@@ -178,7 +178,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name VerifyCodeUsingPost
    * @summary verifyCode
    * @request POST:/api/member/verifycode
@@ -202,7 +202,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member-controller
+   * @tags member_controller
    * @name FindMemberByIdUsingGet
    * @summary findMemberById
    * @request GET:/api/member/{id}
@@ -216,7 +216,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags safe-report-controller
+   * @tags safereport_controller
    * @name ReceiveFormUsingPost
    * @summary receiveForm
    * @request POST:/api/report/requestData
@@ -225,7 +225,7 @@ export class Api<
     dto: SafeReportRequestDto,
     params: RequestParams = {},
   ) =>
-    this.request<ApiResponseFormData, void>({
+    this.request<ApiResponseSafeReportResponseDto, void>({
       path: `/api/report/requestData`,
       method: "POST",
       body: dto,

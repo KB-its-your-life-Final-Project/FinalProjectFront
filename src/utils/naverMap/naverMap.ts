@@ -1,3 +1,10 @@
+/*
+  //필수 선언
+  const mapEl = ref<HTMLDivElement | null>(null);
+  const markers = ref<Array<any>>([]);
+  let map: any;
+*/
+
 import { createApp, h } from "vue";
 import MapSearchMarker from "@/pages/mapSearch/_components/MapSearchMarker.vue";
 
@@ -28,15 +35,13 @@ const mapUtil = {
   createMap: (mapEl: HTMLDivElement) => {
     //기본 옵션 설정
     const defaultOptions = {
-      center: { lat: 37.3595704, lng: 127.105399 },
-      zoom: 13,
+      zoom: 19,
       zoomControl: false,
       zoomControlPosition: naver.maps.Position.LEFT_BOTTOM,
     };
 
     //생성
     const map = new naver.maps.Map(mapEl, {
-      center: new naver.maps.LatLng(defaultOptions.center.lat, defaultOptions.center.lng),
       zoom: defaultOptions.zoom,
       zoomControl: defaultOptions.zoomControl,
       zoomControlOptions: {
@@ -60,7 +65,7 @@ const mapUtil = {
   // 줌 레벨에 따른 마커/클러스터 관리
   createMarkersWithZoomControl: (
     map: naver.maps.Map,
-    markerDataList: Array<{ lat: number; lng: number; title?: string }>,
+    markerDataList: Array<{ latlng: naver.maps.LatLng; jibunAddress: string; roadAddress: string }>,
     markerType?: "MapSearchMarker",
   ) => {
     let currentMarkers: naver.maps.Marker[] = [];
@@ -76,13 +81,10 @@ const mapUtil = {
       currentMarkers = [];
       currentClusters = [];
 
-      if (currentZoom >= 15) {
-        // 줌 레벨 15 이상: 개별 마커 표시
-        console.log("개별 마커 표시");
+      //기준 줌 15레벨
+      if (currentZoom >= 17) {
         currentMarkers = mapUtil.createMarkers(map, markerDataList, markerType);
       } else {
-        // 줌 레벨 15 미만: 클러스터 표시
-        console.log("클러스터 표시");
         currentClusters = mapUtil.createClusters(map, markerDataList);
       }
     };
@@ -103,14 +105,13 @@ const mapUtil = {
   // 마커 생성
   createMarkers: (
     map: naver.maps.Map,
-    markerDataList: Array<{ lat: number; lng: number; title?: string }>,
+    markerDataList: Array<{ jibunAddress: string; roadAddress: string; latlng: naver.maps.LatLng }>,
     markerType?: "MapSearchMarker",
   ) => {
     const markers: naver.maps.Marker[] = []; // 마커 배열 추가
 
     markerDataList.forEach((markerData, index) => {
-      const position = new naver.maps.LatLng(markerData.lat, markerData.lng);
-
+      const position = markerData.latlng;
       let iconContent: any = undefined;
 
       // 문자열에 따라 다른 컴포넌트 사용
@@ -129,7 +130,9 @@ const mapUtil = {
           const app = createApp({
             render() {
               return h(markerIcon, {
-                title: markerData.title,
+                jibunAddress: markerData.jibunAddress,
+                roadAddress: markerData.roadAddress,
+                latlng: markerData.latlng,
               });
             },
           });
@@ -159,13 +162,13 @@ const mapUtil = {
       }
     });
 
-    return markers; // 이 줄이 빠져있었습니다!
+    return markers;
   },
 
   // 클러스터 생성
   createClusters: (
     map: naver.maps.Map,
-    markerDataList: Array<{ lat: number; lng: number; title?: string }>,
+    markerDataList: Array<{ jibunAddress: string; roadAddress: string; latlng: naver.maps.LatLng }>,
   ) => {
     const clusters: any[] = [];
 
@@ -174,8 +177,8 @@ const mapUtil = {
     const clusterMap = new Map();
 
     markerDataList.forEach((markerData) => {
-      const gridX = Math.floor(markerData.lat / gridSize);
-      const gridY = Math.floor(markerData.lng / gridSize);
+      const gridX = Math.floor(markerData.latlng.lat() / gridSize);
+      const gridY = Math.floor(markerData.latlng.lng() / gridSize);
       const clusterKey = `${gridX}-${gridY}`;
 
       if (!clusterMap.has(clusterKey)) {
@@ -187,8 +190,10 @@ const mapUtil = {
     // 클러스터 마커 생성
     clusterMap.forEach((markers, clusterKey) => {
       if (markers.length > 0) {
-        const centerLat = markers.reduce((sum: number, m: any) => sum + m.lat, 0) / markers.length;
-        const centerLng = markers.reduce((sum: number, m: any) => sum + m.lng, 0) / markers.length;
+        const centerLat =
+          markers.reduce((sum: number, m: any) => sum + m.latlng.lat(), 0) / markers.length;
+        const centerLng =
+          markers.reduce((sum: number, m: any) => sum + m.latlng.lng(), 0) / markers.length;
 
         const clusterMarker = new naver.maps.Marker({
           position: new naver.maps.LatLng(centerLat, centerLng),
@@ -232,86 +237,99 @@ const mapUtil = {
 
   // 좌표 기반 주소 검색
   searchCoordinateToAddress: (
-    latlng: any,
-    map: naver.maps.Map,
-    infoWindow: naver.maps.InfoWindow,
-  ) => {
-    infoWindow.close();
+    latlng: naver.maps.LatLng,
+  ): Promise<{ jibunAddress: string; roadAddress: string; latlng: naver.maps.LatLng }> => {
+    return new Promise((resolve, reject) => {
+      naver.maps.Service.reverseGeocode(
+        {
+          coords: latlng,
+          orders: [naver.maps.Service.OrderType.ADDR, naver.maps.Service.OrderType.ROAD_ADDR].join(
+            ",",
+          ),
+        },
+        function (status, response) {
+          if (status === naver.maps.Service.Status.ERROR) {
+            reject(new Error("Failed to load searchCoordinateToAddress" + status));
+            return;
+          }
 
-    naver.maps.Service.reverseGeocode(
-      {
-        coords: latlng,
-        orders: [naver.maps.Service.OrderType.ADDR, naver.maps.Service.OrderType.ROAD_ADDR].join(
-          ",",
-        ),
-      },
-      function (status, response) {
-        if (status === naver.maps.Service.Status.ERROR) {
-          return alert("Something Wrong!");
-        }
+          const address = response.v2.address;
+          const jibunAddress = address.jibunAddress;
+          const roadAddress = address.roadAddress;
 
-        var items = response.v2.results,
-          address = "",
-          htmlAddresses = [];
-
-        for (var i = 0, ii = items.length, item, addrType; i < ii; i++) {
-          item = items[i];
-          address = mapUtil.makeAddress(item) || "";
-          addrType = item.name === "roadaddr" ? "[도로명 주소]" : "[지번 주소]";
-
-          htmlAddresses.push(i + 1 + ". " + addrType + " " + address);
-        }
-
-        infoWindow.setContent(
-          [
-            '<div style="padding:10px;min-width:200px;line-height:150%;">',
-            '<h4 style="margin-top:5px;">검색 좌표</h4><br />',
-            htmlAddresses.join("<br />"),
-            "</div>",
-          ].join("\n"),
-        );
-
-        infoWindow.open(map, latlng);
-      },
-    );
+          resolve({ jibunAddress, roadAddress, latlng });
+        },
+      );
+    });
   },
 
   // 주소 기반 좌표 검색
   searchAddressToCoordinate: (
-    address: any,
-    map: naver.maps.Map,
-    infoWindow: naver.maps.InfoWindow,
-  ) => {
-    naver.maps.Service.geocode(
-      {
-        query: address,
-      },
-      function (status, response) {
-        if (status === naver.maps.Service.Status.ERROR) {
-          return alert("Something Wrong!");
-        }
+    address: string,
+  ): Promise<{ jibunAddress: string; roadAddress: string; latlng: naver.maps.LatLng }> => {
+    return new Promise((resolve, reject) => {
+      naver.maps.Service.geocode(
+        {
+          query: address,
+        },
+        function (status, response) {
+          if (status === naver.maps.Service.Status.ERROR) {
+            reject(new Error("Failed to load searchAddressToCoordinate" + status));
+            return;
+          }
 
-        if (response.v2.meta.totalCount === 0) {
-          return alert("totalCount" + response.v2.meta.totalCount);
-        }
+          if (response.v2.meta.totalCount === 0) {
+            reject(new Error("No address found"));
+            return;
+          }
 
-        var htmlAddresses: any = [],
-          item = response.v2.addresses[0],
-          point = new naver.maps.Point(parseFloat(item.x), parseFloat(item.y));
+          const address = response.v2.addresses[0];
+          const jibunAddress = address.jibunAddress;
+          const roadAddress = address.roadAddress;
+          const latlng = new naver.maps.LatLng(parseFloat(address.y), parseFloat(address.x));
 
-        infoWindow.setContent(
-          [
-            '<div style="padding:10px;min-width:200px;line-height:150%;">',
-            '<h4 style="margin-top:5px;">검색 주소 : ' + address + "</h4><br />",
-            htmlAddresses.join("<br />"),
-            "</div>",
-          ].join("\n"),
-        );
+          resolve({ jibunAddress, roadAddress, latlng });
+        },
+      );
+    });
+  },
 
-        map.setCenter(point);
-        infoWindow.open(map, point);
-      },
-    );
+  // 현재 위치 가져오기
+  getCurrentLocation: (): Promise<naver.maps.LatLng> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported"));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const latlng = new naver.maps.LatLng(latitude, longitude);
+          resolve(latlng);
+        },
+        reject,
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000,
+        },
+      );
+    });
+  },
+
+  getTotalItemsByAnyLocation: async (item: any) => {
+    //주소인 경우
+    if (typeof item === "string") {
+      return mapUtil.searchAddressToCoordinate(item);
+    }
+    //좌표인 경우
+    else if (item instanceof naver.maps.LatLng) {
+      return mapUtil.searchCoordinateToAddress(item);
+    } else {
+      const currentLatLng = await mapUtil.getCurrentLocation();
+      return mapUtil.searchCoordinateToAddress(currentLatLng);
+    }
   },
 
   // 주소 생성 헬퍼 함수
