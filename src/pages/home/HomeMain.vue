@@ -29,7 +29,7 @@ import { mainRouteName } from "@/router/mainRoute";
         </div>
       </Header>
 
-      <main class="flex-1 px-4 pt-4 space-y-4 overflow-auto pb-24 bg-black">
+      <main class="flex-1 px-4 pt-4 space-y-4 overflow-auto pb-24">
         <div class="grid grid-cols-2 gap-4 mt-15">
           <RouterLink v-for="(menu, idx) in HomeCardTypes" :key="idx" :to="{ name: menu.name }">
             <HomeCard :data="menu" />
