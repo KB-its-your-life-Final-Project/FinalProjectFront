@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
+import ModalForm from "@/components/common/ModalForm.vue";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -13,6 +14,7 @@ const lat = ref<number>(store.formData.lat);
 const lng = ref<number>(store.formData.lng);
 const naverReady = ref(false);
 const showPostcode = ref(false);
+const showBuildingNotFoundModal = ref(false); // 건물 없음 모달
 
 // DAUM 우편 번호 API + Naver Maps API 호출
 onMounted(() => {
@@ -46,7 +48,7 @@ function search() {
       oncomplete(data: any) {
         console.log("전체 주소 데이터:", data);
         if(!data.buildingName || data.buildingName.trim()==""){
-          alert("해당 주소에 건물이 없습니다.");
+          showBuildingNotFoundModal.value = true;
           return;
         }
         roadAddress.value = data.roadAddress || data.autoRoadAddress || "";
@@ -185,6 +187,21 @@ function handleClose() {
         다음
       </button>
     </div>
+
+    <!-- 건물 없음 모달 -->
+    <ModalForm
+      v-if="showBuildingNotFoundModal"
+      title="건물 정보 없음"
+      :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
+      @close="showBuildingNotFoundModal = false"
+    >
+      <div class="text-center">
+        <p class="text-gray-600">
+          해당 주소에 건물이 없습니다.<br>
+          다른 주소를 선택해주세요.
+        </p>
+      </div>
+    </ModalForm>
   </div>
 </template>
 
