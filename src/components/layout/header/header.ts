@@ -17,6 +17,7 @@ const headerTitleList = {
   [mainRouteName.myAlarm]: "알람",
   [mainRouteName.myLike]: "내 찜 목록",
   [mainRouteName.mainMenu]: "전체 메뉴",
+  [mainRouteName.transactionDetail]: "",
   [mainRouteName.myPage]: "마이 페이지",
   [myPageRouteName.alarmSetting]: "알림 설정",
 };
@@ -31,6 +32,7 @@ const headerShowList = {
   [mainRouteName.myAlarm]: ["showBack"],
   [mainRouteName.myLike]: ["showBack", "showAlarm"],
   [mainRouteName.mainMenu]: ["showAlarm"],
+  [mainRouteName.transactionDetail]: ["showAlarm", "showBack"],
   [mainRouteName.myPage]: ["showAlarm", "showBack"],
   [myPageRouteName.alarmSetting]: ["showAlarm", "showBack"],
 };
