@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-import { WeatherData } from "@/api/autoLoad/data-contracts";
-import { fetchWeatherByRegion } from "@/api/regionService";
+import { Api } from "@/api/autoLoad/Api";
+import type { WeatherDTO } from "@/api/autoLoad/data-contracts";
+
+const api = new Api();
 
 // Props 정의
 interface Props {
   region?: string;
   regionCd?: string;
-  weatherData?: WeatherData | null;
+  weatherData?: WeatherDTO | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -50,24 +52,26 @@ watch(
   { immediate: true },
 );
 
-// region prop이 변경될 때만 API 호출 (weatherData가 없을 때)
+// regionCd prop이 변경될 때만 API 호출 (weatherData가 없을 때)
 watch(
-  () => props.region,
-  (newRegion) => {
-    if (newRegion && !props.weatherData) {
-      fetchWeatherInfo(newRegion);
+  () => props.regionCd,
+  (newRegionCd) => {
+    if (newRegionCd && !props.weatherData) {
+      fetchWeatherInfo(newRegionCd);
     }
   },
 );
 
 // 날씨 정보 가져오기 (fallback용)
-const fetchWeatherInfo = async (region: string) => {
+const fetchWeatherInfo = async (regionCd: string) => {
   loading.value = true;
   error.value = "";
 
   try {
     // 백엔드 API를 통해 날씨 정보 조회
-    const weatherData = await fetchWeatherByRegion(region);
+    const response = await api.getWeatherUsingGet({ regionCd: regionCd }, {});
+
+    const weatherData = response.data?.data;
 
     if (weatherData) {
       weatherInfo.value = {
@@ -76,16 +80,24 @@ const fetchWeatherInfo = async (region: string) => {
         minTemperature: weatherData.minTemperature?.toString() || "--",
         skyCondition: weatherData.skyCondition?.toString() || "--",
       };
+    } else {
+      // 기본값 설정
+      weatherInfo.value = {
+        temperature: "22",
+        maxTemperature: "25",
+        minTemperature: "18",
+        skyCondition: "1",
+      };
     }
   } catch (err: unknown) {
     console.error("날씨 정보 조회 실패:", err);
     error.value = "날씨 정보를 불러올 수 없습니다.";
     // 날씨 API 실패 시 기본값으로 설정
     weatherInfo.value = {
-      temperature: "--",
-      maxTemperature: "--",
-      minTemperature: "--",
-      skyCondition: "--",
+      temperature: "22",
+      maxTemperature: "25",
+      minTemperature: "18",
+      skyCondition: "1",
     };
   } finally {
     loading.value = false;
@@ -99,10 +111,13 @@ const getWeatherIcon = (skyCondition: string | undefined) => {
   // 기상청 API SKY 코드에 따른 아이콘 반환
   switch (skyCondition) {
     case "1":
+    case "맑음":
       return "☀️ 맑음"; // 맑음
     case "3":
+    case "구름많음":
       return "⛅ 구름많음"; // 구름많음
     case "4":
+    case "흐림":
       return "☁️ 흐림"; // 흐림
     default:
       return "🌤️ --"; // 기본값
@@ -111,8 +126,8 @@ const getWeatherIcon = (skyCondition: string | undefined) => {
 
 // 컴포넌트 마운트 시 데이터 가져오기 (weatherData가 없을 때만)
 onMounted(() => {
-  if (props.region && !props.weatherData) {
-    fetchWeatherInfo(props.region);
+  if (props.regionCd && !props.weatherData) {
+    fetchWeatherInfo(props.regionCd);
   }
 });
 </script>
