@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { Api } from "@/api/autoLoad/Api.ts";
-import axios from "axios";
 import { safeReportStore } from "@/stores/safeReportStore";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
 
 const rawInput = ref(""); // 사용자가 입력한 숫자 문자열
-const budget = ref<number | null>(store.formData.budget);
+const budget = ref<number | undefined>(store.formData.budget);
 const displayValue = ref(""); // 변환된 한글 금액
 const showError = ref(false);
 
@@ -64,7 +62,7 @@ function handleInput(e: Event) {
 function updateDisplay() {
   if (rawInput.value === "") {
     displayValue.value = "";
-    budget.value = null;
+    budget.value = undefined;
     return;
   }
   const numeric = Number(rawInput.value);

@@ -20,6 +20,47 @@ export interface FormData {
   score?: number;
 }
 
+/** RentalRatioAndBuildyear */
+export interface RentalRatioAndBuildyear {
+  /** @format int32 */
+  buildYear?: number;
+  /** @format int32 */
+  dealAmount?: number;
+  /** @format int32 */
+  score?: number;
+  /** @format double */
+  reverse_rental_ratio?: number;
+}
+
+/** FloorAndPurpose */
+export interface FloorAndPurpose {
+  resFloor?: string;
+  resUseType?: string;
+  resStructure?: string;
+  resArea?: string;
+}
+
+/** ViolationStatusVO */
+export interface ViolationStatusVO {
+  violationStatus?: string;
+}
+
+/** SafeReportResponseDto */
+export interface SafeReportResponseDto {
+  rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
+  violationStatus?: ViolationStatusVO;
+  floorAndPurposeList?: FloorAndPurpose[];
+}
+
+/** ApiResponse«SafeReportResponseDto» */
+export interface ApiResponseSafeReportResponseDto {
+  /** @format int32 */
+  code?: number;
+  data?: SafeReportResponseDto;
+  message?: string;
+  success?: boolean;
+}
+
 /** LoginDTO */
 export interface LoginDTO {
   code?: string;

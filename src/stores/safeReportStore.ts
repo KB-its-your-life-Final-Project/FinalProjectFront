@@ -1,58 +1,49 @@
 import { defineStore } from "pinia";
 import { ref, reactive } from "vue";
+import type {
+  SafeReportRequestDto,
+  RentalRatioAndBuildyear,
+  FloorAndPurpose,
+  ViolationStatusVO
+} from "@/api/autoLoad/data-contracts";
 
-// 서버로 전송할 데이터터
-interface FormData {
-  buildingName: string;
-  roadAddress: string; // 도로명주소
-  jibunAddress: string; // 지번주소
-  dongName: string; // 법정동주소
-  lat: number; // 위도
-  lng: number; // 경도
-  budget: number | null;
-}
-
-interface ResultData {
-  // 결과 데이터  (건축년도, 역전세율)
-  [key: string]: unknown;
-}
-
-// 새로운 타입 정의 추가
-interface FloorAndPurpose {
-  resFloor: string;
-  resUseType: string;
-  resStructure: string;
-  resArea: string;
-}
-
-interface ViolationStatusVO {
-  violationStatus: string;
-}
-
-const initFormData: FormData = {
+const initFormData: SafeReportRequestDto = {
   buildingName: "",
   roadAddress: "",
   jibunAddress: "",
   dongName: "",
   lat: 0,
   lng: 0,
-  budget: null,
+  budget: undefined,
 };
 
 export const safeReportStore = defineStore("safeReport", () => {
   const currentStep = ref(0);
-  const formData = reactive<FormData>({ ...initFormData });
-  const resultData = ref<ResultData | null>(null);
+  const formData = reactive<SafeReportRequestDto>({ ...initFormData });
+  const resultData = ref<RentalRatioAndBuildyear | null>(null);
   const violationStatus = ref<string | null>(null);
   const floorAndPurposeList = ref<FloorAndPurpose[] | null>(null);
 
-  const updateFormData = (updated: Partial<FormData>) => {
+  const updateFormData = (updated: Partial<SafeReportRequestDto>) => {
     Object.assign(formData, updated);
+  };
+
+  // API 호출용 DTO 생성 메서드
+  const createRequestDto = (): SafeReportRequestDto => {
+    return {
+      budget: formData.budget,
+      buildingName: formData.buildingName,
+      dongName: formData.dongName,
+      jibunAddress: formData.jibunAddress,
+      lat: formData.lat,
+      lng: formData.lng,
+      roadAddress: formData.roadAddress,
+    };
   };
 
   const nextStep = (payload?: { resultData?: unknown; buildingInfo?: unknown }) => {
     if (payload?.resultData) {
-      resultData.value = payload.resultData as ResultData;
+      resultData.value = payload.resultData as RentalRatioAndBuildyear;
     }
     currentStep.value++;
   };
@@ -66,7 +57,7 @@ export const safeReportStore = defineStore("safeReport", () => {
       formData.buildingName = "";
     } else if (from === 2) {
       // 2→1: 예산 정보 초기화
-      formData.budget = null;
+      formData.budget = undefined;
       console.log("초기화된 budget 값:", formData.budget);
     }
   };
@@ -79,7 +70,7 @@ export const safeReportStore = defineStore("safeReport", () => {
     floorAndPurposeList.value = null;
   };
 
-  const updateResultData = (data: ResultData | null) => {
+  const updateResultData = (data: RentalRatioAndBuildyear | null) => {
     resultData.value = data;
   };
 
@@ -103,6 +94,7 @@ export const safeReportStore = defineStore("safeReport", () => {
     floorAndPurposeList,
 
     updateFormData,
+    createRequestDto,
     nextStep,
     prevStep,
     resetStore,

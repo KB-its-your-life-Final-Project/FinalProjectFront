@@ -143,7 +143,7 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @request POST:/api/report/requestData
    */
   receiveFormUsingPost = (dto: SafeReportRequestDto, params: RequestParams = {}) =>
-    this.request<ApiResponseFormData, void>({
+    this.request<ApiResponseSafeReportResponseDto, void>({
       path: `/api/report/requestData`,
       method: "POST",
       body: dto,

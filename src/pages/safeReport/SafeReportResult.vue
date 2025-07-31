@@ -2,15 +2,12 @@
 import { useRouter } from "vue-router";
 import { computed, ref, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
-import axios from "axios";
 import ModalForm from "@/components/common/ModalForm.vue";
+import { Api } from "@/api/autoLoad/Api";
 
-interface ResultData {
-  dealAmount: number;
-  buildYear: number;
-  reverse_rental_ratio: number;
-  score: number;
-}
+const api = new Api();
+
+
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -87,27 +84,28 @@ onMounted(async () => {
 
   try {
     console.log("보낼 데이터", { ...store.formData });
-    const response = await axios.post("/api/report/requestData", { ...store.formData });
-    console.log("서버 응답:", response.data);
+    const requestDto = store.createRequestDto();
+    const { data } = await api.receiveFormUsingPost(requestDto);
+    console.log("서버 응답:", data);
 
-    store.updateResultData(response.data.data.rentalRatioAndBuildyear);
+    store.updateResultData(data.data?.rentalRatioAndBuildyear);
 
-    if (response.data.data.violationStatus) {
-      store.updateViolationStatusVO(response.data.data.violationStatus);
+    if (data.data?.violationStatus) {
+      store.updateViolationStatusVO(data.data.violationStatus);
     }
 
-    if (response.data.data.floorAndPurposeList) {
-      store.updateFloorAndPurposeList(response.data.data.floorAndPurposeList);
+    if (data.data?.floorAndPurposeList) {
+      store.updateFloorAndPurposeList(data.data.floorAndPurposeList);
     }
 
     // dealAmount가 0인지 체크
-    if (response.data.data.rentalRatioAndBuildyear?.dealAmount === 0) {
+    if (data.data?.rentalRatioAndBuildyear?.dealAmount === 0) {
       showNoDataModal.value = true;
     }
 
     // reverse_rental_ratio가 100 이상인지 체크
-    console.log("reverse_rental_ratio 체크:", response.data.data.rentalRatioAndBuildyear?.reverse_rental_ratio);
-    if (response.data.data.rentalRatioAndBuildyear?.reverse_rental_ratio >= 100) {
+    console.log("reverse_rental_ratio 체크:", data.data?.rentalRatioAndBuildyear?.reverse_rental_ratio);
+    if (data.data?.rentalRatioAndBuildyear?.reverse_rental_ratio >= 100) {
       console.log("전세가율 100% 이상 - 모달 표시");
       showHighRatioModal.value = true;
     }
@@ -125,7 +123,8 @@ onMounted(async () => {
   }
 });
 
-function getFloorLabel(floor: string) {
+function getFloorLabel(floor: string | undefined) {
+  if (!floor) return "";
   if (floor.startsWith("지")) {
     return "지하" + floor.slice(1) + "층";
   }
@@ -147,7 +146,7 @@ function goHome() {
 }
 function goToSelectBudget() {
   // 예산만 초기화하고 건물 정보는 유지
-  store.updateFormData({ budget: null });
+  store.updateFormData({ budget: undefined });
   store.updateResultData(null);
   emit("prev");
 }
@@ -208,7 +207,7 @@ const filteredFloorAndPurposeList = computed(() => {
     <!-- 회색 처리된 메인 컨텐츠 -->
     <div :class="{ 'opacity-50 pointer-events-none': isNoData }">
       <section class="flex flex-col gap-9 items-center mt">
-        <div class="text-center font-pretendard-bold text-lg foont-semibold">
+        <div class="text-center font-pretendard-bold text-xl font-medium">
           {{ store.formData.buildingName }}의 안심 진단 리포트입니다.
         </div>
         <div
@@ -222,7 +221,7 @@ const filteredFloorAndPurposeList = computed(() => {
               :class="gradeColor.text"
             />
             <span class="text-xl font-bold" :class="gradeColor.text">
-              {{ store.resultData?.score ?? "-" }}<span class="text-sm">/10</span>
+              {{ store.resultData?.score ?? "-" }}<span class="text-base">/10</span>
             </span>
           </div>
         </div>
@@ -246,8 +245,8 @@ const filteredFloorAndPurposeList = computed(() => {
               d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.597c.75 1.336-.213 2.998-1.742 2.998H3.48c-1.529 0-2.492-1.662-1.742-2.998L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 012 0v3a1 1 0 01-1 1z"
             />
           </svg>
-          <span :class="gradeColor.text" class="text-md">깡통전세</span>
-          <span class="text-[11px]" :class="gradeColor.text">{{ gradeText }}</span>
+          <span :class="gradeColor.text" class="text-base font-semibold">깡통전세</span>
+          <span class="text-[11px] font-semibold" :class="gradeColor.text">{{ gradeText }}</span>
         </div>
 
               <!-- 박스 2 -->
@@ -260,8 +259,8 @@ const filteredFloorAndPurposeList = computed(() => {
             d="M3 2a1 1 0 011-1h12a1 1 0 011 1v15h-5v-4H8v4H3V2zm2 3v2h2V5H5zm0 4v2h2V9H5zm0 4v2h2v-2H5zm4-8v2h2V5H9zm0 4v2h2V9H9zm0 4v2h2v-2H9zm4-8v2h2V5h-2zm0 4v2h2V9h-2zm0 4v2h2v-2h-2z"
           />
         </svg>
-        <span class="text-md" :class="illegalBox.text">불법건축물</span>
-        <span class="text-[11px]" :class="illegalBox.text">{{ illegalBox.label }}</span>
+        <span class="text-base font-semibold" :class="illegalBox.text">불법건축물</span>
+        <span class="text-[11px] font-semibold" :class="illegalBox.text">{{ illegalBox.label }}</span>
       </div>
       </section>
 
