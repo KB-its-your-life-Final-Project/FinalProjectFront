@@ -1,4 +1,4 @@
-import { RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
 
 //라우트 파일 위치
 const mainRouteMap: Record<string, () => Promise<any>> = {
