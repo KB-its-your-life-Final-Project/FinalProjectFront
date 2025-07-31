@@ -14,7 +14,7 @@ const lat = ref<number>(store.formData.lat);
 const lng = ref<number>(store.formData.lng);
 const naverReady = ref(false);
 const showPostcode = ref(false);
-const showBuildingNotFoundModal = ref(false); // 건물 없음 모달
+const showBuildingNotFoundModal = ref(false);
 
 // DAUM 우편 번호 API + Naver Maps API 호출
 onMounted(() => {

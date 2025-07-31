@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { computed, ref, onMounted } from "vue"; // onMounted 추가
+import { computed, ref, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import axios from "axios";
 import ModalForm from "@/components/common/ModalForm.vue";
@@ -14,16 +14,14 @@ interface ResultData {
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
-
-// 구조분해할당 제거 - 반응성 유지
 const router = useRouter();
 const showModal_financial = ref(false);
 const showModal_building = ref(false);
-const showNoDataModal = ref(false); // 데이터 없음 모달 추가
-const showHighRatioModal = ref(false); // 전세가율 높음 모달 추가
-const isLoading = ref(true); // 로딩 상태 추가
+const showNoDataModal = ref(false); // 데이터 없음 모달
+const showHighRatioModal = ref(false); // 전세가율 높음 모달
+const isLoading = ref(true); // 로딩 상태
 
-// dealAmount가 0인지 체크하는 computed
+// dealAmount가 0인지 체크
 const isNoData = computed(() => {
   // dealAmount가 0일 때 데이터 없음으로 처리
   return store.resultData?.dealAmount === 0;
@@ -92,10 +90,8 @@ onMounted(async () => {
     const response = await axios.post("/api/report/requestData", { ...store.formData });
     console.log("서버 응답:", response.data);
 
-    // 새로운 업데이트 메서드 사용
     store.updateResultData(response.data.data.rentalRatioAndBuildyear);
 
-    // 새로운 구조에 맞게 수정
     if (response.data.data.violationStatus) {
       store.updateViolationStatusVO(response.data.data.violationStatus);
     }
@@ -147,7 +143,7 @@ function goToSelectBudget() {
   // 예산만 초기화하고 건물 정보는 유지
   store.updateFormData({ budget: null });
   store.updateResultData(null);
-  emit("prev"); // 이전 단계(SelectBudget)로 이동
+  emit("prev");
 }
 function goToKB() {
   window.open("https://m.naver.com/");
@@ -172,7 +168,7 @@ const illegalBox = computed(() => {
       label: '있음',
     };
   }
-  // 안전 (기타 값)
+  // 안전 건축물물
   else {
     return {
     bg: 'bg-green-100',
@@ -186,12 +182,10 @@ const illegalBox = computed(() => {
 <template>
   <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen">
     <div class="text-center">
-      <!-- 로딩 스피너 -->
       <div
         class="animate-spin rounded-full h-16 w-16 border-b-2 border-kb-yellow mx-auto mb-4"
       ></div>
 
-      <!-- 로딩 메시지 -->
       <h2 class="text-xl font-pretendard-bold text-kb-ui-01 mb-2">레포트를 생성 중입니다</h2>
       <p class="text-kb-ui-05 text-sm">잠시만 기다려주세요...</p>
     </div>

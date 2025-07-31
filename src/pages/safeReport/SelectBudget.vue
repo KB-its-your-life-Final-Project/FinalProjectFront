@@ -53,7 +53,7 @@ function handleInput(e: Event) {
     showError.value = true;
     rawInput.value = "999999"; // val이 아니라 바로 999999로!
     updateDisplay();
-    return; // 여기서 return!
+    return;
   } else {
     showError.value = false;
   }
@@ -156,7 +156,7 @@ function prev() {
           class="w-full border border-kb-ui-06 rounded-full pl-4 pr-14 focus:outline-none bg-white cursor-text mt-1 text-base"
           style="height: 2.5rem; line-height: 2.5rem; padding-top: 0; padding-bottom: 0"
         />
-        <!-- input의 오른쪽 안에 "만원"을 배치 -->
+        <!-- input의 오른쪽 안에 "만원" 배치 -->
         <span
           class="absolute right-4 top-0 bottom-0 flex items-center text-kb-ui-04 pointer-events-none text-base"
           style="height: 3rem; line-height: 2.5rem"
@@ -165,7 +165,6 @@ function prev() {
         </span>
       </div>
 
-      <!-- 경고 메시지는 input 아래에 block으로! -->
       <div class="text-xs text-kb-ui-04 mt-2 text-right">예산은 100억원 미만이어야 합니다</div>
     </div>
     <div class="fixed z-auto inset-x-0 bottom-6 flex justify-between px-6 pb-24">
