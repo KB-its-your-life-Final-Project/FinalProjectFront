@@ -12,12 +12,20 @@
 
 import {
   ApiResponseBoolean,
+  ApiResponseListEstateWishlistResponseDTO,
   ApiResponseListMemberDTO,
+  ApiResponseListRegionWishlistResponseDTO,
+  ApiResponseListSearchHistoryResponseDTO,
   ApiResponseMemberDTO,
   ApiResponseSafeReportResponseDto,
-  RegisterGoogleDTO,
-  RegisterKakaoDTO,
+  ApiResponseVoid,
+  EstateWishlistRequestDTO,
+  LoginDTO,
+  RegionWishlistRequestDTO,
   SafeReportRequestDto,
+  SearchHistoryRequestDTO,
+  TransactionRequestDTO,
+  TransactionResponseDTO,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
@@ -27,7 +35,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name FindAllUsersUsingGet
    * @summary findAllUsers
    * @request GET:/api/member
@@ -41,7 +49,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name CheckDuplicateEmailUsingGet
    * @summary checkDuplicateEmail
    * @request GET:/api/member/checkemail/{email}
@@ -55,36 +63,28 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
-   * @name FindLoggedinUserUsingGet
-   * @summary findLoggedinUser
-   * @request GET:/api/member/loggedin
+   * @tags member-controller
+   * @name LoginUsingPost
+   * @summary login
+   * @request POST:/api/member/login
    */
-  findLoggedinUserUsingGet = (
-    query?: {
-      authenticated?: boolean;
-      "authorities[0].authority"?: string;
-      credentials?: object;
-      details?: object;
-      principal?: object;
-    },
-    params: RequestParams = {},
-  ) =>
+  loginUsingPost = (loginDto: LoginDTO, params: RequestParams = {}) =>
     this.request<ApiResponseMemberDTO, void>({
-      path: `/api/member/loggedin`,
-      method: "GET",
-      query: query,
+      path: `/api/member/login`,
+      method: "POST",
+      body: loginDto,
+      type: ContentType.Json,
       ...params,
     });
   /**
    * No description
    *
-   * @tags member_controller
-   * @name LogoutMemberUsingPost
-   * @summary logoutMember
+   * @tags member-controller
+   * @name LogoutUsingPost
+   * @summary logout
    * @request POST:/api/member/logout
    */
-  logoutMemberUsingPost = (params: RequestParams = {}) =>
+  logoutUsingPost = (params: RequestParams = {}) =>
     this.request<ApiResponseBoolean, void>({
       path: `/api/member/logout`,
       method: "POST",
@@ -94,17 +94,31 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
-   * @name RegisterMemberByEmailUsingPost
-   * @summary registerMemberByEmail
+   * @tags member-controller
+   * @name CheckLoginStatusUsingGet
+   * @summary checkLoginStatus
+   * @request GET:/api/member/me
+   */
+  checkLoginStatusUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseMemberDTO, void>({
+      path: `/api/member/me`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name RegisterByEmailUsingPost
+   * @summary registerByEmail
    * @request POST:/api/member/register/email
    */
-  registerMemberByEmailUsingPost = (
+  registerByEmailUsingPost = (
     query?: {
       email?: string;
       name?: string;
-      password?: string;
-      verificationCode?: string;
+      password1?: string;
+      password2?: string;
     },
     params: RequestParams = {},
   ) =>
@@ -118,105 +132,27 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
-   * @name RegisterOrLoginMemberByGoogleUsingPost
-   * @summary registerOrLoginMemberByGoogle
-   * @request POST:/api/member/register/google
-   */
-  registerOrLoginMemberByGoogleUsingPost = (
-    registerDto: RegisterGoogleDTO,
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseMemberDTO, void>({
-      path: `/api/member/register/google`,
-      method: "POST",
-      body: registerDto,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags member_controller
-   * @name RegisterOrLoginMemberByKakaoUsingPost
-   * @summary registerOrLoginMemberByKakao
-   * @request POST:/api/member/register/kakao
-   */
-  registerOrLoginMemberByKakaoUsingPost = (
-    registerDto: RegisterKakaoDTO,
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseMemberDTO, void>({
-      path: `/api/member/register/kakao`,
-      method: "POST",
-      body: registerDto,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags member_controller
-   * @name SendVerificationCodeUsingPost
-   * @summary sendVerificationCode
-   * @request POST:/api/member/sendcode
-   */
-  sendVerificationCodeUsingPost = (
-    query: {
-      /** email */
-      email: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseBoolean, void>({
-      path: `/api/member/sendcode`,
-      method: "POST",
-      query: query,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags member_controller
-   * @name VerifyCodeUsingPost
-   * @summary verifyCode
-   * @request POST:/api/member/verifycode
-   */
-  verifyCodeUsingPost = (
-    query: {
-      /** email */
-      email: string;
-      /** verificationCode */
-      verificationCode: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseBoolean, void>({
-      path: `/api/member/verifycode`,
-      method: "POST",
-      query: query,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags member_controller
+   * @tags member-controller
    * @name FindMemberByIdUsingGet
    * @summary findMemberById
    * @request GET:/api/member/{id}
    */
-  findMemberByIdUsingGet = (id: number, params: RequestParams = {}) =>
+  findMemberByIdUsingGet = (
+    id: string,
+    data: number,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
+      body: data,
+      type: ContentType.Json,
       ...params,
     });
   /**
    * No description
    *
-   * @tags safereport_controller
+   * @tags SafeReport
    * @name ReceiveFormUsingPost
    * @summary receiveForm
    * @request POST:/api/report/requestData
@@ -230,6 +166,152 @@ export class Api<
       method: "POST",
       body: dto,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags transaction-detail-controller
+   * @name GetFilteredDataUsingPost
+   * @summary getFilteredData
+   * @request POST:/api/transactions/detail
+   */
+  getFilteredDataUsingPost = (
+    request: TransactionRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<TransactionResponseDTO[], void>({
+      path: `/api/transactions/detail`,
+      method: "POST",
+      body: request,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 건물 관심 리스트
+   * @name GetEstateIdsByMemberIdUsingGet
+   * @summary getEstateIdsByMemberId
+   * @request GET:/api/wishlist/estate
+   */
+  getEstateIdsByMemberIdUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListEstateWishlistResponseDTO, void>({
+      path: `/api/wishlist/estate`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 건물 관심 리스트
+   * @name AddWishlistUsingPost
+   * @summary addWishlist
+   * @request POST:/api/wishlist/estate
+   */
+  addWishlistUsingPost = (
+    estateId: EstateWishlistRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/estate`,
+      method: "POST",
+      body: estateId,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 건물 관심 리스트
+   * @name RemoveWishlistUsingDelete
+   * @summary removeWishlist
+   * @request DELETE:/api/wishlist/estate/{estateId}
+   */
+  removeWishlistUsingDelete = (estateId: number, params: RequestParams = {}) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/estate/${estateId}`,
+      method: "DELETE",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 검색 기록
+   * @name GetSearchHistoryUsingGet
+   * @summary getSearchHistory
+   * @request GET:/api/wishlist/history
+   */
+  getSearchHistoryUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListSearchHistoryResponseDTO, void>({
+      path: `/api/wishlist/history`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 검색 기록
+   * @name SaveSearchHistoryUsingPost
+   * @summary saveSearchHistory
+   * @request POST:/api/wishlist/history
+   */
+  saveSearchHistoryUsingPost = (
+    dto: SearchHistoryRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/history`,
+      method: "POST",
+      body: dto,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 지역 관심 리스트
+   * @name GetRegionsByMemberIdUsingGet
+   * @summary getRegionsByMemberId
+   * @request GET:/api/wishlist/region
+   */
+  getRegionsByMemberIdUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListRegionWishlistResponseDTO, void>({
+      path: `/api/wishlist/region`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 지역 관심 리스트
+   * @name AddWishlistUsingPost1
+   * @summary addWishlist
+   * @request POST:/api/wishlist/region
+   */
+  addWishlistUsingPost1 = (
+    estateId: RegionWishlistRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/region`,
+      method: "POST",
+      body: estateId,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 지역 관심 리스트
+   * @name RemoveWishlistUsingDelete1
+   * @summary removeWishlist
+   * @request DELETE:/api/wishlist/region/{regionCd}
+   */
+  removeWishlistUsingDelete1 = (regionCd: string, params: RequestParams = {}) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/region/${regionCd}`,
+      method: "DELETE",
       ...params,
     });
 }
