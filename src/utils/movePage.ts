@@ -36,6 +36,9 @@ const movePage = {
   localInfoSearch: makeRoute(mainRouteName.localInfoSearch),
   // mainRouteName end
 
+//실거래가 상세페이지
+  transactionDetail: makeRoute(mainRouteName.transactionDetail),
+
   // myPageRouteName start
   mypage: makeRoute(myPageRouteName.mypage),
   mypageStetting: makeRoute(myPageRouteName.alarmSetting),

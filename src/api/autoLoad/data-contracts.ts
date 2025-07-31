@@ -10,10 +10,21 @@
  * ---------------------------------------------------------------
  */
 
-/** BuildingTypeAndPurpose */
-export interface BuildingTypeAndPurpose {
-  buildingPurpose?: string;
-  violationStatus?: string;
+/** FloorAndPurpose */
+export interface FloorAndPurpose {
+  resArea?: string;
+  resFloor?: string;
+  resStructure?: string;
+  resUseType?: string;
+}
+
+/** LoginDTO */
+export interface LoginDTO {
+  code?: string;
+  /** @format int32 */
+  createdType?: number;
+  email?: string;
+  password?: string;
 }
 
 /** MemberDTO */
@@ -39,16 +50,6 @@ export interface MemberDTO {
   /** @format date-time */
   regDate?: string;
   regIp?: string;
-}
-
-/** RegisterGoogleDTO */
-export interface RegisterGoogleDTO {
-  code?: string;
-}
-
-/** RegisterKakaoDTO */
-export interface RegisterKakaoDTO {
-  code?: string;
 }
 
 /** RentalRatioAndBuildyear */
@@ -81,8 +82,31 @@ export interface SafeReportRequestDto {
 
 /** SafeReportResponseDto */
 export interface SafeReportResponseDto {
-  buildingTypeAndPurpose?: BuildingTypeAndPurpose;
+  floorAndPurposeList?: FloorAndPurpose[];
   rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
+  violationStatus?: ViolationStatusVO;
+}
+
+/** TransactionRequestDTO */
+export interface TransactionRequestDTO {
+  buildingName?: string;
+  endDate?: string;
+  startDate?: string;
+  /** @format int32 */
+  tradeType?: number;
+}
+
+/** TransactionResponseDTO */
+export interface TransactionResponseDTO {
+  date?: string;
+  /** @format int32 */
+  price?: number;
+  type?: string;
+}
+
+/** ViolationStatusVO */
+export interface ViolationStatusVO {
+  violationStatus?: string;
 }
 
 /** ApiResponse«List«MemberDTO»» */
