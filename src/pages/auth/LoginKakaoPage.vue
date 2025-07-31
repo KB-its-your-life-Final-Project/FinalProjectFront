@@ -1,29 +1,23 @@
 <script setup lang="ts">
-import { onMounted, reactive } from "vue";
+import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { authStore } from "@/stores/authStore";
-import { LoginDTO } from "@/api/autoLoad";
-
-const route = useRoute();
+import authApi from "@/api/authApi";
 
 const router = useRouter();
-const auth = authStore();
-
-const member = reactive<LoginDTO>({
-  email: "",
-  password: "",
-  code: "",
-  createdType: 2,
-});
+const route = useRoute();
 
 onMounted(async () => {
   const code = route.query.code as string;
-  member.code = code;
   console.log("code: ", code);
   try {
-    const response = await auth.login(member);
+    const response = await authApi.kakaoLogin(code);
     console.log("response: ", response);
-    router.push("/");
+    // 카카오 로그인 성공 시 홈 이동
+    if (response.success === true) {
+      router.push("/home");
+    } else {
+      alert(response.message || "카카오 로그인 실패");
+    }
   } catch (error) {
     alert(error + ": 카카오 로그인 처리 중 오류가 발생했습니다.");
   }

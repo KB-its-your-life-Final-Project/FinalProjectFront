@@ -46,21 +46,20 @@ const router = createRouter({
 
 // 로그인 인증 가드
 router.beforeEach(async (to, from, next) => {
-  // 인증 불필요 화면
   if (!to.meta.requiresAuth) {
     return next(); // 통과
   }
-  const auth = authStore();
   try {
-    // access token 유효성 확인
-    await auth.checkLoginStatus();
+    const auth = authStore();
+    await auth.checkLogin(); // access token 유효성 확인
     next();
   } catch (error) {
-    // refresh token 만료 시 로그인 화면으로 이동
-    next({
-      path: "/auth/login",
-      query: { redirect: to.fullPath }, // 로그인 후 리다이렉트를 위해 현재 경로 저장
-    });
+    try {
+      await auth.refreshTokens(); // refreshToken 시도
+      next();
+    } catch (error) {
+      next("/auth/login"); // 로그인 화면 이동
+    }
   }
 });
 

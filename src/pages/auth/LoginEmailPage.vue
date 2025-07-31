@@ -4,18 +4,20 @@ import { useRouter } from "vue-router";
 import type { AxiosError } from "axios";
 import { authStore } from "@/stores/authStore.ts";
 import GoBackBtn from "@/components/common/GoBackBtn.vue";
-import RegisterLink from "@/components/common/RegisterLink.vue";
 import { isEmpty, isValidEmailFormat } from "@/utils/validate";
-import { LoginDTO } from "@/api/autoLoad/data-contracts";
+import authApi from "@/api/authApi";
+
+interface MemberLoginForm {
+  email: string;
+  password: string;
+}
 
 const router = useRouter();
 const auth = authStore();
 
-const member = reactive<LoginDTO>({
+const member = reactive<MemberLoginForm>({
   email: "",
   password: "",
-  code: "",
-  createdType: 1,
 });
 
 const checkSubmitMsg = ref<string>("");
@@ -27,9 +29,8 @@ onMounted(() => {
   }
 });
 
-const login = async () => {
+const loginUser = async () => {
   checkSubmitMsg.value = "";
-  localStorage.setItem("savedEmail", member.email);
   console.log("사용자 input: ", member);
   if (isEmpty(member.email)) {
     checkSubmitMsg.value = "이메일을 입력하세요";
@@ -39,7 +40,7 @@ const login = async () => {
     checkSubmitMsg.value = "올바른 형식의 이메일을 입력하세요";
     return;
   }
-  const isDuplicateEmail: boolean = await auth.checkDuplicateEmail(member.email);
+  const isDuplicateEmail: boolean = await authApi.checkDuplicateEmail(member.email);
   console.log("isDuplicateEmail: ", isDuplicateEmail);
   if (!isDuplicateEmail) {
     checkSubmitMsg.value = "등록되지 않은 이메일입니다";
@@ -50,9 +51,8 @@ const login = async () => {
     return;
   }
   try {
-    const response = await auth.login(member);
+    await auth.loginUser(member);
     console.log("로그인 성공");
-    console.log("response", response);
     router.push("/");
   } catch (error) {
     const err = error as AxiosError;
@@ -67,8 +67,8 @@ const login = async () => {
     <GoBackBtn />
     <h1 class="text-2xl font-pretendard-bold">로그인</h1>
   </header>
-  <div class="content-wrapper">
-    <form class="form" method="post" @submit.prevent="login" novalidate>
+  <div class="flex flex-col items-center">
+    <form class="form" method="post" @submit.prevent="loginUser" novalidate>
       <div>
         <label for="username">이메일 주소</label>
         <input
@@ -92,16 +92,18 @@ const login = async () => {
       </p>
       <button class="btn" type="submit">로그인</button>
     </form>
-    <RegisterLink />
+    <div class="flex gap-3 mt-[2rem]">
+      <span class="text-kb-ui-04">아직 회원이 아니신가요?</span>
+      <router-link to="/auth/register">
+        <span class="text-positive">가입하기</span>
+      </router-link>
+    </div>
   </div>
 </template>
 
 <style scoped>
 @reference "@/assets/styles/main.css";
 
-.content-wrapper {
-  @apply flex flex-col items-center;
-}
 .form {
   @apply mt-[3rem] w-5/6 h-auto flex flex-col gap-7;
 }
