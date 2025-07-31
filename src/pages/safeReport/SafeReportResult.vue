@@ -347,9 +347,14 @@ const filteredFloorAndPurposeList = computed(() => {
             각 층의 용도는 다음과 같습니다. 주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-red-600 font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
           </p>
           <div class="mt-4">
-            <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2">
-              {{ getFloorLabel(info.resFloor) }}: {{ info.resUseType }}
-              <!-- <span class="text-sm text-gray-500">({{ info.resStructure }})</span> -->
+            <div v-if="filteredFloorAndPurposeList.length > 0">
+              <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2">
+                {{ getFloorLabel(info.resFloor) }}: {{ info.resUseType }}
+                <!-- <span class="text-sm text-gray-500">({{ info.resStructure }})</span> -->
+              </div>
+            </div>
+            <div v-else class="text-center text-gray-500">
+              층별 용도 정보가 없습니다.
             </div>
           </div>
         </div>
