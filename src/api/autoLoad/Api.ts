@@ -13,6 +13,7 @@
 import {
   ApiResponseBoolean,
   ApiResponseListMemberDTO,
+  ApiResponseListNewsDTO,
   ApiResponseMemberDTO,
   ApiResponseSafeReportResponseDto,
   LoginDTO,
@@ -138,6 +139,20 @@ export class Api<
       method: "GET",
       body: data,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags news-controller
+   * @name GetNewsUsingGet
+   * @summary getNews
+   * @request GET:/api/news
+   */
+  getNewsUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListNewsDTO, void>({
+      path: `/api/news`,
+      method: "GET",
       ...params,
     });
   /**

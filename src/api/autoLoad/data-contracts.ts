@@ -52,6 +52,23 @@ export interface MemberDTO {
   regIp?: string;
 }
 
+/** NewsDTO */
+export interface NewsDTO {
+  atchFile?: string;
+  bbsSn?: string;
+  frstRegDt?: string;
+  frstRgtrNm?: string;
+  lastMdfcnDt?: string;
+  lastMdfrNm?: string;
+  pstInqCnt?: string;
+  pstSeNm?: string;
+  pstSeSn?: string;
+  pstSn?: string;
+  pstTtl?: string;
+  pstUrlAddr?: string;
+  pstWholCn?: string;
+}
+
 /** RentalRatioAndBuildyear */
 export interface RentalRatioAndBuildyear {
   /** @format int32 */
@@ -97,6 +114,15 @@ export interface ApiResponseListMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«NewsDTO»» */
+export interface ApiResponseListNewsDTO {
+  /** @format int32 */
+  code?: number;
+  data?: NewsDTO[];
   message?: string;
   success?: boolean;
 }
