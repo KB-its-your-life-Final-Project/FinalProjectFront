@@ -10,6 +10,19 @@
  * ---------------------------------------------------------------
  */
 
+/** EstateWishlistRequestDTO */
+export interface EstateWishlistRequestDTO {
+  /** @format int64 */
+  estateId?: number;
+}
+
+/** EstateWishlistResponseDTO */
+export interface EstateWishlistResponseDTO {
+  buildingName?: string;
+  /** @format int64 */
+  estateId?: number;
+}
+
 /** FloorAndPurpose */
 export interface FloorAndPurpose {
   resArea?: string;
@@ -52,6 +65,17 @@ export interface MemberDTO {
   regIp?: string;
 }
 
+/** RegionWishlistRequestDTO */
+export interface RegionWishlistRequestDTO {
+  regionCd?: string;
+}
+
+/** RegionWishlistResponseDTO */
+export interface RegionWishlistResponseDTO {
+  regionCd?: string;
+  umdNm?: string;
+}
+
 /** RentalRatioAndBuildyear */
 export interface RentalRatioAndBuildyear {
   /** @format int32 */
@@ -84,7 +108,17 @@ export interface SafeReportRequestDto {
 export interface SafeReportResponseDto {
   floorAndPurposeList?: FloorAndPurpose[];
   rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
-  violationStatus?: ViolationStatusVO;
+  violationStatus?: ViolationStatus;
+}
+
+/** SearchHistoryRequestDTO */
+export interface SearchHistoryRequestDTO {
+  keyword?: string;
+}
+
+/** SearchHistoryResponseDTO */
+export interface SearchHistoryResponseDTO {
+  keyword?: string;
 }
 
 /** TransactionRequestDTO */
@@ -104,9 +138,18 @@ export interface TransactionResponseDTO {
   type?: string;
 }
 
-/** ViolationStatusVO */
-export interface ViolationStatusVO {
+/** ViolationStatus */
+export interface ViolationStatus {
   violationStatus?: string;
+}
+
+/** ApiResponse«List«EstateWishlistResponseDTO»» */
+export interface ApiResponseListEstateWishlistResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: EstateWishlistResponseDTO[];
+  message?: string;
+  success?: boolean;
 }
 
 /** ApiResponse«List«MemberDTO»» */
@@ -114,6 +157,24 @@ export interface ApiResponseListMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«RegionWishlistResponseDTO»» */
+export interface ApiResponseListRegionWishlistResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: RegionWishlistResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«SearchHistoryResponseDTO»» */
+export interface ApiResponseListSearchHistoryResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: SearchHistoryResponseDTO[];
   message?: string;
   success?: boolean;
 }
@@ -132,6 +193,14 @@ export interface ApiResponseSafeReportResponseDto {
   /** @format int32 */
   code?: number;
   data?: SafeReportResponseDto;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«Void» */
+export interface ApiResponseVoid {
+  /** @format int32 */
+  code?: number;
   message?: string;
   success?: boolean;
 }

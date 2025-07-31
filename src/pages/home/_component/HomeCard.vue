@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="bg-kb-ui-11 rounded-xl shadow-md p-4 h-[100px] flex flex-col justify-between relative">
+  <div class="bg-kb-ui-11 rounded-xl shadow-md p-4 h-full flex flex-col justify-between relative">
     <img
       :src="data.imgSrc"
       alt="카드 아이콘"
