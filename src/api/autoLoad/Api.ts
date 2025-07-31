@@ -12,11 +12,18 @@
 
 import {
   ApiResponseBoolean,
+  ApiResponseListEstateWishlistResponseDTO,
   ApiResponseListMemberDTO,
+  ApiResponseListRegionWishlistResponseDTO,
+  ApiResponseListSearchHistoryResponseDTO,
   ApiResponseMemberDTO,
   ApiResponseSafeReportResponseDto,
+  ApiResponseVoid,
+  EstateWishlistRequestDTO,
   LoginDTO,
+  RegionWishlistRequestDTO,
   SafeReportRequestDto,
+  SearchHistoryRequestDTO,
   TransactionRequestDTO,
   TransactionResponseDTO,
 } from "./data-contracts";
@@ -28,7 +35,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name FindAllUsersUsingGet
    * @summary findAllUsers
    * @request GET:/api/member
@@ -42,7 +49,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name CheckDuplicateEmailUsingGet
    * @summary checkDuplicateEmail
    * @request GET:/api/member/checkemail/{email}
@@ -125,7 +132,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name FindMemberByIdUsingGet
    * @summary findMemberById
    * @request GET:/api/member/{id}
@@ -178,6 +185,133 @@ export class Api<
       method: "POST",
       body: request,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 건물 관심 리스트
+   * @name GetEstateIdsByMemberIdUsingGet
+   * @summary getEstateIdsByMemberId
+   * @request GET:/api/wishlist/estate
+   */
+  getEstateIdsByMemberIdUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListEstateWishlistResponseDTO, void>({
+      path: `/api/wishlist/estate`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 건물 관심 리스트
+   * @name AddWishlistUsingPost
+   * @summary addWishlist
+   * @request POST:/api/wishlist/estate
+   */
+  addWishlistUsingPost = (
+    estateId: EstateWishlistRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/estate`,
+      method: "POST",
+      body: estateId,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 건물 관심 리스트
+   * @name RemoveWishlistUsingDelete
+   * @summary removeWishlist
+   * @request DELETE:/api/wishlist/estate/{estateId}
+   */
+  removeWishlistUsingDelete = (estateId: number, params: RequestParams = {}) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/estate/${estateId}`,
+      method: "DELETE",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 검색 기록
+   * @name GetSearchHistoryUsingGet
+   * @summary getSearchHistory
+   * @request GET:/api/wishlist/history
+   */
+  getSearchHistoryUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListSearchHistoryResponseDTO, void>({
+      path: `/api/wishlist/history`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 검색 기록
+   * @name SaveSearchHistoryUsingPost
+   * @summary saveSearchHistory
+   * @request POST:/api/wishlist/history
+   */
+  saveSearchHistoryUsingPost = (
+    dto: SearchHistoryRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/history`,
+      method: "POST",
+      body: dto,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 지역 관심 리스트
+   * @name GetRegionsByMemberIdUsingGet
+   * @summary getRegionsByMemberId
+   * @request GET:/api/wishlist/region
+   */
+  getRegionsByMemberIdUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListRegionWishlistResponseDTO, void>({
+      path: `/api/wishlist/region`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 지역 관심 리스트
+   * @name AddWishlistUsingPost1
+   * @summary addWishlist
+   * @request POST:/api/wishlist/region
+   */
+  addWishlistUsingPost1 = (
+    estateId: RegionWishlistRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/region`,
+      method: "POST",
+      body: estateId,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags 지역 관심 리스트
+   * @name RemoveWishlistUsingDelete1
+   * @summary removeWishlist
+   * @request DELETE:/api/wishlist/region/{regionCd}
+   */
+  removeWishlistUsingDelete1 = (regionCd: string, params: RequestParams = {}) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/wishlist/region/${regionCd}`,
+      method: "DELETE",
       ...params,
     });
 }
