@@ -1,7 +1,6 @@
 <!--MapPage 레이아웃-->
 <script setup lang="ts">
 import Header from "@/components/layout/header/Header.vue";
-import Section from "@/components/nav/BottomNav.vue";
 import LogoSearchBar from "@/pages/home/_component/LogoSearchBar.vue";
 import MapPage from "@/pages/mapSearch/MapPage.vue";
 import { mainRouteName } from "@/router/mainRoute";
