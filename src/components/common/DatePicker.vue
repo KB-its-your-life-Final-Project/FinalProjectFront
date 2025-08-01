@@ -3,10 +3,9 @@ import DatePicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 import { ref, watch } from "vue";
 const props = defineProps<{
-  label: string;
   modelValue: Date | null;
   format?: string;
-  inputClass?: string;
+  placeholder?: string;
 }>();
 const emit = defineEmits<{
   (e: "update:modelValue", value: Date | null): void;
@@ -14,19 +13,18 @@ const emit = defineEmits<{
 
 const internalDate = ref<Date | null>(props.modelValue);
 
-// 내부값이 바뀌면 부모에게 알림
 watch(internalDate, (newVal) => {
   emit("update:modelValue", newVal);
 });
 </script>
 
 <template>
-  <div class="relative w-full mt-5">
-    <div class="absolute -top-2 left-3 text-sm test-gray-500 bg-white z-1">{{ label }}</div>
+  <div class="w-full">
     <DatePicker
       v-model:value="internalDate"
       :format="format ?? 'YYYY-MM-DD'"
-      :input-class="inputClass ?? 'border border-gray-300 p-2 rounded w-full'"
+      inputClass="border border-gray-300 bg-gray-100 text-gray-400 px-2 py-1 w-full cursor-pointer"
+      :placeholder="placeholder"
       style="width: 100%"
     />
   </div>
