@@ -4,5 +4,5 @@ defineProps<{
 }>();
 </script>
 <template>
-  <img :src="src" alt="Profile" class="aspect-square w-25 rounded-full" />
+  <img :src="src" alt="Profile" class="aspect-square w-1/1 rounded-full" />
 </template>

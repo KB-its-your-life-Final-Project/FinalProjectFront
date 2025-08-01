@@ -19,7 +19,12 @@ function handleConfirm(): { success: boolean; message: string } {
 }
 </script>
 <template>
-  <ModalForm :title="'이름 변경'" :handle-confirm="handleConfirm" @close="emit('close')">
+  <ModalForm
+    :title="'이름 변경'"
+    :handle-confirm="handleConfirm"
+    @close="emit('close')"
+    hasConfirmBtn
+  >
     <DefaultInput label="기존 이름" v-model="oldNameRef" type="text" disabled />
     <DefaultInput
       class="mt-5"

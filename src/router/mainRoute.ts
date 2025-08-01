@@ -24,6 +24,9 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
   localInfo: () => import("@/pages/localInfo/LocalInfo.vue"),
   LocalInfoSearch: () => import("@/pages/localInfo/LocalInfoSearch.vue"),
 
+  //실거래가 상세페이지
+  transactionDetail: () => import("@/pages/transaction/TransactionDetailPage.vue"),
+
   //최근 본 레포트
   recentSafeReport: () => import("@/pages/safeReport/RecentSafeReport.vue"),
 };
@@ -40,6 +43,7 @@ const mainRouteName = {
   localInfoSearch: "localInfoSearch",
   myPage: "myPage",
   settingAlarm: "settingAlarm",
+  transactionDetail: "transactionDetail",
   recentSafeReport: "recentSafeReport",
 };
 
@@ -84,6 +88,16 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/myAlarm",
     name: mainRouteName.myAlarm,
     component: () => import("@/pages/alarm/myAlarm.vue"),
+  },
+  {
+    path: "/transactionDetail",
+    name: mainRouteName.transactionDetail,
+    component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
+  },
+  {
+    path: "/transactionDetail/:aptName",
+    name: "transactionDetailAptName",
+    component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
   },
   {
     path: "/recentSafeReport",
