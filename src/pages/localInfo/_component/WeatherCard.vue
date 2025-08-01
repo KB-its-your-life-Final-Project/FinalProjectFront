@@ -68,25 +68,32 @@ const fetchWeatherInfo = async (regionCd: string) => {
   error.value = "";
 
   try {
+    console.log("날씨 API 호출 시작 - regionCd:", regionCd);
     // 백엔드 API를 통해 날씨 정보 조회
     const response = await api.getWeatherUsingGet({ regionCd: regionCd }, {});
+    console.log("날씨 API 응답 전체:", response);
+    console.log("날씨 API 응답 data:", response.data);
+    console.log("날씨 API 응답 data.data:", response.data?.data);
 
     const weatherData = response.data?.data;
 
     if (weatherData) {
+      console.log("날씨 데이터 파싱:", weatherData);
       weatherInfo.value = {
         temperature: weatherData.temperature?.toString() || "--",
         maxTemperature: weatherData.maxTemperature?.toString() || "--",
         minTemperature: weatherData.minTemperature?.toString() || "--",
         skyCondition: weatherData.skyCondition?.toString() || "--",
       };
+      console.log("설정된 날씨 정보:", weatherInfo.value);
     } else {
+      console.log("날씨 데이터 없음, 기본값 설정");
       // 기본값 설정
       weatherInfo.value = {
-        temperature: "22",
-        maxTemperature: "25",
-        minTemperature: "18",
-        skyCondition: "1",
+        temperature: "--",
+        maxTemperature: "--",
+        minTemperature: "--",
+        skyCondition: "--",
       };
     }
   } catch (err: unknown) {
@@ -94,10 +101,10 @@ const fetchWeatherInfo = async (regionCd: string) => {
     error.value = "날씨 정보를 불러올 수 없습니다.";
     // 날씨 API 실패 시 기본값으로 설정
     weatherInfo.value = {
-      temperature: "22",
-      maxTemperature: "25",
-      minTemperature: "18",
-      skyCondition: "1",
+      temperature: "--",
+      maxTemperature: "--",
+      minTemperature: "--",
+      skyCondition: "--",
     };
   } finally {
     loading.value = false;
