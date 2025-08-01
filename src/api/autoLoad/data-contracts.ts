@@ -109,7 +109,7 @@ export interface HospitalDTO {
   regionName?: string;
   locataddNm?: string;
   /** @format int64 */
-  totalHospitalCount?: number;
+  totalCount?: number;
 }
 
 export interface SafetyDTO {
@@ -117,7 +117,7 @@ export interface SafetyDTO {
   regionName?: string;
   locataddNm?: string;
   /** @format int64 */
-  totalSafetyBellCount?: number;
+  totalCount?: number;
 }
 
 export interface ReverseGeocodeResponseDTO {

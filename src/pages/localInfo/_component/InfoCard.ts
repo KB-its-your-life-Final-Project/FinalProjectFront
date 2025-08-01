@@ -53,9 +53,9 @@ const fetchSafetyInfo = async (regionCd: string): Promise<string> => {
     console.log("치안시설 API 응답:", response);
 
     const safety = response.data?.data;
-    if (safety && safety.totalSafetyBellCount) {
-      // 안심벨 개수를 표시
-      const safetyBellCount = safety.totalSafetyBellCount;
+    if (safety && safety.totalCount) {
+      // 안심벨 개수를 표시 (백엔드에서 totalCount로 반환)
+      const safetyBellCount = safety.totalCount;
       return `${safetyBellCount.toLocaleString()}개`;
     } else {
       return "--"; // 기본값
@@ -68,15 +68,20 @@ const fetchSafetyInfo = async (regionCd: string): Promise<string> => {
 
 const fetchHospitalInfo = async (regionCd: string): Promise<string> => {
   try {
+    console.log("병원 API 호출 시작 - regionCd:", regionCd);
     const response = await api.getHospitalCountsUsingGet({ regionCd: regionCd }, {});
-    console.log("병원 API 응답:", response);
+    console.log("병원 API 응답 전체:", response);
+    console.log("병원 API 응답 data:", response.data);
+    console.log("병원 API 응답 data.data:", response.data?.data);
 
     const hospital = response.data?.data;
-    if (hospital && hospital.totalHospitalCount) {
-      // 병원 개수를 표시
-      const hospitalCount = hospital.totalHospitalCount;
+    if (hospital && hospital.totalCount) {
+      // 병원 개수를 표시 (백엔드에서 totalCount로 반환)
+      const hospitalCount = hospital.totalCount;
+      console.log("병원 개수:", hospitalCount);
       return `${hospitalCount.toLocaleString()}개`;
     } else {
+      console.log("병원 데이터 없음 또는 totalCount 없음");
       return "--"; // 기본값
     }
   } catch (err: unknown) {
@@ -90,7 +95,7 @@ export const InfoCardList: InfoCardType[] = [
     icon: "fa-solid fa-users",
     title: "인구수",
     value: "20만", // Initial static value
-    description: "주민 수",
+    description: "청년 인구수",
     apiCall: fetchPopulationInfo, // Linked API call
   },
   {
