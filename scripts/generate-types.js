@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import fs from "fs";
 import dotenv from "dotenv";
 import https from "https";
 import http from "http";
@@ -19,7 +20,7 @@ function checkServerStatus(url) {
     //http 구별
     const protocol = url.startsWith("https") ? https : http;
 
-    //status 가졍오기
+    //status 가져오기
     const req = protocol.get(url, (res) => {
       resolve(res.statusCode === 200);
     });
@@ -45,6 +46,37 @@ const outputPath = join(__dirname, "../src/api/autoLoad");
 //swagger로 api 가져오기 명령어
 const command = `npx swagger-typescript-api generate --path ${backendUrl}/v2/api-docs --output ${outputPath} --http-client axios --modular --modular-type`;
 
+/**
+ * http-client.ts 파일에 withCredentials: true 설정을 자동 추가하는 함수
+ * - axios 인스턴스 생성 시 쿠키 등 인증 정보를 자동 포함
+ * - swagger-typescrypt-api 실행 후 파일을 읽어와 수정
+ */
+async function addCredentials() {
+  const httpClientPath = join(outputPath, "http-client.ts");
+  try {
+    let content = fs.readFileSync(httpClientPath, "utf8");
+
+    // withCredentials 설정 없으면 추가
+    if (!content.includes("withCredentials")) {
+      // axios.create 호출 부분을 찾아서 withCredentials: true 추가
+      content = content.replace(/axios\.create\(\{([\s\S]*?)\}\)/, (match, inner) => {
+        // 기존 옵션 뒤에 withCredentials: true 추가
+        const modifiedInner = inner.trim().endsWith(",")
+          ? `${inner} withCredentials: true,`
+          : `${inner}, withCredentials: true,`;
+        return `axios.create({${modifiedInner}})`;
+      });
+      // 수정된 내용을 파일에 다시 쓰기
+      fs.writeFileSync(httpClientPath, content, "utf8");
+      console.log("withCredentials: true 설정이 http-client.ts 에 추가되었습니다.");
+    } else {
+      console.log("http-client.ts 에 이미 withCredentials 설정이 존재합니다.");
+    }
+  } catch (err) {
+    console.error("http-client.ts 수정 중 오류 발생:", err);
+  }
+}
+
 //타입 생성 시작
 async function generateTypes() {
   try {
@@ -60,6 +92,8 @@ async function generateTypes() {
       console.log("Generating Types...");
       //커맨드 실행
       execSync(command, { studio: "inherit" });
+      // http-client.ts에 withCredentials 설정 자동 추가
+      addCredentials();
       console.log("Modular types generated successfully!");
     }
   } catch (error) {

@@ -8,6 +8,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["close"]);
+const oldNameRef = ref(props.oldName);
 const newName = ref("");
 function handleConfirm(): { success: boolean; message: string } {
   if (isEmpty(newName.value)) {
@@ -19,7 +20,7 @@ function handleConfirm(): { success: boolean; message: string } {
 </script>
 <template>
   <ModalForm :title="'이름 변경'" :handle-confirm="handleConfirm" @close="emit('close')">
-    <DefaultInput label="기존 이름" :old-data="oldName" type="text" disabled />
+    <DefaultInput label="기존 이름" v-model="oldNameRef" type="text" disabled />
     <DefaultInput
       class="mt-5"
       label="변경 이름"

@@ -1,25 +1,31 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import authApi from "@/api/authApi";
+import { authStore } from "@/stores/authStore";
+import { LoginDTO } from "@/api/autoLoad";
+
+const route = useRoute();
 
 const router = useRouter();
-const route = useRoute();
+const auth = authStore();
+
+const member = reactive<LoginDTO>({
+  email: "",
+  password: "",
+  code: "",
+  createdType: 3,
+});
 
 onMounted(async () => {
   const code = route.query.code as string;
+  member.code = code;
   console.log("code: ", code);
   try {
-    const response = await authApi.googleLogin(code);
+    const response = await auth.login(member);
     console.log("response: ", response);
-    // 구글 로그인 성공 시 홈 이동
-    if (response.success === true) {
-      router.push("/home");
-    } else {
-      alert(response.message || "구글 로그인 실패");
-    }
+    router.push("/");
   } catch (error) {
-    alert(error + ": 카카오 로그인 처리 중 오류가 발생했습니다.");
+    alert(error + ": 구글 로그인 처리 중 오류가 발생했습니다.");
   }
 });
 </script>
