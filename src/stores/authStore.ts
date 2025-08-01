@@ -110,6 +110,7 @@ export const authStore = defineStore("auth", () => {
       }
     } catch (error) {
       console.error("Invalid JSON in localStorage:", storedMember);
+      console.error("ERROR:", error);
       localStorage.removeItem("authUser"); // 잘못된 값 제거
     }
   };
