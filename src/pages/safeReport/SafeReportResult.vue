@@ -3,6 +3,7 @@ import { useRouter } from "vue-router";
 import { computed, ref, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
+import ToolTip from "@/components/common/ToolTip.vue";
 import { Api } from "@/api/autoLoad/Api";
 
 const api = new Api();
@@ -26,10 +27,10 @@ const isNoData = computed(() => {
 
 const gradeText = computed(() => {
   if (!store.resultData || typeof store.resultData.score !== "number") return "-";
-  if (store.resultData.score >= 8) return "위험";
-  if (store.resultData.score >= 5) return "주의";
-  if (store.resultData.score >= 3) return "안전";
-  return "매우 안전";
+  if (store.resultData.score == 10) return "안전";
+  else if (store.resultData.score == 6) return "주의";
+  else return "위험";
+
 });
 
 const gradeColor = computed(() => {
@@ -40,37 +41,33 @@ const gradeColor = computed(() => {
       label: "-",
     };
   }
-  if (store.resultData.score >= 8) {
+  if (store.resultData.score == 10) {
     return {
-      bg: "bg-red-100",
-      text: "text-red-600",
-      label: "위험",
+      bg: "bg-yellow-100",
+      text: "text-yellow-600",
+      label: "안전",
+
     };
-  } else if (store.resultData.score >= 5) {
+  } else if (store.resultData.score == 6) {
     return {
       bg: "bg-orange-100",
       text: "text-orange-500",
       label: "주의",
     };
-  } else if (store.resultData.score >= 3) {
+  } else{
     return {
-      bg: "bg-yellow-100",
-      text: "text-yellow-600",
-      label: "안전",
-    };
-  } else {
-    return {
-      bg: "bg-blue-100",
-      text: "text-blue-600",
-      label: "매우 안전",
+      bg: "bg-red-100",
+      text: "text-red-600",
+      label: "위험",
     };
   }
-});
+  }
+);
 
 const riskText = computed(() => {
   if (gradeText.value === "위험" || gradeText.value === "주의") {
     return "보증금 회수에 대한 리스크가 있습니다.";
-  } else if (gradeText.value === "안전" || gradeText.value === "매우 안전") {
+  } else if (gradeText.value === "안전") {
     return "보증금 회수에 대한 리스크가 없습니다.";
   }
   return "";
@@ -190,6 +187,9 @@ const filteredFloorAndPurposeList = computed(() => {
     info.resUseType && info.resUseType.trim() !== ''
   );
 });
+
+// 층별 용도 펼침/접힘 상태
+const showFloorDetails = ref(false);
 </script>
 
 <template>
@@ -236,17 +236,26 @@ const filteredFloorAndPurposeList = computed(() => {
 
       <section class="flex justify-center gap-4 px-4 mt-6 text-center text-xs font-medium">
         <!--    박스1-->
-        <div
-          class="flex flex-col items-center justify-center w-32 h-24 rounded"
-          :class="gradeColor.bg"
-        >
-          <svg class="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20" :class="gradeColor.text">
-            <path
-              d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.597c.75 1.336-.213 2.998-1.742 2.998H3.48c-1.529 0-2.492-1.662-1.742-2.998L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 012 0v3a1 1 0 01-1 1z"
-            />
-          </svg>
-          <span :class="gradeColor.text" class="text-base font-semibold">깡통전세</span>
-          <span class="text-[11px] font-semibold" :class="gradeColor.text">{{ gradeText }}</span>
+        <div class="relative">
+          <!-- 툴팁을 박스 바깥 좌측 상단에 배치 -->
+          <div class="absolute -top-2 -left-2 z-10">
+            <ToolTip>
+              깡통전세란 전세가와 매매가가 비슷한 주택을 의미합니다. 깡통 전세의 경우우 전세 계약이 만료된 후 세입자가<span class="text-red-600 font-semibold">전세 보증금을 돌려받기 어려울 수 있습니다.</span>
+            </ToolTip>
+          </div>
+
+          <div
+            class="flex flex-col items-center justify-center w-32 h-24 rounded"
+            :class="gradeColor.bg"
+          >
+            <svg class="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20" :class="gradeColor.text">
+              <path
+                d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.597c.75 1.336-.213 2.998-1.742 2.998H3.48c-1.529 0-2.492-1.662-1.742-2.998L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 012 0v3a1 1 0 01-1 1z"
+              />
+            </svg>
+            <span :class="gradeColor.text" class="text-base font-semibold">깡통전세</span>
+            <span class="text-[11px] font-semibold" :class="gradeColor.text">{{ gradeText }}</span>
+          </div>
         </div>
 
               <!-- 박스 2 -->
@@ -334,32 +343,71 @@ const filteredFloorAndPurposeList = computed(() => {
       v-if="showModal_building"
       title="건축물 정보"
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
-      @close="showModal_building = false"
+      @close="() => { showModal_building = false; showFloorDetails = false; }"
     >
-              <div v-if="store.floorAndPurposeList && store.floorAndPurposeList.length">
-          <p>
-            <span :class="store.violationStatus === '위반건축물' ? 'text-red-600 font-extrabold' : 'text-green-600 font-extrabold'">
-              위반 건축물 여부: {{ store.violationStatus === '위반건축물' ? '위반 건축물' : '정상 건축물' }}
-            </span>
-          </p>
-          <p class="mt-2">
-            각 층의 용도는 다음과 같습니다. 주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-red-600 font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
-          </p>
-          <div class="mt-4">
-            <div v-if="filteredFloorAndPurposeList.length > 0">
-              <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2">
-                {{ getFloorLabel(info.resFloor) }}: {{ info.resUseType }}
-                <!-- <span class="text-sm text-gray-500">({{ info.resStructure }})</span> -->
+      <div v-if="store.floorAndPurposeList && store.floorAndPurposeList.length">
+        <!-- 위반건축물 여부 섹션 -->
+        <div class="flex justify-between items-center py-3 border-b border-gray-200">
+          <span class="text-gray-700 font-medium">위반건축물등록여부</span>
+          <span :class="store.violationStatus === '위반건축물' ? 'text-red-600 font-semibold' : 'text-blue-600 font-semibold'">
+            {{ store.violationStatus === '위반건축물' ? '위반건축물' : '정상건축물' }}
+          </span>
+        </div>
+
+        <!-- 건축년도 섹션 -->
+        <div class="flex justify-between items-center py-3 border-b border-gray-200">
+          <span class="text-gray-700 font-medium">건축년도</span>
+          <span class="text-blue-600 font-semibold">
+            {{ store.resultData?.buildYear ? `${store.resultData.buildYear}년` : '정보 없음' }}
+          </span>
+        </div>
+
+        <!-- 층별 용도 섹션 -->
+        <div class="py-3">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            @click="showFloorDetails = !showFloorDetails"
+          >
+            <span class="text-gray-700 font-medium">층별 용도</span>
+            <div class="flex items-center">
+              <span class="text-blue-600 font-semibold mr-2">
+                {{ filteredFloorAndPurposeList.length > 0 ? `${filteredFloorAndPurposeList.length}개 층` : '정보 없음' }}
+              </span>
+              <font-awesome-icon
+                :icon="['fas', 'chevron-down']"
+                class="text-gray-400 transition-transform duration-200"
+                :class="{ 'rotate-180': showFloorDetails }"
+              />
+            </div>
+          </div>
+
+          <!-- 펼쳐진 층별 용도 상세 정보 -->
+          <div v-if="showFloorDetails" class="mt-3 pl-4 border-l-2 border-gray-200">
+            <div class="flex items-center mb-3">
+              <span class="text-sm text-gray-600">층별 용도 정보</span>
+              <div class="ml-2 relative">
+                <ToolTip>
+                  <div class="max-w-[160px] text-xs">
+                    주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-red-600 font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
+                  </div>
+                </ToolTip>
               </div>
             </div>
-            <div v-else class="text-center text-gray-500">
+            <div v-if="filteredFloorAndPurposeList.length > 0">
+              <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2 text-sm">
+                <span class="font-medium">{{ getFloorLabel(info.resFloor) }}:</span>
+                <span class="text-gray-700">{{ info.resUseType }}</span>
+              </div>
+            </div>
+            <div v-else class="text-center text-gray-500 text-sm">
               층별 용도 정보가 없습니다.
             </div>
           </div>
         </div>
-        <div v-else class="text-center text-gray-500">
-          건축물 정보가 없습니다.
-        </div>
+      </div>
+      <div v-else class="text-center text-gray-500">
+        건축물 정보가 없습니다.
+      </div>
     </ModalForm>
 
     <!-- 데이터 없음 모달 -->
