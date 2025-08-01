@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import RegisterLink from "@/components/common/RegisterLink.vue";
+import movePage from "@/utils/movePage";
 
 onMounted(() => {
   const kakao = (window as any).Kakao;
@@ -65,12 +66,12 @@ const loginGoogle = async () => {
             <span>Google로 시작하기</span>
           </div>
         </button>
-        <button class="login-btn email-sec">
+        <button class="login-btn email-sec" @click="movePage.loginEmail()">
           <div class="snslogo-text-wrapper">
-            <img class="size-5" src="@/assets/imgs/email.svg" alt="이메일 이미지" />
-            <router-link to="/auth/loginEmail">
+            <img class="size-5" src="@/assets/imgs/email.svg" alt="이메일 이미지"/>
+            <!-- <router-link to="/auth/loginEmail"> -->
               <span>E-mail로 시작하기</span>
-            </router-link>
+            <!-- </router-link> -->
           </div>
         </button>
       </div>
