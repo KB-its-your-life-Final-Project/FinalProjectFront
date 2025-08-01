@@ -47,7 +47,7 @@ function search() {
     const postcode = new (window as any).daum.Postcode({
       oncomplete(data: any) {
         console.log("전체 주소 데이터:", data);
-        if(!data.buildingName || data.buildingName.trim()==""){
+        if (!data.buildingName || data.buildingName.trim() == "") {
           showBuildingNotFoundModal.value = true;
           return;
         }
@@ -197,7 +197,7 @@ function handleClose() {
     >
       <div class="text-center">
         <p class="text-gray-600">
-          해당 주소에 건물이 없습니다.<br>
+          해당 주소에 건물이 없습니다.<br />
           다른 주소를 선택해주세요.
         </p>
       </div>

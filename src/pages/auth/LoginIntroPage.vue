@@ -68,10 +68,8 @@ const loginGoogle = async () => {
         </button>
         <button class="login-btn email-sec" @click="movePage.loginEmail()">
           <div class="snslogo-text-wrapper">
-            <img class="size-5" src="@/assets/imgs/email.svg" alt="이메일 이미지"/>
-            <!-- <router-link to="/auth/loginEmail"> -->
-              <span>E-mail로 시작하기</span>
-            <!-- </router-link> -->
+            <img class="size-5" src="@/assets/imgs/email.svg" alt="이메일 이미지" />
+            <span>E-mail로 시작하기</span>
           </div>
         </button>
       </div>

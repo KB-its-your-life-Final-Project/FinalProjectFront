@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import HomeCard from "@/pages/home/_component/HomeCard.vue";
-import HomeNews from "@/pages/home/_component/HomeNews.vue";
+import YouthProgram from "@/pages/home/_component/YouthProgram.vue";
 
 import Header from "@/components/layout/header/Header.vue";
 import Footer from "@/components/layout/Footer.vue";
@@ -35,7 +35,7 @@ import { mainRouteName } from "@/router/mainRoute";
             <HomeCard :data="menu" />
           </RouterLink>
         </div>
-        <HomeNews />
+        <YouthProgram />
         <Footer />
       </main>
     </div>

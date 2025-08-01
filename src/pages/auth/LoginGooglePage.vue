@@ -2,7 +2,7 @@
 import { onMounted, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { authStore } from "@/stores/authStore";
-import { LoginDTO } from "@/api/autoLoad";
+import type { LoginDTO } from "@/api/autoLoad/data-contracts";
 
 const route = useRoute();
 

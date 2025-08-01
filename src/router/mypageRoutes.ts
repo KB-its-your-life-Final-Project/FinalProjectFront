@@ -1,5 +1,5 @@
-import type { Component } from 'vue';
-import type { RouteRecordRaw } from 'vue-router';
+import type { Component } from "vue";
+import type { RouteRecordRaw } from "vue-router";
 
 //라우트 파일 위치
 const myPageRouteMap: Record<string, () => Promise<Component>> = {
