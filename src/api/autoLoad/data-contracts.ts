@@ -52,23 +52,6 @@ export interface MemberDTO {
   regIp?: string;
 }
 
-/** NewsDTO */
-export interface NewsDTO {
-  atchFile?: string;
-  bbsSn?: string;
-  frstRegDt?: string;
-  frstRgtrNm?: string;
-  lastMdfcnDt?: string;
-  lastMdfrNm?: string;
-  pstInqCnt?: string;
-  pstSeNm?: string;
-  pstSeSn?: string;
-  pstSn?: string;
-  pstTtl?: string;
-  pstUrlAddr?: string;
-  pstWholCn?: string;
-}
-
 /** RentalRatioAndBuildyear */
 export interface RentalRatioAndBuildyear {
   /** @format int32 */
@@ -109,6 +92,23 @@ export interface ViolationStatusVO {
   violationStatus?: string;
 }
 
+/** YouthContentDTO */
+export interface YouthContentDTO {
+  atchFile?: string;
+  bbsSn?: string;
+  frstRegDt?: string;
+  frstRgtrNm?: string;
+  lastMdfcnDt?: string;
+  lastMdfrNm?: string;
+  pstInqCnt?: string;
+  pstSeNm?: string;
+  pstSeSn?: string;
+  pstSn?: string;
+  pstTtl?: string;
+  pstUrlAddr?: string;
+  pstWholCn?: string;
+}
+
 /** ApiResponse«List«MemberDTO»» */
 export interface ApiResponseListMemberDTO {
   /** @format int32 */
@@ -118,11 +118,11 @@ export interface ApiResponseListMemberDTO {
   success?: boolean;
 }
 
-/** ApiResponse«List«NewsDTO»» */
-export interface ApiResponseListNewsDTO {
+/** ApiResponse«List«YouthContentDTO»» */
+export interface ApiResponseListYouthContentDTO {
   /** @format int32 */
   code?: number;
-  data?: NewsDTO[];
+  data?: YouthContentDTO[];
   message?: string;
   success?: boolean;
 }

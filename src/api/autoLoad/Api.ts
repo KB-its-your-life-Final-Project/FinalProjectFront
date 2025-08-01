@@ -10,16 +10,25 @@
  * ---------------------------------------------------------------
  */
 
-import {
+import type {
   ApiResponseBoolean,
+  ApiResponseListEstateWishlistResponseDTO,
   ApiResponseListMemberDTO,
-  ApiResponseListNewsDTO,
+  ApiResponseListRegionWishlistResponseDTO,
+  ApiResponseListSearchHistoryResponseDTO,
   ApiResponseMemberDTO,
   ApiResponseSafeReportResponseDto,
+  ApiResponseVoid,
+  EstateWishlistRequestDTO,
   LoginDTO,
+  RegionWishlistRequestDTO,
   SafeReportRequestDto,
+  SearchHistoryRequestDTO,
+  TransactionRequestDTO,
+  TransactionResponseDTO,
 } from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { ContentType, HttpClient } from "./http-client";
+import type { RequestParams } from "./http-client";
 
 export class Api<
   SecurityDataType = unknown,
@@ -136,7 +145,7 @@ export class Api<
    * @request GET:/api/news
    */
   getNewsUsingGet = (params: RequestParams = {}) =>
-    this.request<ApiResponseListNewsDTO, void>({
+    this.request<ApiResponseListYouthContentDTO, void>({
       path: `/api/news`,
       method: "GET",
       ...params,
