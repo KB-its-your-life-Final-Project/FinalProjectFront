@@ -21,6 +21,7 @@ import {
   ApiResponseWeatherDTO,
   ApiResponsePopulationDTO,
   ApiResponseReverseGeocodeResponseDTO,
+  ApiResponseFacilityDTO,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
@@ -236,6 +237,27 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
   ) =>
     this.request<ApiResponseReverseGeocodeResponseDTO, void>({
       path: `/api/localinfo/reverse-geocode`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * 편의시설 수 조회
+   *
+   * @tags local-info-controller
+   * @name GetFacilityCountsUsingGet
+   * @summary 법정동코드로 편의시설 수 조회
+   * @request GET:/api/localinfo/facilities-count
+   */
+  getFacilityCountsUsingGet = (
+    query?: {
+      regionCd?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseFacilityDTO, void>({
+      path: `/api/localinfo/facilities-count`,
       method: "GET",
       query: query,
       ...params,

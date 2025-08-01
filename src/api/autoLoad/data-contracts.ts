@@ -96,6 +96,14 @@ export interface PopulationDTO {
   populationYouth?: number;
 }
 
+export interface FacilityDTO {
+  regionCd?: string;
+  regionName?: string;
+  locataddNm?: string;
+  /** @format int64 */
+  totalBicycleCount?: number;
+}
+
 export interface ReverseGeocodeResponseDTO {
   address?: string;
   regionCd?: string;
@@ -162,6 +170,14 @@ export interface ApiResponsePopulationDTO {
   /** @format int32 */
   code?: number;
   data?: PopulationDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseFacilityDTO {
+  /** @format int32 */
+  code?: number;
+  data?: FacilityDTO;
   message?: string;
   success?: boolean;
 }
