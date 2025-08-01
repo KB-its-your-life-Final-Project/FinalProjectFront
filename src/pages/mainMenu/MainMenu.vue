@@ -55,7 +55,7 @@ function openInquiry() {
       <MenuItem :icon="['fas', 'house']" label="실거래가 조회" to="/mapSearch" />
       <MenuItem :icon="['fas', 'shield-alt']" label="안심 정보" to="/safereport" />
       <MenuItem :icon="['far', 'heart']" label="찜한 매물" to="/myLike" />
-      <MenuItem :icon="['far', 'file-lines']" label="최근 본 리포트" to="/" />
+      <MenuItem :icon="['far', 'file-lines']" label="최근 본 리포트" to="/recentSafeReport" />
       <!--      -->
     </MenuSection>
 

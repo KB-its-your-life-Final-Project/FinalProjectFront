@@ -23,6 +23,9 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
   //안심진단
   localInfo: () => import("@/pages/localInfo/LocalInfo.vue"),
   LocalInfoSearch: () => import("@/pages/localInfo/LocalInfoSearch.vue"),
+
+  //최근 본 레포트
+  recentSafeReport: () => import("@/pages/safeReport/RecentSafeReport.vue"),
 };
 
 //라우트 이름
@@ -37,6 +40,7 @@ const mainRouteName = {
   localInfoSearch: "localInfoSearch",
   myPage: "myPage",
   settingAlarm: "settingAlarm",
+  recentSafeReport: "recentSafeReport",
 };
 
 //라우트 설정
@@ -80,6 +84,11 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/myAlarm",
     name: mainRouteName.myAlarm,
     component: () => import("@/pages/alarm/myAlarm.vue"),
+  },
+  {
+    path: "/recentSafeReport",
+    name: mainRouteName.recentSafeReport,
+    component: () => import("@/pages/safeReport/RecentSafeReport.vue"),
   },
 ];
 
