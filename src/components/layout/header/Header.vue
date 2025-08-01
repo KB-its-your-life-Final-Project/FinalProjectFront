@@ -14,10 +14,15 @@ const emit = defineEmits(["back-click"]);
 //헤더 받아오기
 const props = defineProps<{
   headerShowtype: headerShowtype;
+  title? :string; // 아파트명을 받아오고 싶음
 }>();
 
 //제목 설정
+const title = ref(props.title ?? headerTitleList[props.headerShowtype]);
+
+/*
 const title = ref(headerTitleList[props.headerShowtype]);
+*/
 
 // 자동으로 모든 항목에 대한 boolean 변수들 생성
 const showItems = reactive(
@@ -60,7 +65,8 @@ function handleBackClick() {
         v-if="title"
         :class="['text-base font-semibold text-kb-ui-01', showItems.showBack ? 'ml-4' : '']"
       >
-        {{ title }}
+         {{ props.title || title }}
+
       </span>
     </div>
 

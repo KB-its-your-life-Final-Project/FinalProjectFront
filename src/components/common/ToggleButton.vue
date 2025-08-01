@@ -18,14 +18,14 @@ const isOn = computed({
 });
 
 function toggle() {
-  isOn.value = !isOn.value; // computed의 setter 호출 -> emit 발생
+  isOn.value = !isOn.value;
 }
 </script>
 
 <template>
   <button
     :class="[
-      'relative w-15 h-7 rounded-full transition-colors duration-300',
+      'relative w-15 h-7 rounded-full transition-colors duration-300 cursor-pointer',
       isOn ? 'bg-kb-yellow' : 'bg-gray-200',
     ]"
     @click="toggle"

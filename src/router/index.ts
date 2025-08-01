@@ -18,6 +18,12 @@ const routes: RouteRecordRaw[] = [
     name: "splashScreen",
     component: () => import("@/components/layout/SplashScreenPage.vue"),
   },
+    // 지도 화면
+    {
+      path: "/maps",
+      name: "maps",
+      component: () => import("@/pages/mapSearch/MapPage.vue"),
+    },
   // 404 NotFound
   {
     path: "/:paths(.*)*",
