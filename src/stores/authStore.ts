@@ -30,7 +30,7 @@ export const authStore = defineStore("auth", () => {
   const member = ref<Member>(getDefaultMember);
 
   // 이메일 중복 확인
-  const checkDuplicateEmail = async (email: string): Promise<string> => {
+  const checkDuplicateEmail = async (email: string): Promise<boolean> => {
     try {
       const { data } = await api.checkDuplicateEmailUsingGet(email);
       console.log("checking if email is duplicate: ", data);
