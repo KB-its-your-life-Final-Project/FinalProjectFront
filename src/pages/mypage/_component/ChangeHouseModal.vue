@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
 import ModalForm from "@/components/common/ModalForm.vue";
 import DatePicker from "@/components/common/DatePicker.vue";
@@ -35,30 +35,29 @@ const options = [
   { label: "전세", value: "jeonse" },
   { label: "월세", value: "monthlyRent" },
 ];
-
-watch(deposit, (newVal) => {
-  console.log("보증금:", newVal);
-});
-
-watch(monthlyRent, (newVal) => {
-  console.log("월세:", newVal);
-});
 </script>
 <template>
-  <ModalForm :title="title" :handle-confirm="handleConfirm" @close="emit('close')">
+  <ModalForm :title="title" :handle-confirm="handleConfirm" @close="emit('close')" hasConfirmBtn>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">집 주소</div>
       <PostcodeSearch />
     </div>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">계약 기간</div>
-      <DatePicker :label="'계약 시작일'" v-model="startDate"></DatePicker>
-      <DatePicker :label="'계약 종료일'" v-model="endDate"></DatePicker>
+      <div class="flex items-center gap-1 mt-4">
+        <DatePicker
+          :label="'계약 시작일'"
+          v-model="startDate"
+          placeholder="계약 시작일"
+        ></DatePicker>
+        <div class="text-lg font-pretendard-bold">~</div>
+        <DatePicker :label="'계약 종료일'" v-model="endDate" placeholder="계약 종료일"></DatePicker>
+      </div>
     </div>
 
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">계약 금액</div>
-      <RadioListButton class="mt-4" v-model="contractType" :options="options" />
+      <RadioListButton class="mt-4" v-model="contractType" :options="options" rounded />
     </div>
     <div class="mt-5" v-if="contractType === 'jeonse'">
       <DefaultInput label="전세금" type="money" v-model="deposit"></DefaultInput>

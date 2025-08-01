@@ -10,19 +10,6 @@
  * ---------------------------------------------------------------
  */
 
-/** EstateWishlistRequestDTO */
-export interface EstateWishlistRequestDTO {
-  /** @format int64 */
-  estateId?: number;
-}
-
-/** EstateWishlistResponseDTO */
-export interface EstateWishlistResponseDTO {
-  buildingName?: string;
-  /** @format int64 */
-  estateId?: number;
-}
-
 /** FloorAndPurpose */
 export interface FloorAndPurpose {
   resArea?: string;
@@ -65,15 +52,21 @@ export interface MemberDTO {
   regIp?: string;
 }
 
-/** RegionWishlistRequestDTO */
-export interface RegionWishlistRequestDTO {
-  regionCd?: string;
-}
-
-/** RegionWishlistResponseDTO */
-export interface RegionWishlistResponseDTO {
-  regionCd?: string;
-  umdNm?: string;
+/** NewsDTO */
+export interface NewsDTO {
+  atchFile?: string;
+  bbsSn?: string;
+  frstRegDt?: string;
+  frstRgtrNm?: string;
+  lastMdfcnDt?: string;
+  lastMdfrNm?: string;
+  pstInqCnt?: string;
+  pstSeNm?: string;
+  pstSeSn?: string;
+  pstSn?: string;
+  pstTtl?: string;
+  pstUrlAddr?: string;
+  pstWholCn?: string;
 }
 
 /** RentalRatioAndBuildyear */
@@ -108,48 +101,12 @@ export interface SafeReportRequestDto {
 export interface SafeReportResponseDto {
   floorAndPurposeList?: FloorAndPurpose[];
   rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
-  violationStatus?: ViolationStatus;
+  violationStatus?: ViolationStatusVO;
 }
 
-/** SearchHistoryRequestDTO */
-export interface SearchHistoryRequestDTO {
-  keyword?: string;
-}
-
-/** SearchHistoryResponseDTO */
-export interface SearchHistoryResponseDTO {
-  keyword?: string;
-}
-
-/** TransactionRequestDTO */
-export interface TransactionRequestDTO {
-  buildingName?: string;
-  endDate?: string;
-  startDate?: string;
-  /** @format int32 */
-  tradeType?: number;
-}
-
-/** TransactionResponseDTO */
-export interface TransactionResponseDTO {
-  date?: string;
-  /** @format int32 */
-  price?: number;
-  type?: string;
-}
-
-/** ViolationStatus */
-export interface ViolationStatus {
+/** ViolationStatusVO */
+export interface ViolationStatusVO {
   violationStatus?: string;
-}
-
-/** ApiResponse«List«EstateWishlistResponseDTO»» */
-export interface ApiResponseListEstateWishlistResponseDTO {
-  /** @format int32 */
-  code?: number;
-  data?: EstateWishlistResponseDTO[];
-  message?: string;
-  success?: boolean;
 }
 
 /** ApiResponse«List«MemberDTO»» */
@@ -161,20 +118,11 @@ export interface ApiResponseListMemberDTO {
   success?: boolean;
 }
 
-/** ApiResponse«List«RegionWishlistResponseDTO»» */
-export interface ApiResponseListRegionWishlistResponseDTO {
+/** ApiResponse«List«NewsDTO»» */
+export interface ApiResponseListNewsDTO {
   /** @format int32 */
   code?: number;
-  data?: RegionWishlistResponseDTO[];
-  message?: string;
-  success?: boolean;
-}
-
-/** ApiResponse«List«SearchHistoryResponseDTO»» */
-export interface ApiResponseListSearchHistoryResponseDTO {
-  /** @format int32 */
-  code?: number;
-  data?: SearchHistoryResponseDTO[];
+  data?: NewsDTO[];
   message?: string;
   success?: boolean;
 }
@@ -193,14 +141,6 @@ export interface ApiResponseSafeReportResponseDto {
   /** @format int32 */
   code?: number;
   data?: SafeReportResponseDto;
-  message?: string;
-  success?: boolean;
-}
-
-/** ApiResponse«Void» */
-export interface ApiResponseVoid {
-  /** @format int32 */
-  code?: number;
   message?: string;
   success?: boolean;
 }
