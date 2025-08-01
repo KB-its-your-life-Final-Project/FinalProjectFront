@@ -30,13 +30,14 @@ import type {
 import { ContentType, HttpClient } from "./http-client";
 import type { RequestParams } from "./http-client";
 
+
 export class Api<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name FindAllUsersUsingGet
    * @summary findAllUsers
    * @request GET:/api/member
@@ -50,7 +51,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name CheckDuplicateEmailUsingGet
    * @summary checkDuplicateEmail
    * @request GET:/api/member/checkemail/{email}
@@ -81,8 +82,8 @@ export class Api<
    * No description
    *
    * @tags member-controller
-   * @name LogoutMemberUsingPost
-   * @summary logoutMember
+   * @name LogoutUsingPost
+   * @summary logout
    * @request POST:/api/member/logout
    */
   logoutUsingPost = (params: RequestParams = {}) =>
@@ -96,8 +97,22 @@ export class Api<
    * No description
    *
    * @tags member-controller
-   * @name RegisterMemberByEmailUsingPost
-   * @summary registerMemberByEmail
+   * @name CheckLoginStatusUsingGet
+   * @summary checkLoginStatus
+   * @request GET:/api/member/me
+   */
+  checkLoginStatusUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseMemberDTO, void>({
+      path: `/api/member/me`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name RegisterByEmailUsingPost
+   * @summary registerByEmail
    * @request POST:/api/member/register/email
    */
   registerByEmailUsingPost = (
@@ -119,7 +134,7 @@ export class Api<
   /**
    * No description
    *
-   * @tags member_controller
+   * @tags member-controller
    * @name FindMemberByIdUsingGet
    * @summary findMemberById
    * @request GET:/api/member/{id}
@@ -166,22 +181,6 @@ export class Api<
       path: `/api/report/requestData`,
       method: "POST",
       body: dto,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags transaction-detail-controller
-   * @name GetFilteredDataUsingPost
-   * @summary getFilteredData
-   * @request POST:/api/transactions/detail
-   */
-  getFilteredDataUsingPost = (request: TransactionRequestDTO, params: RequestParams = {}) =>
-    this.request<TransactionResponseDTO[], void>({
-      path: `/api/transactions/detail`,
-      method: "POST",
-      body: request,
       type: ContentType.Json,
       ...params,
     });
