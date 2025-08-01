@@ -37,7 +37,7 @@ const options = [
 ];
 </script>
 <template>
-  <ModalForm :title="title" :handle-confirm="handleConfirm" @close="emit('close')">
+  <ModalForm :title="title" :handle-confirm="handleConfirm" @close="emit('close')" hasConfirmBtn>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">집 주소</div>
       <PostcodeSearch />

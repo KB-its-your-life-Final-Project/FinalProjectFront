@@ -19,7 +19,7 @@ import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
 import defaultProfile from "@/assets/imgs/profile.jpg";
 import ProfileImage from "@/components/common/ProfileImage.vue";
-
+import ProfileInfo from "@/components/common/ProfileInfo.vue";
 const modalMap = {
   name: markRaw(ChangeNameModal),
   editHouse: markRaw(ChangeHouseModal),
@@ -89,7 +89,9 @@ const email = userStore.email*/
       class="relative bg-white mx-4 p-4 rounded-xl shadow-md items-center space-x-4 flex flex-col gap-[1vh] z-2"
     >
       <div class="relative">
-        <ProfileImage :src="user.imagePath" />
+        <div class="w-25">
+          <ProfileImage :src="user.imagePath" />
+        </div>
         <button
           class="absolute bottom-0 right-0 cursor-pointer p-1 bg-gray-300 rounded-full"
           @click="openModal('profile', { profile: user.imagePath, name: user.name })"
@@ -97,16 +99,8 @@ const email = userStore.email*/
           <font-awesome-icon :icon="['fas', 'camera']"></font-awesome-icon>
         </button>
       </div>
-      <div class="flex-1 flex flex-col items-center">
-        <p class="text-xl font-pretendard-bold">{{ user.name }}</p>
-        <p class="text-xl font-pretendard-bold flex items-center gap-1">
-          {{ user.email }}
-          <font-awesome-icon
-            class="border rounded-full p-[2px] w-2 h-2 text-success"
-            :icon="['fas', 'check']"
-          />
-        </p>
-      </div>
+      <ProfileInfo :name="user.name" :email="user.email" />
+
       <div class="w-4/5 relative h-10">
         <div class="absolute w-full border border-kb-gray-light rounded-md">
           <button

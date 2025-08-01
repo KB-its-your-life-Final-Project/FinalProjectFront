@@ -39,7 +39,12 @@ function checkPassword(password: string) {
 }
 </script>
 <template>
-  <ModalForm :title="'비밀번호 변경'" :handle-confirm="handleConfirm" @close="emit('close')">
+  <ModalForm
+    :title="'비밀번호 변경'"
+    :handle-confirm="handleConfirm"
+    @close="emit('close')"
+    hasConfirmBtn
+  >
     <DefaultInput
       label="기존 비밀번호"
       v-model="oldPassword"

@@ -32,7 +32,12 @@ function handleConfirm(): { success: boolean; message: string } {
 }
 </script>
 <template>
-  <ModalForm :title="'프로필 이미지 변경'" :handle-confirm="handleConfirm" @close="emit('close')">
+  <ModalForm
+    :title="'프로필 이미지 변경'"
+    :handle-confirm="handleConfirm"
+    @close="emit('close')"
+    hasConfirmBtn
+  >
     <div class="flex flex-col items-center gap-2">
       <img class="rounded-full max-w-1/2 aspect-1/1" :src="previewUrl || profile" />
       <p v-if="selectedFile" class="text-sm text-gray-600">선택한 파일: {{ selectedFile?.name }}</p>

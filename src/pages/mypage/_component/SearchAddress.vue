@@ -1,103 +1,75 @@
-<template>
-  <div class="border border-gray-300 mt-4 rounded-md">
-    <div class="space-y-2">
-      <input v-model="roadAddress" placeholder="도로명주소" class="p-2 w-full" readonly />
-      <input
-        v-model="jibunAddress"
-        placeholder="지번주소"
-        class="border-y border-gray-300 p-2 w-full"
-        readonly
-      />
-      <div class="relative">
-        <input v-model="extraAddress" placeholder="참고 항목" class="p-2" readonly />
-        <button
-          @click="openPostcode"
-          class="bg-kb-yellow-positive text-white px-4 rounded-rb absolute right-0 h-1/1 cursor-pointer"
-        >
-          주소 찾기
-        </button>
-      </div>
-    </div>
-  </div>
-  <div></div>
-  <div
-    ref="layerContainer"
-    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white w-full h-full rounded-md hidden"
-  >
-    <div class="bg-kb-yellow rounded-t-lg h-12">
-      <button class="px-5 py-3 text-lg cursor-pointer" @click="closeLayer">X</button>
-    </div>
-    <div ref="layerContent" class="h-[calc(100%-48px)]">
-      <!-- 여기에 postcode iframe이 embed 됩니다 -->
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
+import PostcodeLayer from "@/components/common/SearchAddressLayer.vue";
 
+// 주소 데이터
 const roadAddress = ref("");
 const jibunAddress = ref("");
-const extraAddress = ref("");
-const layerContainer = ref<HTMLElement | null>(null);
-const layerContent = ref<HTMLElement | null>(null);
-let postcodeRef: any = null;
-function openLayer() {
-  if (layerContainer.value) {
-    layerContainer.value.classList.remove("hidden");
-  }
-}
+const buildingName = ref("");
+const dongName = ref("");
+const dongNo = ref("");
+// 주소 찾기 레이어 표시 여부
+const showPostcode = ref(false);
 
-function closeLayer() {
-  if (layerContainer.value) {
-    layerContainer.value.classList.add("hidden");
-  }
-}
-onMounted(() => {
-  if (!window.daum || !window.daum.postcode) {
-    const script = document.createElement("script");
-    script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-    script.onload = () => console.log("Daum postcode script loaded");
-    document.head.appendChild(script);
-  }
-});
-
+// 주소 찾기 버튼 클릭
 function openPostcode() {
-  if (!window.daum || !window.daum.Postcode) return;
+  showPostcode.value = true;
+}
 
-  postcodeRef = new window.daum.Postcode({
-    oncomplete: (data: any) => {
-      let extra = "";
-
-      if (data.userSelectedType === "R") {
-        if (data.bname && /[동|로|가]$/g.test(data.bname)) extra += data.bname;
-        if (data.buildingName && data.apartment === "Y")
-          extra += extra ? `, ${data.buildingName}` : data.buildingName;
-        if (extra) extra = ` (${extra})`;
-      }
-
-      roadAddress.value = data.roadAddress;
-      jibunAddress.value = data.jibunAddress;
-      extraAddress.value = extra;
-
-      closeLayer();
-    },
-    width: "100%",
-    height: "100%",
-    maxSuggestItems: 5,
-  });
-  if (layerContent.value) {
-    postcodeRef.embed(layerContent.value);
-  }
-  openLayer();
+function onAddressSelected(
+  payload: Partial<{
+    roadAddress: string;
+    jibunAddress: string;
+    buildingName: string;
+    dongName: string;
+  }>,
+) {
+  if (payload.roadAddress) roadAddress.value = payload.roadAddress;
+  if (payload.jibunAddress) jibunAddress.value = payload.jibunAddress;
+  if (payload.buildingName) buildingName.value = payload.buildingName;
+  if (payload.dongName) dongName.value = payload.dongName;
 }
 </script>
-<style>
-.scrollbar-hide {
-  -ms-overflow-style: none; /* IE, Edge */
-  scrollbar-width: none; /* Firefox */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-</style>
+
+<template>
+  <div class="border border-gray-300 mt-4 rounded-md space-y-2">
+    <input v-model="roadAddress" placeholder="도로명주소" class="p-2 w-full" readonly />
+    <input
+      v-model="jibunAddress"
+      placeholder="지번주소"
+      class="p-2 w-full border-t border-gray-300"
+      readonly
+    />
+    <div class="flex border-t border-gray-300">
+      <input
+        v-model="dongName"
+        placeholder="법정동명"
+        class="p-2 w-full border-r border-gray-300"
+        readonly
+      />
+
+      <input v-model="buildingName" placeholder="건물명" class="p-2 w-full pr-28" readonly />
+    </div>
+
+    <div class="relative">
+      <input
+        v-model="dongNo"
+        placeholder="동 입력(예: 204동)"
+        class="p-2 w-full border-t border-gray-300"
+      />
+      <button
+        @click="openPostcode"
+        class="absolute right-0 top-0 h-full px-4 bg-kb-yellow-positive text-white rounded-r"
+      >
+        주소 찾기
+      </button>
+    </div>
+  </div>
+
+  <!-- 주소 검색 레이어 컴포넌트 -->
+  <PostcodeLayer
+    :visible="showPostcode"
+    @close="showPostcode = false"
+    @complete="onAddressSelected"
+  />
+</template>
