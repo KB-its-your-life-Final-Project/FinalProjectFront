@@ -73,6 +73,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/safeReport",
     name: mainRouteName.safeReport,
     component: () => import("@/pages/safeReport/SafeReport.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/localInfo",
@@ -103,6 +104,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/recentSafeReport",
     name: mainRouteName.recentSafeReport,
     component: () => import("@/pages/safeReport/RecentSafeReport.vue"),
+    meta: { requiresAuth: true },
   },
 ];
 

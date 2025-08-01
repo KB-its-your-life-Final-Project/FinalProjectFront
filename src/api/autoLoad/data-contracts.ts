@@ -10,53 +10,44 @@
  * ---------------------------------------------------------------
  */
 
-/** FloorAndPurpose */
+/** EstateWishlistRequestDTO */
+export interface EstateWishlistRequestDTO {
+  /** @format int64 */
+  estateId?: number;
+}
+
+/** EstateWishlistResponseDTO */
+export interface EstateWishlistResponseDTO {
+  buildingName?: string;
+  /** @format int64 */
+  estateId?: number;
+}
+
+/**
+ * FloorAndPurpose
+ * 층수와 용도 정보
+ */
 export interface FloorAndPurpose {
+  /**
+   * 면적
+   * @example "84.5㎡"
+   */
   resArea?: string;
+  /**
+   * 층수
+   * @example "5층"
+   */
   resFloor?: string;
+  /**
+   * 구조
+   * @example "철근콘크리트"
+   */
   resStructure?: string;
+  /**
+   * 용도
+   * @example "주거"
+   */
   resUseType?: string;
-}
-
-/** RentalRatioAndBuildyear */
-export interface RentalRatioAndBuildyear {
-  /** @format int32 */
-  buildYear?: number;
-  /** @format int32 */
-  dealAmount?: number;
-  /** @format int32 */
-  score?: number;
-  /** @format double */
-  reverse_rental_ratio?: number;
-}
-
-/** FloorAndPurpose */
-export interface FloorAndPurpose {
-  resFloor?: string;
-  resUseType?: string;
-  resStructure?: string;
-  resArea?: string;
-}
-
-/** ViolationStatusVO */
-export interface ViolationStatusVO {
-  violationStatus?: string;
-}
-
-/** SafeReportResponseDto */
-export interface SafeReportResponseDto {
-  rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
-  violationStatus?: ViolationStatusVO;
-  floorAndPurposeList?: FloorAndPurpose[];
-}
-
-/** ApiResponse«SafeReportResponseDto» */
-export interface ApiResponseSafeReportResponseDto {
-  /** @format int32 */
-  code?: number;
-  data?: SafeReportResponseDto;
-  message?: string;
-  success?: boolean;
 }
 
 /** LoginDTO */
@@ -93,61 +84,158 @@ export interface MemberDTO {
   regIp?: string;
 }
 
-/** NewsDTO */
-export interface NewsDTO {
-  atchFile?: string;
-  bbsSn?: string;
-  frstRegDt?: string;
-  frstRgtrNm?: string;
-  lastMdfcnDt?: string;
-  lastMdfrNm?: string;
-  pstInqCnt?: string;
-  pstSeNm?: string;
-  pstSeSn?: string;
-  pstSn?: string;
-  pstTtl?: string;
-  pstUrlAddr?: string;
-  pstWholCn?: string;
+/** RegionWishlistRequestDTO */
+export interface RegionWishlistRequestDTO {
+  regionCd?: string;
 }
 
-/** RentalRatioAndBuildyear */
+/** RegionWishlistResponseDTO */
+export interface RegionWishlistResponseDTO {
+  regionCd?: string;
+  umdNm?: string;
+}
+
+/**
+ * RentalRatioAndBuildyear
+ * 거래금액, 건축연도, 역전세율 정보
+ */
 export interface RentalRatioAndBuildyear {
-  /** @format int32 */
+  /**
+   * 건축연도
+   * @format int32
+   * @example 2010
+   */
   buildYear?: number;
-  /** @format int32 */
+  /**
+   * 연식률 점수
+   * @format int32
+   * @example 2
+   */
   buildyear_score?: number;
-  /** @format int32 */
+  /**
+   * 거래가 (만원)
+   * @format int32
+   * @example 50000
+   */
   dealAmount?: number;
-  /** @format double */
+  /**
+   * 역전세율 (%)
+   * @format double
+   * @example 85.5
+   */
   reverse_rental_ratio?: number;
-  /** @format int32 */
+  /**
+   * 최종 점수
+   * @format int32
+   * @example 5
+   */
   score?: number;
 }
 
-/** SafeReportRequestDto */
+/**
+ * SafeReportRequestDto
+ * 안전 리포트 요청 데이터
+ */
 export interface SafeReportRequestDto {
-  /** @format int32 */
+  /**
+   * 예산 (만원)
+   * @format int32
+   * @example 5000
+   */
   budget?: number;
+  /**
+   * 건물명
+   * @example "아파트명"
+   */
   buildingName?: string;
+  /**
+   * 동명
+   * @example "101동"
+   */
   dongName?: string;
+  /**
+   * 지번 주소
+   * @example "서울특별시 강남구 역삼동 123-45"
+   */
   jibunAddress?: string;
-  /** @format double */
+  /**
+   * 위도
+   * @format double
+   * @example 37.5665
+   */
   lat?: number;
-  /** @format double */
+  /**
+   * 경도
+   * @format double
+   * @example 126.978
+   */
   lng?: number;
+  /**
+   * 도로명 주소
+   * @example "서울특별시 강남구 테헤란로 123"
+   */
   roadAddress?: string;
 }
 
-/** SafeReportResponseDto */
+/**
+ * SafeReportResponseDto
+ * 안전 리포트 응답 데이터
+ */
 export interface SafeReportResponseDto {
+  /** 층수와 용도 목록 */
   floorAndPurposeList?: FloorAndPurpose[];
+  /** 건축년도, 거래금액, 역전세율 정보 */
   rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
-  violationStatus?: ViolationStatusVO;
+  /** 위반 여부 정보 */
+  violationStatus?: ViolationStatus;
 }
 
-/** ViolationStatusVO */
-export interface ViolationStatusVO {
+/** SearchHistoryRequestDTO */
+export interface SearchHistoryRequestDTO {
+  keyword?: string;
+}
+
+/** SearchHistoryResponseDTO */
+export interface SearchHistoryResponseDTO {
+  keyword?: string;
+}
+
+/** TransactionRequestDTO */
+export interface TransactionRequestDTO {
+  buildingName?: string;
+  endDate?: string;
+  startDate?: string;
+  /** @format int32 */
+  tradeType?: number;
+}
+
+/** TransactionResponseDTO */
+export interface TransactionResponseDTO {
+  date?: string;
+  /** @format int32 */
+  price?: number;
+  type?: string;
+}
+
+/**
+ * ViolationStatus
+ * 위반 여부 정보
+ */
+export interface ViolationStatus {
+  /**
+   * 위반 여부
+   * @example "위반건축물"
+   */
   violationStatus?: string;
+}
+
+/** ApiResponse«List«EstateWishlistResponseDTO»» */
+export interface ApiResponseListEstateWishlistResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: EstateWishlistResponseDTO[];
+  message?: string;
+  success?: boolean;
 }
 
 /** ApiResponse«List«MemberDTO»» */
@@ -159,11 +247,20 @@ export interface ApiResponseListMemberDTO {
   success?: boolean;
 }
 
-/** ApiResponse«List«NewsDTO»» */
-export interface ApiResponseListNewsDTO {
+/** ApiResponse«List«RegionWishlistResponseDTO»» */
+export interface ApiResponseListRegionWishlistResponseDTO {
   /** @format int32 */
   code?: number;
-  data?: NewsDTO[];
+  data?: RegionWishlistResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«SearchHistoryResponseDTO»» */
+export interface ApiResponseListSearchHistoryResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: SearchHistoryResponseDTO[];
   message?: string;
   success?: boolean;
 }
@@ -181,7 +278,16 @@ export interface ApiResponseMemberDTO {
 export interface ApiResponseSafeReportResponseDto {
   /** @format int32 */
   code?: number;
+  /** 안전 리포트 응답 데이터 */
   data?: SafeReportResponseDto;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«Void» */
+export interface ApiResponseVoid {
+  /** @format int32 */
+  code?: number;
   message?: string;
   success?: boolean;
 }

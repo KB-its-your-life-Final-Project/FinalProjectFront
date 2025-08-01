@@ -240,7 +240,7 @@ const showFloorDetails = ref(false);
           <!-- 툴팁을 박스 바깥 좌측 상단에 배치 -->
           <div class="absolute -top-2 -left-2 z-10">
             <ToolTip>
-              깡통전세란 전세가와 매매가가 비슷한 주택을 의미합니다. 깡통 전세의 경우우 전세 계약이 만료된 후 세입자가<span class="text-red-600 font-semibold">전세 보증금을 돌려받기 어려울 수 있습니다.</span>
+              깡통전세란 전세가와 매매가가 비슷한 주택을 의미합니다. 깡통 전세의 경우우 전세 계약이 만료된 후 세입자가<span class="text-error font-semibold">전세 보증금을 돌려받기 어려울 수 있습니다.</span>
             </ToolTip>
           </div>
 
@@ -347,17 +347,17 @@ const showFloorDetails = ref(false);
     >
       <div v-if="store.floorAndPurposeList && store.floorAndPurposeList.length">
         <!-- 위반건축물 여부 섹션 -->
-        <div class="flex justify-between items-center py-3 border-b border-gray-200">
-          <span class="text-gray-700 font-medium">위반건축물등록여부</span>
-          <span :class="store.violationStatus === '위반건축물' ? 'text-red-600 font-semibold' : 'text-blue-600 font-semibold'">
+        <div class="flex justify-between items-center py-3 border-b border-kb-ui-09">
+          <span class="text-kb-ui-02 font-medium">위반건축물등록여부</span>
+          <span :class="store.violationStatus === '위반건축물' ? 'text-error font-semibold' : 'text-positive font-semibold'">
             {{ store.violationStatus === '위반건축물' ? '위반건축물' : '정상건축물' }}
           </span>
         </div>
 
         <!-- 건축년도 섹션 -->
-        <div class="flex justify-between items-center py-3 border-b border-gray-200">
-          <span class="text-gray-700 font-medium">건축년도</span>
-          <span class="text-blue-600 font-semibold">
+        <div class="flex justify-between items-center py-3 border-b border-kb-ui-09">
+          <span class="text-kb-ui-02 font-medium">건축년도</span>
+          <span class="text-positive font-semibold">
             {{ store.resultData?.buildYear ? `${store.resultData.buildYear}년` : '정보 없음' }}
           </span>
         </div>
@@ -368,27 +368,27 @@ const showFloorDetails = ref(false);
             class="flex justify-between items-center cursor-pointer"
             @click="showFloorDetails = !showFloorDetails"
           >
-            <span class="text-gray-700 font-medium">층별 용도</span>
+            <span class="text-ui-02 font-medium">층별 용도</span>
             <div class="flex items-center">
-              <span class="text-blue-600 font-semibold mr-2">
+              <span class="text-positive font-semibold mr-2">
                 {{ filteredFloorAndPurposeList.length > 0 ? `${filteredFloorAndPurposeList.length}개 층` : '정보 없음' }}
               </span>
               <font-awesome-icon
                 :icon="['fas', 'chevron-down']"
-                class="text-gray-400 transition-transform duration-200"
+                class="text-kb-ui-05 transition-transform duration-200"
                 :class="{ 'rotate-180': showFloorDetails }"
               />
             </div>
           </div>
 
           <!-- 펼쳐진 층별 용도 상세 정보 -->
-          <div v-if="showFloorDetails" class="mt-3 pl-4 border-l-2 border-gray-200">
+          <div v-if="showFloorDetails" class="mt-3 pl-4 border-l-2 border-kb-ui-09">
             <div class="flex items-center mb-3">
-              <span class="text-sm text-gray-600">층별 용도 정보</span>
+              <span class="text-sm text-kb-ui-02">층별 용도 정보</span>
               <div class="ml-2 relative">
                 <ToolTip>
                   <div class="max-w-[160px] text-xs">
-                    주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-red-600 font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
+                    주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-error font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
                   </div>
                 </ToolTip>
               </div>
@@ -396,16 +396,16 @@ const showFloorDetails = ref(false);
             <div v-if="filteredFloorAndPurposeList.length > 0">
               <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2 text-sm">
                 <span class="font-medium">{{ getFloorLabel(info.resFloor) }}:</span>
-                <span class="text-gray-700">{{ info.resUseType }}</span>
+                <span class="text-kb-ui-02">{{ info.resUseType }}</span>
               </div>
             </div>
-            <div v-else class="text-center text-gray-500 text-sm">
+            <div v-else class="text-center text-kb-ui-02 text-sm">
               층별 용도 정보가 없습니다.
             </div>
           </div>
         </div>
       </div>
-      <div v-else class="text-center text-gray-500">
+      <div v-else class="text-center text-kb-ui-02">
         건축물 정보가 없습니다.
       </div>
     </ModalForm>
@@ -418,14 +418,14 @@ const showFloorDetails = ref(false);
       <div class="rounded-lg shadow-lg p-6 w-80 bg-white">
         <div class="text-center">
           <div class="mb-4">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="mx-auto h-12 w-12 text-kb-ui-05" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">
+          <h3 class="text-lg font-medium text-kb-ui-02 mb-2">
             데이터 없음
           </h3>
-          <p class="text-sm text-gray-500 mb-6">
+          <p class="text-sm text-kb-ui-02 mb-6">
             해당 건물에 대한 매매 거래 내역이 존재하지 않아<br>
             안심 레포트를 제공할 수 없습니다.
           </p>
@@ -442,9 +442,9 @@ const showFloorDetails = ref(false);
     <!-- 전세가율 높음 모달 -->
     <div
       v-if="showHighRatioModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-kb-ui-01 bg-opacity-50"
     >
-      <div class="rounded-lg shadow-lg p-6 w-80 bg-white">
+      <div class="rounded-lg shadow-lg p-6 w-80 bg-kb-ui-11">
         <div class="text-center">
           <div class="mb-4">
             <svg class="mx-auto h-12 w-12 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -454,7 +454,7 @@ const showFloorDetails = ref(false);
           <h3 class="text-lg font-medium text-gray-900 mb-2">
             전세가율 초과
           </h3>
-          <p class="text-sm text-gray-500 mb-6">
+          <p class="text-sm text-kb-ui-04 mb-6">
             전세가율이 100%를 초과했습니다.<br>
             입력하신 예산 금액이 현실적인지 다시 확인해 주세요.
           </p>

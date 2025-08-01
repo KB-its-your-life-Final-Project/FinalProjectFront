@@ -98,7 +98,7 @@ function numberToKorean(num: number, removeUnit = ""): string {
 async function next() {
   const budget_val = Number(budget.value);
 
-  // 100만원(=100) 이하 또는 100억원(=1,000,000) 이상은 불가
+  // 100만원(=100) 이하 불가
   if (budget.value == null || budget_val <= 0 || !Number.isFinite(budget_val)) {
     validationMessage.value = "예산을 올바르게 입력해주세요!";
     showValidationModal.value = true;
