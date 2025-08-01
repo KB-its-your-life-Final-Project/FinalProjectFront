@@ -14,7 +14,7 @@ const emit = defineEmits(["back-click"]);
 //헤더 받아오기
 const props = defineProps<{
   headerShowtype: headerShowtype;
-  title? :string; // 아파트명을 받아오고 싶음
+  title?: string; // 아파트명을 받아오고 싶음
 }>();
 
 //제목 설정
@@ -65,8 +65,7 @@ function handleBackClick() {
         v-if="title"
         :class="['text-base font-semibold text-kb-ui-01', showItems.showBack ? 'ml-4' : '']"
       >
-         {{ props.title || title }}
-
+        {{ props.title || title }}
       </span>
     </div>
 

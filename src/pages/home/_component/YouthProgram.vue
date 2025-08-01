@@ -108,7 +108,7 @@ onMounted(() => {
 @reference "@/assets/styles/main.css";
 /* 스크롤바 전체 너비 */
 ul::-webkit-scrollbar {
-  @apply w-[0.5rem]
+  @apply w-[0.5rem];
 }
 
 /* 스크롤바 막대(thumb) 스타일 */
@@ -118,7 +118,7 @@ ul::-webkit-scrollbar-thumb {
 
 /* 스크롤바 막대 hover 효과 (선택사항) */
 ul::-webkit-scrollbar-thumb:hover {
-  @apply bg-kb-gray-light
+  @apply bg-kb-gray-light;
 }
 
 /* 스크롤바 트랙(배경) */
