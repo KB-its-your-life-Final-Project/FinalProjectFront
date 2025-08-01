@@ -22,6 +22,8 @@ import {
   ApiResponsePopulationDTO,
   ApiResponseReverseGeocodeResponseDTO,
   ApiResponseFacilityDTO,
+  ApiResponseHospitalDTO,
+  ApiResponseSafetyDTO,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
@@ -258,6 +260,48 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
   ) =>
     this.request<ApiResponseFacilityDTO, void>({
       path: `/api/localinfo/facilities-count`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * 병원 수 조회
+   *
+   * @tags local-info-controller
+   * @name GetHospitalCountsUsingGet
+   * @summary 법정동코드로 병원 수 조회
+   * @request GET:/api/localinfo/hospitals-count
+   */
+  getHospitalCountsUsingGet = (
+    query?: {
+      regionCd?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseHospitalDTO, void>({
+      path: `/api/localinfo/hospitals-count`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+
+  /**
+   * 안전시설 수 조회
+   *
+   * @tags local-info-controller
+   * @name GetSafetyCountsUsingGet
+   * @summary 법정동코드로 안전시설 수 조회
+   * @request GET:/api/localinfo/safety-count
+   */
+  getSafetyCountsUsingGet = (
+    query?: {
+      regionCd?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseSafetyDTO, void>({
+      path: `/api/localinfo/safety-count`,
       method: "GET",
       query: query,
       ...params,

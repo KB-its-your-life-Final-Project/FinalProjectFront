@@ -104,6 +104,22 @@ export interface FacilityDTO {
   totalBicycleCount?: number;
 }
 
+export interface HospitalDTO {
+  regionCd?: string;
+  regionName?: string;
+  locataddNm?: string;
+  /** @format int64 */
+  totalHospitalCount?: number;
+}
+
+export interface SafetyDTO {
+  regionCd?: string;
+  regionName?: string;
+  locataddNm?: string;
+  /** @format int64 */
+  totalSafetyBellCount?: number;
+}
+
 export interface ReverseGeocodeResponseDTO {
   address?: string;
   regionCd?: string;
@@ -178,6 +194,22 @@ export interface ApiResponseFacilityDTO {
   /** @format int32 */
   code?: number;
   data?: FacilityDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseHospitalDTO {
+  /** @format int32 */
+  code?: number;
+  data?: HospitalDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseSafetyDTO {
+  /** @format int32 */
+  code?: number;
+  data?: SafetyDTO;
   message?: string;
   success?: boolean;
 }
