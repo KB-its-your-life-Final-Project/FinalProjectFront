@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { YouthContentDTO } from "@/api/autoLoad/data-contracts";
+import type { YouthContentDTO } from "@/api/autoLoad/data-contracts";
 import { Api } from "@/api/autoLoad/Api";
 
 const api = new Api();
@@ -39,7 +39,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 text-center mt-6 h-[17rem] overflow-scroll">
+  <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 text-center mt-6 h-[17rem]">
     <div class="flex justify-center mb-4">
       <div class="flex flex-row items-center text-base gap-2">
         <h1 class="w-13">
@@ -54,12 +54,12 @@ onMounted(() => {
     <div>
       <ul
         v-if="youthProgramList.length > 0"
-        class="space-y-4 text-left overflow-y-auto max-h-[30rem] news-scroll pr-2"
+        class="space-y-4 text-left max-h-[12.5rem] overflow-scroll"
       >
         <li
           v-for="(program, index) in youthProgramList"
           :key="index"
-          class="news-item flex item-start h-[5rem] justify-between gap-2 break-words overflow-hidden"
+          class="flex item-start h-[5rem] justify-between gap-2 break-words overflow-hidden"
         >
           <!-- 텍스트: 제목 클릭 시 새창 이동 -->
           <div class="flex-1 pr-4 min-w-0">
@@ -106,11 +106,23 @@ onMounted(() => {
 
 <style scoped>
 @reference "@/assets/styles/main.css";
-/* Chrome */
-.news-scroll::-webkit-scrollbar {
-  @apply w-[0.5rem];
+/* 스크롤바 전체 너비 */
+ul::-webkit-scrollbar {
+  @apply w-[0.5rem]
 }
-.news-scroll::-webkit-scrollbar-thumb {
-  @apply bg-kb-ui-08 rounded-lg;
+
+/* 스크롤바 막대(thumb) 스타일 */
+ul::-webkit-scrollbar-thumb {
+  @apply bg-kb-ui-07 rounded-sm;
+}
+
+/* 스크롤바 막대 hover 효과 (선택사항) */
+ul::-webkit-scrollbar-thumb:hover {
+  @apply bg-kb-gray-light
+}
+
+/* 스크롤바 트랙(배경) */
+ul::-webkit-scrollbar-track {
+  @apply bg-transparent;
 }
 </style>
