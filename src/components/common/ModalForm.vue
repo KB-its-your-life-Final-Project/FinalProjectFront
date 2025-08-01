@@ -3,6 +3,7 @@ import { useToast, ToastType } from "@/utils/useToast";
 
 const props = defineProps<{
   title: string;
+  hasConfirmBtn?: boolean;
   handleConfirm: () =>
     | Promise<{ success: boolean; message: string }>
     | { success: boolean; message: string };
@@ -46,18 +47,28 @@ async function onConfirm() {
         <slot></slot>
       </div>
       <div class="flex justify-end gap-2 mt-8">
-        <button
-          class="rounded-xl w-1/2 py-2 bg-kb-yellow-positive text-white rounded cursor-pointer"
-          @click="onConfirm"
-        >
-          완료
-        </button>
-        <button
-          class="rounded-xl w-1/2 cursor-pointer text-white bg-kb-gray-light"
-          @click="$emit('close')"
-        >
-          취소
-        </button>
+        <template v-if="hasConfirmBtn">
+          <button
+            class="rounded-xl w-1/2 cursor-pointer text-white bg-kb-gray-light"
+            @click="$emit('close')"
+          >
+            닫기
+          </button>
+          <button
+            class="rounded-xl w-1/2 py-2 bg-kb-yellow-positive text-white cursor-pointer"
+            @click="onConfirm"
+          >
+            완료
+          </button>
+        </template>
+        <template v-else>
+          <button
+            class="rounded-xl w-full py-2 bg-kb-yellow-positive text-white cursor-pointer"
+            @click="$emit('close')"
+          >
+            확인
+          </button>
+        </template>
       </div>
     </div>
   </div>
