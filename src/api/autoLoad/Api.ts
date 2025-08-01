@@ -564,6 +564,7 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @request POST:/api/wishlist/estate
    */
   addWishlistUsingPost = (estateId: EstateWishlistRequestDTO, params: RequestParams = {}) =>
+
     this.request<ApiResponseVoid, void>({
       path: `/api/wishlist/estate`,
       method: "POST",
@@ -637,7 +638,9 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary addWishlist
    * @request POST:/api/wishlist/region
    */
+
   addWishlistUsingPost1 = (estateId: RegionWishlistRequestDTO, params: RequestParams = {}) =>
+
     this.request<ApiResponseVoid, void>({
       path: `/api/wishlist/region`,
       method: "POST",
