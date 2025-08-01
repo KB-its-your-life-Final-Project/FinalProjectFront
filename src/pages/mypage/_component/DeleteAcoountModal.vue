@@ -33,7 +33,12 @@ function checkPassword(password: string) {
 }
 </script>
 <template>
-  <ModalForm :title="'회원 탈퇴'" @close="emit('close')" :handle-confirm="handleConfirm">
+  <ModalForm
+    :title="'회원 탈퇴'"
+    @close="emit('close')"
+    :handle-confirm="handleConfirm"
+    hasConfirmBtn
+  >
     <div class="relative">
       <DefaultInput
         :label="'기존 비밀번호'"

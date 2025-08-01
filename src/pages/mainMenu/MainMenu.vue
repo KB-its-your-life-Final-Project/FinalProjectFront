@@ -5,10 +5,13 @@ import MenuItem from "@/pages/mainMenu/_component/MenuItems.vue";
 import MenuSection from "@/pages/mainMenu/_component/MenuSection.vue";
 import Footer from "@/components/layout/Footer.vue";
 import { authStore } from "@/stores/authStore";
+import defaultProfile from "@/assets/imgs/profile.jpg";
 
 /*임의로 로그아웃, 회원탈퇴 부분 넣겠습니다.*/
 
 import { mainRouteName } from "@/router/mainRoute";
+import ProfileInfo from "@/components/common/ProfileInfo.vue";
+import ProfileImage from "@/components/common/ProfileImage.vue";
 
 const auth = authStore();
 
@@ -35,15 +38,15 @@ function openInquiry() {
 <template>
   <Header :headerShowtype="mainRouteName.mainMenu">
     <!--Header 부분에 회원 정보가 크게 띄게 수정-->
-
     <div class="pl-3 pr-8 pt-8 pb-8">
       <div class="mt-[1.5rem] flex items-center justify-center text-center">
         <!-- 프로필 사진 넣어주세요! 회원부분이랑 연동해서      -->
-        <img src="@/assets/imgs/profile.jpg" class="w-[6rem] h-[6rem] rounded-full object-cover" />
+        <div class="flex-[1]">
+          <ProfileImage :src="defaultProfile" />
+        </div>
         <!--어떤 식으로 회원 정보를 받아올 것인지 - 홍길동은 예시임 + 업로드 기능 (사진 추가해야 함)   -->
-        <div class="flex flex-col justify-center mt-3 ml-[1rem]">
-          <div class="font-pretendard text-2xl font-bold text-kb-ui-01">{{ "홍길동" }}</div>
-          <div class="text-xl font-bold text-kb-ui-01">{{ "GILLDONG@MAIL.COM" }}</div>
+        <div class="flex-[3]">
+          <ProfileInfo name="홍길동" email="GILDONG@GMAIL.COM"></ProfileInfo>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 <!-- Header -->
 
 <script setup lang="ts">
-import { defineProps, ref, reactive } from "vue";
+import { ref, reactive } from "vue";
 import movePage from "@/utils/movePage";
 import { headerTitleList, headerShowList } from "./header";
 import type { headerShowtype } from "./header";

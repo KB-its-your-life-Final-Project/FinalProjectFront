@@ -30,7 +30,9 @@ import type {
 import { ContentType, HttpClient } from "./http-client";
 import type { RequestParams } from "./http-client";
 
-export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -136,7 +138,11 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary findMemberById
    * @request GET:/api/member/{id}
    */
-  findMemberByIdUsingGet = (id: string, data: number, params: RequestParams = {}) =>
+  findMemberByIdUsingGet = (
+    id: string,
+    data: number,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
@@ -166,7 +172,10 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary receiveForm
    * @request POST:/api/report/requestData
    */
-  receiveFormUsingPost = (dto: SafeReportRequestDto, params: RequestParams = {}) =>
+  receiveFormUsingPost = (
+    dto: SafeReportRequestDto,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseSafeReportResponseDto, void>({
       path: `/api/report/requestData`,
       method: "POST",
