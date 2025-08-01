@@ -27,27 +27,7 @@ const initState: AuthState = {
 export const authStore = defineStore("auth", () => {
   const state = ref<AuthState>({ ...initState });
 
-
-  // 이메일 중복 확인
-  const checkDuplicateEmail = async (email: string): Promise<boolean> => {
-    try {
-      const { data } = await api.checkDuplicateEmailUsingGet(email);
-      console.log("checking if email is duplicate: ", data);
-      if (data.success === false) {
-        console.log("message: ", data.message);
-        console.log("이메일 중복 여부: ", data.data);
-      } else {
-        console.log("message: ", data.message);
-        console.log("이메일 중복 여부: ", data.data);
-      }
-      return data.data;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const isLoggedIn = computed(() => !!state.value.user.email); // 로그인 여부
-
 
   const getUsername = computed(() => state.value.user.email); // 로그인 사용자 ID
 
