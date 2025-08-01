@@ -94,7 +94,7 @@ export const InfoCardList: InfoCardType[] = [
     apiCall: fetchPopulationInfo, // Linked API call
   },
   {
-    icon: "fa-solid fa-bicycle",
+    icon: "fa-solid fa-motorcycle",
     title: "자전거",
     value: "1,234", // Initial static value
     description: "대여소 수",
