@@ -1,6 +1,6 @@
 // 공백 여부
 export const isEmpty = (input: string | null | undefined): boolean => {
-  return !input || input.trimEnd() === "";
+  return !input || input.trim() === "";
 };
 
 // 이메일 유효성 검사
