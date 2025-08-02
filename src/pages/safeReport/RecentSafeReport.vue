@@ -92,7 +92,7 @@ onMounted(() => {
   <Header :headerShowtype="mainRouteName.recentSafeReport">
     <div class="mt-15"></div>
   </Header>
-  <div class="mt-6 bg-gray-50 min-h-screen relative z-0">
+  <div class="relative z-0">
     <!-- 로딩 상태 -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-[60vh]">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
@@ -119,19 +119,19 @@ onMounted(() => {
         <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">최근 본 레포트가 없습니다</h3>
-        <p class="text-gray-600 mb-4">안심 진단을 진행하면 여기에 기록됩니다.</p>
-        <button @click="router.push({ name: 'safeReport' })" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium">
+        <h3 class="text-lg font-medium text-kb-ui-02 mb-2">최근 본 레포트가 없습니다</h3>
+        <p class="text-kb-ui-03 mb-4">안심 진단을 진행하면 여기에 기록됩니다.</p>
+        <button @click="router.push({ name: 'safeReport' })" class="bg-kb-yellow-positive text-white px-6 py-3 rounded-lg font-medium">
           안심 진단 시작하기
         </button>
       </div>
     </div>
 
     <!-- 레포트 목록 -->
-    <div v-else class="p-4 space-y-4">
-      <div v-for="report in recentReports" :key="report.id" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div v-else class="p-4">
+      <div v-for="report in recentReports" :key="report.id" class="bg-kb-ui-11 rounded-lg shadow-sm border border-kb-ui-06 overflow-hidden mb-4 last:mb-0">
         <!-- 카드 헤더 -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <div class="flex items-center justify-between p-4 border-b border-kb-ui-07">
           <div class="flex items-center space-x-2">
             <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
               {{ report.resultGrade || '건물' }}
@@ -151,18 +151,18 @@ onMounted(() => {
         <div @click="viewReport(report)" class="p-4 cursor-pointer hover:bg-gray-50 transition-colors">
           <!-- 건물 정보 -->
           <div class="mb-3">
-            <h3 class="text-lg font-semibold text-gray-900 mb-1">
+            <h3 class="text-lg font-semibold text-kb-ui-02 mb-1">
               {{ report.buildingName }}
             </h3>
-            <p class="text-sm text-gray-600 leading-relaxed">
+            <p class="text-sm text-kb-ui-03 leading-relaxed">
               {{ report.roadAddress }}
             </p>
           </div>
 
           <!-- 하단 정보 -->
-          <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-            <span class="text-sm text-gray-500">
-              등록일: {{ formatDate(report.updatedAt || '') }}
+          <div class="flex items-center justify-between pt-3 border-t border-kb-ui-07">
+            <span class="text-sm text-kb-ui-04">
+              열람일: {{ formatDate(report.updatedAt || '') }}
             </span>
             <span class="text-sm font-medium text-green-600">
               안전진단 완료
@@ -172,5 +172,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
+
+
 </template>
 
