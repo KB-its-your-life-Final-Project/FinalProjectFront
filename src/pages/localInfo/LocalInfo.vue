@@ -49,10 +49,8 @@ const getLastDong = (fullAddress: string) => {
     </div>
   </Header>
 
-  <div class="w-full h-full flex-col px-8 mt-2">
-    <div class="w-ful h-full mt-2">
-      <RegionSearch @region-selected="handleRegionSelected" />
-    </div>
+  <div class="w-full h-full flex-col px-4 mt-4">
+    <RegionSearch @region-selected="handleRegionSelected" />
   </div>
 
   <div class="px-4 mt-16">

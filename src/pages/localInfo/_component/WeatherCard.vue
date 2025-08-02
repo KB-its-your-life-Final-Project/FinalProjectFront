@@ -113,21 +113,18 @@ const fetchWeatherInfo = async (regionCd: string) => {
 
 // 날씨 상태에 따른 아이콘 반환 (기상청 API 코드 기준)
 const getWeatherIcon = (skyCondition: string | undefined) => {
-  if (!skyCondition || skyCondition === "--") return "🌤️ --"; // 데이터가 없으면 기본 아이콘 + --
+  if (!skyCondition || skyCondition === "--") return " --"; // 데이터가 없으면 기본 아이콘 + --
 
   // 기상청 API SKY 코드에 따른 아이콘 반환
   switch (skyCondition) {
-    case "1":
     case "맑음":
-      return "☀️ 맑음"; // 맑음
-    case "3":
+      return "☀️"; // 맑음
     case "구름많음":
-      return "⛅ 구름많음"; // 구름많음
-    case "4":
+      return "⛅"; // 구름많음
     case "흐림":
-      return "☁️ 흐림"; // 흐림
+      return "☁️"; // 흐림
     default:
-      return "🌤️ --"; // 기본값
+      return "--"; // 기본값
   }
 };
 
@@ -144,17 +141,17 @@ onMounted(() => {
     <div class="flex items-center justify-between mt-3">
       <!-- 온도 정보 -->
       <div class="flex flex-col items-center w-full">
-        <div v-if="loading" class="font-pretendard-bold text-4xl text-gray-800">로딩중...</div>
+        <div v-if="loading" class="font-pretendard-bold text-4xl text-kb-ui-02">로딩중...</div>
         <div v-else-if="error" class="font-pretendard-bold text-sm text-red-500">
           {{ error }}
         </div>
         <div
           v-else-if="weatherInfo?.temperature && weatherInfo.temperature !== '--'"
-          class="font-pretendard-bold text-4xl text-gray-800"
+          class="font-pretendard-bold text-4xl text-kb-ui-02"
         >
           {{ weatherInfo.temperature }}°
         </div>
-        <div v-else class="font-pretendard-bold text-4xl text-gray-800">--°</div>
+        <div v-else class="font-pretendard-bold text-4xl text-kb-ui-02">--°</div>
         <div class="font-pretendard-bold text-sm text-kb-ui-04">
           최고 {{ weatherInfo?.maxTemperature || "--" }}°
         </div>
@@ -164,7 +161,7 @@ onMounted(() => {
       </div>
       <!-- 날씨 이미지 -->
       <div class="flex flex-col items-center w-full gap-3">
-        <div class="text-4xl">{{ getWeatherIcon(weatherInfo?.skyCondition) }}</div>
+        <div class="text-6xl">{{ getWeatherIcon(weatherInfo?.skyCondition) }}</div>
         <div class="text-xs text-kb-ui-05">출처 : 기상청</div>
       </div>
     </div>

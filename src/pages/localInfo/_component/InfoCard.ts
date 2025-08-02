@@ -5,6 +5,7 @@ export type InfoCardType = {
   title: string;
   value: string;
   description: string;
+  bgColor: string; // 배경색 클래스 추가
   apiCall?: (regionCd: string) => Promise<string>;
 };
 
@@ -96,6 +97,7 @@ export const InfoCardList: InfoCardType[] = [
     title: "인구수",
     value: "20만", // Initial static value
     description: "청년 인구수",
+    bgColor: "bg-blue-500", // 배경색 추가
     apiCall: fetchPopulationInfo, // Linked API call
   },
   {
@@ -103,6 +105,7 @@ export const InfoCardList: InfoCardType[] = [
     title: "자전거",
     value: "1,234", // Initial static value
     description: "대여소 수",
+    bgColor: "bg-green-500", // 배경색 추가
     apiCall: fetchFacilityInfo, // Linked API call
   },
   {
@@ -110,6 +113,7 @@ export const InfoCardList: InfoCardType[] = [
     title: "치안시설",
     value: "50", // Initial static value
     description: "안심벨 수",
+    bgColor: "bg-red-500", // 배경색 추가
     apiCall: fetchSafetyInfo, // Linked API call
   },
   {
@@ -117,6 +121,7 @@ export const InfoCardList: InfoCardType[] = [
     title: "병원",
     value: "15", // Initial static value
     description: "의료기관 수",
+    bgColor: "bg-purple-500", // 배경색 추가
     apiCall: fetchHospitalInfo, // Linked API call
   },
 ];

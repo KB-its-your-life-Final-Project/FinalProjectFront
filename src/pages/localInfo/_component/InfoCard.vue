@@ -76,9 +76,11 @@ const displayValue = computed(() => {
   >
     <!-- 상단: 타이틀 & 아이콘 -->
     <div class="flex items-center justify-between px-4 mt-4">
-      <div class="font-pretendard-bold text-xl text-kb-ui-01">{{ info.title }}</div>
-      <div class="rounded-xl w-10 h-10 flex items-center justify-center">
-        <font-awesome-icon :icon="info.icon" class="text-[20px] text-blue-900" />
+      <div class="font-pretendard-bold text-3xl text-kb-ui-01">{{ info.title }}</div>
+      <div
+        :class="`rounded-xl w-10 h-10 flex items-center justify-center ${info.bgColor} shadow-md`"
+      >
+        <font-awesome-icon :icon="info.icon" class="text-[20px] text-white" />
       </div>
     </div>
     <!-- 본문: 값/설명 -->
