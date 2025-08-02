@@ -1,7 +1,8 @@
 import type { RouteRecordRaw } from "vue-router";
+import type { Component } from "vue";
 
 //라우트 파일 위치
-const mainRouteMap: Record<string, () => Promise<any>> = {
+const mainRouteMap: Record<string, () => Promise<Component>> = {
   //홈
   homeMain: () => import("@/pages/home/HomeMain.vue"),
 
