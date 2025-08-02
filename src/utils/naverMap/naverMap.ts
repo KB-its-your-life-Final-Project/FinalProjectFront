@@ -338,12 +338,12 @@ const mapUtil = {
       return;
     }
 
-    var name = item.name,
+    const name = item.name,
       region = item.region,
       land = item.land,
       isRoadAddress = name === "roadaddr";
 
-    var sido = "",
+    let sido = "",
       sigugun = "",
       dongmyun = "",
       ri = "",
