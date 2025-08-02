@@ -85,7 +85,7 @@ onMounted(async () => {
     const { data } = await api.receiveFormUsingPost(requestDto);
     console.log("서버 응답:", data);
 
-    store.updateResultData(data.data?.rentalRatioAndBuildyear);
+    store.updateResultData(data.data?.rentalRatioAndBuildyear ?? null);
 
     if (data.data?.violationStatus) {
       store.updateViolationStatusVO(data.data.violationStatus);
@@ -102,7 +102,7 @@ onMounted(async () => {
 
     // reverse_rental_ratio가 100 이상인지 체크
     console.log("reverse_rental_ratio 체크:", data.data?.rentalRatioAndBuildyear?.reverse_rental_ratio);
-    if (data.data?.rentalRatioAndBuildyear?.reverse_rental_ratio >= 100) {
+    if ((data.data?.rentalRatioAndBuildyear?.reverse_rental_ratio ?? 0) >= 100) {
       console.log("전세가율 100% 이상 - 모달 표시");
       showHighRatioModal.value = true;
     }

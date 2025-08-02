@@ -14,9 +14,12 @@ import {
   ApiResponseBoolean,
   ApiResponseListEstateWishlistResponseDTO,
   ApiResponseListMemberDTO,
+  ApiResponseListRecentSafeReportResponseDto,
   ApiResponseListRegionWishlistResponseDTO,
   ApiResponseListSearchHistoryResponseDTO,
+  ApiResponseListYouthContentDTO,
   ApiResponseMemberDTO,
+  ApiResponseRecentSafeReportDetailResponseDto,
   ApiResponseSafeReportResponseDto,
   ApiResponseVoid,
   EstateWishlistRequestDTO,
@@ -150,19 +153,75 @@ export class Api<
       ...params,
     });
   /**
-   * @description 건물의 위도/경도와 예산을 받아서 안전 리포트 정보를 생성합니다. 건축년도, 거래금액, 전세가율, 위반여부, 층수/용도 정보를 포함합니다.
+   * No description
+   *
+   * @tags news-controller
+   * @name GetNewsUsingGet
+   * @summary getNews
+   * @request GET:/api/news
+   */
+  getNewsUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListYouthContentDTO, void>({
+      path: `/api/news`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * @description 사용자가 최근에 본 안심레포트 목록을 조회합니다.
+   *
+   * @tags SafeReport
+   * @name GetRecentReportsUsingGet
+   * @summary 최근 본 안심레포트 목록 조회
+   * @request GET:/api/report/recentSafeReport
+   */
+  getRecentReportsUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListRecentSafeReportResponseDto, void>({
+      path: `/api/report/recentSafeReport`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * @description 특정 안심레포트의 상세 정보를 조회합니다.
+   *
+   * @tags SafeReport
+   * @name GetRecentReportDetailUsingGet
+   * @summary 최근 본 안심레포트 상세 조회
+   * @request GET:/api/report/recentSafeReport/{id}
+   */
+  getRecentReportDetailUsingGet = (id: number, params: RequestParams = {}) =>
+    this.request<ApiResponseRecentSafeReportDetailResponseDto, void>({
+      path: `/api/report/recentSafeReport/${id}`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * @description 특정 안심레포트를 최근 본 목록에서 삭제합니다.
+   *
+   * @tags SafeReport
+   * @name DeleteRecentReportUsingDelete
+   * @summary 최근 본 안심레포트 삭제
+   * @request DELETE:/api/report/recentSafeReport/{id}
+   */
+  deleteRecentReportUsingDelete = (id: number, params: RequestParams = {}) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/report/recentSafeReport/${id}`,
+      method: "DELETE",
+      ...params,
+    });
+  /**
+   * @description 건물의 위도/경도와 예산을 받아서 안심 레포트 정보를 생성합니다. 건축년도, 거래금액, 전세가율, 위반여부, 층수/용도 정보를 포함합니다.
    *
    * @tags SafeReport
    * @name ReceiveFormUsingPost
-   * @summary 안전 리포트 데이터 요청
-   * @request POST:/api/report/requestData
+   * @summary 안심 레포트 데이터 요청
+   * @request POST:/api/report/requestSafeReport
    */
   receiveFormUsingPost = (
     dto: SafeReportRequestDto,
     params: RequestParams = {},
   ) =>
     this.request<ApiResponseSafeReportResponseDto, void>({
-      path: `/api/report/requestData`,
+      path: `/api/report/requestSafeReport`,
       method: "POST",
       body: dto,
       type: ContentType.Json,

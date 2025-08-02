@@ -10,6 +10,33 @@
  * ---------------------------------------------------------------
  */
 
+/** EstateDTO */
+export interface EstateDTO {
+  /** @format int32 */
+  buildYear?: number;
+  buildingName?: string;
+  /** @format int32 */
+  buildingType?: number;
+  /** @format int32 */
+  id?: number;
+  jibun?: string;
+  jibunAddr?: string;
+  /** @format double */
+  latitude?: number;
+  /** @format double */
+  longitude?: number;
+  mhouseType?: string;
+  /** @format int32 */
+  originalId?: number;
+  /** @format int32 */
+  sggCd?: number;
+  sggNm?: string;
+  shouseType?: string;
+  /** @format int32 */
+  sourceTable?: number;
+  umdNm?: string;
+}
+
 /** EstateWishlistRequestDTO */
 export interface EstateWishlistRequestDTO {
   /** @format int64 */
@@ -82,6 +109,37 @@ export interface MemberDTO {
   /** @format date-time */
   regDate?: string;
   regIp?: string;
+}
+
+/** RecentSafeReportDetailResponseDto */
+export interface RecentSafeReportDetailResponseDto {
+  /** @format int32 */
+  budget?: number;
+  buildingName?: string;
+  /** @format date-time */
+  createdAt?: string;
+  /** @format date-time */
+  diagnosisDate?: string;
+  diagnosisStatus?: string;
+  dongName?: string;
+  /** @format int32 */
+  id?: number;
+  jibunAddress?: string;
+  latitude?: number;
+  longitude?: number;
+  reportData?: string;
+  roadAddress?: string;
+}
+
+/** RecentSafeReportResponseDto */
+export interface RecentSafeReportResponseDto {
+  buildingName?: string;
+  /** @format int32 */
+  id?: number;
+  resultGrade?: string;
+  roadAddress?: string;
+  /** @format date-time */
+  updatedAt?: string;
 }
 
 /** RegionWishlistRequestDTO */
@@ -229,6 +287,32 @@ export interface ViolationStatus {
   violationStatus?: string;
 }
 
+/** YouthContentDTO */
+export interface YouthContentDTO {
+  atchFile?: string;
+  bbsSn?: string;
+  frstRegDt?: string;
+  frstRgtrNm?: string;
+  lastMdfcnDt?: string;
+  lastMdfrNm?: string;
+  pstInqCnt?: string;
+  pstSeNm?: string;
+  pstSeSn?: string;
+  pstSn?: string;
+  pstTtl?: string;
+  pstUrlAddr?: string;
+  pstWholCn?: string;
+}
+
+/** ApiResponse«EstateDTO» */
+export interface ApiResponseEstateDTO {
+  /** @format int32 */
+  code?: number;
+  data?: EstateDTO;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«List«EstateWishlistResponseDTO»» */
 export interface ApiResponseListEstateWishlistResponseDTO {
   /** @format int32 */
@@ -243,6 +327,15 @@ export interface ApiResponseListMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«RecentSafeReportResponseDto»» */
+export interface ApiResponseListRecentSafeReportResponseDto {
+  /** @format int32 */
+  code?: number;
+  data?: RecentSafeReportResponseDto[];
   message?: string;
   success?: boolean;
 }
@@ -265,11 +358,29 @@ export interface ApiResponseListSearchHistoryResponseDTO {
   success?: boolean;
 }
 
+/** ApiResponse«List«YouthContentDTO»» */
+export interface ApiResponseListYouthContentDTO {
+  /** @format int32 */
+  code?: number;
+  data?: YouthContentDTO[];
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«MemberDTO» */
 export interface ApiResponseMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«RecentSafeReportDetailResponseDto» */
+export interface ApiResponseRecentSafeReportDetailResponseDto {
+  /** @format int32 */
+  code?: number;
+  data?: RecentSafeReportDetailResponseDto;
   message?: string;
   success?: boolean;
 }
