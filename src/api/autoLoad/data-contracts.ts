@@ -104,6 +104,17 @@ export interface SafeReportRequestDto {
   roadAddress?: string;
 }
 
+/** SafeReportResponseDto */
+export interface SafeReportResponseDto {
+  floorAndPurposeList?: FloorAndPurpose[];
+  rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
+  violationStatus?: ViolationStatusVO;
+}
+
+/** ViolationStatusVO */
+export interface ViolationStatusVO {
+  violationStatus?: string;
+}
 // LocalInfo 관련 타입들
 export interface LocalInfoResponseDTO {
   region?: string;
@@ -174,11 +185,37 @@ export interface ApiResponseFormData {
   success?: boolean;
 }
 
+/** YouthContentDTO */
+export interface YouthContentDTO {
+  atchFile?: string;
+  bbsSn?: string;
+  frstRegDt?: string;
+  frstRgtrNm?: string;
+  lastMdfcnDt?: string;
+  lastMdfrNm?: string;
+  pstInqCnt?: string;
+  pstSeNm?: string;
+  pstSeSn?: string;
+  pstSn?: string;
+  pstTtl?: string;
+  pstUrlAddr?: string;
+  pstWholCn?: string;
+}
+
 /** ApiResponse«List«MemberDTO»» */
 export interface ApiResponseListMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«YouthContentDTO»» */
+export interface ApiResponseListYouthContentDTO {
+  /** @format int32 */
+  code?: number;
+  data?: YouthContentDTO[];
   message?: string;
   success?: boolean;
 }
@@ -232,63 +269,6 @@ export interface ApiResponseBoolean {
   /** @format int32 */
   code?: number;
   data?: boolean;
-  message?: string;
-  success?: boolean;
-}
-
-// LocalInfo API 응답 타입들
-export interface ApiResponseListLocalInfoResponseDTO {
-  /** @format int32 */
-  code?: number;
-  data?: LocalInfoResponseDTO[];
-  message?: string;
-  success?: boolean;
-}
-
-export interface ApiResponseWeatherDTO {
-  /** @format int32 */
-  code?: number;
-  data?: WeatherDTO;
-  message?: string;
-  success?: boolean;
-}
-
-export interface ApiResponsePopulationDTO {
-  /** @format int32 */
-  code?: number;
-  data?: PopulationDTO;
-  message?: string;
-  success?: boolean;
-}
-
-export interface ApiResponseFacilityDTO {
-  /** @format int32 */
-  code?: number;
-  data?: FacilityDTO;
-  message?: string;
-  success?: boolean;
-}
-
-export interface ApiResponseHospitalDTO {
-  /** @format int32 */
-  code?: number;
-  data?: HospitalDTO;
-  message?: string;
-  success?: boolean;
-}
-
-export interface ApiResponseSafetyDTO {
-  /** @format int32 */
-  code?: number;
-  data?: SafetyDTO;
-  message?: string;
-  success?: boolean;
-}
-
-export interface ApiResponseReverseGeocodeResponseDTO {
-  /** @format int32 */
-  code?: number;
-  data?: ReverseGeocodeResponseDTO;
   message?: string;
   success?: boolean;
 }

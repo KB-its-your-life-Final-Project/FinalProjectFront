@@ -23,7 +23,7 @@ watch(internalDate, (newVal) => {
     <DatePicker
       v-model:value="internalDate"
       :format="format ?? 'YYYY-MM-DD'"
-      inputClass="border border-gray-300 bg-gray-100 text-gray-400 px-2 py-1 w-full cursor-pointer"
+      inputClass="border border-gray-300 text-gray-500 px-2 py-1 w-full cursor-pointer"
       :placeholder="placeholder"
       style="width: 100%"
     />

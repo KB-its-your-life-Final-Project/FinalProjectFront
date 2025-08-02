@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import colorList from "@/assets/styles/colors.css?raw";
 import fontList from "@/assets/styles/fonts.css?raw";
-import LogoutBtn from "@/components/common/LogoutBtn.vue";
 
 const kbColorList = colorList
   .split("\n")

@@ -97,7 +97,7 @@ const route = useRoute();
 const selectedAptName = ref<string>((route.params.aptName as string) || "");
 
 const selectedType = ref("전체");
-const selectedYear = ref<number | '전체'>(1);
+const selectedYear = ref<number | "전체">(1);
 
 //날짜의 기본값- 아무것도 없는 값
 const startDate = ref<Date | null>(null);
@@ -128,16 +128,12 @@ const formatDateLocal = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-
-
 const getTradeTypeCode = (label: string | null): number | null => {
   console.log("getTradeTypeCode 호출:", label);
   if (label === "매매") return 1;
   if (label === "전월세") return 2;
   return null; // "전체" 혹은 그 외
 };
-
-
 
 const filteredData = async (aptName: string) => {
   console.log("실제 axios 요청 발생!", selectedAptName.value, startDate.value, endDate.value);
@@ -149,13 +145,10 @@ const filteredData = async (aptName: string) => {
     endDate: endDate.value ? formatDateLocal(endDate.value) : null,
   };
 
-
-
   try {
-    const res = await axios.post("/api/transactions/detail", body)
+    const res = await axios.post("/api/transactions/detail", body);
     console.log("백엔드 응답 받음:", res.data);
-    graphData.value = res.data
-
+    graphData.value = res.data;
   } catch (error) {
     console.error("데이터 가져오기 실패", error);
   }
@@ -201,9 +194,7 @@ watch(
       selectedAptName.value = newName as string;
       filteredData(newName as string);
     }
-
-}
-
+  },
 );
 
 onMounted(() => {

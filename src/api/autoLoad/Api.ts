@@ -10,7 +10,7 @@
  * ---------------------------------------------------------------
  */
 
-import {
+import type {
   ApiResponseBoolean,
   ApiResponseListEstateWishlistResponseDTO,
   ApiResponseListMemberDTO,
@@ -41,7 +41,8 @@ import {
   ApiResponseHospitalDTO,
   ApiResponseSafetyDTO,
 } from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { ContentType, HttpClient } from "./http-client";
+import type { RequestParams } from "./http-client";
 
 export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
@@ -155,6 +156,20 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
       method: "GET",
       body: data,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags news-controller
+   * @name GetNewsUsingGet
+   * @summary getNews
+   * @request GET:/api/news
+   */
+  getNewsUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListYouthContentDTO, void>({
+      path: `/api/news`,
+      method: "GET",
       ...params,
     });
   /**
@@ -305,155 +320,6 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
     this.request<ApiResponseVoid, void>({
       path: `/api/wishlist/region/${regionCd}`,
       method: "DELETE",
-      ...params,
-    });
-
-  // LocalInfo API 메서드들
-  /**
-   * 지역 검색
-   *
-   * @tags local-info-controller
-   * @name SearchRegionsUsingGet
-   * @summary 지역 검색
-   * @request GET:/api/localinfo/search
-   */
-  searchRegionsUsingGet = (
-    query?: {
-      keyword?: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseListLocalInfoResponseDTO, void>({
-      path: `/api/localinfo/search`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * 날씨 조회
-   *
-   * @tags local-info-controller
-   * @name GetWeatherUsingGet
-   * @summary 법정동코드로 날씨 조회
-   * @request GET:/api/localinfo/weather
-   */
-  getWeatherUsingGet = (
-    query?: {
-      regionCd?: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseWeatherDTO, void>({
-      path: `/api/localinfo/weather`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * 인구 조회
-   *
-   * @tags local-info-controller
-   * @name GetPopulationUsingGet
-   * @summary 법정동코드로 인구 조회
-   * @request GET:/api/localinfo/population
-   */
-  getPopulationUsingGet = (
-    query?: {
-      regionCd?: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponsePopulationDTO, void>({
-      path: `/api/localinfo/population`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * 좌표로 주소 조회
-   *
-   * @tags local-info-controller
-   * @name ReverseGeocodeUsingGet
-   * @summary 좌표로 법정동 주소 조회
-   * @request GET:/api/localinfo/reverse-geocode
-   */
-  reverseGeocodeUsingGet = (
-    query?: {
-      latitude?: number;
-      longitude?: number;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseReverseGeocodeResponseDTO, void>({
-      path: `/api/localinfo/reverse-geocode`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * 편의시설 수 조회
-   *
-   * @tags local-info-controller
-   * @name GetFacilityCountsUsingGet
-   * @summary 법정동코드로 편의시설 수 조회
-   * @request GET:/api/localinfo/facilities-count
-   */
-  getFacilityCountsUsingGet = (
-    query?: {
-      regionCd?: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseFacilityDTO, void>({
-      path: `/api/localinfo/facilities-count`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * 병원 수 조회
-   *
-   * @tags local-info-controller
-   * @name GetHospitalCountsUsingGet
-   * @summary 법정동코드로 병원 수 조회
-   * @request GET:/api/localinfo/hospitals-count
-   */
-  getHospitalCountsUsingGet = (
-    query?: {
-      regionCd?: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseHospitalDTO, void>({
-      path: `/api/localinfo/hospitals-count`,
-      method: "GET",
-      query: query,
-      ...params,
-    });
-
-  /**
-   * 안전시설 수 조회
-   *
-   * @tags local-info-controller
-   * @name GetSafetyCountsUsingGet
-   * @summary 법정동코드로 안전시설 수 조회
-   * @request GET:/api/localinfo/safety-count
-   */
-  getSafetyCountsUsingGet = (
-    query?: {
-      regionCd?: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseSafetyDTO, void>({
-      path: `/api/localinfo/safety-count`,
-      method: "GET",
-      query: query,
       ...params,
     });
 

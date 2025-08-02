@@ -26,14 +26,14 @@ export interface MapItem {
  * GET 방식: 쿼리 파라미터로 범위 전송, 지도 아이템 목록 응답
  */
 export function fetchMapItems(params: BoundsParams) {
-  return apiClient.get<MapItem[]>('/maps/items', { params });
+  return apiClient.get<MapItem[]>("/maps/items", { params });
 }
 
 /**
  * POST 방식: JSON 바디로 범위 전송, 지도 아이템 목록 응답
  */
 export function postMapBounds(params: BoundsParams) {
-  return apiClient.post<MapItem[]>('/maps/items', params);
+  return apiClient.post<MapItem[]>("/maps/items", params);
 }
 
 /**

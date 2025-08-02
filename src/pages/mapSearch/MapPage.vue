@@ -99,23 +99,13 @@ const loadMarkers = async () => {
 onMounted(async () => {
   //지도 생성
   try {
-    console.log("지도 초기화 시작");
     await mapUtil.loadNaverMapScript();
-    console.log("네이버 지도 API 로드 완료");
 
-    if (!mapEl.value) {
-      console.error("지도 컨테이너를 찾을 수 없습니다");
-      return;
-    }
-
-    console.log("지도 컨테이너 크기:", mapEl.value.offsetWidth, "x", mapEl.value.offsetHeight);
+    if (!mapEl.value) return;
 
     map = mapUtil.createMap(mapEl.value);
-    console.log("지도 객체 생성 완료");
 
-    // 지도 초기화 완료 후 마커 로드
     naver.maps.Event.addListener(map, "init", async function () {
-      console.log("지도 초기화 완료, 마커 로드 시작");
       await loadMarkers();
     });
   } catch (error) {
@@ -149,13 +139,7 @@ watch(
 
 <template>
   <!--  지도 표시-->
-  <div id="map" ref="mapEl" class="relative w-full h-full min-h-[500px]"></div>
+  <div id="map" ref="mapEl" class="relative w-full h-full"></div>
 </template>
 
-<style scoped>
-#map {
-  width: 100%;
-  height: 100%;
-  min-height: 500px;
-}
-</style>
+<style scoped></style>

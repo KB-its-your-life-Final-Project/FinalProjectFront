@@ -1,5 +1,6 @@
 import { myPageRouteName } from "@/router/mypageRoutes";
 import { mainRouteName } from "@/router/mainRoute";
+import { authRouteName } from "@/router/authRoute";
 import router from "@/router";
 
 //라우트 생성
@@ -20,7 +21,7 @@ const makeRoute = (routeName: string) => {
   return makeQuery;
 };
 
-// route naem 기반 페이지 이동
+// route name 기반 페이지 이동
 const movePage = {
   back() {
     router.back();
@@ -36,7 +37,15 @@ const movePage = {
   localInfoSearch: makeRoute(mainRouteName.localInfoSearch),
   // mainRouteName end
 
-//실거래가 상세페이지
+  // authRouteName start
+  login: makeRoute(authRouteName.login),
+  loginEmail: makeRoute(authRouteName.loginEmail),
+  loginKakao: makeRoute(authRouteName.loginKakao),
+  loginGoogle: makeRoute(authRouteName.loginGoogle),
+  register: makeRoute(authRouteName.register),
+  // authRouteName end
+
+  //실거래가 상세페이지
   transactionDetail: makeRoute(mainRouteName.transactionDetail),
 
   // myPageRouteName start
