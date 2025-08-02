@@ -10,6 +10,7 @@
  * ---------------------------------------------------------------
  */
 
+
 import type {
   ApiResponseBoolean,
   ApiResponseListEstateWishlistResponseDTO,
@@ -30,6 +31,7 @@ import type {
 import { ContentType, HttpClient } from "./http-client";
 import type { RequestParams } from "./http-client";
 
+
 export class Api<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -42,9 +44,28 @@ export class Api<
    * @request GET:/api/member
    */
   findAllUsersUsingGet = (params: RequestParams = {}) =>
-    this.request<ApiResponseListMemberDTO, void>({
+    this.request<ApiResponseListMemberResponseDTO, void>({
       path: `/api/member`,
       method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name ChangeMemberInfoUsingPut
+   * @summary changeMemberInfo
+   * @request PUT:/api/member/change
+   */
+  changeMemberInfoUsingPut = (
+    changeReqDto: ChangeRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseMemberResponseDTO, void>({
+      path: `/api/member/change`,
+      method: "PUT",
+      body: changeReqDto,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -69,11 +90,11 @@ export class Api<
    * @summary login
    * @request POST:/api/member/login
    */
-  loginUsingPost = (loginDto: LoginDTO, params: RequestParams = {}) =>
-    this.request<ApiResponseMemberDTO, void>({
+  loginUsingPost = (loginReqDto: LoginRequestDTO, params: RequestParams = {}) =>
+    this.request<ApiResponseMemberResponseDTO, void>({
       path: `/api/member/login`,
       method: "POST",
-      body: loginDto,
+      body: loginReqDto,
       type: ContentType.Json,
       ...params,
     });
@@ -101,7 +122,7 @@ export class Api<
    * @request GET:/api/member/me
    */
   checkLoginStatusUsingGet = (params: RequestParams = {}) =>
-    this.request<ApiResponseMemberDTO, void>({
+    this.request<ApiResponseMemberResponseDTO, void>({
       path: `/api/member/me`,
       method: "GET",
       ...params,
@@ -123,10 +144,29 @@ export class Api<
     },
     params: RequestParams = {},
   ) =>
-    this.request<ApiResponseMemberDTO, void>({
+    this.request<ApiResponseMemberResponseDTO, void>({
       path: `/api/member/register/email`,
       method: "POST",
       query: query,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name VerifyPwdUsingGet
+   * @summary verifyPwd
+   * @request GET:/api/member/verifypwd
+   */
+  verifyPwdUsingGet = (
+    verifyPwdReqDto: VerifyPwdRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseBoolean, void>({
+      path: `/api/member/verifypwd`,
+      method: "GET",
+      body: verifyPwdReqDto,
       type: ContentType.Json,
       ...params,
     });
@@ -138,16 +178,10 @@ export class Api<
    * @summary findMemberById
    * @request GET:/api/member/{id}
    */
-  findMemberByIdUsingGet = (
-    id: string,
-    data: number,
-    params: RequestParams = {},
-  ) =>
-    this.request<ApiResponseMemberDTO, void>({
+  findMemberByIdUsingGet = (id: number, params: RequestParams = {}) =>
+    this.request<ApiResponseMemberResponseDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
-      body: data,
-      type: ContentType.Json,
       ...params,
     });
   /**

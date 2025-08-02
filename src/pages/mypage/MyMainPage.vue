@@ -14,12 +14,15 @@ import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
 import ToastList from "@/components/common/ToastList.vue";
 
-import { markRaw, ref, reactive } from "vue";
+import { markRaw, ref, computed } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
+import { authStore } from "@/stores/authStore";
+
 import defaultProfile from "@/assets/imgs/profile.jpg";
 import ProfileImage from "@/components/common/ProfileImage.vue";
 import ProfileInfo from "@/components/common/ProfileInfo.vue";
+
 const modalMap = {
   name: markRaw(ChangeNameModal),
   editHouse: markRaw(ChangeHouseModal),
@@ -57,12 +60,13 @@ const isOpenDrawer = ref(false);
 const currentModalName = ref<null | ModalNames>(null);
 const modalProps = ref<ModalPropsMap[ModalNames] | null>(null);
 
-const user = reactive({
-  name: "홍길동",
-  email: "HONG@GMAIL.COM",
+const auth = authStore();
+const user = computed(() => ({
+  name: auth.member.name ?? "사용자",
+  email: auth.member.email ?? "이메일 없음",
   isRegistered: false,
-  imagePath: defaultProfile,
-});
+  imagePath: auth.member.profileImg || defaultProfile,
+}));
 
 function openDrawer() {
   isOpenDrawer.value = !isOpenDrawer.value;
@@ -75,10 +79,9 @@ function closeModal() {
   currentModalName.value = null;
   modalProps.value = null;
 }
-/*회원가입한 데이터를 받아오기!*/
-/* (예시) const userStore = useUserStore()
-const name = userStore.name
-const email = userStore.email*/
+function handleNameChanged(newName: string) {
+  auth.member.name = newName;
+}
 </script>
 
 <template>
@@ -90,7 +93,7 @@ const email = userStore.email*/
     >
       <div class="relative">
         <div class="w-25">
-          <ProfileImage :src="user.imagePath" />
+          <ProfileImage :src="auth.member.profileImg || defaultProfile" />
         </div>
         <button
           class="absolute bottom-0 right-0 cursor-pointer p-1 bg-gray-300 rounded-full"
@@ -184,5 +187,6 @@ const email = userStore.email*/
     :is="currentModalName ? modalMap[currentModalName] : null"
     v-bind="modalProps"
     @close="closeModal"
+    @nameChanged="handleNameChanged"
   ></component>
 </template>

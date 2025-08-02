@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { reactive } from "vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { MemberDTO } from "@/api/autoLoad/data-contracts";
+import type { LoginRequestDTO, MemberResponseDTO } from "@/api/autoLoad/data-contracts";
 
 const api = new Api();
 
@@ -28,51 +28,50 @@ const getDefaultMember = (): Member => ({
 
 export const authStore = defineStore("auth", () => {
   // 상태
-  const member = ref<Member>(getDefaultMember);
+  const member = reactive<Member>(getDefaultMember());
 
   // 이메일 중복 확인
   const checkDuplicateEmail = async (email: string): Promise<boolean> => {
     try {
       const { data } = await api.checkDuplicateEmailUsingGet(email);
-      console.log("checking if email is duplicate: ", data);
-      if (data.success === false) {
-        console.log("message: ", data.message);
-        console.log("이메일 중복 여부: ", data.data);
-      } else {
-        console.log("message: ", data.message);
-        console.log("이메일 중복 여부: ", data.data);
-      }
+      console.log("이메일 중복 확인 결과: ", data);
       return data.data ?? false;
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error("이메일 중복 확인 오류:", error);
       throw error;
     }
   };
 
   // 로그인 여부 확인
-  const checkLoginStatus = async (): Promise<MemberDTO> => {
+  const checkLoginStatus = async (): Promise<MemberResponseDTO> => {
     try {
       const { data } = await api.checkLoginStatusUsingGet();
       console.log("로그인 상태 확인 결과: ", data);
       console.log("message: ", data.message);
-      console.log("로그인 상태 여부: ", data.data);
+      console.log("로그인 상태 여부: ", data.success);
 
       if (!data.data) {
         throw new Error("로그인 정보가 없습니다.");
       }
       return data.data;
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error("로그인 상태 확인 오류:", error);
       throw error;
     }
   };
 
   // 로그인 (토큰은 쿠키에 있으므로 응답에서 사용자 정보만 받아서 상태에 저장)
-  const login = async (member: Member): Promise<Member> => {
+  const login = async (loginInfo: LoginRequestDTO): Promise<MemberResponseDTO> => {
     try {
-      const { data } = await api.loginUsingPost(member);
-      console.log("data: !!", data);
+      const { data } = await api.loginUsingPost(loginInfo);
+      console.log("data: ", data);
       if (data.success === true && data.data) {
+        // 상태 업데이트
+        Object.assign(member, data.data);
+        console.log("member: ", member);
+        // 로컬 스토리지에 회원 정보 저장
+        localStorage.setItem("authUser", JSON.stringify(data.data));
         const createdType = data.data.createdType;
-        localStorage.setItem("authUser", JSON.stringify(data.data)); // 사용자 정보만 저장
         if (createdType === 1) {
           console.log("이메일 로그인 성공");
         } else if (createdType === 2) {
@@ -85,7 +84,7 @@ export const authStore = defineStore("auth", () => {
         return data.data;
       }
       throw new Error(data.message || "로그인 실패");
-    } catch (error) {
+    } catch (error: unknown) {
       throw error;
     }
   };
@@ -94,8 +93,8 @@ export const authStore = defineStore("auth", () => {
   const logout = async (): Promise<void> => {
     try {
       await api.logoutUsingPost();
-      console.log("typescript api로 로그아웃 성공!");
-    } catch (error) {
+      console.log("로그아웃 성공");
+    } catch (error: unknown) {
       console.error("로그아웃 실패:", error);
     } finally {
       localStorage.removeItem("authUser");
@@ -105,16 +104,17 @@ export const authStore = defineStore("auth", () => {
   // 로컬 스토리지에서 사용자 정보 로드 (페이지 새로고침 시 유지용)
   const load = (): void => {
     const storedMember = localStorage.getItem("authUser");
-    try {
-      if (storedMember) {
-        member.value = JSON.parse(storedMember);
+    if (storedMember) {
+      try {
+        const parsed: Member = JSON.parse(storedMember);
+        Object.assign(member, parsed);
+      } catch (error: unknown) {
+        console.error("로컬스토리지 JSON 파싱 실패:", error);
+        localStorage.removeItem("authUser"); // 잘못된 값 제거
       }
-    } catch (error) {
-      console.error("Invalid JSON in localStorage:", storedMember);
-      console.error("ERROR:", error);
-      localStorage.removeItem("authUser"); // 잘못된 값 제거
     }
   };
+
   load();
 
   return {

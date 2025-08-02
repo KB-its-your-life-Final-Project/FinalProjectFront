@@ -3,8 +3,18 @@ import { onMounted } from "vue";
 import RegisterLink from "@/components/common/RegisterLink.vue";
 import movePage from "@/utils/movePage";
 
+declare global {
+  interface Window {
+    Kakao: {
+      isInitialized: () => boolean;
+      init: (key: string) => void;
+      [key: string]: unknown;
+    };
+  }
+}
+
 onMounted(() => {
-  const kakao = (window as any).Kakao;
+  const kakao = window.Kakao;
   if (kakao && !kakao.isInitialized()) {
     kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
     console.log("Kakao SDK가 초기화되었습니다");

@@ -6,13 +6,13 @@ import { authStore } from "@/stores/authStore.ts";
 import GoBackBtn from "@/components/common/GoBackBtn.vue";
 import RegisterLink from "@/components/common/RegisterLink.vue";
 import { isEmpty, isValidEmailFormat } from "@/utils/validate";
-import type { LoginDTO } from "@/api/autoLoad/data-contracts";
+import type { LoginRequestDTO } from "@/api/autoLoad/data-contracts";
 
 const auth = authStore();
 
-const member = reactive<LoginDTO>({
+const member = reactive<LoginRequestDTO>({
   email: "",
-  password: "",
+  pwd: "",
   code: "",
   createdType: 1,
 });
@@ -23,18 +23,19 @@ onMounted(() => {
   const savedEmail = localStorage.getItem("savedEmail");
   if (savedEmail) {
     member.email = savedEmail;
+  } else {
+    console.log("저장된 이메일이 없습니다.");
   }
 });
 
 const login = async () => {
   checkSubmitMsg.value = "";
-  localStorage.setItem("savedEmail", member.email);
   console.log("사용자 input: ", member);
   if (isEmpty(member.email)) {
     checkSubmitMsg.value = "이메일을 입력하세요";
     return;
   }
-  if (!isValidEmailFormat(member.email)) {
+  if (!member.email || !isValidEmailFormat(member.email)) {
     checkSubmitMsg.value = "올바른 형식의 이메일을 입력하세요";
     return;
   }
@@ -44,12 +45,13 @@ const login = async () => {
     checkSubmitMsg.value = "등록되지 않은 이메일입니다";
     return;
   }
-  if (isEmpty(member.password)) {
+  if (isEmpty(member.pwd)) {
     checkSubmitMsg.value = "비밀번호를 입력하세요";
     return;
   }
   try {
     const response = await auth.login(member);
+    localStorage.setItem("savedEmail", member.email);
     console.log("로그인 성공");
     console.log("response", response);
     movePage.homeMain();
@@ -83,7 +85,7 @@ const login = async () => {
           class="input-box"
           type="password"
           placeholder="비밀번호를 입력하세요"
-          v-model="member.password"
+          v-model="member.pwd"
         />
       </div>
       <p class="w-full h-2 text-center text-error">

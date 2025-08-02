@@ -68,7 +68,7 @@ const displayValue = computed(() => {
       />
       <span
         v-if="type === 'money' && rawValue"
-        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 text-sm pointer-events-none"
       >
         {{ formatted }}
       </span>

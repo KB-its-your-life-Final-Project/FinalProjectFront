@@ -1,23 +1,58 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import ModalForm from "@/components/common/ModalForm.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
+import { Api } from "@/api/autoLoad/Api";
+import type { ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
 import { isEmpty } from "@/utils/validate";
+
+// 상태
+const oldName = computed(() => props.oldName); // readonly
+const newName = ref("");
+
+// Props & Emit
 const props = defineProps<{
   oldName: string;
 }>();
+const emit = defineEmits<{
+  (e: "close"): void;
+  (e: "nameChanged", newName: string): void;
+}>();
 
-const emit = defineEmits(["close"]);
-const oldNameRef = ref(props.oldName);
-const newName = ref("");
-function handleConfirm(): { success: boolean; message: string } {
+// API
+const api = new Api();
+
+async function handleConfirm(): Promise<{ success: boolean; message: string }> {
+  const nameToChange = newName.value.trim();
+
   if (isEmpty(newName.value)) {
-    return { success: false, message: "변경할 이름을 입력해 주세요" };
+    return { success: false, message: "변경할 이름을 입력하세요" };
   }
-  /** todo: 변경 요청 api 호출 */
-  return { success: true, message: "이름이 변경되었습니다" };
+
+  if (nameToChange === oldName.value) {
+    return { success: false, message: "기존 이름과 동일합니다" };
+  }
+
+  const changeRequestDto: ChangeRequestDTO = {
+    name: nameToChange,
+    profileImg: "",
+    pwd: "",
+    changeType: 1,
+  };
+  console.log("changeRequestDto: ", changeRequestDto);
+
+  try {
+    const { data } = await api.changeMemberInfoUsingPut(changeRequestDto);
+    console.log("data: ", data);
+    emit("nameChanged", newName.value); // 부모에게 변경된 이름 전달
+    return { success: true, message: "이름이 변경되었습니다" };
+  } catch (error: unknown) {
+    console.error("이름 변경 실패: ", error);
+    return { success: false, message: "이름 변경에 실패했습니다" };
+  }
 }
 </script>
+
 <template>
   <ModalForm
     :title="'이름 변경'"
@@ -25,11 +60,11 @@ function handleConfirm(): { success: boolean; message: string } {
     @close="emit('close')"
     hasConfirmBtn
   >
-    <DefaultInput label="기존 이름" v-model="oldNameRef" type="text" disabled />
+    <DefaultInput label="기존 이름" :model-value="oldName" type="text" disabled />
     <DefaultInput
       class="mt-5"
       label="변경 이름"
-      placeholder="변경할 이름을 입력해주세요"
+      placeholder="변경할 이름을 입력하세요"
       v-model="newName"
       type="text"
     ></DefaultInput>

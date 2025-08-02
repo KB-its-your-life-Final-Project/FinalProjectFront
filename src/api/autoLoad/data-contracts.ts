@@ -10,6 +10,15 @@
  * ---------------------------------------------------------------
  */
 
+/** ChangeRequestDTO */
+export interface ChangeRequestDTO {
+  /** @format int32 */
+  changeType?: number;
+  name?: string;
+  profileImg?: string;
+  pwd?: string;
+}
+
 /** EstateWishlistRequestDTO */
 export interface EstateWishlistRequestDTO {
   /** @format int64 */
@@ -31,17 +40,17 @@ export interface FloorAndPurpose {
   resUseType?: string;
 }
 
-/** LoginDTO */
-export interface LoginDTO {
+/** LoginRequestDTO */
+export interface LoginRequestDTO {
   code?: string;
   /** @format int32 */
   createdType?: number;
   email?: string;
-  password?: string;
+  pwd?: string;
 }
 
-/** MemberDTO */
-export interface MemberDTO {
+/** MemberResponseDTO */
+export interface MemberResponseDTO {
   /** @format int32 */
   age?: number;
   /** @format int32 */
@@ -138,6 +147,12 @@ export interface TransactionResponseDTO {
   type?: string;
 }
 
+/** VerifyPwdRequestDTO */
+export interface VerifyPwdRequestDTO {
+  email?: string;
+  pwd?: string;
+}
+
 /** ViolationStatus */
 export interface ViolationStatus {
   violationStatus?: string;
@@ -169,11 +184,11 @@ export interface ApiResponseListEstateWishlistResponseDTO {
   success?: boolean;
 }
 
-/** ApiResponse«List«MemberDTO»» */
-export interface ApiResponseListMemberDTO {
+/** ApiResponse«List«MemberResponseDTO»» */
+export interface ApiResponseListMemberResponseDTO {
   /** @format int32 */
   code?: number;
-  data?: MemberDTO[];
+  data?: MemberResponseDTO[];
   message?: string;
   success?: boolean;
 }
@@ -205,11 +220,11 @@ export interface ApiResponseListYouthContentDTO {
   success?: boolean;
 }
 
-/** ApiResponse«MemberDTO» */
-export interface ApiResponseMemberDTO {
+/** ApiResponse«MemberResponseDTO» */
+export interface ApiResponseMemberResponseDTO {
   /** @format int32 */
   code?: number;
-  data?: MemberDTO;
+  data?: MemberResponseDTO;
   message?: string;
   success?: boolean;
 }
