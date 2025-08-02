@@ -138,7 +138,6 @@ export interface RecentSafeReportResponseDto {
   id?: number;
   resultGrade?: string;
   roadAddress?: string;
-  /** @format date-time */
   updatedAt?: string;
 }
 
@@ -169,7 +168,7 @@ export interface RentalRatioAndBuildyear {
    * @format int32
    * @example 2
    */
-  buildyear_score?: number;
+  buildYearScore?: number;
   /**
    * 거래가 (만원)
    * @format int32
@@ -181,7 +180,7 @@ export interface RentalRatioAndBuildyear {
    * @format double
    * @example 85.5
    */
-  reverse_rental_ratio?: number;
+  reverseRentalRatio?: number;
   /**
    * 최종 점수
    * @format int32
