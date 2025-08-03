@@ -2,6 +2,7 @@ import { myPageRouteName } from "@/router/mypageRoutes";
 import { mainRouteName } from "@/router/mainRoute";
 import { authRouteName } from "@/router/authRoute";
 import router from "@/router";
+import WishlistPage from "@/pages/wishlist/WishlistPage.vue";
 
 //라우트 생성
 const makeRoute = (routeName: string) => {
@@ -30,7 +31,7 @@ const movePage = {
   // mainRouteName start
   homeMain: makeRoute(mainRouteName.homeMain),
   mapSearch: makeRoute(mainRouteName.mapSearch),
-  myLike: makeRoute(mainRouteName.myLike),
+  wishlist: makeRoute(mainRouteName.wishlist),
   safeReport: makeRoute(mainRouteName.safeReport),
   myAlarm: makeRoute(mainRouteName.myAlarm),
   localInfo: makeRoute(mainRouteName.localInfo),
