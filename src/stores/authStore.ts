@@ -2,8 +2,10 @@ import { defineStore } from "pinia";
 import { reactive } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { LoginRequestDTO, MemberResponseDTO } from "@/api/autoLoad/data-contracts";
+import { useToast } from "@/utils/useToast";
 
 const api = new Api();
+const {addToast, createToast} = useToast();
 
 // 사용자 인터페이스
 interface Member {
@@ -93,12 +95,21 @@ export const authStore = defineStore("auth", () => {
   const logout = async (): Promise<void> => {
     try {
       await api.logoutUsingPost();
+      addToast(createToast("로그아웃 되었습니다", "success"));
       console.log("로그아웃 성공");
     } catch (error: unknown) {
       console.error("로그아웃 실패:", error);
     } finally {
       localStorage.removeItem("authUser");
+      // 상태 초기화
+      Object.assign(member, getDefaultMember());
     }
+  };
+
+  // 사용자 상태 직접 설정
+  const setMember = (newMember: Partial<Member>): void => {
+    Object.assign(member, newMember);
+    localStorage.setItem("authUser", JSON.stringify(member));
   };
 
   // 로컬 스토리지에서 사용자 정보 로드 (페이지 새로고침 시 유지용)
@@ -123,5 +134,6 @@ export const authStore = defineStore("auth", () => {
     checkLoginStatus,
     login,
     logout,
+    setMember
   };
 });

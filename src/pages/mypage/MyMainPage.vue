@@ -14,7 +14,7 @@ import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
 import ToastList from "@/components/common/ToastList.vue";
 
-import { markRaw, ref, computed } from "vue";
+import { markRaw, ref, computed, onMounted } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
 import { authStore } from "@/stores/authStore";
@@ -22,6 +22,10 @@ import { authStore } from "@/stores/authStore";
 import defaultProfile from "@/assets/imgs/profile.jpg";
 import ProfileImage from "@/components/common/ProfileImage.vue";
 import ProfileInfo from "@/components/common/ProfileInfo.vue";
+
+import { Api } from "@/api/autoLoad/Api";
+
+const api = new Api();
 
 const modalMap = {
   name: markRaw(ChangeNameModal),
@@ -59,6 +63,7 @@ type ModalPropsMap = {
 const isOpenDrawer = ref(false);
 const currentModalName = ref<null | ModalNames>(null);
 const modalProps = ref<ModalPropsMap[ModalNames] | null>(null);
+const isPwdChangeable = computed(() => auth.member.createdType === 1); // 1: 이메일 계정
 
 const auth = authStore();
 const user = computed(() => ({
@@ -82,6 +87,18 @@ function closeModal() {
 function handleNameChanged(newName: string) {
   auth.member.name = newName;
 }
+
+onMounted (async () => {
+  try {
+    const { data } = await api.checkLoginStatusUsingGet();
+    if (data.success && data.data) {
+      console.log("member: ", data);
+      auth.setMember(data.data);
+    }
+  } catch (error: unknown) {
+    console.error("로그인 여부 확인 중 오류: ", error);
+    }
+});
 </script>
 
 <template>
@@ -104,10 +121,10 @@ function handleNameChanged(newName: string) {
       </div>
       <ProfileInfo :name="user.name" :email="user.email" />
 
-      <div class="w-4/5 relative h-10">
-        <div class="absolute w-full border border-kb-gray-light rounded-md">
+      <div class="w-4/5 relative h-10 mt-3">
+        <div class="absolute w-full border border-kb-ui-07 rounded-lg">
           <button
-            class="text-lg py-2 w-full font-bold cursor-pointer text-kb-gray-light flex justify-center items-center gap-2"
+            class="text-md font-pretendard-medium py-2 w-full font-bold cursor-pointer text-kb-ui-04 flex justify-center items-center gap-2"
             @click="openDrawer"
           >
             회원정보 수정
@@ -128,6 +145,7 @@ function handleNameChanged(newName: string) {
                 @click="openModal('name', { oldName: user.name })"
               />
               <EditItem
+                v-if="isPwdChangeable"
                 :title="'비밀번호 변경'"
                 :icon="['fas', 'key']"
                 @click="openModal('password', {})"
@@ -166,7 +184,7 @@ function handleNameChanged(newName: string) {
   <div v-else class="h-100 flex flex-col items-center justify-center">
     <div class="font-pretendard-bold text-xl">나의 집을 등록하고 정보를 받아보세요!</div>
     <button
-      class="mt-10 cursor-pointer bg-kb-yellow-positive text-white px-10 py-3 rounded-md"
+      class="mt-10 text-md cursor-pointer bg-kb-yellow-positive text-white px-10 py-3 rounded-md"
       @click="openModal('newHouse', { type: 'regist' })"
     >
       나의 집 등록하기
@@ -174,7 +192,7 @@ function handleNameChanged(newName: string) {
   </div>
   <div class="mx-4 mt-4">
     <button
-      class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
+      class="w-full py-3 bg-kb-ui-09 text-md rounded-md shadow-inner cursor-pointer"
       @click="movePage.mypageStetting()"
     >
       알림 설정

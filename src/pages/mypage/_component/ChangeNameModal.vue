@@ -4,6 +4,7 @@ import ModalForm from "@/components/common/ModalForm.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
+import { authStore } from "@/stores/authStore";
 import { isEmpty } from "@/utils/validate";
 
 // 상태
@@ -22,13 +23,13 @@ const emit = defineEmits<{
 // API
 const api = new Api();
 
+const auth = authStore();
+
 async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   const nameToChange = newName.value.trim();
-
   if (isEmpty(newName.value)) {
     return { success: false, message: "변경할 이름을 입력하세요" };
   }
-
   if (nameToChange === oldName.value) {
     return { success: false, message: "기존 이름과 동일합니다" };
   }
@@ -37,14 +38,17 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
     name: nameToChange,
     profileImg: "",
     pwd: "",
-    changeType: 1,
+    changeType: 1, // 1: name, 2: pwd, 3: profileImg
   };
   console.log("changeRequestDto: ", changeRequestDto);
 
   try {
     const { data } = await api.changeMemberInfoUsingPut(changeRequestDto);
     console.log("data: ", data);
+    auth.member.name = newName.value;
+    console.log("auth.member: ", auth.member);
     emit("nameChanged", newName.value); // 부모에게 변경된 이름 전달
+    emit("close");
     return { success: true, message: "이름이 변경되었습니다" };
   } catch (error: unknown) {
     console.error("이름 변경 실패: ", error);

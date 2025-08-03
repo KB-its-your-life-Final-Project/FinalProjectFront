@@ -10,27 +10,28 @@
  * ---------------------------------------------------------------
  */
 
-
 import type {
   ApiResponseBoolean,
   ApiResponseListEstateWishlistResponseDTO,
-  ApiResponseListMemberDTO,
+  ApiResponseListMemberResponseDTO,
   ApiResponseListRegionWishlistResponseDTO,
   ApiResponseListSearchHistoryResponseDTO,
-  ApiResponseMemberDTO,
+  ApiResponseListYouthContentDTO,
+  ApiResponseMemberResponseDTO,
   ApiResponseSafeReportResponseDto,
   ApiResponseVoid,
+  ChangeRequestDTO,
   EstateWishlistRequestDTO,
-  LoginDTO,
+  LoginRequestDTO,
   RegionWishlistRequestDTO,
   SafeReportRequestDto,
   SearchHistoryRequestDTO,
   TransactionRequestDTO,
   TransactionResponseDTO,
+  VerifyPwdRequestDTO,
 } from "./data-contracts";
 import { ContentType, HttpClient } from "./http-client";
 import type { RequestParams } from "./http-client";
-
 
 export class Api<
   SecurityDataType = unknown,
@@ -155,17 +156,17 @@ export class Api<
    * No description
    *
    * @tags member-controller
-   * @name VerifyPwdUsingGet
+   * @name VerifyPwdUsingPost
    * @summary verifyPwd
-   * @request GET:/api/member/verifypwd
+   * @request POST:/api/member/verifypwd
    */
-  verifyPwdUsingGet = (
+  verifyPwdUsingPost = (
     verifyPwdReqDto: VerifyPwdRequestDTO,
     params: RequestParams = {},
   ) =>
     this.request<ApiResponseBoolean, void>({
       path: `/api/member/verifypwd`,
-      method: "GET",
+      method: "POST",
       body: verifyPwdReqDto,
       type: ContentType.Json,
       ...params,

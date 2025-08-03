@@ -57,7 +57,7 @@ router.beforeEach(async (to, from, next) => {
     next();
   } catch (error: unknown) {
     // refresh token 만료 시 로그인 화면으로 이동
-    console.log("refreshToken 만료: ", error)
+    console.log("refreshToken 만료: ", error);
     next({
       path: "/auth/login",
       query: { redirect: to.fullPath }, // 로그인 후 리다이렉트를 위해 현재 경로 저장

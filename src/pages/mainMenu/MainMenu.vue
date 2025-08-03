@@ -6,6 +6,9 @@ import MenuSection from "@/pages/mainMenu/_component/MenuSection.vue";
 import Footer from "@/components/layout/Footer.vue";
 import { authStore } from "@/stores/authStore";
 import defaultProfile from "@/assets/imgs/profile.jpg";
+import logo from "@/assets/imgs/logo_border.svg";
+
+import ToastList from "@/components/common/ToastList.vue";
 
 /*임의로 로그아웃, 회원탈퇴 부분 넣겠습니다.*/
 
@@ -40,13 +43,11 @@ function openInquiry() {
     <!--Header 부분에 회원 정보가 크게 띄게 수정-->
     <div class="pl-3 pr-8 pt-8 pb-8">
       <div class="mt-[1.5rem] flex items-center justify-center text-center">
-        <!-- 프로필 사진 넣어주세요! 회원부분이랑 연동해서      -->
         <div class="flex-[1]">
-          <ProfileImage :src="defaultProfile" />
+          <ProfileImage :src="auth.member.createdType === 0 ? logo : (auth.member.profileImg || defaultProfile)" />
         </div>
-        <!--어떤 식으로 회원 정보를 받아올 것인지 - 홍길동은 예시임 + 업로드 기능 (사진 추가해야 함)   -->
         <div class="flex-[3]">
-          <ProfileInfo name="홍길동" email="GILDONG@GMAIL.COM"></ProfileInfo>
+          <ProfileInfo :name="auth.member.name || '안전한 거래의 시작,'" :email="auth.member.email || 'Light House'"></ProfileInfo>
         </div>
       </div>
     </div>
@@ -79,4 +80,5 @@ function openInquiry() {
   </div>
   <Footer />
   <div class="h-15"></div>
+   <ToastList />
 </template>

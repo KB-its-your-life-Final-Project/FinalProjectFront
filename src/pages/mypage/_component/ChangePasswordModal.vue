@@ -6,12 +6,13 @@ import { Api } from "@/api/autoLoad/Api";
 import type { VerifyPwdRequestDTO, ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
 import { isEmpty, isValidPasswordFormat, isValidPasswordChk } from "@/utils/validate";
 import { useToast } from "@/utils/useToast";
+import { authStore } from "@/stores/authStore";
 
 // 상태
 const oldPwd = ref("");
 const newPwd = ref("");
-const doublePwd = ref("");
-const validation = ref(false);
+const newPwdChk = ref("");
+const isVerified = ref(false);
 
 // Emit
 const emit = defineEmits(["close"]);
@@ -19,43 +20,64 @@ const emit = defineEmits(["close"]);
 // API
 const api = new Api();
 
+const auth = authStore();
 const { addToast, createToast } = useToast();
 
 // 비밀번호 확인 버튼 클릭 시 (기존 비밀번호 인증)
 async function checkPassword(password: string) {
-  if (isEmpty(password) || !isValidPasswordFormat(password)) {
-    addToast(createToast("입력이 되지 않거나 올바르지 않은 형식의 비밀번호입니다", "error"));
+  if (isEmpty(password)) {
+    addToast(createToast("기존 비밀번호를 입력하세요", "error"));
     return;
   }
-
   const verifyPwdRequestDto: VerifyPwdRequestDTO = {
-    email: ""
-    pwd: "",
+    email: auth.member.email,
+    pwd: oldPwd.value,
   };
-  console.log("changeRequestDto: ", verifyPwdRequestDto);
-  /** todo: 비밀번호 검증 api 호출 */
-  const { data } = await api.verifyPwdUsingGet(verifyPwdRequestDto);
-  if (data.data)
-  addToast(createToast("비밀번호가 일치합니다", "success"));
-  validation.value = true;
+  console.log("verifyPwdRequestDto: ", verifyPwdRequestDto);
+  const { data } = await api.verifyPwdUsingPost(verifyPwdRequestDto);
+  console.log("response data: ", data);
+  if (data.data) {
+    addToast(createToast("비밀번호가 일치합니다", "success"));
+    isVerified.value = true;
+    return;
+  }
+  addToast(createToast("비밀번호가 일치하지 않습니다", "error"));
+  return;
 }
 
-async function handleConfirm(): { success: boolean; message: string } {
-  if (!validation.value) {
-    return { success: false, message: "기존 비밀번호 확인부터 진행하세요" };
+async function handleConfirm(): Promise<{ success: boolean; message: string }> {
+  if (!isVerified.value) {
+    return { success: false, message: "기존 비밀번호를 인증하세요" };
   }
-  if (
-    isEmpty(newPassword.value) ||
-    !isValidPasswordFormat(newPassword.value) ||
-    isEmpty(doublePassword.value) ||
-    !isValidPasswordFormat(doublePassword.value)
-  ) {
-    return { success: false, message: "새 비밀번호가 비었거나 형식에 이상이 있습니다" };
+  if (isEmpty(newPwd.value) || isEmpty(newPwdChk.value)) {
+    return { success: false, message: "새 비밀번호 및 비밀번호 확인을 입력하세요 (공백 불가)"};
   }
-  if (!isValidPasswordChk(newPassword.value, doublePassword.value)) {
-    return { success: false, message: "새 비밀번호가 불일치 합니다" };
+  if (!isValidPasswordFormat(newPwd.value) || !isValidPasswordFormat(newPwdChk.value)) {
+    return { success: false, message: "새 비밀번호의 형식이 올바르지 않습니다"}
   }
-  return { success: true, message: "비밀번호 변경 성공" };
+  if (!isValidPasswordChk(newPwd.value, newPwdChk.value)) {
+    return { success: false, message: "새 비밀번호 및 비밀번호 확인이 불일치 합니다" };
+  }
+  if (oldPwd.value == newPwd.value) {
+    return { success: false, message: "기존 비밀번호와 다른 비밀번호를 입력하세요" };
+  }
+
+  const changeRequestDto: ChangeRequestDTO = {
+    name: "",
+    profileImg: "",
+    pwd: newPwd.value,
+    changeType: 2, // 1: name, 2: pwd, 3: profileImg
+  };
+  console.log("changeRequestDto: ", changeRequestDto);
+
+  try {
+    const { data } = await api.changeMemberInfoUsingPut(changeRequestDto);
+    console.log("data: ", data);
+    return { success: true, message: "비밀번호가 변경되었습니다" };
+  } catch (error: unknown) {
+    console.error("비밀번호 변경 실패: ", error);
+    return { success: false, message: "비밀번호 변경에 실패했습니다" };
+  } 
 }
 </script>
 <template>
@@ -67,18 +89,18 @@ async function handleConfirm(): { success: boolean; message: string } {
   >
     <DefaultInput
       label="기존 비밀번호"
-      v-model="oldPassword"
+      v-model="oldPwd"
       type="password"
       placeholder="본인 인증이 필요합니다"
       showButton
       button-label="인증"
-      @button-click="checkPassword(oldPassword)"
+      @button-click="checkPassword(oldPwd)"
     />
-    <div v-if="validation" class="text-sm text-success mt-1 ml-1">* 인증 완료</div>
+    <div v-if="isVerified" class="text-sm text-success mt-1 ml-1">* 인증 완료</div>
     <DefaultInput
       class="mt-4"
       label="새 비밀번호"
-      v-model="newPassword"
+      v-model="newPwd"
       :type="'password'"
       placeholder="새 비밀번호를 입력하세요"
     ></DefaultInput>
@@ -86,7 +108,7 @@ async function handleConfirm(): { success: boolean; message: string } {
     <DefaultInput
       class="mt-4"
       label="비밀번호 확인"
-      v-model="doublePassword"
+      v-model="newPwdChk"
       :type="'password'"
       placeholder="새 비밀번호를 입력하세요"
     ></DefaultInput>
