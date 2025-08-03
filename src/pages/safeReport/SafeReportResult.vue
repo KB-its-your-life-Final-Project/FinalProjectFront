@@ -141,7 +141,7 @@ onMounted(async () => {
     try {
       console.log("보낼 데이터", { ...store.formData });
       const requestDto = store.createRequestDto();
-      const { data } = await api.receiveFormUsingPost(requestDto);
+                        const { data } = await api.generateSafeReportUsingPost(requestDto);
       console.log("서버 응답:", data);
 
       store.updateResultData(data.data?.rentalRatioAndBuildyear ?? null);

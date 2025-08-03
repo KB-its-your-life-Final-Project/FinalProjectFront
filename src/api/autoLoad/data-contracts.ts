@@ -189,7 +189,7 @@ export interface SafeReportRequestDto {
   buildingName?: string;
   /**
    * 동명
-   * @example "101동"
+   * @example "문동동동"
    */
   dongName?: string;
   /**
