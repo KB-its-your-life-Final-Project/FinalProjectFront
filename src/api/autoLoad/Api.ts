@@ -19,7 +19,6 @@ import {
   ApiResponseListSearchHistoryResponseDTO,
   ApiResponseListYouthContentDTO,
   ApiResponseMemberDTO,
-  ApiResponseRecentSafeReportDetailResponseDto,
   ApiResponseSafeReportResponseDto,
   ApiResponseVoid,
   EstateWishlistRequestDTO,
@@ -189,7 +188,7 @@ export class Api<
    * @request GET:/api/report/recentSafeReport/{id}
    */
   getRecentReportDetailUsingGet = (id: number, params: RequestParams = {}) =>
-    this.request<ApiResponseRecentSafeReportDetailResponseDto, void>({
+    this.request<ApiResponseSafeReportResponseDto, void>({
       path: `/api/report/recentSafeReport/${id}`,
       method: "GET",
       ...params,

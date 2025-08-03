@@ -10,14 +10,22 @@ const buildingName = ref(store.formData.buildingName);
 const roadAddress = ref(store.formData.roadAddress);
 const jibunAddress = ref(store.formData.jibunAddress);
 const dongName = ref(store.formData.dongName);
-const lat = ref<number>(store.formData.lat);
-const lng = ref<number>(store.formData.lng);
+const lat = ref<number>(store.formData.lat || 0);
+const lng = ref<number>(store.formData.lng || 0);
 const naverReady = ref(false);
 const showPostcode = ref(false);
 const showBuildingNotFoundModal = ref(false);
 
 // DAUM 우편 번호 API + Naver Maps API 호출
 onMounted(() => {
+  // 검색바 초기화
+  buildingName.value = "";
+  roadAddress.value = "";
+  jibunAddress.value = "";
+  dongName.value = "";
+  lat.value = 0;
+  lng.value = 0;
+
   if (!window.daum) {
     const script = document.createElement("script");
     script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
@@ -63,14 +71,14 @@ function search() {
           dongName: dongName.value,
         });
 
-        if (roadAddress.value && naverReady.value) {
+        if (roadAddress.value && naverReady.value && jibunAddress.value) {
           searchAddressToCoordinate(jibunAddress.value);
         }
       },
       onclose: () => {
         showPostcode.value = false;
         // 주소 선택 없이 닫으면 초기화
-        if (!buildingName.value.trim()) {
+        if (!buildingName.value?.trim()) {
           resetFormData();
         }
       },
@@ -110,7 +118,6 @@ function searchAddressToCoordinate(address: string) {
       lat: latVal,
       lng: lngVal,
     });
-    console.log("store 업데이트 후 formData:", store.formData);
   });
 }
 
@@ -181,7 +188,7 @@ function handleClose() {
     <div class="fixed z-0 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
-        :disabled="!buildingName.trim() || !roadAddress.trim() || !jibunAddress.trim()"
+        :disabled="!buildingName?.trim() || !roadAddress?.trim() || !jibunAddress?.trim()"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
       >
         다음

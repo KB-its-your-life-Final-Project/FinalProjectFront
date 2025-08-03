@@ -5,6 +5,8 @@ import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
 import ToolTip from "@/components/common/ToolTip.vue";
 import { Api } from "@/api/autoLoad/Api";
+import Header from "@/components/layout/header/Header.vue";
+import { mainRouteName } from "@/router/mainRoute";
 
 const api = new Api();
 
@@ -13,6 +15,11 @@ const api = new Api();
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
 const router = useRouter();
+
+// 독립적인 페이지로 접근했는지 확인 (라우터를 통해 직접 접근)
+const isStandalonePage = computed(() => {
+  return router.currentRoute.value.name === 'safeReportResult';
+});
 const showModal_financial = ref(false);
 const showModal_building = ref(false);
 const showNoDataModal = ref(false); // 데이터 없음 모달
@@ -79,60 +86,113 @@ onMounted(async () => {
   showHighRatioModal.value = false;
   isLoading.value = true;
 
-  try {
-    console.log("보낼 데이터", { ...store.formData });
-    const requestDto = store.createRequestDto();
-    const { data } = await api.receiveFormUsingPost(requestDto);
-    console.log("서버 응답:", data);
+  // localStorage에서 데이터 확인
+  const fromRecentReports = localStorage.getItem('fromRecentReports');
+  const savedReportDataStr = localStorage.getItem('savedReportData');
 
-    store.updateResultData(data.data?.rentalRatioAndBuildyear ?? null);
+  if (fromRecentReports === 'true' && savedReportDataStr) {
+    // 최근 본 레포트에서 온 경우
+    const savedData = JSON.parse(savedReportDataStr);
 
-    if (data.data?.violationStatus) {
-      store.updateViolationStatusVO(data.data.violationStatus);
+            // store 초기화 (이전 데이터 제거)
+    store.resetStore();
+
+    // localStorage에서 건물명과 예산 정보를 가져와서 store에 저장
+    const buildingName = localStorage.getItem('buildingName') || '';
+    const budget = localStorage.getItem('budget') ? parseInt(localStorage.getItem('budget')!) : undefined;
+    const roadAddress = localStorage.getItem('roadAddress') || '';
+
+    store.updateFormData({
+      buildingName,
+      budget,
+      roadAddress
+    });
+    // 전달받은 데이터로 store 업데이트
+    store.updateResultData(savedData.rentalRatioAndBuildyear ?? null);
+
+    if (savedData.violationStatus) {
+      store.updateViolationStatusVO(savedData.violationStatus);
     }
 
-    if (data.data?.floorAndPurposeList) {
-      store.updateFloorAndPurposeList(data.data.floorAndPurposeList);
+    if (savedData.floorAndPurposeList) {
+      store.updateFloorAndPurposeList(savedData.floorAndPurposeList);
     }
 
     // dealAmount가 0인지 체크
-    if (data.data?.rentalRatioAndBuildyear?.dealAmount === 0) {
+    if (savedData.rentalRatioAndBuildyear?.dealAmount === 0) {
       showNoDataModal.value = true;
     }
 
-    // reverse_rental_ratio가 100 이상인지 체크
-    console.log("reverse_rental_ratio 체크:", data.data?.rentalRatioAndBuildyear?.reverse_rental_ratio);
-    if ((data.data?.rentalRatioAndBuildyear?.reverse_rental_ratio ?? 0) >= 100) {
-      console.log("전세가율 100% 이상 - 모달 표시");
+    // reverseRentalRatio가 100 이상인지 체크
+    if ((savedData.rentalRatioAndBuildyear?.reverseRentalRatio ?? 0) >= 100) {
       showHighRatioModal.value = true;
     }
 
-    console.log("저장된 resultData:", store.resultData);
-    console.log("저장된 violationStatus:", store.violationStatus);
-    console.log("저장된 floorAndPurposeList:", store.floorAndPurposeList);
-    console.log("resultData.score:", store.resultData?.score);
-    console.log("resultData.buildYear:", store.resultData?.buildYear);
+    // localStorage 정리
+    localStorage.removeItem('savedReportData');
+    localStorage.removeItem('fromRecentReports');
+    localStorage.removeItem('buildingName');
+    localStorage.removeItem('budget');
+    localStorage.removeItem('roadAddress');
 
     isLoading.value = false;
-  } catch (error) {
-    console.error("전송 실패: ", error);
-    isLoading.value = false;
+  } else {
+    // 일반적인 안심 진단 플로우 - 서버에 API 요청
+    try {
+      console.log("보낼 데이터", { ...store.formData });
+      const requestDto = store.createRequestDto();
+      const { data } = await api.receiveFormUsingPost(requestDto);
+      console.log("서버 응답:", data);
+
+      store.updateResultData(data.data?.rentalRatioAndBuildyear ?? null);
+
+      if (data.data?.violationStatus) {
+        store.updateViolationStatusVO(data.data.violationStatus);
+      }
+
+      if (data.data?.floorAndPurposeList) {
+        store.updateFloorAndPurposeList(data.data.floorAndPurposeList);
+      }
+
+      // dealAmount가 0인지 체크
+      if (data.data?.rentalRatioAndBuildyear?.dealAmount === 0) {
+        showNoDataModal.value = true;
+      }
+
+      // reverseRentalRatio가 100 이상인지 체크
+      if ((data.data?.rentalRatioAndBuildyear?.reverseRentalRatio ?? 0) >= 100) {
+        showHighRatioModal.value = true;
+      }
+
+      isLoading.value = false;
+    } catch (error) {
+      console.error("전송 실패: ", error);
+      isLoading.value = false;
+    }
   }
 });
 
 function getFloorLabel(floor: string | undefined) {
   if (!floor) return "";
   if (floor.startsWith("지")) {
-    return "지하" + floor.slice(1) + "층";
+    const remaining = floor.slice(1);
+    const result = "지하" + remaining + (remaining.includes("층") ? "" : "층");
+    return result;
   }
   if (floor.startsWith("상")) {
-    return "지상" + floor.slice(1) + "층";
+    const remaining = floor.slice(1);
+    const result = "지상" + remaining + (remaining.includes("층") ? "" : "층");
+    return result;
   }
   if (floor.startsWith("하")) {
-    return "지하" + floor.slice(1) + "층";
+    const remaining = floor.slice(1);
+    const result = "지하" + remaining + (remaining.includes("층") ? "" : "층");
+    return result;
   }
   if (floor.startsWith("탑")) {
-    return "옥탑" + floor.slice(1) + "층";
+    const remaining = floor.slice(1);
+    const result = "옥탑" + remaining + (remaining.includes("층") ? "" : "층");
+    return result;
   }
   return floor;
 }
@@ -193,6 +253,18 @@ const showFloorDetails = ref(false);
 </script>
 
 <template>
+  <!-- 독립적인 페이지로 접근했을 때만 헤더 표시 -->
+  <Header v-if="isStandalonePage" :headerShowtype="mainRouteName.safeReportResult">
+    <div class="mt-23">
+      <img
+      src="@/assets/imgs/safereport.png"
+      alt="AI 안심 진단 리포트"
+      class="absolute right-1 top-13/20 -translate-y-1/2 h-30"
+      style="z-index:1;"
+    />
+    </div>
+  </Header>
+
   <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen">
     <div class="text-center">
       <div
@@ -206,7 +278,7 @@ const showFloorDetails = ref(false);
   <div v-else>
     <!-- 회색 처리된 메인 컨텐츠 -->
     <div :class="{ 'opacity-50 pointer-events-none': isNoData }">
-      <section class="flex flex-col gap-9 items-center mt">
+      <section class="flex flex-col gap-9 items-center" :class="isStandalonePage ? 'mt-6' : 'mt'">
         <div class="text-center font-pretendard-bold text-xl font-medium">
           {{ store.formData.buildingName }}의 안심 진단 리포트입니다.
         </div>
@@ -327,12 +399,12 @@ const showFloorDetails = ref(false);
               <p class="mt-4">
           {{ store.formData.buildingName }}의 최근 거래 가격은
           {{ store.resultData?.dealAmount }}만원 입니다. 이에 따라 역전세율은
-          {{
-            store.resultData?.reverse_rental_ratio != null &&
-            !isNaN(Number(store.resultData.reverse_rental_ratio))
-              ? Number(store.resultData.reverse_rental_ratio).toFixed(2)
-              : "-"
-          }}%이며 깡통 전세 위험 점수는 {{ store.resultData?.score }}/10점 입니다. 이 수치는
+                      {{
+              store.resultData?.reverseRentalRatio != null &&
+              !isNaN(Number(store.resultData.reverseRentalRatio))
+                ? Number(store.resultData.reverseRentalRatio).toFixed(2)
+                : "-"
+            }}%이며 깡통 전세 위험 점수는 {{ store.resultData?.score }}/10점 입니다. 이 수치는
                     <span :class="gradeColor.text + ' font-bold'">{{ gradeText }}</span> 구간으로 평가되며
           <span :class="gradeColor.text + ' font-bold'">{{ riskText }}</span>
         </p>

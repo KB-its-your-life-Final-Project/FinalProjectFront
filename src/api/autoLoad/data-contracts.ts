@@ -111,28 +111,10 @@ export interface MemberDTO {
   regIp?: string;
 }
 
-/** RecentSafeReportDetailResponseDto */
-export interface RecentSafeReportDetailResponseDto {
-  /** @format int32 */
-  budget?: number;
-  buildingName?: string;
-  /** @format date-time */
-  createdAt?: string;
-  /** @format date-time */
-  diagnosisDate?: string;
-  diagnosisStatus?: string;
-  dongName?: string;
-  /** @format int32 */
-  id?: number;
-  jibunAddress?: string;
-  latitude?: number;
-  longitude?: number;
-  reportData?: string;
-  roadAddress?: string;
-}
-
 /** RecentSafeReportResponseDto */
 export interface RecentSafeReportResponseDto {
+  /** @format int32 */
+  budget?: number;
   buildingName?: string;
   /** @format int32 */
   id?: number;
@@ -371,15 +353,6 @@ export interface ApiResponseMemberDTO {
   /** @format int32 */
   code?: number;
   data?: MemberDTO;
-  message?: string;
-  success?: boolean;
-}
-
-/** ApiResponse«RecentSafeReportDetailResponseDto» */
-export interface ApiResponseRecentSafeReportDetailResponseDto {
-  /** @format int32 */
-  code?: number;
-  data?: RecentSafeReportDetailResponseDto;
   message?: string;
   success?: boolean;
 }

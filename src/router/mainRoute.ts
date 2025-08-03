@@ -29,6 +29,9 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
 
   //최근 본 레포트
   recentSafeReport: () => import("@/pages/safeReport/RecentSafeReport.vue"),
+
+  //안심 진단 결과
+  safeReportResult: () => import("@/pages/safeReport/SafeReportResult.vue"),
 };
 
 //라우트 이름
@@ -45,6 +48,7 @@ const mainRouteName = {
   settingAlarm: "settingAlarm",
   transactionDetail: "transactionDetail",
   recentSafeReport: "recentSafeReport",
+  safeReportResult: "safeReportResult",
 };
 
 //라우트 설정
@@ -104,6 +108,12 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/recentSafeReport",
     name: mainRouteName.recentSafeReport,
     component: () => import("@/pages/safeReport/RecentSafeReport.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/safeReportResult",
+    name: mainRouteName.safeReportResult,
+    component: () => import("@/pages/safeReport/SafeReportResult.vue"),
     meta: { requiresAuth: true },
   },
 ];

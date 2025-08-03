@@ -21,7 +21,6 @@ const fetchRecentReports = async () => {
     error.value = null;
 
     const response = await api.getRecentReportsUsingGet();
-    console.log('최근 본 레포트 응답:', response);
 
     if (response.data?.data) {
       recentReports.value = response.data.data;
@@ -40,7 +39,6 @@ const fetchRecentReports = async () => {
 const deleteReport = async (reportId: number) => {
   try {
     await api.deleteRecentReportUsingDelete(reportId);
-    console.log('레포트 삭제 성공:', reportId);
 
     // 목록에서 제거
     recentReports.value = recentReports.value.filter(report => report.id !== reportId);
@@ -55,16 +53,20 @@ const viewReport = async (report: RecentSafeReportResponseDto) => {
   try {
     // 상세 데이터 조회
     const detailResponse = await api.getRecentReportDetailUsingGet(report.id!);
-    console.log('상세 데이터 응답:', detailResponse);
 
     if (detailResponse.data?.data) {
-      // 라우터 상태로 상세 데이터 전달하여 SafeReportResult.vue로 이동
+      // localStorage에 데이터 저장
+      localStorage.setItem('savedReportData', JSON.stringify(detailResponse.data.data));
+      localStorage.setItem('fromRecentReports', 'true');
+
+      // 건물명과 예산 정보도 함께 저장
+      localStorage.setItem('buildingName', report.buildingName || '');
+      localStorage.setItem('budget', report.budget?.toString() || '');
+      localStorage.setItem('roadAddress', report.roadAddress || '');
+
+      // SafeReportResult.vue로 이동
       router.push({
-        name: 'safeReportResult',
-        state: {
-          savedReportData: detailResponse.data.data,
-          fromRecentReports: true
-        }
+        name: 'safeReportResult'
       });
     } else {
       alert('상세 데이터를 불러올 수 없습니다.');
@@ -79,6 +81,20 @@ const viewReport = async (report: RecentSafeReportResponseDto) => {
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+};
+
+// 등급별 색상 클래스 반환
+const getGradeColorClass = (grade: string | undefined) => {
+  switch (grade) {
+    case '안전':
+      return 'bg-yellow-100 text-yellow-800';
+    case '주의':
+      return 'bg-orange-100 text-orange-800';
+    case '위험':
+      return 'bg-red-100 text-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
 };
 
 
@@ -128,12 +144,12 @@ onMounted(() => {
     </div>
 
     <!-- 레포트 목록 -->
-    <div v-else class="p-4">
+    <div v-else class="p-4 h-[calc(100vh-120px)] overflow-y-auto">
       <div v-for="report in recentReports" :key="report.id" class="bg-kb-ui-11 rounded-lg shadow-sm border border-kb-ui-06 overflow-hidden mb-4 last:mb-0">
         <!-- 카드 헤더 -->
         <div class="flex items-center justify-between p-4 border-b border-kb-ui-07">
           <div class="flex items-center space-x-2">
-            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+            <span :class="`${getGradeColorClass(report.resultGrade)} text-sm font-bold px-3 py-2 rounded`">
               {{ report.resultGrade || '건물' }}
             </span>
           </div>
