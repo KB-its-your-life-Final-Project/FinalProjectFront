@@ -2,11 +2,15 @@
 import { ref, onMounted, toRaw, watch } from "vue";
 import mapUtil from "@/utils/naverMap/naverMap";
 import { useRoute } from "vue-router";
+import MapFilter from "@/pages/mapSearch/_components/MapFilter.vue";
 
+//지도 필수 변수
 const mapEl = ref<HTMLDivElement | null>(null);
 const markers = ref<Array<any>>([]);
 let map: any;
 let markerManager: any;
+let mapMoveTimer: any;
+
 const route = useRoute();
 
 //주소 검색시
@@ -24,11 +28,14 @@ const props = defineProps<{
 const addresssList = ref(props.addresssList);
 const latlngList = ref(props.latlngList);
 
+// 지도 영역 상태 추적
+const mapBounds = ref<any>(null);
+
 // 마커 로드 함수
 const loadMarkers = async () => {
   if (!map) return;
 
-  // 기존 마커/클러스터 제거 (markerManager의 updateMarkersByZoom 활용)
+  // 기존 마커/클러스터 제거
   if (markerManager) {
     markerManager.updateMarkersByZoom();
   }
@@ -61,7 +68,6 @@ const loadMarkers = async () => {
   }
   //검색 결과가 존재할 경우
   else if (searchInput.value) {
-    console.log(searchInput.value);
     const atcResult = await mapUtil.searchAddressToCoordinate(searchInput.value);
     markers.value = [
       {
@@ -73,19 +79,22 @@ const loadMarkers = async () => {
 
     map.setCenter(atcResult.latlng);
   }
-  //아무것도 못받으면 그냥 현재 주소 표기
-  else {
-    const currentLatLng = await mapUtil.getCurrentLocation();
-    const ctaResult = await mapUtil.searchCoordinateToAddress(currentLatLng);
-    markers.value = [
-      {
-        jibunAddress: ctaResult.jibunAddress,
-        roadAddress: ctaResult.roadAddress,
-        latlng: ctaResult.latlng,
-      },
-    ];
+  //아무것도 못받으면 그냥 현재 주변 건물 표시
+  else if (
+    (!addresssList.value || addresssList.value.length === 0) &&
+    (!latlngList.value || latlngList.value.length === 0)
+  ) {
+    try {
+      // 주변 건물들 가져오기 (지도 중심 이동 후)
+      const buildings = await mapUtil.searchBuildingsInBounds(map);
+      console.log(buildings);
 
-    map.setCenter(currentLatLng);
+      if (buildings.length > 0) {
+        markers.value = buildings;
+      }
+    } catch (error) {
+      console.error("건물 정보 로드 실패:", error);
+    }
   }
 
   // 줌 레벨에 따른 마커/클러스터 관리
@@ -94,6 +103,19 @@ const loadMarkers = async () => {
     toRaw(markers.value),
     "MapSearchMarker",
   );
+};
+
+// 지도 이동 시 마커 업데이트 함수
+const updateMarkersOnMapMove = () => {
+  // 기존 타이머가 있으면 제거
+  if (mapMoveTimer) {
+    clearTimeout(mapMoveTimer);
+  }
+
+  // 마커 업데이트 (화면 이동이 끝나면 실행)
+  mapMoveTimer = setTimeout(async () => {
+    await loadMarkers();
+  }, 3000);
 };
 
 onMounted(async () => {
@@ -105,8 +127,33 @@ onMounted(async () => {
 
     map = mapUtil.createMap(mapEl.value);
 
+    //초기 마커 생성
     naver.maps.Event.addListener(map, "init", async function () {
-      await loadMarkers();
+      //아무것도 없으면 현재주소
+      if (!addresssList.length && !latlngList.length && !searchInput.value) {
+        const currentLatLng = await mapUtil.getCurrentLocation();
+        console.log(currentLatLng);
+        map.setCenter(currentLatLng);
+      }
+
+      // await loadMarkers();
+
+      // 지도 영역 변화 감지
+      watch(
+        //mapBounds 가 시작부터 변화해서 watch가 onMounted 안에 위치
+        mapBounds,
+        () => {
+          if (mapBounds.value !== null) {
+            // updateMarkersOnMapMove();
+          }
+        },
+        { deep: true },
+      );
+    });
+
+    // 지도 이동 감지
+    naver.maps.Event.addListener(map, "bounds_changed", () => {
+      mapBounds.value = map.getBounds();
     });
   } catch (error) {
     console.error("Failed initializing Maps:", error);
@@ -138,6 +185,7 @@ watch(
 </script>
 
 <template>
+  <MapFilter />
   <!--  지도 표시-->
   <div id="map" ref="mapEl" class="relative w-full h-full"></div>
 </template>

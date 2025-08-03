@@ -17,7 +17,7 @@ import Footer from "@/components/layout/Footer.vue";
     </div>
   </Header>
   <!-- 지도부분 넣어주세요!!!! -->
-  <div class="w-full h-[calc(100vh)] bg-kb-ui-08 mt-[1.5rem] rounded-xl">
+  <div class="w-full h-[calc(100vh)] mt-[1.5rem] rounded-xl">
     <!-- 지도 API   -->
     <MapPage />
   </div>
