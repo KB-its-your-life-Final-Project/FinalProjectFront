@@ -10,7 +10,7 @@ import { useGradeCalculation } from "./composables/useGradeCalculation";
 import { useModalState } from "./composables/useModalState";
 import { useIllegalBuildingStatus } from "./composables/useIllegalBuildingStatus";
 import { SafeReportService } from "./services/safeReportService";
-import { getFloorLabel } from "@/utils/floorUtils";
+import { getFloorLabel } from "./composables/floorUtils";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
