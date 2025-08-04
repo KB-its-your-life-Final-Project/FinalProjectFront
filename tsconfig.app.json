@@ -1,5 +1,5 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  // "extends": "@vue/tsconfig/tsconfig.dom.json", 오류가 있어서 주석처리
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/types/naver-maps.d.ts"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
