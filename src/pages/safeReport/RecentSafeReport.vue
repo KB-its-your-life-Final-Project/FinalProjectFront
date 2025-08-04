@@ -107,6 +107,8 @@ const getGradeColorClass = (grade: string | undefined) => {
 
 
 
+
+
 onMounted(() => {
   fetchRecentReports();
 });
@@ -143,10 +145,10 @@ onMounted(() => {
         <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <h3 class="text-lg font-medium text-kb-ui-02 mb-2">최근 본 레포트가 없습니다</h3>
-        <p class="text-kb-ui-03 mb-4">안심 진단을 진행하면 여기에 기록됩니다.</p>
-        <button @click="router.push({ name: 'safeReport' })" class="bg-kb-yellow-positive text-white px-6 py-3 rounded-lg font-medium">
-          안심 진단 시작하기
+        <h3 class="text-lg font-medium text-gray-900 mb-2">최근 본 레포트가 없습니다</h3>
+        <p class="text-gray-500 mb-6">건물을 검색하여 레포트를 생성해보세요.</p>
+        <button @click="router.push({ name: 'safeReport' })" class="bg-kb-yellow text-kb-ui-01 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors">
+          레포트 생성하기
         </button>
       </div>
     </div>
