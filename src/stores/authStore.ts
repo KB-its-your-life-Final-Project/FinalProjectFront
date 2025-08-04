@@ -1,18 +1,19 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { Api } from "@/api/autoLoad/Api";
+import type { MemberDTO } from "@/api/autoLoad/data-contracts";
 
 const api = new Api();
 
 // 사용자 인터페이스
 interface Member {
-  email: string;
-  kakaoId: string;
-  googleId: string;
-  name: string;
-  phone: string;
-  profileImg: string;
-  createdType: number;
+  email?: string;
+  kakaoId?: string;
+  googleId?: string;
+  name?: string;
+  phone?: string;
+  profileImg?: string;
+  createdType?: number;
 }
 
 const getDefaultMember = (): Member => ({
@@ -30,7 +31,7 @@ export const authStore = defineStore("auth", () => {
   const member = ref<Member>(getDefaultMember);
 
   // 이메일 중복 확인
-  const checkDuplicateEmail = async (email: string): Promise<string> => {
+  const checkDuplicateEmail = async (email: string): Promise<boolean> => {
     try {
       const { data } = await api.checkDuplicateEmailUsingGet(email);
       console.log("checking if email is duplicate: ", data);
@@ -41,23 +42,22 @@ export const authStore = defineStore("auth", () => {
         console.log("message: ", data.message);
         console.log("이메일 중복 여부: ", data.data);
       }
-      return data.data;
+      return data.data ?? false;
     } catch (error) {
       throw error;
     }
   };
 
   // 로그인 여부 확인
-  const checkLoginStatus = async (): Promise<boolean> => {
+  const checkLoginStatus = async (): Promise<MemberDTO> => {
     try {
       const { data } = await api.checkLoginStatusUsingGet();
       console.log("로그인 상태 확인 결과: ", data);
-      if (data.success === false) {
-        console.log("message: ", data.message);
-        console.log("로그인 상태 여부: ", data.data);
-      } else {
-        console.log("message: ", data.message);
-        console.log("로그인 상태 여부: ", data.data);
+      console.log("message: ", data.message);
+      console.log("로그인 상태 여부: ", data.data);
+
+      if (!data.data) {
+        throw new Error("로그인 정보가 없습니다.");
       }
       return data.data;
     } catch (error) {
@@ -70,7 +70,7 @@ export const authStore = defineStore("auth", () => {
     try {
       const { data } = await api.loginUsingPost(member);
       console.log("data: !!", data);
-      if (data.success === true) {
+      if (data.success === true && data.data) {
         const createdType = data.data.createdType;
         localStorage.setItem("authUser", JSON.stringify(data.data)); // 사용자 정보만 저장
         if (createdType === 1) {
@@ -82,8 +82,9 @@ export const authStore = defineStore("auth", () => {
         } else {
           console.log("알 수 없는 로그인 방식");
         }
+        return data.data;
       }
-      return data.data;
+      throw new Error(data.message || "로그인 실패");
     } catch (error) {
       throw error;
     }
