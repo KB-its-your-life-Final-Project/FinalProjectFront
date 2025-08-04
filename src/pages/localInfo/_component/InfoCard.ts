@@ -5,7 +5,7 @@ export type InfoCardType = {
   title: string;
   value: string;
   description: string;
-  bgColor: string; // 배경색 클래스 추가
+  color: string;
   apiCall?: (regionCd: string) => Promise<string>;
 };
 
@@ -74,6 +74,8 @@ const fetchHospitalInfo = async (regionCd: string): Promise<string> => {
     console.log("병원 API 응답 전체:", response);
     console.log("병원 API 응답 data:", response.data);
     console.log("병원 API 응답 data.data:", response.data?.data);
+    console.log("병원 API 응답 data.data 타입:", typeof response.data?.data);
+    console.log("병원 API 응답 data.data 키들:", Object.keys(response.data?.data || {}));
 
     const hospital = response.data?.data;
     if (hospital && hospital.totalCount) {
@@ -83,6 +85,8 @@ const fetchHospitalInfo = async (regionCd: string): Promise<string> => {
       return `${hospitalCount.toLocaleString()}개`;
     } else {
       console.log("병원 데이터 없음 또는 totalCount 없음");
+      console.log("hospital 객체:", hospital);
+      console.log("hospital.totalCount:", hospital?.totalCount);
       return "--"; // 기본값
     }
   } catch (err: unknown) {
@@ -97,15 +101,15 @@ export const InfoCardList: InfoCardType[] = [
     title: "인구수",
     value: "20만", // Initial static value
     description: "청년 인구수",
-    bgColor: "bg-blue-500", // 배경색 추가
+    color: "text-blue-500", // 텍스트 색상
     apiCall: fetchPopulationInfo, // Linked API call
   },
   {
     icon: "fa-solid fa-motorcycle",
-    title: "자전거",
+    title: "공공자전거",
     value: "1,234", // Initial static value
     description: "대여소 수",
-    bgColor: "bg-green-500", // 배경색 추가
+    color: "text-green-500", // 텍스트 색상
     apiCall: fetchFacilityInfo, // Linked API call
   },
   {
@@ -113,7 +117,7 @@ export const InfoCardList: InfoCardType[] = [
     title: "치안시설",
     value: "50", // Initial static value
     description: "안심벨 수",
-    bgColor: "bg-red-500", // 배경색 추가
+    color: "text-yellow-500", // 텍스트 색상
     apiCall: fetchSafetyInfo, // Linked API call
   },
   {
@@ -121,7 +125,7 @@ export const InfoCardList: InfoCardType[] = [
     title: "병원",
     value: "15", // Initial static value
     description: "의료기관 수",
-    bgColor: "bg-purple-500", // 배경색 추가
+    color: "text-red-500", // 텍스트 색상
     apiCall: fetchHospitalInfo, // Linked API call
   },
 ];

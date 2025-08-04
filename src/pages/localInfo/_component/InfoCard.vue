@@ -36,7 +36,7 @@ const fetchDynamicData = async (regionCd: string) => {
 // 지역 코드가 변경될 때마다 동적 데이터 다시 가져오기
 watch(
   () => props.regionCd,
-  (newRegionCd) => {
+  (newRegionCd: string | undefined) => {
     console.log("regionCd 변경 감지:", newRegionCd, "카드 제목:", props.info.title);
     if (newRegionCd && props.info.apiCall) {
       fetchDynamicData(newRegionCd);
@@ -77,10 +77,8 @@ const displayValue = computed(() => {
     <!-- 상단: 타이틀 & 아이콘 -->
     <div class="flex items-center justify-between px-4 mt-4">
       <div class="font-pretendard-bold text-3xl text-kb-ui-01">{{ info.title }}</div>
-      <div
-        :class="`rounded-xl w-10 h-10 flex items-center justify-center ${info.bgColor} shadow-md`"
-      >
-        <font-awesome-icon :icon="info.icon" class="text-[20px] text-white" />
+      <div :class="`rounded-xl w-10 h-10 flex items-center justify-center bg-kb-ui-08 shadow-md`">
+        <font-awesome-icon :icon="info.icon" :class="`text-[20px] ${info.color}`" />
       </div>
     </div>
     <!-- 본문: 값/설명 -->
