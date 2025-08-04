@@ -26,6 +26,12 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
 
   //실거래가 상세페이지
   transactionDetail: () => import("@/pages/transaction/TransactionDetailPage.vue"),
+
+  //최근 본 레포트
+  recentSafeReport: () => import("@/pages/safeReport/RecentSafeReport.vue"),
+
+  //안심 진단 결과
+  safeReportResult: () => import("@/pages/safeReport/SafeReportResult.vue"),
 };
 
 //라우트 이름
@@ -41,6 +47,8 @@ const mainRouteName = {
   myPage: "myPage",
   settingAlarm: "settingAlarm",
   transactionDetail: "transactionDetail",
+  recentSafeReport: "recentSafeReport",
+  safeReportResult: "safeReportResult",
 };
 
 //라우트 설정
@@ -69,6 +77,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/safeReport",
     name: mainRouteName.safeReport,
     component: () => import("@/pages/safeReport/SafeReport.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/localInfo",
@@ -94,6 +103,18 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/transactionDetail/:aptName",
     name: "transactionDetailAptName",
     component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
+  },
+  {
+    path: "/recentSafeReport",
+    name: mainRouteName.recentSafeReport,
+    component: () => import("@/pages/safeReport/RecentSafeReport.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/safeReportResult",
+    name: mainRouteName.safeReportResult,
+    component: () => import("@/pages/safeReport/SafeReportResult.vue"),
+    meta: { requiresAuth: true },
   },
 ];
 
