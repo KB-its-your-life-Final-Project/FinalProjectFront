@@ -23,6 +23,10 @@ import {
   faCamera,
   faTriangleExclamation,
   faCircleInfo,
+  faListCheck,
+  faFileContract,
+  faArrowRotateRight,
+  faChartPie,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
@@ -66,6 +70,10 @@ library.add(
   faCamera,
   faTriangleExclamation,
   faCircleInfo,
+  faListCheck,
+  faFileContract,
+  faArrowRotateRight,
+  faChartPie,
 );
 
 export { FontAwesomeIcon };

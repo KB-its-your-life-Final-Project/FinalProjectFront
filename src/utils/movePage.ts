@@ -48,6 +48,7 @@ const movePage = {
   //실거래가 상세페이지
   transactionDetail: makeRoute(mainRouteName.transactionDetail),
 
+
   // myPageRouteName start
   mypage: makeRoute(myPageRouteName.mypage),
   mypageStetting: makeRoute(myPageRouteName.alarmSetting),

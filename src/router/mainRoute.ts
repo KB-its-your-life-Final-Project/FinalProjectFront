@@ -18,7 +18,7 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
   safeReport: () => import("@/pages/safeReport/SafeReport.vue"),
 
   //알람
-  myAlarm: () => import("@/pages/alarm/MyAlarm.vue"),
+  myAlarm: () => import("@/pages/alarm/alarmList.vue"),
 
   //안심진단
   localInfo: () => import("@/pages/localInfo/LocalInfo.vue"),
@@ -26,6 +26,8 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
 
   //실거래가 상세페이지
   transactionDetail: () => import("@/pages/transaction/TransactionDetailPage.vue"),
+  //알람 목록 페이지
+  //alarmList: () => import("@/pages/alarm/TransactionDetailPage.vue")
 };
 
 //라우트 이름
@@ -41,6 +43,7 @@ const mainRouteName = {
   myPage: "myPage",
   settingAlarm: "settingAlarm",
   transactionDetail: "transactionDetail",
+  alarmList:"myAlarm",
 };
 
 //라우트 설정
@@ -83,7 +86,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
   {
     path: "/myAlarm",
     name: mainRouteName.myAlarm,
-    component: () => import("@/pages/alarm/MyAlarm.vue"),
+    component: () => import("@/pages/alarm/alarmList.vue"),
   },
   {
     path: "/transactionDetail",
@@ -95,6 +98,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     name: "transactionDetailAptName",
     component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
   },
+
 ];
 
 export { mainRouteMap, mainRouteName, mainRouteRecordRaw };

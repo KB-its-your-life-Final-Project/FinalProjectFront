@@ -29,7 +29,7 @@ const headerShowList = {
   [mainRouteName.localInfo]: ["showAlarm", "showBack"],
   [mainRouteName.safeReport]: ["showAlarm", "showBack"],
   [mainRouteName.localInfoSearch]: ["showAlarm", "showBack"],
-  [mainRouteName.myAlarm]: ["showBack"],
+  [mainRouteName.myAlarm]: ["showAlarm", "showBack"],
   [mainRouteName.myLike]: ["showBack", "showAlarm"],
   [mainRouteName.mainMenu]: ["showAlarm"],
   [mainRouteName.transactionDetail]: ["showAlarm", "showBack"],
