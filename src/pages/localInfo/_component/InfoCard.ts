@@ -121,7 +121,7 @@ export const InfoCardList: InfoCardType[] = [
     apiCall: fetchSafetyInfo, // Linked API call
   },
   {
-    icon: "fa-solid fa-hospital",
+    icon: "fa-solid fa-first-aid",
     title: "병원",
     value: "15", // Initial static value
     description: "의료기관 수",

@@ -9,6 +9,9 @@ import { InfoCardList } from "@/pages/localInfo/_component/InfoCard.ts";
 import Footer from "@/components/layout/Footer.vue";
 import { ref } from "vue";
 import type { LocalInfoResponseDTO } from "@/api/autoLoad/data-contracts";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 // 선택된 지역 정보
 const selectedRegion = ref<string>("서울특별시");
@@ -38,13 +41,31 @@ const getLastDong = (fullAddress: string) => {
   // "동"이 없으면 마지막 부분 반환
   return parts[parts.length - 1] || fullAddress;
 };
+
+// 하트 클릭 핸들러
+const handleHeartClick = () => {
+  const currentRegion = getLastDong(selectedRegion);
+  router.push({
+    name: "myLike",
+    query: {
+      region: currentRegion,
+      fullAddress: selectedRegion,
+      regionCd: selectedRegionCd,
+    },
+  });
+};
 </script>
 
 <template>
   <Header headerShowtype="localInfo">
     <div class="mt-23">
-      <div class="font-pretendard-bold text-5xl text-kb-ui-10">
+      <div class="font-pretendard-bold text-5xl text-kb-ui-10 flex items-center gap-3">
         {{ getLastDong(selectedRegion) }} 동네이야기
+        <font-awesome-icon
+          icon="fa-solid fa-heart"
+          class="text-rose-500 text-4xl cursor-pointer hover:text-rose-700 transition-colors"
+          @click="handleHeartClick"
+        />
       </div>
     </div>
   </Header>

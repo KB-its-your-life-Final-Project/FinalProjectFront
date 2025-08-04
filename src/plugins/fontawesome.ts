@@ -24,13 +24,14 @@ import {
   faTriangleExclamation,
   faCircleInfo,
   faMotorcycle,
-  faHospital,
+  faFirstAid,
+  faHeart,
+  faCross,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
   faStar as farStar,
   faCircleXmark,
-  faHeart,
   faFileLines,
   faEnvelope,
   faUser,
@@ -69,7 +70,8 @@ library.add(
   faTriangleExclamation,
   faCircleInfo,
   faMotorcycle,
-  faHospital,
+  faHeart,
+  faFirstAid,
 );
 
 export { FontAwesomeIcon };
