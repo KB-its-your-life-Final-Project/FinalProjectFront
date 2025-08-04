@@ -255,7 +255,7 @@ export class Api<
    * @description 건물의 위도/경도와 예산을 받아서 안심 레포트 정보를 생성합니다. 건축년도, 거래금액, 전세가율, 위반여부, 층수/용도 정보를 포함합니다.
    *
    * @tags SafeReport
-   * @name GenerateSafeReportUsingPost
+   * @name generateSafeReportUsingPost
    * @summary 안심 레포트 데이터 요청
    * @request POST:/api/report/requestSafeReport
    */
