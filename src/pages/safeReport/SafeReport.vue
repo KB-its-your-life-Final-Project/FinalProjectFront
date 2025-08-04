@@ -8,7 +8,7 @@ import { mainRouteName } from "@/router/mainRoute";
 import { safeReportStore } from "@/stores/safeReportStore";
 
 const store = safeReportStore();
-const steps = [SearchBuilding, SelectBudget, SafeReportResult]
+const steps = [SearchBuilding, SelectBudget, SafeReportResult];
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 

@@ -8,26 +8,22 @@ export function getFloorLabel(floor: string | undefined): string {
 
   if (floor.startsWith("지")) {
     const remaining = floor.slice(1);
-    const result = "지하" + remaining + (remaining.includes("층") ? "" : "층");
-    return result;
+    return "지하" + remaining + (remaining.includes("층") ? "" : "층");
   }
 
   if (floor.startsWith("상")) {
     const remaining = floor.slice(1);
-    const result = "지상" + remaining + (remaining.includes("층") ? "" : "층");
-    return result;
+    return "지상" + remaining + (remaining.includes("층") ? "" : "층");
   }
 
   if (floor.startsWith("하")) {
     const remaining = floor.slice(1);
-    const result = "지하" + remaining + (remaining.includes("층") ? "" : "층");
-    return result;
+    return "지하" + remaining + (remaining.includes("층") ? "" : "층");
   }
 
   if (floor.startsWith("탑")) {
     const remaining = floor.slice(1);
-    const result = "옥탑" + remaining + (remaining.includes("층") ? "" : "층");
-    return result;
+    return "옥탑" + remaining + (remaining.includes("층") ? "" : "층");
   }
 
   return floor;
