@@ -29,12 +29,24 @@ import {
   SearchHistoryRequestDTO,
   TransactionRequestDTO,
   TransactionResponseDTO,
+  ApiResponseListLocalInfoResponseDTO,
+  ApiResponseWeatherDTO,
+  ApiResponsePopulationDTO,
+  ApiResponseReverseGeocodeResponseDTO,
+  ApiResponseFacilityDTO,
+  ApiResponseHospitalDTO,
+  ApiResponseSafetyDTO,
+  ApiResponseListLocalInfoResponseDTO,
+  ApiResponseWeatherDTO,
+  ApiResponsePopulationDTO,
+  ApiResponseReverseGeocodeResponseDTO,
+  ApiResponseFacilityDTO,
+  ApiResponseHospitalDTO,
+  ApiResponseSafetyDTO,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Api<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -183,11 +195,7 @@ export class Api<
    * @summary findMemberById
    * @request GET:/api/member/{id}
    */
-  findMemberByIdUsingGet = (
-    id: string,
-    data: number,
-    params: RequestParams = {},
-  ) =>
+  findMemberByIdUsingGet = (id: string, data: number, params: RequestParams = {}) =>
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
