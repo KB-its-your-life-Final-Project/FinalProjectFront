@@ -1,121 +1,50 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { watch, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
+import { useBudgetInput } from "./composables/useBudgetInput";
+import { useBudgetValidation } from "./composables/useBudgetValidation";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
 
-const rawInput = ref(""); // 사용자가 입력한 숫자 문자열
-const budget = ref<number | undefined>(store.formData.budget);
-const displayValue = ref(""); // 변환된 한글 금액
-const showError = ref(false);
-const inputRef = ref<HTMLInputElement>();
+// 예산 입력 관리
+const {
+  rawInput,
+  budget,
+  displayValue,
+  inputRef,
+  handleInput,
+  focusInput,
+} = useBudgetInput(store.formData.budget);
 
-// 모달 상태 관리
-const showValidationModal = ref(false);
-const validationMessage = ref("");
+// 예산 검증 관리
+const {
+  showValidationModal,
+  validationMessage,
+  validateBudget,
+  showValidationError,
+  handleValidationConfirm,
+} = useBudgetValidation();
 
-onMounted(() => {
-  setTimeout(() => {
-    inputRef.value?.focus();
-  }, 100);
-});
-
-function handleInput(e: Event) {
-  let val = (e.target as HTMLInputElement).value;
-  // 숫자 이외 입력 불가
-  if (/[^0-9]/.test(val)) {
-    val = val.replace(/[^0-9]/g, "");
-  }
-  if (val === "") {
-    rawInput.value = "";
-    showError.value = false;
-    updateDisplay();
-    return;
-  }
-  if (Number(val) > 999999) {
-    showError.value = true;
-    rawInput.value = "999999"; // val이 아니라 바로 999999로!
-    updateDisplay();
-    return;
-  } else {
-    showError.value = false;
-  }
-  rawInput.value = val;
-  updateDisplay();
-}
-
-function updateDisplay() {
-  if (rawInput.value === "") {
-    displayValue.value = "";
-    budget.value = undefined;
-    return;
-  }
-  const numeric = Number(rawInput.value);
-  displayValue.value = numberToKorean(numeric * 10000);
-  budget.value = numeric;
-}
-
+// store와 동기화
 watch(budget, (val) => {
   store.updateFormData({ budget: val });
 });
 
-// 한글 금액 변환
-function numberToKorean(num: number, removeUnit = ""): string {
-  if (num === 0) return removeUnit ? "" : "영원";
-  const unitWords = ["", "만", "억"];
-  const smallUnitWords = ["", "십", "백", "천"];
-  const numberWords = ["영", "일", "이", "삼", "사", "오", "육", "칠", "팔", "구"];
-  const result = [];
-  let unitPos = 0;
-  while (num > 0) {
-    const part = num % 10000;
-    if (part > 0) {
-      let section = "";
-      const digits = part.toString().padStart(4, "0").split("").map(Number);
-      digits.forEach((digit, idx) => {
-        if (digit !== 0) {
-          if (!(digit === 1 && idx !== 3)) {
-            section += numberWords[digit];
-          }
-          section += smallUnitWords[3 - idx];
-        }
-      });
-      const unit = unitWords[unitPos];
-      if (unit !== removeUnit) {
-        result.unshift(section + unit);
-      } else {
-        result.unshift(section);
-      }
-    }
-    unitPos++;
-    num = Math.floor(num / 10000);
-  }
-  return result.join("");
-}
+onMounted(() => {
+  focusInput();
+});
 
 async function next() {
-  const budget_val = Number(budget.value);
+  const validation = validateBudget(budget.value);
 
-  // 100만원(=100) 이하 불가
-  if (budget.value == null || budget_val <= 0 || !Number.isFinite(budget_val)) {
-    validationMessage.value = "예산을 올바르게 입력해주세요!";
-    showValidationModal.value = true;
-    return;
-  }
-  if (budget_val < 100) {
-    validationMessage.value = "예산은 100만원 이상이어야 합니다!";
-    showValidationModal.value = true;
+  if (!validation.isValid) {
+    showValidationError(validation.message);
     return;
   }
 
   emit("next");
-}
-
-// 모달 확인 핸들러
-function handleValidationConfirm() {
-  return { success: true, message: "확인되었습니다." };
 }
 
 function prev() {

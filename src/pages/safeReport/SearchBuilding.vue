@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
+import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -13,10 +14,21 @@ const dongName = ref(store.formData.dongName);
 const lat = ref<number>(store.formData.lat || 0);
 const lng = ref<number>(store.formData.lng || 0);
 const naverReady = ref(false);
-const showPostcode = ref(false);
+const showAddressLayer = ref(false);
 const showBuildingNotFoundModal = ref(false);
 
-// DAUM 우편 번호 API + Naver Maps API 호출
+// 버튼 활성화 상태 디버깅
+const isButtonEnabled = computed(() => {
+  const hasBuildingName = buildingName.value?.trim();
+  const hasRoadAddress = roadAddress.value?.trim();
+  const hasJibunAddress = jibunAddress.value?.trim();
+
+
+  // 모든 필수 주소 정보가 있어야 활성화
+  return hasBuildingName && hasRoadAddress && hasJibunAddress;
+});
+
+// Naver Maps API 호출
 onMounted(() => {
   // 검색바 초기화
   buildingName.value = "";
@@ -26,11 +38,6 @@ onMounted(() => {
   lat.value = 0;
   lng.value = 0;
 
-  if (!window.daum) {
-    const script = document.createElement("script");
-    script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-    document.head.appendChild(script);
-  }
   if (!window.naver?.maps) {
     const naverScript = document.createElement("script");
     naverScript.src =
@@ -46,48 +53,51 @@ onMounted(() => {
 });
 
 function search() {
-  showPostcode.value = true;
+  showAddressLayer.value = true;
+}
 
-  nextTick(() => {
-    const container = document.getElementById("postcodeContainer");
-    if (!container || !(window as any).daum?.Postcode) return;
+// 주소 선택 완료 핸들러
+function handleAddressComplete(payload: {
+  roadAddress?: string;
+  jibunAddress?: string;
+  buildingName?: string;
+  dongName?: string;
+}) {
+  console.log("전체 주소 데이터:", payload);
 
-    const postcode = new (window as any).daum.Postcode({
-      oncomplete(data: any) {
-        console.log("전체 주소 데이터:", data);
-        if(!data.buildingName || data.buildingName.trim()==""){
-          showBuildingNotFoundModal.value = true;
-          return;
-        }
-        roadAddress.value = data.roadAddress || data.autoRoadAddress || "";
-        jibunAddress.value = data.jibunAddress || data.autoJibunAddress || "";
-        buildingName.value = data.buildingName || "";
-        dongName.value = /[동|로|가]$/.test(data.bname) ? data.bname : "";
+  // 건물명이 없으면 모달 표시
+  if (!payload.buildingName || payload.buildingName.trim() === "") {
+    showBuildingNotFoundModal.value = true;
+    return;
+  }
 
-        store.updateFormData({
-          roadAddress: roadAddress.value,
-          jibunAddress: jibunAddress.value,
-          buildingName: buildingName.value,
-          dongName: dongName.value,
-        });
+  // 주소 정보 업데이트 (SearchAddressLayer에서 이미 auto 주소 처리됨)
+  roadAddress.value = payload.roadAddress || "";
+  jibunAddress.value = payload.jibunAddress || "";
+  buildingName.value = payload.buildingName || "";
+  dongName.value = payload.dongName || "";
 
-        if (roadAddress.value && naverReady.value && jibunAddress.value) {
-          searchAddressToCoordinate(jibunAddress.value);
-        }
-      },
-      onclose: () => {
-        showPostcode.value = false;
-        // 주소 선택 없이 닫으면 초기화
-        if (!buildingName.value?.trim()) {
-          resetFormData();
-        }
-      },
-      width: "100%",
-      height: "100%",
-    });
-
-    postcode.embed(container);
+  // store 업데이트
+  store.updateFormData({
+    roadAddress: roadAddress.value,
+    jibunAddress: jibunAddress.value,
+    buildingName: buildingName.value,
+    dongName: dongName.value,
   });
+
+  // 좌표 변환
+  if (roadAddress.value && naverReady.value && jibunAddress.value) {
+    searchAddressToCoordinate(jibunAddress.value);
+  }
+}
+
+// 주소 레이어 닫기 핸들러
+function handleAddressLayerClose() {
+  showAddressLayer.value = false;
+  // 주소 선택 없이 닫으면 초기화
+  if (!buildingName.value?.trim()) {
+    resetFormData();
+  }
 }
 
 function searchAddressToCoordinate(address: string) {
@@ -138,11 +148,7 @@ function resetFormData() {
   lng.value = 0;
 }
 
-// 닫기 버튼 클릭 시 초기화
-function handleClose() {
-  showPostcode.value = false;
-  resetFormData();
-}
+
 </script>
 
 <template>
@@ -169,26 +175,21 @@ function handleClose() {
       </button>
     </div>
 
-    <!--    주소 검색 창 -->
+    <!-- 주소 검색 레이어 -->
     <teleport to="body">
-      <div
-        v-if="showPostcode"
-        class="fixed left-0 top-0 w-screen h-screen z-[9999] bg-white flex items-center justify-center"
-      >
-        <div id="postcodeContainer" class="w-full h-full" style="min-height: 400px"></div>
-        <button
-          class="absolute top-2 right-2 z-[10000] bg-white text-sm border px-2 py-1 rounded"
-          @click="handleClose"
-        >
-          닫기
-        </button>
-      </div>
+      <SearchAddressLayer
+        :visible="showAddressLayer"
+        :return-fields="['roadAddress', 'jibunAddress', 'buildingName', 'dongName']"
+        :fullscreen="true"
+        @complete="handleAddressComplete"
+        @close="handleAddressLayerClose"
+      />
     </teleport>
 
     <div class="fixed z-0 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
-        :disabled="!buildingName?.trim() || !roadAddress?.trim() || !jibunAddress?.trim()"
+        :disabled="!isButtonEnabled"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
       >
         다음

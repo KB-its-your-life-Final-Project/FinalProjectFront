@@ -4,6 +4,7 @@ import { ref, watch } from "vue";
 const props = defineProps<{
   visible: boolean;
   returnFields?: Array<"roadAddress" | "jibunAddress" | "buildingName" | "dongName">;
+  fullscreen?: boolean; // 전체 화면 모드 여부
 }>();
 
 const emit = defineEmits<{
@@ -39,9 +40,9 @@ watch(
       const postcodeRef = new window.daum.Postcode({
         oncomplete: (data: any) => {
           const fullAddressPayload = {
-            roadAddress: data.roadAddress,
-            jibunAddress: data.jibunAddress,
-            buildingName: data.buildingName && data.apartment === "Y" ? data.buildingName : "",
+            roadAddress: data.roadAddress || data.autoRoadAddress || "",
+            jibunAddress: data.jibunAddress || data.autoJibunAddress || "",
+            buildingName: data.buildingName || "",
             dongName: data.bname && /[동|로|가]$/g.test(data.bname) ? data.bname : "",
           };
 
@@ -63,6 +64,41 @@ watch(
       });
 
       postcodeRef.embed(layerContent.value);
+
+      // iframe 내부 스타일 주입 (글자 크기 조정)
+      setTimeout(() => {
+        const iframe = layerContent.value?.querySelector('iframe');
+        if (iframe) {
+          try {
+            // iframe 로드 완료 후 스타일 주입
+            iframe.onload = () => {
+              try {
+                const doc = iframe.contentDocument || iframe.contentWindow?.document;
+                if (doc) {
+                  const style = doc.createElement('style');
+                  style.textContent = `
+                    * { font-size: 16px !important; }
+                    body { font-size: 16px !important; }
+                    input { font-size: 16px !important; }
+                    button { font-size: 16px !important; }
+                    .tip { font-size: 14px !important; }
+                    .example { font-size: 14px !important; }
+                    .search_tip { font-size: 14px !important; }
+                    .postcode_search { font-size: 16px !important; }
+                    .postcode_search input { font-size: 16px !important; }
+                    .postcode_search button { font-size: 16px !important; }
+                  `;
+                  doc.head.appendChild(style);
+                }
+              } catch (e) {
+                console.log('iframe 스타일 주입 실패:', e);
+              }
+            };
+          } catch (e) {
+            console.log('iframe 접근 실패:', e);
+          }
+        }
+      }, 200);
     }
   },
   { immediate: true },
@@ -76,12 +112,23 @@ function closeLayer() {
 <template>
   <div
     v-show="visible"
-    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white w-full h-full rounded-md"
+    :class="[
+      props.fullscreen
+        ? 'fixed inset-0 z-[9999] bg-white'
+        : 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white w-full h-full rounded-md'
+    ]"
   >
-    <div class="bg-kb-yellow rounded-t-lg h-12">
+    <div class="bg-kb-yellow h-12 flex items-center">
       <button class="px-5 py-3 text-lg cursor-pointer" @click="closeLayer">X</button>
     </div>
-    <div ref="layerContent" class="h-[calc(100%-48px)]">
+    <div
+      ref="layerContent"
+      :class="[
+        props.fullscreen
+          ? 'h-[calc(100vh-48px)]'
+          : 'h-[calc(100%-48px)]'
+      ]"
+    >
       <!-- 여기에 postcode iframe이 embed 됩니다 -->
     </div>
   </div>

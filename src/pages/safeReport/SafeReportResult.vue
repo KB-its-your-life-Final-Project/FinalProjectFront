@@ -4,13 +4,13 @@ import { computed, ref, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
 import ToolTip from "@/components/common/ToolTip.vue";
-import { Api } from "@/api/autoLoad/Api";
 import Header from "@/components/layout/header/Header.vue";
 import { mainRouteName } from "@/router/mainRoute";
-
-const api = new Api();
-
-
+import { useGradeCalculation } from "./composables/useGradeCalculation";
+import { useModalState } from "./composables/useModalState";
+import { useIllegalBuildingStatus } from "./composables/useIllegalBuildingStatus";
+import { SafeReportService } from "./services/safeReportService";
+import { getFloorLabel } from "@/utils/floorUtils";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -20,95 +20,67 @@ const router = useRouter();
 const isStandalonePage = computed(() => {
   return router.currentRoute.value.name === 'safeReportResult';
 });
-const showModal_financial = ref(false);
-const showModal_building = ref(false);
-const showNoDataModal = ref(false); // 데이터 없음 모달
-const showHighRatioModal = ref(false); // 전세가율 높음 모달
+
+// 모달 상태 관리
+const {
+  showModal_financial,
+  showModal_building,
+  showNoDataModal,
+  showHighRatioModal,
+  resetModals,
+  openNoDataModal,
+  openHighRatioModal,
+} = useModalState();
+
 const isLoading = ref(true); // 로딩 상태
+
+// 등급 계산
+const { gradeText, gradeColor, riskText } = useGradeCalculation(() => store.resultData);
+
+// 불법건축물 상태 계산
+const { illegalBox } = useIllegalBuildingStatus(() => store.violationStatus);
 
 // dealAmount가 0인지 체크
 const isNoData = computed(() => {
-  // dealAmount가 0일 때 데이터 없음으로 처리
   return store.resultData?.dealAmount === 0;
-});
-
-const gradeText = computed(() => {
-  if (!store.resultData || typeof store.resultData.score !== "number") return "-";
-  if (store.resultData.score == 10) return "안전";
-  else if (store.resultData.score == 6) return "주의";
-  else return "위험";
-
-});
-
-const gradeColor = computed(() => {
-  if (!store.resultData || typeof store.resultData.score !== "number") {
-    return {
-      bg: "bg-gray-100",
-      text: "text-gray-400",
-      label: "-",
-    };
-  }
-  if (store.resultData.score == 10) {
-    return {
-      bg: "bg-yellow-100",
-      text: "text-yellow-600",
-      label: "안전",
-
-    };
-  } else if (store.resultData.score == 6) {
-    return {
-      bg: "bg-orange-100",
-      text: "text-orange-500",
-      label: "주의",
-    };
-  } else{
-    return {
-      bg: "bg-red-100",
-      text: "text-red-600",
-      label: "위험",
-    };
-  }
-  }
-);
-
-const riskText = computed(() => {
-  if (gradeText.value === "위험" || gradeText.value === "주의") {
-    return "보증금 회수에 대한 리스크가 있습니다.";
-  } else if (gradeText.value === "안전") {
-    return "보증금 회수에 대한 리스크가 없습니다.";
-  }
-  return "";
 });
 
 onMounted(async () => {
   // 모달 상태 초기화
-  showNoDataModal.value = false;
-  showHighRatioModal.value = false;
+  resetModals();
   isLoading.value = true;
 
   // localStorage에서 데이터 확인
   const fromRecentReports = localStorage.getItem('fromRecentReports');
-  const savedReportDataStr = localStorage.getItem('savedReportData');
 
-  if (fromRecentReports === 'true' && savedReportDataStr) {
+  if (fromRecentReports === 'true') {
     // 최근 본 레포트에서 온 경우
-    const savedData = JSON.parse(savedReportDataStr);
+    await loadSavedReportData();
+  } else {
+    // 일반적인 안심 진단 플로우 - 서버에 API 요청
+    await loadReportFromAPI();
+  }
+});
 
-            // store 초기화 (이전 데이터 제거)
+// 저장된 리포트 데이터 로드
+async function loadSavedReportData() {
+  try {
+    const savedData = SafeReportService.loadSavedReportData();
+    if (!savedData) {
+      console.error("저장된 데이터가 없습니다.");
+      isLoading.value = false;
+      return;
+    }
+
+    // store 초기화 (이전 데이터 제거)
     store.resetStore();
 
-    // localStorage에서 건물명과 예산 정보를 가져와서 store에 저장
-    const buildingName = localStorage.getItem('buildingName') || '';
-    const budget = localStorage.getItem('budget') ? parseInt(localStorage.getItem('budget')!) : undefined;
-    const roadAddress = localStorage.getItem('roadAddress') || '';
+    // localStorage에서 건물 정보 로드
+    const buildingInfo = SafeReportService.loadBuildingInfo();
+    store.updateFormData(buildingInfo);
 
-    store.updateFormData({
-      buildingName,
-      budget,
-      roadAddress
-    });
     // 전달받은 데이터로 store 업데이트
-    store.updateResultData(savedData.rentalRatioAndBuildyear ?? null);
+    store.updateResultData(savedData.rentalRatioAndBuildyear);
 
     if (savedData.violationStatus) {
       store.updateViolationStatusVO(savedData.violationStatus);
@@ -118,127 +90,56 @@ onMounted(async () => {
       store.updateFloorAndPurposeList(savedData.floorAndPurposeList);
     }
 
-    // dealAmount가 0인지 체크
-    if (savedData.rentalRatioAndBuildyear?.dealAmount === 0) {
-      showNoDataModal.value = true;
+    // 데이터 유효성 검사 및 모달 표시
+    const validation = SafeReportService.validateReportData(savedData);
+    if (validation.hasNoData) {
+      openNoDataModal();
     }
-
-    // reverseRentalRatio가 100 이상인지 체크
-    if ((savedData.rentalRatioAndBuildyear?.reverseRentalRatio ?? 0) >= 100) {
-      showHighRatioModal.value = true;
+    if (validation.hasHighRatio) {
+      openHighRatioModal();
     }
 
     // localStorage 정리
-    localStorage.removeItem('savedReportData');
-    localStorage.removeItem('fromRecentReports');
-    localStorage.removeItem('buildingName');
-    localStorage.removeItem('budget');
-    localStorage.removeItem('roadAddress');
+    SafeReportService.clearLocalStorage();
 
     isLoading.value = false;
-  } else {
-    // 일반적인 안심 진단 플로우 - 서버에 API 요청
-    try {
-      console.log("보낼 데이터", { ...store.formData });
-      const requestDto = store.createRequestDto();
-                        const { data } = await api.generateSafeReportUsingPost(requestDto);
-      console.log("서버 응답:", data);
+  } catch (error) {
+    console.error("저장된 데이터 로드 실패:", error);
+    isLoading.value = false;
+  }
+}
 
-      store.updateResultData(data.data?.rentalRatioAndBuildyear ?? null);
+// API에서 리포트 데이터 로드
+async function loadReportFromAPI() {
+  try {
+    const requestDto = store.createRequestDto();
+    const reportData = await SafeReportService.generateSafeReport(requestDto);
 
-      if (data.data?.violationStatus) {
-        store.updateViolationStatusVO(data.data.violationStatus);
-      }
+    store.updateResultData(reportData.rentalRatioAndBuildyear);
 
-      if (data.data?.floorAndPurposeList) {
-        store.updateFloorAndPurposeList(data.data.floorAndPurposeList);
-      }
-
-      // dealAmount가 0인지 체크
-      if (data.data?.rentalRatioAndBuildyear?.dealAmount === 0) {
-        showNoDataModal.value = true;
-      }
-
-      // reverseRentalRatio가 100 이상인지 체크
-      if ((data.data?.rentalRatioAndBuildyear?.reverseRentalRatio ?? 0) >= 100) {
-        showHighRatioModal.value = true;
-      }
-
-      isLoading.value = false;
-    } catch (error) {
-      console.error("전송 실패: ", error);
-      isLoading.value = false;
+    if (reportData.violationStatus) {
+      store.updateViolationStatusVO(reportData.violationStatus);
     }
-  }
-});
 
-function getFloorLabel(floor: string | undefined) {
-  if (!floor) return "";
-  if (floor.startsWith("지")) {
-    const remaining = floor.slice(1);
-    const result = "지하" + remaining + (remaining.includes("층") ? "" : "층");
-    return result;
-  }
-  if (floor.startsWith("상")) {
-    const remaining = floor.slice(1);
-    const result = "지상" + remaining + (remaining.includes("층") ? "" : "층");
-    return result;
-  }
-  if (floor.startsWith("하")) {
-    const remaining = floor.slice(1);
-    const result = "지하" + remaining + (remaining.includes("층") ? "" : "층");
-    return result;
-  }
-  if (floor.startsWith("탑")) {
-    const remaining = floor.slice(1);
-    const result = "옥탑" + remaining + (remaining.includes("층") ? "" : "층");
-    return result;
-  }
-  return floor;
-}
+    if (reportData.floorAndPurposeList) {
+      store.updateFloorAndPurposeList(reportData.floorAndPurposeList);
+    }
 
-function goHome() {
-  store.resetStore();
-  router.push({ name: "homeMain" });
-}
-function goToSelectBudget() {
-  // 예산만 초기화하고 건물 정보는 유지
-  store.updateFormData({ budget: undefined });
-  store.updateResultData(null);
-  emit("prev");
-}
-function goToKB() {
-  window.open("https://m.naver.com/");
-}
+    // 데이터 유효성 검사 및 모달 표시
+    const validation = SafeReportService.validateReportData(reportData);
+    if (validation.hasNoData) {
+      openNoDataModal();
+    }
+    if (validation.hasHighRatio) {
+      openHighRatioModal();
+    }
 
-// 박스2(불법건축물) 색상 및 텍스트 동적 처리
-const illegalBox = computed(() => {
-  const status = store.violationStatus;
-  // 조회 불가
-  if (status === null || status === undefined) {
-    return {
-      bg: 'bg-gray-200',
-      text: 'text-gray-500',
-      label: '조회 불가',
-    };
+    isLoading.value = false;
+  } catch (error) {
+    console.error("전송 실패: ", error);
+    isLoading.value = false;
   }
-  // 위험 (위반건축물)
-  else if (status === '위반건축물') {
-    return {
-      bg: 'bg-red-100',
-      text: 'text-red-600',
-      label: '있음',
-    };
-  }
-  // 안전 건축물물
-  else {
-    return {
-    bg: 'bg-green-100',
-    text: 'text-green-700',
-    label: '없음',
-  };
 }
-});
 
 // resUseType이 빈 문자열이 아닌 항목만 필터링
 const filteredFloorAndPurposeList = computed(() => {
@@ -250,6 +151,22 @@ const filteredFloorAndPurposeList = computed(() => {
 
 // 층별 용도 펼침/접힘 상태
 const showFloorDetails = ref(false);
+
+function goHome() {
+  store.resetStore();
+  router.push({ name: "homeMain" });
+}
+
+function goToSelectBudget() {
+  // 예산만 초기화하고 건물 정보는 유지
+  store.updateFormData({ budget: undefined });
+  store.updateResultData(null);
+  emit("prev");
+}
+
+function goToKB() {
+  window.open("https://m.naver.com/");
+}
 </script>
 
 <template>

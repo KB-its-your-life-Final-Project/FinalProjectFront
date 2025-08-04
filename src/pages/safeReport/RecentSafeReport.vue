@@ -11,8 +11,10 @@ const api = new Api();
 
 // 상태 관리
 const recentReports = ref<RecentSafeReportResponseDto[]>([]);
+const allReports = ref<RecentSafeReportResponseDto[]>([]); // 전체 데이터 저장
 const isLoading = ref(true);
 const error = ref<string | null>(null);
+const MAX_DISPLAY_COUNT = 5; // 최대 표시 개수
 
 // 최근 본 레포트 목록 가져오기
 const fetchRecentReports = async () => {
@@ -23,8 +25,11 @@ const fetchRecentReports = async () => {
     const response = await api.getRecentReportsUsingGet();
 
     if (response.data?.data) {
-      recentReports.value = response.data.data;
+      allReports.value = response.data.data;
+      // 최대 5개만 표시
+      recentReports.value = response.data.data.slice(0, MAX_DISPLAY_COUNT);
     } else {
+      allReports.value = [];
       recentReports.value = [];
     }
   } catch (err) {
@@ -40,8 +45,11 @@ const deleteReport = async (reportId: number) => {
   try {
     await api.deleteRecentReportUsingDelete(reportId);
 
-    // 목록에서 제거
-    recentReports.value = recentReports.value.filter(report => report.id !== reportId);
+    // 전체 목록에서 제거
+    allReports.value = allReports.value.filter(report => report.id !== reportId);
+
+    // 표시 목록 업데이트 (최대 5개)
+    recentReports.value = allReports.value.slice(0, MAX_DISPLAY_COUNT);
   } catch (err) {
     console.error('레포트 삭제 실패:', err);
     alert('레포트 삭제에 실패했습니다.');
@@ -91,7 +99,7 @@ const getGradeColorClass = (grade: string | undefined) => {
     case '주의':
       return 'bg-orange-100 text-orange-800';
     case '위험':
-      return 'bg-red-100 text-red-800';
+      return 'bg-error text-error';
     default:
       return 'bg-gray-100 text-gray-800';
   }
@@ -144,7 +152,8 @@ onMounted(() => {
     </div>
 
     <!-- 레포트 목록 -->
-    <div v-else class="p-4 h-[calc(100vh-120px)] overflow-y-auto">
+    <div v-else class="p-4 h-[calc(100vh-180px)] overflow-y-auto pb-6">
+
       <div v-for="report in recentReports" :key="report.id" class="bg-kb-ui-11 rounded-lg shadow-sm border border-kb-ui-06 overflow-hidden mb-4 last:mb-0">
         <!-- 카드 헤더 -->
         <div class="flex items-center justify-between p-4 border-b border-kb-ui-07">
@@ -181,7 +190,7 @@ onMounted(() => {
               열람일: {{ formatDate(report.updatedAt || '') }}
             </span>
             <span class="text-sm font-medium text-green-600">
-              안전진단 완료
+              안심심진단 완료
             </span>
           </div>
         </div>
