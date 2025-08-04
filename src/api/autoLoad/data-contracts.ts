@@ -10,6 +10,19 @@
  * ---------------------------------------------------------------
  */
 
+/** EstateWishlistRequestDTO */
+export interface EstateWishlistRequestDTO {
+  /** @format int64 */
+  estateId?: number;
+}
+
+/** EstateWishlistResponseDTO */
+export interface EstateWishlistResponseDTO {
+  buildingName?: string;
+  /** @format int64 */
+  estateId?: number;
+}
+
 /** FloorAndPurpose */
 export interface FloorAndPurpose {
   resArea?: string;
@@ -52,6 +65,17 @@ export interface MemberDTO {
   regIp?: string;
 }
 
+/** RegionWishlistRequestDTO */
+export interface RegionWishlistRequestDTO {
+  regionCd?: string;
+}
+
+/** RegionWishlistResponseDTO */
+export interface RegionWishlistResponseDTO {
+  regionCd?: string;
+  umdNm?: string;
+}
+
 /** RentalRatioAndBuildyear */
 export interface RentalRatioAndBuildyear {
   /** @format int32 */
@@ -91,6 +115,75 @@ export interface SafeReportResponseDto {
 export interface ViolationStatusVO {
   violationStatus?: string;
 }
+// LocalInfo 관련 타입들
+export interface LocalInfoResponseDTO {
+  region?: string;
+  regionCd?: string;
+  /** @format int32 */
+  gridX?: number;
+  /** @format int32 */
+  gridY?: number;
+  locataddNm?: string;
+}
+
+export interface WeatherDTO {
+  temperature?: string;
+  maxTemperature?: string;
+  minTemperature?: string;
+  skyCondition?: string;
+}
+
+export interface PopulationDTO {
+  regionCd?: string;
+  regionName?: string;
+  locataddNm?: string;
+  /** @format int64 */
+  populationTotal?: number;
+  /** @format int64 */
+  populationYouth?: number;
+}
+
+export interface FacilityDTO {
+  regionCd?: string;
+  regionName?: string;
+  locataddNm?: string;
+  /** @format int64 */
+  totalBicycleCount?: number;
+}
+
+export interface HospitalDTO {
+  regionCd?: string;
+  regionName?: string;
+  locataddNm?: string;
+  /** @format int64 */
+  totalCount?: number;
+}
+
+export interface SafetyDTO {
+  regionCd?: string;
+  regionName?: string;
+  locataddNm?: string;
+  /** @format int64 */
+  totalCount?: number;
+}
+
+export interface ReverseGeocodeResponseDTO {
+  address?: string;
+  regionCd?: string;
+  /** @format double */
+  latitude?: number;
+  /** @format double */
+  longitude?: number;
+}
+
+/** ApiResponse«FormData» */
+export interface ApiResponseFormData {
+  /** @format int32 */
+  code?: number;
+  data?: EstateWishlistResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
 
 /** YouthContentDTO */
 export interface YouthContentDTO {
@@ -127,6 +220,24 @@ export interface ApiResponseListYouthContentDTO {
   success?: boolean;
 }
 
+/** ApiResponse«List«RegionWishlistResponseDTO»» */
+export interface ApiResponseListRegionWishlistResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: RegionWishlistResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«SearchHistoryResponseDTO»» */
+export interface ApiResponseListSearchHistoryResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: SearchHistoryResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«MemberDTO» */
 export interface ApiResponseMemberDTO {
   /** @format int32 */
@@ -145,11 +256,76 @@ export interface ApiResponseSafeReportResponseDto {
   success?: boolean;
 }
 
+/** ApiResponse«Void» */
+export interface ApiResponseVoid {
+  /** @format int32 */
+  code?: number;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«boolean» */
 export interface ApiResponseBoolean {
   /** @format int32 */
   code?: number;
   data?: boolean;
+  message?: string;
+  success?: boolean;
+}
+
+// LocalInfo API 응답 타입들
+export interface ApiResponseListLocalInfoResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: LocalInfoResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseWeatherDTO {
+  /** @format int32 */
+  code?: number;
+  data?: WeatherDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponsePopulationDTO {
+  /** @format int32 */
+  code?: number;
+  data?: PopulationDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseFacilityDTO {
+  /** @format int32 */
+  code?: number;
+  data?: FacilityDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseHospitalDTO {
+  /** @format int32 */
+  code?: number;
+  data?: HospitalDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseSafetyDTO {
+  /** @format int32 */
+  code?: number;
+  data?: SafetyDTO;
+  message?: string;
+  success?: boolean;
+}
+
+export interface ApiResponseReverseGeocodeResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: ReverseGeocodeResponseDTO;
   message?: string;
   success?: boolean;
 }
