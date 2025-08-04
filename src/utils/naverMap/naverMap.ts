@@ -10,6 +10,7 @@
 import { createApp, h } from "vue";
 import MapSearchMarker from "@/pages/mapSearch/_components/MapSearchMarker.vue";
 import type { MarkerDataType } from "./naverMapCustomType";
+import movePage from "../movePage";
 
 const mapUtil = {
   // 네이버 지도 API 스크립트 로드
@@ -88,7 +89,7 @@ const mapUtil = {
 
       //기준 줌 15레벨
       if (currentZoom >= 17) {
-        currentMarkers = mapUtil.createMarkers(map, markerDataList, markerType, onClickCallback);
+        currentMarkers = mapUtil.createMarkers(map, markerDataList, markerType);
       } else {
         currentClusters = mapUtil.createClusters(map, markerDataList);
       }
@@ -112,12 +113,11 @@ const mapUtil = {
     map: naver.maps.Map,
     markerDataList: Array<MarkerDataType>,
     markerType?: "MapSearchMarker",
-    onClickCallback?: (markerData: any, marker: naver.maps.Marker) => void,
   ) => {
     const markers: naver.maps.Marker[] = []; // 마커 배열 추가
 
-    markerDataList.forEach((MarkerDataType, index) => {
-      const position = MarkerDataType.latlng;
+    markerDataList.forEach((MarkerData, index) => {
+      const position = MarkerData.latlng;
       let iconContent: any = undefined;
 
       // 문자열에 따라 다른 컴포넌트 사용
@@ -135,7 +135,7 @@ const mapUtil = {
           const tempDiv = document.createElement("div");
           const app = createApp({
             render() {
-              return h(markerIcon, MarkerDataType);
+              return h(markerIcon, MarkerData);
             },
           });
           app.mount(tempDiv);
@@ -157,11 +157,15 @@ const mapUtil = {
       });
 
       // 클릭시 이벤트
-      if (onClickCallback) {
-        naver.maps.Event.addListener(marker, "click", () => {
-          onClickCallback(MarkerDataType, marker);
+      naver.maps.Event.addListener(marker, "click", () => {
+        movePage.transactionDetail({
+          jibunAddress: encodeURIComponent(MarkerData.jibunAddress),
+          roadAddress: encodeURIComponent(MarkerData.roadAddress),
+          lat: MarkerData.latlng.lat().toString(),
+          lng: MarkerData.latlng.lng().toString(),
+          buildingName: encodeURIComponent(MarkerData.buildingName || ""),
         });
-      }
+      });
 
       markers.push(marker);
 
@@ -175,10 +179,7 @@ const mapUtil = {
   },
 
   // 클러스터 생성
-  createClusters: (
-    map: naver.maps.Map,
-    markerDataList: Array<MarkerDataType>,
-  ) => {
+  createClusters: (map: naver.maps.Map, markerDataList: Array<MarkerDataType>) => {
     const clusters: any[] = [];
 
     // 간단한 클러스터링 로직 (격자 기반)
@@ -197,7 +198,7 @@ const mapUtil = {
     });
 
     // 클러스터 마커 생성
-    clusterMap.forEach((markers, clusterKey) => {
+    clusterMap.forEach((markers) => {
       if (markers.length > 0) {
         const centerLat =
           markers.reduce((sum: number, m: any) => sum + m.latlng.lat(), 0) / markers.length;
@@ -268,15 +269,15 @@ const mapUtil = {
     let gridSize: number;
 
     if (currentZoom >= 20) {
-      gridSize = 0.0002; // 약 20m 간격 (줌 레벨 20 이상)
+      gridSize = 0.0001; // 약 20m 간격 (줌 레벨 20 이상)
     } else if (currentZoom >= 19) {
-      gridSize = 0.0005; // 약 50m 간격 (줌 레벨 19)
+      gridSize = 0.0003; // 약 50m 간격 (줌 레벨 19)
     } else if (currentZoom >= 17) {
-      gridSize = 0.001; // 약 100m 간격 (줌 레벨 17-18)
+      gridSize = 0.0006; // 약 100m 간격 (줌 레벨 17-18)
     } else if (currentZoom >= 15) {
-      gridSize = 0.002; // 약 200m 간격 (줌 레벨 15-16)
+      gridSize = 0.001; // 약 200m 간격 (줌 레벨 15-16)
     } else {
-      gridSize = 0.005; // 약 500m 간격 (줌 레벨 15 미만)
+      gridSize = 0.0025; // 약 500m 간격 (줌 레벨 15 미만)
     }
 
     const minLat = bounds.getMin().y;
@@ -339,7 +340,7 @@ const mapUtil = {
               buildings.push(buildingInfo);
               // console.log(`⚠️ 정확한 좌표 검색 실패, 원본 사용: ${buildingInfo.jibunAddress}`);
             }
-          } 
+          }
         } else {
           // console.log(`⚠️ 유효하지 않은 주소: ${buildingInfo.jibunAddress}`);
         }
@@ -360,9 +361,7 @@ const mapUtil = {
   },
 
   // 좌표 기반 주소 검색
-  searchCoordinateToAddress: (
-    latlng: naver.maps.LatLng,
-  ): Promise<{ jibunAddress: string; roadAddress: string; latlng: naver.maps.LatLng }> => {
+  searchCoordinateToAddress: (latlng: naver.maps.LatLng): Promise<MarkerDataType> => {
     return new Promise((resolve, reject) => {
       naver.maps.Service.reverseGeocode(
         {
@@ -388,9 +387,7 @@ const mapUtil = {
   },
 
   // 주소 기반 좌표 검색
-  searchAddressToCoordinate: (
-    address: string,
-  ): Promise<{ jibunAddress: string; roadAddress: string; latlng: naver.maps.LatLng }> => {
+  searchAddressToCoordinate: (address: string): Promise<MarkerDataType> => {
     return new Promise((resolve, reject) => {
       naver.maps.Service.geocode(
         {

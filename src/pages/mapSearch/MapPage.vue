@@ -3,15 +3,18 @@ import { ref, onMounted, toRaw, watch } from "vue";
 import mapUtil from "@/utils/naverMap/naverMap";
 import { useRoute } from "vue-router";
 import MapFilter from "@/pages/mapSearch/_components/MapFilter.vue";
+import MapDetailList from "@/pages/mapSearch/_components/MapDetailList.vue";
+import { MarkerDataType } from "@/utils/naverMap/naverMapCustomType";
 
 //지도 필수 변수
 const mapEl = ref<HTMLDivElement | null>(null);
-const markers = ref<Array<any>>([]);
+const markers = ref<Array<MarkerDataType>>([]);
 let map: any;
 let markerManager: any;
 let mapMoveTimer: any;
 
 const route = useRoute();
+const mapDetailShow = ref(true);
 
 //주소 검색시
 const searchInput = route.query.searchInput
@@ -130,13 +133,13 @@ onMounted(async () => {
     //초기 마커 생성
     naver.maps.Event.addListener(map, "init", async function () {
       //아무것도 없으면 현재주소
-      if (!addresssList.length && !latlngList.length && !searchInput.value) {
+      if (!addresssList.value?.length && !latlngList.value?.length && !searchInput.value) {
         const currentLatLng = await mapUtil.getCurrentLocation();
         console.log(currentLatLng);
         map.setCenter(currentLatLng);
       }
 
-      // await loadMarkers();
+      await loadMarkers();
 
       // 지도 영역 변화 감지
       watch(
@@ -187,7 +190,15 @@ watch(
 <template>
   <MapFilter />
   <!--  지도 표시-->
-  <div id="map" ref="mapEl" class="relative w-full h-full"></div>
+  <div id="map" ref="mapEl" class="relative w-full h-full">
+    <div v-if="mapDetailShow" class="absolute bottom-0 z-10 w-full h-65 border-1">
+      <MapDetailList :markers="markers">
+        <template v-slot:mapDetailShow>
+          <div @click="mapDetailShow = false">X</div>
+        </template>
+      </MapDetailList>
+    </div>
+  </div>
 </template>
 
 <style scoped></style>
