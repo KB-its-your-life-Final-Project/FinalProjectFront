@@ -45,7 +45,7 @@ const movePage = {
   register: makeRoute(authRouteName.register),
   // authRouteName end
 
-//실거래가 상세페이지
+  //실거래가 상세페이지
   transactionDetail: makeRoute(mainRouteName.transactionDetail),
 
   // myPageRouteName start

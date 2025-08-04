@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
 import type { AxiosError } from "axios";
+import movePage from "@/utils/movePage";
 import { authStore } from "@/stores/authStore.ts";
 import GoBackBtn from "@/components/common/GoBackBtn.vue";
 import RegisterLink from "@/components/common/RegisterLink.vue";
 import { isEmpty, isValidEmailFormat } from "@/utils/validate";
-import { LoginDTO } from "@/api/autoLoad/data-contracts";
+import type { LoginDTO } from "@/api/autoLoad/data-contracts";
 
-const router = useRouter();
 const auth = authStore();
 
 const member = reactive<LoginDTO>({
@@ -53,7 +52,7 @@ const login = async () => {
     const response = await auth.login(member);
     console.log("로그인 성공");
     console.log("response", response);
-    router.push("/");
+    movePage.homeMain();
   } catch (error) {
     const err = error as AxiosError;
     checkSubmitMsg.value = "비밀번호가 일치하지 않습니다";

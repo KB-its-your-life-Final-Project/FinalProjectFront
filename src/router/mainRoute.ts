@@ -18,7 +18,7 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
   safeReport: () => import("@/pages/safeReport/SafeReport.vue"),
 
   //알람
-  myAlarm: () => import("@/pages/alarm/myAlarm.vue"),
+  myAlarm: () => import("@/pages/alarm/MyAlarm.vue"),
 
   //안심진단
   localInfo: () => import("@/pages/localInfo/LocalInfo.vue"),
@@ -92,7 +92,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
   {
     path: "/myAlarm",
     name: mainRouteName.myAlarm,
-    component: () => import("@/pages/alarm/myAlarm.vue"),
+    component: () => import("@/pages/alarm/MyAlarm.vue"),
   },
   {
     path: "/transactionDetail",
