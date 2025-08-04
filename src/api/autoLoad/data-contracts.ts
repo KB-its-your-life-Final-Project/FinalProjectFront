@@ -15,7 +15,6 @@ export interface ChangeRequestDTO {
   /** @format int32 */
   changeType?: number;
   name?: string;
-  profileImg?: string;
   pwd?: string;
 }
 
@@ -164,6 +163,8 @@ export interface YouthContentDTO {
   bbsSn?: string;
   frstRegDt?: string;
   frstRgtrNm?: string;
+  /** @format int64 */
+  id?: number;
   lastMdfcnDt?: string;
   lastMdfrNm?: string;
   pstInqCnt?: string;

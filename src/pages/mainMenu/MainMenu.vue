@@ -47,7 +47,7 @@ function openInquiry() {
           <ProfileImage :src="auth.member.createdType === 0 ? logo : (auth.member.profileImg || defaultProfile)" />
         </div>
         <div class="flex-[3]">
-          <ProfileInfo :name="auth.member.name || '안전한 거래의 시작,'" :email="auth.member.email || 'Light House'"></ProfileInfo>
+          <ProfileInfo :name="auth.member.name || '안전한 거래의 시작,'" :email="auth.member.createdType === 0 ? 'Light House' : (auth.member.email || '')"></ProfileInfo>
         </div>
       </div>
     </div>
@@ -75,7 +75,7 @@ function openInquiry() {
   </div>
 
   <div class="mt-8 flex justify-center gap-40 text-sm text-kb-ui-05 pb-6">
-    <button class="underline cursor-pointer" @click="withdraw">회원탈퇴</button>
+    <!-- <button class="underline cursor-pointer" @click="withdraw">회원탈퇴</button> -->
     <button class="underline cursor-pointer" @click="logout">로그아웃</button>
   </div>
   <Footer />

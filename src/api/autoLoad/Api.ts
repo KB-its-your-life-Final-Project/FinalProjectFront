@@ -10,7 +10,7 @@
  * ---------------------------------------------------------------
  */
 
-import type {
+import {
   ApiResponseBoolean,
   ApiResponseListEstateWishlistResponseDTO,
   ApiResponseListMemberResponseDTO,
@@ -30,8 +30,7 @@ import type {
   TransactionResponseDTO,
   VerifyPwdRequestDTO,
 } from "./data-contracts";
-import { ContentType, HttpClient } from "./http-client";
-import type { RequestParams } from "./http-client";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 export class Api<
   SecurityDataType = unknown,
@@ -40,11 +39,11 @@ export class Api<
    * No description
    *
    * @tags member-controller
-   * @name FindAllUsersUsingGet
-   * @summary findAllUsers
+   * @name FindAllMembersUsingGet
+   * @summary findAllMembers
    * @request GET:/api/member
    */
-  findAllUsersUsingGet = (params: RequestParams = {}) =>
+  findAllMembersUsingGet = (params: RequestParams = {}) =>
     this.request<ApiResponseListMemberResponseDTO, void>({
       path: `/api/member`,
       method: "GET",
@@ -156,6 +155,21 @@ export class Api<
    * No description
    *
    * @tags member-controller
+   * @name UnregisterUsingPost
+   * @summary unregister
+   * @request POST:/api/member/unregister
+   */
+  unregisterUsingPost = (params: RequestParams = {}) =>
+    this.request<ApiResponseMemberResponseDTO, void>({
+      path: `/api/member/unregister`,
+      method: "POST",
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
    * @name VerifyPwdUsingPost
    * @summary verifyPwd
    * @request POST:/api/member/verifypwd
@@ -197,6 +211,85 @@ export class Api<
     this.request<ApiResponseListYouthContentDTO, void>({
       path: `/api/news`,
       method: "GET",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags news-controller
+   * @name GetUnreadContentsUsingGet
+   * @summary getUnreadContents
+   * @request GET:/api/news/list
+   */
+  getUnreadContentsUsingGet = (
+    query: {
+      /**
+       * memberId
+       * @format int64
+       */
+      memberId: number;
+      /**
+       * page
+       * @format int32
+       */
+      page: number;
+      /**
+       * size
+       * @format int32
+       */
+      size: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListYouthContentDTO, void>({
+      path: `/api/news/list`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags news-controller
+   * @name MarkAsReadUsingPost
+   * @summary markAsRead
+   * @request POST:/api/news/read
+   */
+  markAsReadUsingPost = (
+    query: {
+      /**
+       * contentId
+       * @format int64
+       */
+      contentId: number;
+      /**
+       * memberId
+       * @format int64
+       */
+      memberId: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<void, void>({
+      path: `/api/news/read`,
+      method: "POST",
+      query: query,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags news-controller
+   * @name SyncYouthContentsUsingPost
+   * @summary syncYouthContents
+   * @request POST:/api/news/sync
+   */
+  syncYouthContentsUsingPost = (params: RequestParams = {}) =>
+    this.request<object, void>({
+      path: `/api/news/sync`,
+      method: "POST",
+      type: ContentType.Json,
       ...params,
     });
   /**

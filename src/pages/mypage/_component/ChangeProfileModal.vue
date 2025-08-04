@@ -1,14 +1,27 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import ModalForm from "@/components/common/ModalForm.vue";
+import { Api } from "@/api/autoLoad/Api";
+import type { ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
+import { useToast } from "@/utils/useToast";
+import { authStore } from "@/stores/authStore";
+
+// 상태
+const selectedFile = ref<File | null>(null);
+const previewUrl = ref<string>("");
+
+// Props & Emit
 const props = defineProps<{
   profile: string;
   name: string;
 }>();
 const emit = defineEmits(["close"]);
 
-const selectedFile = ref<File | null>(null);
-const previewUrl = ref<string>("");
+// API
+const api = new Api();
+
+const auth = authStore();
+
 function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -17,18 +30,22 @@ function handleFileChange(event: Event) {
     previewUrl.value = URL.createObjectURL(file);
   }
 }
-function handleConfirm(): { success: boolean; message: string } {
+
+async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   if (!selectedFile.value) {
-    return { success: false, message: "이미지를 선택해주세요." };
+    return { success: false, message: "이미지를 선택하세요" };
   }
-  /** todo: 실제 프로필 화면 변경 로직이 구성되어야 함. */
-  const tmpRepository = "/Users/cheonkio/upload/avatar";
-  const newFileName = `${props.name}_profile.jpg`;
-  const renamedFile = new File([selectedFile.value], newFileName, {
-    type: selectedFile.value.type,
-  });
-  console.log(renamedFile.name, "이 ", tmpRepository, "에 저장되었습니다");
-  return { success: true, message: "프로필이 변경되었습니다" };
+  const formData = new FormData();
+  formData.append("file", selectedFile.value);
+  formData.append("changeType", "3");
+  try {
+    const { data } = await api.changeMemberInfoUsingPut(formData);
+    console.log("data: ", data);
+    return { success: true, message: "프로필이 변경되었습니다" };
+  } catch (error: unknown) {
+    console.error("업로드 실패", error);
+    return { success: false, message: "업로드 중 오류가 발생했습니다." };
+  }
 }
 </script>
 <template>

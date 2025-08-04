@@ -3,9 +3,8 @@ import { ref, computed } from "vue";
 import ModalForm from "@/components/common/ModalForm.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
 import { authStore } from "@/stores/authStore";
-import { isEmpty } from "@/utils/validate";
+import { isEmpty, isValidName } from "@/utils/validate";
 
 // 상태
 const oldName = computed(() => props.oldName); // readonly
@@ -30,20 +29,23 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   if (isEmpty(newName.value)) {
     return { success: false, message: "변경할 이름을 입력하세요" };
   }
+  if (!isValidName(newName.value)) {
+    return { success: false, message: "올바른 형식의 이름을 입력하세요" };
+  }
   if (nameToChange === oldName.value) {
     return { success: false, message: "기존 이름과 동일합니다" };
   }
 
-  const changeRequestDto: ChangeRequestDTO = {
-    name: nameToChange,
-    profileImg: "",
-    pwd: "",
-    changeType: 1, // 1: name, 2: pwd, 3: profileImg
-  };
-  console.log("changeRequestDto: ", changeRequestDto);
+  const changeRequestFormDto = new FormData();
+  changeRequestFormDto.append("name", nameToChange);
+  changeRequestFormDto.append("profileImg", "");
+  changeRequestFormDto.append("pwd", "");
+  changeRequestFormDto.append("changeType", "1"); //  1: name, 2: pwd, 3: profileImg; 문자열로 넣어야 함 (FormData는 전부 문자열 or Blob)
+
+  console.log("changeRequestFormDto: ", changeRequestFormDto);
 
   try {
-    const { data } = await api.changeMemberInfoUsingPut(changeRequestDto);
+    const { data } = await api.changeMemberInfoUsingPut(changeRequestFormDto);
     console.log("data: ", data);
     auth.member.name = newName.value;
     console.log("auth.member: ", auth.member);

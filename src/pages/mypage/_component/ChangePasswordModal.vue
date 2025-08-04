@@ -31,7 +31,7 @@ async function checkPassword(password: string) {
   }
   const verifyPwdRequestDto: VerifyPwdRequestDTO = {
     email: auth.member.email,
-    pwd: oldPwd.value,
+    pwd: password,
   };
   console.log("verifyPwdRequestDto: ", verifyPwdRequestDto);
   const { data } = await api.verifyPwdUsingPost(verifyPwdRequestDto);
@@ -77,7 +77,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   } catch (error: unknown) {
     console.error("비밀번호 변경 실패: ", error);
     return { success: false, message: "비밀번호 변경에 실패했습니다" };
-  } 
+  }
 }
 </script>
 <template>
