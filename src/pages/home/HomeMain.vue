@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import HomeCard from "@/pages/home/_component/HomeCard.vue";
+import YouthProgram from "@/pages/home/_component/YouthProgram.vue";
 
 import Header from "@/components/layout/header/Header.vue";
 import Footer from "@/components/layout/Footer.vue";
@@ -12,12 +13,15 @@ import { mainRouteName } from "@/router/mainRoute";
 
 <template>
   <!-- home type =props 그대로 둘 건데, 과정을 어떻게 변화시킬 것인지 -->
+
   <div class="min-h-screen flex flex-col items-center bg-kb-ui-11">
     <div class="w-full flex flex-col flex-1">
       <Header :headerShowtype="mainRouteName.homeMain">
-        <div class="mt-0 pl-[1.5rem]">
-          <h2 class="text-sm text-kb-ui-01 font-semibold">원룸, 빌라, 오피스텔, 아파트</h2>
-          <h1 class="text-lg font-bold mt-[0.25rem]">집에 대한 모든 정보를 찾아보세요!</h1>
+        <div class="pl-8 pr-8 pt-14 pb-10">
+          <h2 class="text-sm font-bold text-kb-ui-01 font-semibold">
+            원룸, 빌라, 오피스텔, 아파트
+          </h2>
+          <h1 class="text-lg font-bold mt-[0.3rem]">집에 대한 모든 정보를 찾아보세요!</h1>
         </div>
 
         <div class="px-4 mt-3">
@@ -31,10 +35,7 @@ import { mainRouteName } from "@/router/mainRoute";
             <HomeCard :data="menu" />
           </RouterLink>
         </div>
-        <div class="bg-kb-ui-11 rounded-xl shadow-md p-4 sm:p-6 text-center mt-6 min-h-[15.625rem]">
-          <p class="text-kb-ui-01 text-sm">Recent news events coverage</p>
-        </div>
-
+        <YouthProgram />
         <Footer />
       </main>
     </div>

@@ -1,21 +1,82 @@
-<!-- MenuPage.vue 레이아웃 -->
 <script setup lang="ts">
 // 필요 시 기능 추가
 import Header from "@/components/layout/header/Header.vue";
-import Section from "@/components/nav/BottomNav.vue";
+import MenuItem from "@/pages/mainMenu/_component/MenuItems.vue";
+import MenuSection from "@/pages/mainMenu/_component/MenuSection.vue";
+import Footer from "@/components/layout/Footer.vue";
+import { authStore } from "@/stores/authStore";
+import defaultProfile from "@/assets/imgs/profile.jpg";
+
+/*임의로 로그아웃, 회원탈퇴 부분 넣겠습니다.*/
+
 import { mainRouteName } from "@/router/mainRoute";
+import ProfileInfo from "@/components/common/ProfileInfo.vue";
+import ProfileImage from "@/components/common/ProfileImage.vue";
+
+const auth = authStore();
+
+// 로그아웃
+const logout = async () => {
+  if (auth.logout) {
+    await auth.logout();
+  } else {
+    console.error("logoutUser is undefined");
+  }
+};
+
+function withdraw() {
+  alert("요청 중...");
+  // 회원탈퇴의 로직을 추가해주세요
+}
+
+function openInquiry() {
+  alert("lighthouse@gmail.com 로 문의 주세요!");
+}
 </script>
 
+<!-- MenuPage.vue 레이아웃 -->
 <template>
-  <Header :headerShowtype="mainRouteName.mainMenu" />
+  <Header :headerShowtype="mainRouteName.mainMenu">
+    <!--Header 부분에 회원 정보가 크게 띄게 수정-->
+    <div class="pl-3 pr-8 pt-8 pb-8">
+      <div class="mt-[1.5rem] flex items-center justify-center text-center">
+        <!-- 프로필 사진 넣어주세요! 회원부분이랑 연동해서      -->
+        <div class="flex-[1]">
+          <ProfileImage :src="defaultProfile" />
+        </div>
+        <!--어떤 식으로 회원 정보를 받아올 것인지 - 홍길동은 예시임 + 업로드 기능 (사진 추가해야 함)   -->
+        <div class="flex-[3]">
+          <ProfileInfo name="홍길동" email="GILDONG@GMAIL.COM"></ProfileInfo>
+        </div>
+      </div>
+    </div>
+  </Header>
 
-  <h1 class="text-xl font-bold">전체 메뉴</h1>
-  <ul class="mt-4 space-y-2">
-    <li>마이페이지</li>
-    <li>안심 정보</li>
-    <li>찜한 매물</li>
-    <li>서비스 소개</li>
-    <!-- 실제 라우팅 연결은 필요에 따라 RouterLink-->
-  </ul>
-  <Section />
+  <div class="p-4 space-y-6">
+    <MenuSection title="계정">
+      <MenuItem :icon="['far', 'user']" label="마이페이지" to="/mypage" />
+      <MenuItem :icon="['fas', 'house']" label="실거래가 조회" to="/mapSearch" />
+      <MenuItem :icon="['fas', 'shield-alt']" label="안심 정보" to="/safereport" />
+      <MenuItem :icon="['far', 'heart']" label="찜한 매물" to="/myLike" />
+      <MenuItem :icon="['far', 'file-lines']" label="최근 본 리포트" to="/" />
+      <!--      -->
+    </MenuSection>
+
+    <MenuSection title="설정">
+      <MenuItem :icon="['fas', 'bell']" label="알림 설정" to="/mypage/setting" />
+    </MenuSection>
+
+    <MenuSection title="고객지원 및 안내">
+      <div @click="openInquiry">
+        <MenuItem :icon="['far', 'envelope']" label="서비스 문의하기" />
+      </div>
+    </MenuSection>
+  </div>
+
+  <div class="mt-8 flex justify-center gap-40 text-sm text-kb-ui-05 pb-6">
+    <button class="underline cursor-pointer" @click="withdraw">회원탈퇴</button>
+    <button class="underline cursor-pointer" @click="logout">로그아웃</button>
+  </div>
+  <Footer />
+  <div class="h-15"></div>
 </template>

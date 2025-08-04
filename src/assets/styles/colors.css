@@ -19,4 +19,8 @@
   --color-error: #f23f3f;
   --color-error-input: #ff5858;
   --color-caution: #ffd338;
+  --color-success: #1fbe42;
+  --color-terms-border: #bfdbfe;
+  --color-terms-bg: #eff6ff;
+  --color-terms-text: #3b62f6;
 }
