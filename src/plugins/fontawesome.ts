@@ -27,12 +27,15 @@ import {
   faFileContract,
   faArrowRotateRight,
   faChartPie,
+  faMotorcycle,
+  faFirstAid,
+  faHeart,
+  faCross,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
   faStar as farStar,
   faCircleXmark,
-  faHeart,
   faFileLines,
   faEnvelope,
   faUser,
@@ -74,6 +77,9 @@ library.add(
   faFileContract,
   faArrowRotateRight,
   faChartPie,
+  faMotorcycle,
+  faHeart,
+  faFirstAid,
 );
 
 export { FontAwesomeIcon };

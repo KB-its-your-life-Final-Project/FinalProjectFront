@@ -24,7 +24,7 @@ onBeforeUnmount(() => {
     <div class="relative">
       <font-awesome-icon
         icon="fas fa-info-circle"
-        class="text-terms-text cursor-pointer"
+        class="text-terms-text cursor-pointer text-lg"
         @click.stop="toggle"
       />
       <transition name="fade-up" appear>
