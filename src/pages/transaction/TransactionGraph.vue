@@ -97,6 +97,7 @@ const chartOptions = computed(() => {
           boxWidth: 12,
           padding: 20,
         },
+        onClick: () => {},
       },
       tooltip: {
         mode: "index",
@@ -128,12 +129,16 @@ const chartOptions = computed(() => {
       intersect: false,
     },
     scales: {
+    
       y: {
         beginAtZero: true,
         min: minY,
         max: maxY,
         ticks: {
           stepSize: Math.ceil((maxY - minY) / 5),
+          callback: function (value: number) {
+            return (value / 10000).toFixed(1) + "억"; // 여기에 '억' 추가
+          },
         },
       },
     },
