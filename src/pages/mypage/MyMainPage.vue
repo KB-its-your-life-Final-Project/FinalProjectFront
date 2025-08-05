@@ -79,8 +79,9 @@ function openModal<T extends ModalNames>(type: T, props: ModalPropsMap[T]) {
   modalProps.value = props;
 }
 const handleModalClose = () => {
+  const modalType = currentModalName.value;
   closeModal();
-  if(currentModalName.value === 'newHouse'||currentModalName.value=='editHouse'){
+  if(modalType === 'newHouse' || modalType === 'editHouse'){
     fetchHomeData();
   }
 };
@@ -137,8 +138,20 @@ const getRentTypeText = (rentType?: number) => {
 const formatRentAmount = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
     return `${homeData.jeonseAmount || 0}만원`;
-  } else {
+  } else if (homeData.rentType === 2) {
     return `${homeData.monthlyRent || 0}만원`;
+  } else {
+    return '금액 정보 없음';
+  }
+};
+
+const getRentSubContent = (homeData: HomeRegisterResponseDTO) => {
+  if (homeData.rentType === 1) {
+    return '전세 계약';
+  } else if (homeData.rentType === 2) {
+    return `보증금: ${homeData.monthlyDeposit || 0}만원`;
+  } else {
+    return '계약 정보 없음';
   }
 };
 
@@ -225,11 +238,11 @@ const email = userStore.email*/
   <div v-if="isLoading" class="h-100 flex items-center justify-center">
   <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
 </div>
-<div v-else-if="homeData" class="h-100">
+<div v-else-if="homeData" class="overflow-y-auto pb-20">
   <!-- 등록된 집 정보 -->
   <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
-  <div class="mx-4 text-xs text-gray-400">{{ homeData.aptNm || '등록된 아파트' }}</div>
-  <InfoCard :title="'등록된 아파트'" :content="homeData.aptNm || '정보 없음'" />
+  <div class="mx-4 text-xs text-gray-400">{{ homeData.buildingName || '등록된 아파트' }}</div>
+  <InfoCard :title="'등록된 아파트'" :content="homeData.buildingName || '정보 없음'" :sub-content="homeData.buildingNumber ? `${homeData.buildingNumber}` : '동 정보 없음'" />
 
   <!-- 계약 정보 -->
   <h2 class="text-lg mx-4 mt-4">계약 정보</h2>
@@ -246,8 +259,32 @@ const email = userStore.email*/
   <InfoCard
     :title="getRentTypeText(homeData.rentType)"
     :content="formatRentAmount(homeData)"
-    :sub-content="`보증금: ${homeData.monthlyDeposit || 0}만원`"
+    :sub-content="getRentSubContent(homeData)"
   />
+
+  <!-- 나의 집 정보 수정하기 버튼 -->
+  <div class="mx-4 mt-4">
+    <button
+      class="w-full py-3 bg-kb-yellow-positive text-white text-sm rounded-md shadow-inner cursor-pointer"
+      @click="openModal('editHouse', {
+        type: 'edit',
+        address: homeData.buildingName || '',
+        contractDate: homeData.contractStart || '',
+      })"
+    >
+      나의 집 정보 수정하기
+    </button>
+  </div>
+
+  <!-- 알림 설정 버튼 -->
+  <div class="mx-4 mt-4">
+    <button
+      class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
+      @click="movePage.mypageStetting()"
+    >
+      알림 설정
+    </button>
+  </div>
 </div>
   <div v-else class="h-100 flex flex-col items-center justify-center">
     <div class="font-pretendard-bold text-xl">나의 집을 등록하고 정보를 받아보세요!</div>
@@ -258,7 +295,9 @@ const email = userStore.email*/
       나의 집 등록하기
     </button>
   </div>
-  <div class="mx-4 mt-4">
+
+  <!-- 알림 설정 버튼 (하단 고정) - 집 정보가 없을 때만 표시 -->
+  <div v-if="!homeData" class="fixed bottom-20 left-4 right-4 z-10">
     <button
       class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
       @click="movePage.mypageStetting()"
@@ -266,6 +305,7 @@ const email = userStore.email*/
       알림 설정
     </button>
   </div>
+
   <ToastList />
   <Section />
 

@@ -92,6 +92,11 @@ export interface FloorAndPurpose {
  */
 export interface HomeRegisterRequestDTO {
   /**
+   * 건물동 이름
+   * @example "101동"
+   */
+  buildingNumber?: string;
+  /**
    * 계약 종료일
    * @example "2025.04.23"
    */
@@ -150,10 +155,15 @@ export interface HomeRegisterResponseDTO {
    */
   actionType?: string;
   /**
-   * 아파트명
+   * 건물명
    * @example "강남아파트"
    */
-  aptNm?: string;
+  buildingName?: string;
+  /**
+   * 건물동명
+   * @example "101동"
+   */
+  buildingNumber?: string;
   /**
    * 계약 종료일
    * @example "2025.04.23"
