@@ -46,7 +46,7 @@
         <button
           v-for="year in ['전체', 1, 3, 5]"
           :key="year"
-          @click="setYear(year)"
+          @click="setYear(year as number | '전체')"
           :class="[
             'text-sm py-2 border text-center rounded-none w-full h-[30px]',
             selectedYear === year
@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Header from "@/components/layout/header/Header.vue";
 import TransactionGraph from "@/pages/transaction/TransactionGraph.vue";
 import { onMounted, ref, watch } from "vue";
@@ -92,9 +92,21 @@ import axios from "axios";
 import { mainRouteName } from "@/router/mainRoute.ts";
 
 import DatePicker from "@/components/common/DatePicker.vue";
+import type { MarkerDataType } from "@/types/marker";
+
+// Props 정의
+interface Props {
+  marker?: MarkerDataType;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  marker: undefined,
+});
 
 const route = useRoute();
-const selectedAptName = ref<string>((route.params.aptName as string) || "");
+const router = useRouter();
+
+const selectedAptName = ref<string>((route.query.aptName as string) || "");
 
 const selectedType = ref("전체");
 const selectedYear = ref<number | "전체">(1);
@@ -118,7 +130,7 @@ const toggleFavorite = () => {
 
 //전체 거래 데이터 및 그래프들 데이터
 
-//const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([]);
+//const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([])
 
 //날짜 달력
 const formatDateLocal = (date: Date): string => {
@@ -138,8 +150,44 @@ const getTradeTypeCode = (label: string | null): number | null => {
 const filteredData = async (aptName: string) => {
   console.log("실제 axios 요청 발생!", selectedAptName.value, startDate.value, endDate.value);
 
+  // 임시 테스트 데이터 사용
+  const allTestData = [
+    { date: "2024-01", price: 50000, type: "매매" },
+    { date: "2024-02", price: 52000, type: "매매" },
+    { date: "2024-03", price: 48000, type: "전월세" },
+    { date: "2024-04", price: 51000, type: "매매" },
+    { date: "2023-11", price: 49000, type: "매매" },
+    { date: "2023-12", price: 47000, type: "전월세" },
+    { date: "2022-06", price: 45000, type: "매매" },
+    { date: "2022-08", price: 46000, type: "전월세" },
+  ];
+
+  // 거래 형식 필터링
+  let filteredData = allTestData;
+  if (selectedType.value !== "전체") {
+    filteredData = allTestData.filter((item) => item.type === selectedType.value);
+  }
+
+  // 날짜 범위 필터링
+  if (startDate.value && endDate.value) {
+    const startDateStr = formatDateLocal(startDate.value).substring(0, 7); // YYYY-MM 형식
+    const endDateStr = formatDateLocal(endDate.value).substring(0, 7);
+
+    filteredData = filteredData.filter((item) => {
+      return item.date >= startDateStr && item.date <= endDateStr;
+    });
+  }
+
+  console.log("필터링된 데이터:", filteredData);
+  graphData.value = filteredData;
+
+  // 실제 API 호출은 나중에 활성화
+  /*
   const body = {
-    buildingName: selectedAptName.value,
+    jibunAddress: props.marker?.jibunAddress || "서울특별시 광명시",
+    lat: props.marker?.latlng?.lat() || 37.5665,
+    lng: props.marker?.latlng?.lng() || 126.978,
+    buildingName: props.marker?.buildingName || aptName,
     tradeType: getTradeTypeCode(selectedType.value),
     startDate: startDate.value ? formatDateLocal(startDate.value) : null,
     endDate: endDate.value ? formatDateLocal(endDate.value) : null,
@@ -152,10 +200,11 @@ const filteredData = async (aptName: string) => {
   } catch (error) {
     console.error("데이터 가져오기 실패", error);
   }
+  */
 };
 
 //연도 버튼 클릭으로 필터링 기능
-const setYear = (year) => {
+const setYear = (year: number | "전체") => {
   selectedYear.value = year;
 
   if (year === "전체") {
@@ -169,13 +218,28 @@ const setYear = (year) => {
     startDate.value = past;
     endDate.value = now;
   }
+  // URL 업데이트
+  router.push({
+    query: {
+      ...route.query,
+      year: year === "전체" ? undefined : year.toString(),
+    },
+  });
+
   filteredData(selectedAptName.value);
-  //filteredData();
 };
 
 const setType = (type: string) => {
   console.log("거래 형식 선택됨:", type);
   selectedType.value = type;
+
+  // URL 업데이트
+  router.push({
+    query: {
+      ...route.query,
+      type: type === "전체" ? undefined : type,
+    },
+  });
   filteredData(selectedAptName.value);
 };
 //수동으로 버튼 누르면... 해제
@@ -183,18 +247,39 @@ const handleDateChange = () => {
   selectedYear.value = "전체";
   //startDate.value = null
   // endDate.value = null
+
+  // URL 업데이트
+  router.push({
+    query: {
+      ...route.query,
+      startDate: startDate.value ? formatDateLocal(startDate.value) : undefined,
+      endDate: endDate.value ? formatDateLocal(endDate.value) : undefined,
+      year: undefined, // 수동 날짜 선택 시 year 파라미터 제거
+    },
+  });
+
   filteredData(selectedAptName.value);
 };
 
 //url은 변경되어있지만, 컴포넌트는 남아있는 경우를 방지
 watch(
-  () => route.params.aptName,
-  (newName) => {
-    if (newName) {
-      selectedAptName.value = newName as string;
-      filteredData(newName as string);
+  () => route.query,
+  (newQuery) => {
+    if (newQuery.type !== undefined) {
+      selectedType.value = newQuery.type as string;
+    }
+    if (newQuery.year !== undefined) {
+      selectedYear.value = Number(newQuery.year);
+    }
+    // 날짜 필터도 URL에서 읽어올 수 있음
+    if (newQuery.startDate) {
+      startDate.value = new Date(newQuery.startDate as string);
+    }
+    if (newQuery.endDate) {
+      endDate.value = new Date(newQuery.endDate as string);
     }
   },
+  { deep: true },
 );
 
 onMounted(() => {
