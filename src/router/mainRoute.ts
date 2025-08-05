@@ -67,6 +67,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/wishlist",
     name: mainRouteName.wishlist,
     component: mainRouteMap.wishlist,
+    meta: { requiresAuth: true },
   },
   {
     path: "/mainMenu",

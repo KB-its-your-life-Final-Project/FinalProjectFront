@@ -17,7 +17,7 @@ const headerTitleList = {
   [mainRouteName.recentSafeReport]: "최근 본 레포트",
   [mainRouteName.localInfoSearch]: "동네.ZIP",
   [mainRouteName.myAlarm]: "알람",
-  [mainRouteName.wishlist]: "내 찜 목록",
+  [mainRouteName.wishlist]: "관심 목록",
   [mainRouteName.mainMenu]: "전체 메뉴",
   [mainRouteName.transactionDetail]: "",
   [mainRouteName.myPage]: "마이 페이지",

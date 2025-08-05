@@ -2,7 +2,6 @@ import { myPageRouteName } from "@/router/mypageRoutes";
 import { mainRouteName } from "@/router/mainRoute";
 import { authRouteName } from "@/router/authRoute";
 import router from "@/router";
-import WishlistPage from "@/pages/wishlist/WishlistPage.vue";
 
 //라우트 생성
 const makeRoute = (routeName: string) => {
