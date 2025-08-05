@@ -13,15 +13,23 @@
 import {
   ApiResponseBoolean,
   ApiResponseEstateDTO,
+  ApiResponseFacilityDTO,
+  ApiResponseHospitalDTO,
   ApiResponseListEstateWishlistResponseDTO,
+  ApiResponseListLawdCdResponseDTO,
+  ApiResponseListLocalInfoResponseDTO,
   ApiResponseListMemberDTO,
   ApiResponseListRecentSafeReportResponseDto,
   ApiResponseListRegionWishlistResponseDTO,
   ApiResponseListSearchHistoryResponseDTO,
   ApiResponseListYouthContentDTO,
   ApiResponseMemberDTO,
+  ApiResponsePopulationDTO,
+  ApiResponseReverseGeocodeResponseDTO,
   ApiResponseSafeReportResponseDto,
+  ApiResponseSafetyDTO,
   ApiResponseVoid,
+  ApiResponseWeatherDTO,
   EstateWishlistRequestDTO,
   LoginDTO,
   RegionWishlistRequestDTO,
@@ -29,24 +37,12 @@ import {
   SearchHistoryRequestDTO,
   TransactionRequestDTO,
   TransactionResponseDTO,
-  ApiResponseListLocalInfoResponseDTO,
-  ApiResponseWeatherDTO,
-  ApiResponsePopulationDTO,
-  ApiResponseReverseGeocodeResponseDTO,
-  ApiResponseFacilityDTO,
-  ApiResponseHospitalDTO,
-  ApiResponseSafetyDTO,
-  ApiResponseListLocalInfoResponseDTO,
-  ApiResponseWeatherDTO,
-  ApiResponsePopulationDTO,
-  ApiResponseReverseGeocodeResponseDTO,
-  ApiResponseFacilityDTO,
-  ApiResponseHospitalDTO,
-  ApiResponseSafetyDTO,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -86,6 +82,208 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
   ) =>
     this.request<ApiResponseEstateDTO, void>({
       path: `/api/estate/latlng`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags lawdCd 정보 조회
+   * @name GetAllLawdCdUsingGet
+   * @summary getAllLawdCd
+   * @request GET:/api/lawdCd
+   */
+  getAllLawdCdUsingGet = (
+    query?: {
+      /** @format int32 */
+      limit?: number;
+      /** @format int32 */
+      offset?: number;
+      regionCd?: string;
+      sggCd?: string;
+      sidoCd?: string;
+      umdCd?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListLawdCdResponseDTO, void>({
+      path: `/api/lawdCd`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * @description 법정동코드(regionCd)로 해당 지역의 편의시설(예: 자전거 대수) 정보를 조회합니다.
+   *
+   * @tags 지역 정보 API
+   * @name GetFacilityCountsByRegionCdUsingGet
+   * @summary 법정동코드로 편의시설 수 조회
+   * @request GET:/api/localinfo/facilities-count
+   */
+  getFacilityCountsByRegionCdUsingGet = (
+    query: {
+      /**
+       * 지역 법정동 코드
+       * @example "1168010800"
+       */
+      regionCd: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseFacilityDTO, void>({
+      path: `/api/localinfo/facilities-count`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * @description 법정동코드(regionCd)로 해당 지역의 병원 수 정보를 조회합니다.
+   *
+   * @tags 지역 정보 API
+   * @name GetHospitalCountsByRegionCdUsingGet
+   * @summary 법정동코드로 병원 수 조회
+   * @request GET:/api/localinfo/hospitals-count
+   */
+  getHospitalCountsByRegionCdUsingGet = (
+    query: {
+      /**
+       * 지역 법정동 코드
+       * @example "1168010800"
+       */
+      regionCd: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseHospitalDTO, void>({
+      path: `/api/localinfo/hospitals-count`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * @description 법정동코드(regionCd)로 해당 지역의 인구 정보를 조회합니다.
+   *
+   * @tags 지역 정보 API
+   * @name GetPopulationByRegionCdUsingGet
+   * @summary 법정동코드로 인구 조회
+   * @request GET:/api/localinfo/population
+   */
+  getPopulationByRegionCdUsingGet = (
+    query: {
+      /**
+       * 지역 법정동 코드
+       * @example "1168010800"
+       */
+      regionCd: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponsePopulationDTO, void>({
+      path: `/api/localinfo/population`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * @description 위도/경도(latitude, longitude)를 이용하여 법정동 주소 정보를 조회합니다.
+   *
+   * @tags 지역 정보 API
+   * @name ReverseGeocodeUsingGet
+   * @summary 좌표로 법정동 주소 조회
+   * @request GET:/api/localinfo/reverse-geocode
+   */
+  reverseGeocodeUsingGet = (
+    query: {
+      /**
+       * 위도 (Latitude)
+       * @format double
+       * @example 37.5665
+       */
+      latitude: number;
+      /**
+       * 경도 (Longitude)
+       * @format double
+       * @example 126.978
+       */
+      longitude: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseReverseGeocodeResponseDTO, void>({
+      path: `/api/localinfo/reverse-geocode`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * @description 법정동코드(regionCd)로 해당 지역의 안전시설(안심벨) 수 정보를 조회합니다.
+   *
+   * @tags 지역 정보 API
+   * @name GetSafetyCountsByRegionCdUsingGet
+   * @summary 법정동코드로 안전시설 수 조회
+   * @request GET:/api/localinfo/safety-count
+   */
+  getSafetyCountsByRegionCdUsingGet = (
+    query: {
+      /**
+       * 지역 법정동 코드
+       * @example "1168010800"
+       */
+      regionCd: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseSafetyDTO, void>({
+      path: `/api/localinfo/safety-count`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * @description 키워드로 지역을 검색합니다.
+   *
+   * @tags 지역 정보 API
+   * @name SearchRegionsUsingGet
+   * @summary 지역 검색
+   * @request GET:/api/localinfo/search
+   */
+  searchRegionsUsingGet = (
+    query: {
+      /**
+       * 검색 키워드
+       * @example "강남"
+       */
+      keyword: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListLocalInfoResponseDTO, void>({
+      path: `/api/localinfo/search`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * @description 법정동코드로 날씨 정보를 조회합니다.
+   *
+   * @tags 지역 정보 API
+   * @name GetWeatherByRegionNameUsingGet
+   * @summary 법정동코드로 날씨 조회
+   * @request GET:/api/localinfo/weather
+   */
+  getWeatherByRegionNameUsingGet = (
+    query: {
+      /**
+       * 지역 법정동 코드
+       * @example "1168010800"
+       */
+      regionCd: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseWeatherDTO, void>({
+      path: `/api/localinfo/weather`,
       method: "GET",
       query: query,
       ...params,
@@ -195,7 +393,11 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary findMemberById
    * @request GET:/api/member/{id}
    */
-  findMemberByIdUsingGet = (id: string, data: number, params: RequestParams = {}) =>
+  findMemberByIdUsingGet = (
+    id: string,
+    data: number,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseMemberDTO, void>({
       path: `/api/member/${id}`,
       method: "GET",
@@ -305,10 +507,15 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary getEstateIdsByMemberId
    * @request GET:/api/wishlist/estate
    */
-  getEstateIdsByMemberIdUsingGet = (params: RequestParams = {}) =>
+  getEstateIdsByMemberIdUsingGet = (
+    token: string,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseListEstateWishlistResponseDTO, void>({
       path: `/api/wishlist/estate`,
       method: "GET",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -320,13 +527,13 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @request POST:/api/wishlist/estate
    */
   addWishlistUsingPost = (
-    estateId: EstateWishlistRequestDTO,
+    token: EstateWishlistRequestDTO,
     params: RequestParams = {},
   ) =>
     this.request<ApiResponseVoid, void>({
       path: `/api/wishlist/estate`,
       method: "POST",
-      body: estateId,
+      body: token,
       type: ContentType.Json,
       ...params,
     });
@@ -338,10 +545,16 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary removeWishlist
    * @request DELETE:/api/wishlist/estate/{estateId}
    */
-  removeWishlistUsingDelete = (estateId: number, params: RequestParams = {}) =>
+  removeWishlistUsingDelete = (
+    estateId: number,
+    token: string,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseVoid, void>({
       path: `/api/wishlist/estate/${estateId}`,
       method: "DELETE",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -352,10 +565,12 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary getSearchHistory
    * @request GET:/api/wishlist/history
    */
-  getSearchHistoryUsingGet = (params: RequestParams = {}) =>
+  getSearchHistoryUsingGet = (token: string, params: RequestParams = {}) =>
     this.request<ApiResponseListSearchHistoryResponseDTO, void>({
       path: `/api/wishlist/history`,
       method: "GET",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -367,13 +582,13 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @request POST:/api/wishlist/history
    */
   saveSearchHistoryUsingPost = (
-    dto: SearchHistoryRequestDTO,
+    token: SearchHistoryRequestDTO,
     params: RequestParams = {},
   ) =>
     this.request<ApiResponseVoid, void>({
       path: `/api/wishlist/history`,
       method: "POST",
-      body: dto,
+      body: token,
       type: ContentType.Json,
       ...params,
     });
@@ -385,10 +600,12 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary getRegionsByMemberId
    * @request GET:/api/wishlist/region
    */
-  getRegionsByMemberIdUsingGet = (params: RequestParams = {}) =>
+  getRegionsByMemberIdUsingGet = (token: string, params: RequestParams = {}) =>
     this.request<ApiResponseListRegionWishlistResponseDTO, void>({
       path: `/api/wishlist/region`,
       method: "GET",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -400,13 +617,13 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @request POST:/api/wishlist/region
    */
   addWishlistUsingPost1 = (
-    estateId: RegionWishlistRequestDTO,
+    token: RegionWishlistRequestDTO,
     params: RequestParams = {},
   ) =>
     this.request<ApiResponseVoid, void>({
       path: `/api/wishlist/region`,
       method: "POST",
-      body: estateId,
+      body: token,
       type: ContentType.Json,
       ...params,
     });
@@ -418,10 +635,16 @@ export class Api<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    * @summary removeWishlist
    * @request DELETE:/api/wishlist/region/{regionCd}
    */
-  removeWishlistUsingDelete1 = (regionCd: string, params: RequestParams = {}) =>
+  removeWishlistUsingDelete1 = (
+    regionCd: string,
+    token: string,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseVoid, void>({
       path: `/api/wishlist/region/${regionCd}`,
       method: "DELETE",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
 }

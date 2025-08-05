@@ -14,7 +14,7 @@ export interface GradeInfo {
 export function useGradeCalculation(resultData: () => RentalRatioAndBuildyear | null) {
   const gradeText = computed(() => {
     const data = resultData();
-    if (!data || typeof data.score !== "number") return "-";
+    if (!data || typeof data.score !== "number" || data.dealAmount === 0) return "조회 불가";
     if (data.score === 10) return "안전";
     else if (data.score === 6) return "주의";
     else return "위험";
@@ -22,11 +22,11 @@ export function useGradeCalculation(resultData: () => RentalRatioAndBuildyear | 
 
   const gradeColor = computed(() => {
     const data = resultData();
-    if (!data || typeof data.score !== "number") {
+    if (!data || typeof data.score !== "number" || data.dealAmount === 0) {
       return {
         bg: "bg-gray-100",
         text: "text-gray-400",
-        label: "-",
+        label: "조회 불가",
       };
     }
 

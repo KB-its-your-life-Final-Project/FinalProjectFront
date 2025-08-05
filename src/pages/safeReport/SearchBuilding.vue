@@ -16,6 +16,8 @@ const lng = ref<number>(store.formData.lng || 0);
 const naverReady = ref(false);
 const showAddressLayer = ref(false);
 const showBuildingNotFoundModal = ref(false);
+const showBuildingNameInputModal = ref(false);
+const buildingNameInput = ref(''); // 건물명 입력값
 
 // 버튼 활성화 상태 디버깅
 const isButtonEnabled = computed(() => {
@@ -30,13 +32,25 @@ const isButtonEnabled = computed(() => {
 
 // Naver Maps API 호출
 onMounted(() => {
-  // 검색바 초기화
-  buildingName.value = "";
-  roadAddress.value = "";
-  jibunAddress.value = "";
-  dongName.value = "";
-  lat.value = 0;
-  lng.value = 0;
+  // 검색바 초기화 (store에 값이 있으면 유지)
+  if (!store.formData.buildingName) {
+    buildingName.value = "";
+  }
+  if (!store.formData.roadAddress) {
+    roadAddress.value = "";
+  }
+  if (!store.formData.jibunAddress) {
+    jibunAddress.value = "";
+  }
+  if (!store.formData.dongName) {
+    dongName.value = "";
+  }
+  if (!store.formData.lat) {
+    lat.value = 0;
+  }
+  if (!store.formData.lng) {
+    lng.value = 0;
+  }
 
   if (!window.naver?.maps) {
     const naverScript = document.createElement("script");
@@ -65,9 +79,9 @@ function handleAddressComplete(payload: {
 }) {
   console.log("전체 주소 데이터:", payload);
 
-  // 건물명이 없으면 모달 표시
+  // 건물명이 없으면 건물명 입력 모달 표시
   if (!payload.buildingName || payload.buildingName.trim() === "") {
-    showBuildingNotFoundModal.value = true;
+    showBuildingNameInputModal.value = true;
     return;
   }
 
@@ -88,6 +102,33 @@ function handleAddressComplete(payload: {
   // 좌표 변환
   if (roadAddress.value && naverReady.value && jibunAddress.value) {
     searchAddressToCoordinate(jibunAddress.value);
+  }
+}
+
+// 건물명 입력 처리
+function handleBuildingNameSubmit() {
+  if (buildingNameInput.value.trim()) {
+    const inputBuildingName = buildingNameInput.value.trim();
+    buildingName.value = inputBuildingName;
+
+    // store 업데이트 (위도/경도는 빈 상태로)
+    store.updateFormData({
+      buildingName: inputBuildingName,
+      roadAddress: roadAddress.value,
+      jibunAddress: jibunAddress.value,
+      dongName: dongName.value,
+      lat: undefined, // 위도 초기화
+      lng: undefined  // 경도 초기화
+    });
+
+    // store에서 업데이트된 값으로 동기화
+    buildingName.value = store.formData.buildingName || inputBuildingName;
+
+    showBuildingNameInputModal.value = false;
+    buildingNameInput.value = ''; // 입력값 초기화
+
+    // 다음 화면으로 이동
+    next();
   }
 }
 
@@ -195,6 +236,41 @@ function resetFormData() {
         다음
       </button>
     </div>
+
+    <!-- 건물명 입력 모달 -->
+    <ModalForm
+      v-if="showBuildingNameInputModal"
+      title="건물을 찾을 수 없습니다."
+      :handle-confirm="() => {
+        if (buildingNameInput.value.trim()) {
+          handleBuildingNameSubmit();
+          return { success: true, message: '' };
+        } else {
+          return { success: false, message: '건물명을 입력해주세요.' };
+        }
+      }"
+      @close="showBuildingNameInputModal = false"
+    >
+      <div class="text-center">
+        <!-- <div class="mb-4">
+          <svg class="mx-auto h-12 w-12 text-kb-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+          </svg>
+        </div> -->
+        <p class="text-medium text-kb-ui-02">
+          건물명을 입력해주세요.<br>
+          입력하신 건물명으로 안심 진단을 진행합니다.
+        </p>
+        <input
+          v-model="buildingNameInput"
+          type="text"
+          placeholder="건물명을 입력하세요"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kb-yellow focus:border-transparent mt-4"
+          @keyup.enter="handleBuildingNameSubmit"
+        />
+      </div>
+    </ModalForm>
 
     <!-- 건물 없음 모달 -->
     <ModalForm
