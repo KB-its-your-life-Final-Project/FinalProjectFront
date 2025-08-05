@@ -18,6 +18,33 @@ export interface ChangeRequestDTO {
   pwd?: string;
 }
 
+/** EstateDTO */
+export interface EstateDTO {
+  /** @format int32 */
+  buildYear?: number;
+  buildingName?: string;
+  /** @format int32 */
+  buildingType?: number;
+  /** @format int32 */
+  id?: number;
+  jibun?: string;
+  jibunAddr?: string;
+  /** @format double */
+  latitude?: number;
+  /** @format double */
+  longitude?: number;
+  mhouseType?: string;
+  /** @format int32 */
+  originalId?: number;
+  /** @format int32 */
+  sggCd?: number;
+  sggNm?: string;
+  shouseType?: string;
+  /** @format int32 */
+  sourceTable?: number;
+  umdNm?: string;
+}
+
 /** EstateWishlistRequestDTO */
 export interface EstateWishlistRequestDTO {
   /** @format int64 */
@@ -31,12 +58,60 @@ export interface EstateWishlistResponseDTO {
   estateId?: number;
 }
 
-/** FloorAndPurpose */
+/** FacilityDTO */
+export interface FacilityDTO {
+  locataddNm?: string;
+  regionCd?: string;
+  regionName?: string;
+  /** @format int64 */
+  totalBicycleCount?: number;
+}
+
+/**
+ * FloorAndPurpose
+ * 층수와 용도 정보
+ */
 export interface FloorAndPurpose {
+  /**
+   * 면적
+   * @example "84.5㎡"
+   */
   resArea?: string;
+  /**
+   * 층수
+   * @example "5층"
+   */
   resFloor?: string;
+  /**
+   * 구조
+   * @example "철근콘크리트"
+   */
   resStructure?: string;
+  /**
+   * 용도
+   * @example "주거"
+   */
   resUseType?: string;
+}
+
+/** HospitalDTO */
+export interface HospitalDTO {
+  locataddNm?: string;
+  regionCd?: string;
+  regionName?: string;
+  /** @format int64 */
+  totalCount?: number;
+}
+
+/** LocalInfoResponseDTO */
+export interface LocalInfoResponseDTO {
+  /** @format int32 */
+  gridX?: number;
+  /** @format int32 */
+  gridY?: number;
+  locataddNm?: string;
+  region?: string;
+  regionCd?: string;
 }
 
 /** LoginRequestDTO */
@@ -73,6 +148,29 @@ export interface MemberResponseDTO {
   regIp?: string;
 }
 
+/** PopulationDTO */
+export interface PopulationDTO {
+  locataddNm?: string;
+  /** @format int64 */
+  populationTotal?: number;
+  /** @format int64 */
+  populationYouth?: number;
+  regionCd?: string;
+  regionName?: string;
+}
+
+/** RecentSafeReportResponseDto */
+export interface RecentSafeReportResponseDto {
+  /** @format int32 */
+  budget?: number;
+  buildingName?: string;
+  /** @format int32 */
+  id?: number;
+  resultGrade?: string;
+  roadAddress?: string;
+  updatedAt?: string;
+}
+
 /** RegionWishlistRequestDTO */
 export interface RegionWishlistRequestDTO {
   regionCd?: string;
@@ -84,39 +182,119 @@ export interface RegionWishlistResponseDTO {
   umdNm?: string;
 }
 
-/** RentalRatioAndBuildyear */
+/**
+ * RentalRatioAndBuildyear
+ * 거래금액, 건축연도, 역전세율 정보
+ */
 export interface RentalRatioAndBuildyear {
-  /** @format int32 */
+  /**
+   * 건축연도
+   * @format int32
+   * @example 2010
+   */
   buildYear?: number;
-  /** @format int32 */
-  buildyear_score?: number;
-  /** @format int32 */
+  /**
+   * 연식률 점수
+   * @format int32
+   * @example 2
+   */
+  buildYearScore?: number;
+  /**
+   * 거래가 (만원)
+   * @format int32
+   * @example 50000
+   */
   dealAmount?: number;
-  /** @format double */
-  reverse_rental_ratio?: number;
-  /** @format int32 */
+  /**
+   * 역전세율 (%)
+   * @format double
+   * @example 85.5
+   */
+  reverseRentalRatio?: number;
+  /**
+   * 최종 점수
+   * @format int32
+   * @example 5
+   */
   score?: number;
 }
 
-/** SafeReportRequestDto */
+/** ReverseGeocodeResponseDTO */
+export interface ReverseGeocodeResponseDTO {
+  addressName?: string;
+  /** @format double */
+  latitude?: number;
+  legalDongCode?: string;
+  legalDongName?: string;
+  /** @format double */
+  longitude?: number;
+}
+
+/**
+ * SafeReportRequestDto
+ * 안전 리포트 요청 데이터
+ */
 export interface SafeReportRequestDto {
-  /** @format int32 */
+  /**
+   * 예산 (만원)
+   * @format int32
+   * @example 5000
+   */
   budget?: number;
+  /**
+   * 건물명
+   * @example "아파트명"
+   */
   buildingName?: string;
+  /**
+   * 동명
+   * @example "문동동동"
+   */
   dongName?: string;
+  /**
+   * 지번 주소
+   * @example "서울특별시 강남구 역삼동 123-45"
+   */
   jibunAddress?: string;
-  /** @format double */
+  /**
+   * 위도
+   * @format double
+   * @example 37.5665
+   */
   lat?: number;
-  /** @format double */
+  /**
+   * 경도
+   * @format double
+   * @example 126.978
+   */
   lng?: number;
+  /**
+   * 도로명 주소
+   * @example "서울특별시 강남구 테헤란로 123"
+   */
   roadAddress?: string;
 }
 
-/** SafeReportResponseDto */
+/**
+ * SafeReportResponseDto
+ * 안전 리포트 응답 데이터
+ */
 export interface SafeReportResponseDto {
+  /** 층수와 용도 목록 */
   floorAndPurposeList?: FloorAndPurpose[];
+  /** 건축년도, 거래금액, 역전세율 정보 */
   rentalRatioAndBuildyear?: RentalRatioAndBuildyear;
+  /** 위반 여부 정보 */
   violationStatus?: ViolationStatus;
+}
+
+/** SafetyDTO */
+export interface SafetyDTO {
+  locataddNm?: string;
+  regionCd?: string;
+  regionName?: string;
+  /** @format int64 */
+  totalCount?: number;
 }
 
 /** SearchHistoryRequestDTO */
@@ -152,13 +330,38 @@ export interface VerifyPwdRequestDTO {
   pwd?: string;
 }
 
-/** ViolationStatus */
+/**
+ * ViolationStatus
+ * 위반 여부 정보
+ */
 export interface ViolationStatus {
+  /**
+   * 위반 여부
+   * @example "위반건축물"
+   */
   violationStatus?: string;
 }
 
-/** YouthContentDTO */
-export interface YouthContentDTO {
+/** WeatherDTO */
+export interface WeatherDTO {
+  /** @format int32 */
+  gridX?: number;
+  /** @format int32 */
+  gridY?: number;
+  locataddNm?: string;
+  /** @format int32 */
+  maxTemperature?: number;
+  /** @format int32 */
+  minTemperature?: number;
+  region?: string;
+  regionCd?: string;
+  skyCondition?: string;
+  /** @format int32 */
+  temperature?: number;
+}
+
+/** YouthProgramDTO */
+export interface YouthProgramDTO {
   atchFile?: string;
   bbsSn?: string;
   frstRegDt?: string;
@@ -176,6 +379,33 @@ export interface YouthContentDTO {
   pstWholCn?: string;
 }
 
+/** ApiResponse«EstateDTO» */
+export interface ApiResponseEstateDTO {
+  /** @format int32 */
+  code?: number;
+  data?: EstateDTO;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«FacilityDTO» */
+export interface ApiResponseFacilityDTO {
+  /** @format int32 */
+  code?: number;
+  data?: FacilityDTO;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«HospitalDTO» */
+export interface ApiResponseHospitalDTO {
+  /** @format int32 */
+  code?: number;
+  data?: HospitalDTO;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«List«EstateWishlistResponseDTO»» */
 export interface ApiResponseListEstateWishlistResponseDTO {
   /** @format int32 */
@@ -185,11 +415,29 @@ export interface ApiResponseListEstateWishlistResponseDTO {
   success?: boolean;
 }
 
+/** ApiResponse«List«LocalInfoResponseDTO»» */
+export interface ApiResponseListLocalInfoResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: LocalInfoResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«List«MemberResponseDTO»» */
 export interface ApiResponseListMemberResponseDTO {
   /** @format int32 */
   code?: number;
   data?: MemberResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«RecentSafeReportResponseDto»» */
+export interface ApiResponseListRecentSafeReportResponseDto {
+  /** @format int32 */
+  code?: number;
+  data?: RecentSafeReportResponseDto[];
   message?: string;
   success?: boolean;
 }
@@ -212,11 +460,11 @@ export interface ApiResponseListSearchHistoryResponseDTO {
   success?: boolean;
 }
 
-/** ApiResponse«List«YouthContentDTO»» */
-export interface ApiResponseListYouthContentDTO {
+/** ApiResponse«List«YouthProgramDTO»» */
+export interface ApiResponseListYouthProgramDTO {
   /** @format int32 */
   code?: number;
-  data?: YouthContentDTO[];
+  data?: YouthProgramDTO[];
   message?: string;
   success?: boolean;
 }
@@ -230,11 +478,39 @@ export interface ApiResponseMemberResponseDTO {
   success?: boolean;
 }
 
+/** ApiResponse«PopulationDTO» */
+export interface ApiResponsePopulationDTO {
+  /** @format int32 */
+  code?: number;
+  data?: PopulationDTO;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«ReverseGeocodeResponseDTO» */
+export interface ApiResponseReverseGeocodeResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: ReverseGeocodeResponseDTO;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«SafeReportResponseDto» */
 export interface ApiResponseSafeReportResponseDto {
   /** @format int32 */
   code?: number;
+  /** 안전 리포트 응답 데이터 */
   data?: SafeReportResponseDto;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«SafetyDTO» */
+export interface ApiResponseSafetyDTO {
+  /** @format int32 */
+  code?: number;
+  data?: SafetyDTO;
   message?: string;
   success?: boolean;
 }
@@ -243,6 +519,15 @@ export interface ApiResponseSafeReportResponseDto {
 export interface ApiResponseVoid {
   /** @format int32 */
   code?: number;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«WeatherDTO» */
+export interface ApiResponseWeatherDTO {
+  /** @format int32 */
+  code?: number;
+  data?: WeatherDTO;
   message?: string;
   success?: boolean;
 }

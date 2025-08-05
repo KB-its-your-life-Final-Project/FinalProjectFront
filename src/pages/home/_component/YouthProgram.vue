@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import type { YouthContentDTO } from "@/api/autoLoad/data-contracts";
+import type { YouthProgramDTO } from "@/api/autoLoad/data-contracts";
 import { Api } from "@/api/autoLoad/Api";
 import { authStore } from "@/stores/authStore";
 
@@ -8,9 +8,9 @@ const api = new Api();
 const auth = authStore();
 const memberId = auth.member.id || 0;
 
-const allowedPstSeNm = ["취업지원", "직업훈련", "대외활동"]; // 필터링 조건
+const allowedPstSeNm = ["취업지원", "직업훈련", "대외활동"]; // 취업지원, 직업훈련, 대외활동 중 필요 시 필터
 
-const youthProgramList = ref<YouthContentDTO[]>([]);
+const youthProgramList = ref<YouthProgramDTO[]>([]);
 const currentPage = ref(1);
 const pageSize = 20;
 const loading = ref(false);
@@ -18,13 +18,13 @@ const hasMore = ref(true);
 
 const loadMoreTrigger = ref<HTMLElement | null>(null);
 
-async function fetchUnreadContents(page: number) {
+async function fetchUnreadPrograms(page: number) {
   if (loading.value || !hasMore.value) return;
 
   loading.value = true;
 
   try {
-    const { data } = await api.getUnreadContentsUsingGet({
+    const { data } = await api.getUnreadProgramsUsingGet({
       memberId,
       page,
       size: pageSize,
@@ -41,7 +41,7 @@ async function fetchUnreadContents(page: number) {
         const hrefMatch = item.pstWholCn?.match(/href="([^"]+)"/);
         return {
           ...item,
-          hrefUrl: hrefMatch ? hrefMatch[1] : "",
+          hrefUrl: hrefMatch ? hrefMatch[1] : "", // 링크가 여러개 있는 경우 있음 -> 하나만 불러오기
         };
       });
 
@@ -68,7 +68,7 @@ function setupObserver() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting && hasMore.value && !loading.value) {
-        fetchUnreadContents(currentPage.value + 1);
+        fetchUnreadPrograms(currentPage.value + 1);
       }
     });
   });
@@ -77,7 +77,16 @@ function setupObserver() {
     observer.disconnect();
   });
 }
-async function handleClick(program: YouthContentDTO) {
+
+async function handleClick(program: YouthProgramDTO) {
+    if (!program.id) {
+    console.error("프로그램 ID가 없습니다.");
+    // 링크만 열고 읽음 처리는 하지 않음
+    if (program.hrefUrl) {
+      window.open(program.hrefUrl, "_blank");
+    }
+    return;
+  }
   try {
     await api.markAsReadUsingPost({
       memberId: memberId, // 당신의 변수 이름에 맞게 조정
@@ -95,36 +104,35 @@ async function handleClick(program: YouthContentDTO) {
 }
 
 onMounted(async () => {
-  await fetchUnreadContents(1);
+  await fetchUnreadPrograms(1);
   setupObserver();
 });
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 text-center mt-6 h-[17rem] flex flex-col">
+  <div class="wrapper">
     <div class="flex justify-center mb-4">
-      <div class="flex flex-row items-center text-base gap-2">
+      <div class="header-title-wrapper">
         <h1 class="w-13">
           <img class="w-full" src="@/assets/imgs/youth_logo.svg" alt="온통청년 로고" />
         </h1>
-        <h2 class="flex items-center text-base font-semibold gap-x-2">
+        <h2 class="header-title-text-wrapper">
           <span class="text-kb-ui-06 text-sm">제공</span>
           <span>청년 프로그램</span>
         </h2>
       </div>
     </div>
-
     <ul
       v-if="youthProgramList.length > 0"
-      class="space-y-4 text-left overflow-auto flex-1 max-h-[12.5rem]"
+      class="list-wrapper"
     >
       <li
         v-for="(program, index) in youthProgramList"
         :key="program.id ?? index"
-        class="flex item-start h-[5rem] justify-between gap-2 break-words overflow-hidden"
+        class="list-item-wrapper"
       >
         <div class="flex-1 pr-4 min-w-0">
-          <h3 class="title">
+          <h3 class="program-title">
             <a
               v-if="program.hrefUrl"
               :href="program.hrefUrl"
@@ -137,7 +145,7 @@ onMounted(async () => {
             <span v-else>{{ program.pstTtl }}</span>
           </h3>
         </div>
-        <div v-if="program.atchFile" class="w-16 h-16 flex-shrink-0">
+        <div v-if="program.atchFile" class="img-wrapper">
           <a
             v-if="program.hrefUrl"
             :href="program.hrefUrl"
@@ -148,14 +156,14 @@ onMounted(async () => {
             <img
               :src="program.atchFile"
               alt="프로그램 이미지"
-              class="w-full h-full object-cover rounded-lg"
+              class="program-img"
             />
           </a>
           <img
             v-else
             :src="program.atchFile"
-            alt="뉴스 이미지"
-            class="w-full h-full object-cover rounded-lg"
+            alt="프로그램 이미지"
+            class="program-img"
           />
         </div>
       </li>
@@ -181,8 +189,29 @@ ul::-webkit-scrollbar-thumb {
 ul::-webkit-scrollbar-thumb:hover {
   @apply bg-kb-yellow-positive;
 }
-.title {
+.wrapper {
+  @apply bg-white rounded-xl shadow-md p-4 sm:p-6 text-center mt-6 h-[20rem] flex flex-col;
+}
+.header-title-wrapper {
+  @apply flex flex-row items-center text-base gap-2;
+}
+.header-title-text-wrapper {
+  @apply flex items-center text-base font-semibold gap-x-2;
+}
+.list-wrapper {
+  @apply space-y-4 text-left overflow-auto flex-1 max-h-[15rem];
+}
+.list-item-wrapper {
+  @apply flex h-[7rem] justify-between gap-1 break-words overflow-hidden;
+}
+.program-title {
   @apply text-[0.9rem] text-base text-kb-ui-04 break-words underline;
+}
+.img-wrapper {
+  @apply flex items-center justify-center w-28 h-28 flex-shrink-0;
+}
+.program-img {
+  @apply max-w-27 max-h-27 object-cover rounded-lg shadow-sm shadow-gray-300;
 }
 .loading {
   @apply text-[0.8rem] font-pretendard-regular text-kb-ui-06;
