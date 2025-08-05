@@ -2,6 +2,7 @@
 import { ref, watch } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { LocalInfoResponseDTO } from "@/api/autoLoad/data-contracts";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const api = new Api();
 
@@ -126,8 +127,9 @@ const selectRegion = (region: LocalInfoResponseDTO) => {
   // 부모 컴포넌트로 선택된 지역 정보 전달
   emit("regionSelected", region);
 
-  // 검색바 초기화
-  clearSearch();
+  // 검색 결과만 초기화하고 입력값은 유지
+  searchResults.value = [];
+  loading.value = false;
 };
 </script>
 

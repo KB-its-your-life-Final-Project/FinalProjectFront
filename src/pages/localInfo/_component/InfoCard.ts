@@ -13,13 +13,14 @@ const api = new Api();
 
 const fetchPopulationInfo = async (regionCd: string): Promise<string> => {
   try {
-    const response = await api.getPopulationUsingGet({ regionCd: regionCd }, {});
+    const response = await api.getPopulationByRegionCdUsingGet({ regionCd: regionCd }, {});
     console.log("인구 API 응답:", response);
 
     const population = response.data?.data;
-    if (population && population.populationYouth) {
-      const youth = population.populationYouth;
-      return `${youth.toLocaleString()}명`;
+    if (population && population.youthRatio !== null && population.youthRatio !== undefined) {
+      const ratio = population.youthRatio;
+      const ratioPercent = (ratio * 100).toFixed(1);
+      return `${ratioPercent}%`;
     } else {
       return "--";
     }
@@ -31,7 +32,7 @@ const fetchPopulationInfo = async (regionCd: string): Promise<string> => {
 
 const fetchFacilityInfo = async (regionCd: string): Promise<string> => {
   try {
-    const response = await api.getFacilityCountsUsingGet({ regionCd: regionCd }, {});
+    const response = await api.getFacilityCountsByRegionCdUsingGet({ regionCd: regionCd }, {});
     console.log("편의시설 API 응답:", response);
 
     const facility = response.data?.data;
@@ -50,7 +51,7 @@ const fetchFacilityInfo = async (regionCd: string): Promise<string> => {
 
 const fetchSafetyInfo = async (regionCd: string): Promise<string> => {
   try {
-    const response = await api.getSafetyCountsUsingGet({ regionCd: regionCd }, {});
+    const response = await api.getSafetyCountsByRegionCdUsingGet({ regionCd: regionCd }, {});
     console.log("치안시설 API 응답:", response);
 
     const safety = response.data?.data;
@@ -70,7 +71,7 @@ const fetchSafetyInfo = async (regionCd: string): Promise<string> => {
 const fetchHospitalInfo = async (regionCd: string): Promise<string> => {
   try {
     console.log("병원 API 호출 시작 - regionCd:", regionCd);
-    const response = await api.getHospitalCountsUsingGet({ regionCd: regionCd }, {});
+    const response = await api.getHospitalCountsByRegionCdUsingGet({ regionCd: regionCd }, {});
     console.log("병원 API 응답 전체:", response);
     console.log("병원 API 응답 data:", response.data);
     console.log("병원 API 응답 data.data:", response.data?.data);
@@ -98,9 +99,9 @@ const fetchHospitalInfo = async (regionCd: string): Promise<string> => {
 export const InfoCardList: InfoCardType[] = [
   {
     icon: "fa-solid fa-users",
-    title: "인구수",
+    title: "청년 인구비율",
     value: "20만", // Initial static value
-    description: "청년 인구수",
+    description: "전체 주민 대비 청년 주민수",
     color: "text-blue-500", // 텍스트 색상
     apiCall: fetchPopulationInfo, // Linked API call
   },
@@ -108,7 +109,7 @@ export const InfoCardList: InfoCardType[] = [
     icon: "fa-solid fa-motorcycle",
     title: "공공자전거",
     value: "1,234", // Initial static value
-    description: "대여소 수",
+    description: "따릉이 대여소 수",
     color: "text-green-500", // 텍스트 색상
     apiCall: fetchFacilityInfo, // Linked API call
   },
@@ -116,7 +117,7 @@ export const InfoCardList: InfoCardType[] = [
     icon: "fa-solid fa-shield-halved",
     title: "치안시설",
     value: "50", // Initial static value
-    description: "안심벨 수",
+    description: "안심벨 개수",
     color: "text-yellow-500", // 텍스트 색상
     apiCall: fetchSafetyInfo, // Linked API call
   },
@@ -124,7 +125,7 @@ export const InfoCardList: InfoCardType[] = [
     icon: "fa-solid fa-first-aid",
     title: "병원",
     value: "15", // Initial static value
-    description: "의료기관 수",
+    description: "자치구 응급의료기관 수",
     color: "text-red-500", // 텍스트 색상
     apiCall: fetchHospitalInfo, // Linked API call
   },

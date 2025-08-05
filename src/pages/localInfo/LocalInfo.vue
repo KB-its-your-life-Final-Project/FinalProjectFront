@@ -74,14 +74,14 @@ const handleHeartClick = () => {
     <RegionSearch @region-selected="handleRegionSelected" />
   </div>
 
-  <div class="px-4 mt-16">
+  <div class="px-4 mt-10">
     <!-- 날씨 정보 박스 -->
     <div class="mt-8">
       <WeatherCard :region="selectedRegion" :regionCd="selectedRegionCd" :weather-data="null" />
     </div>
 
     <!-- 카드 4개 2x2 그리드로 표시 -->
-    <div class="grid grid-cols-2 gap-8 mt-8">
+    <div class="grid grid-cols-2 gap-4 mt-4">
       <InfoCard
         v-for="(card, i) in InfoCardList"
         :key="i"

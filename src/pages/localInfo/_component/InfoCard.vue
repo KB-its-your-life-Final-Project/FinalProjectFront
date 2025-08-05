@@ -71,23 +71,21 @@ const displayValue = computed(() => {
 </script>
 
 <template>
-  <div
-    class="flex flex-col bg-kb-ui-11 rounded-xl border-1 border-blue-200 shadow-md p-4 gap-5 min-h-[10.625rem]"
-  >
+  <div class="bg-kb-ui-11 rounded-xl border-1 border-kb-yellow shadow-md p-4 w-full">
     <!-- 상단: 타이틀 & 아이콘 -->
-    <div class="flex items-center justify-between px-4 mt-4">
-      <div class="font-pretendard-bold text-3xl text-kb-ui-01">{{ info.title }}</div>
-      <div :class="`rounded-xl w-10 h-10 flex items-center justify-center bg-kb-ui-08 shadow-md`">
+    <div class="flex items-center justify-between m-2">
+      <div class="font-pretendard-bold text-2xl text-kb-ui-01">{{ info.title }}</div>
+      <div class="rounded-xl w-10 h-10 flex items-center justify-center bg-kb-ui-08 shadow-md">
         <font-awesome-icon :icon="info.icon" :class="`text-[20px] ${info.color}`" />
       </div>
     </div>
     <!-- 본문: 값/설명 -->
-    <div class="flex items-center justify-between flex-col gap-10">
-      <div class="font-pretendard-bold text-3xl text-kb-ui-02">
+    <div class="flex items-center justify-between flex-col gap-4 mt-4">
+      <div class="font-pretendard-medium text-2xl text-kb-ui-02">
         {{ displayValue }}
       </div>
-      <div class="w-full bg-kb-ui-08 rounded-xl border-2 border-kb-ui-08 text-center text-kb-ui-04">
-        {{ info.description }}
+      <div class="bg-kb-ui-08 rounded-xl border-2 border-kb-ui-08 text-center w-full">
+        <div class="font-pretendard-small text-kb-ui-04">{{ info.description }}</div>
       </div>
     </div>
   </div>
