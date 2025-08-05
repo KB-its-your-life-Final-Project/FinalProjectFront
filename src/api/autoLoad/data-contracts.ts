@@ -10,6 +10,55 @@
  * ---------------------------------------------------------------
  */
 
+/**
+ * BuildingResponseDto
+ * 건물 검색 결과
+ */
+export interface BuildingResponseDto {
+  /**
+   * 건물명 목록
+   * @example ["목동아파트","목동빌라"]
+   */
+  buildingNames?: string[];
+  /**
+   * 읍면동 이름
+   * @example "목동"
+   */
+  dongName?: string;
+  /**
+   * 5자리 지역코드
+   * @example 11110
+   */
+  regionCode?: string;
+}
+
+/**
+ * DongDto
+ * 읍/면/동 정보
+ */
+export interface DongDto {
+  /**
+   * 읍/면/동 이름
+   * @example "원서동"
+   */
+  dongNm?: string;
+  /**
+   * 시/군/구 코드
+   * @example 110
+   */
+  sggCd?: string;
+  /**
+   * 시/도 코드
+   * @example 11
+   */
+  sidoCd?: string;
+  /**
+   * 읍/면/동 코드
+   * @example 149
+   */
+  umdCd?: string;
+}
+
 /** EstateDTO */
 export interface EstateDTO {
   /** @format int32 */
@@ -84,6 +133,131 @@ export interface FloorAndPurpose {
    * @example "주거"
    */
   resUseType?: string;
+}
+
+/**
+ * HomeRegisterRequestDTO
+ * 나의 집 저장 요청 데이터
+ */
+export interface HomeRegisterRequestDTO {
+  /**
+   * 건물동 이름
+   * @example "101동"
+   */
+  buildingNumber?: string;
+  /**
+   * 계약 종료일
+   * @example "2025.04.23"
+   */
+  contractEnd?: string;
+  /**
+   * 계약 시작일
+   * @example "2023.04.23"
+   */
+  contractStart?: string;
+  /**
+   * 전세 금액
+   * @format int32
+   * @example 200
+   */
+  jeonseAmount?: number;
+  /**
+   * 위도
+   * @format double
+   * @example 37.5665
+   */
+  lat?: number;
+  /**
+   * 경도
+   * @format double
+   * @example 126.978
+   */
+  lng?: number;
+  /**
+   * 월세 보증금
+   * @format int32
+   * @example 300
+   */
+  monthlyDeposit?: number;
+  /**
+   * 월세 금액
+   * @format int32
+   * @example 50
+   */
+  monthlyRent?: number;
+  /**
+   * 거래 유형
+   * @format int32
+   * @example 1
+   */
+  rentType?: number;
+}
+
+/**
+ * HomeRegisterResponseDTO
+ * 나의 집 저장 응답 데이터
+ */
+export interface HomeRegisterResponseDTO {
+  /**
+   * 처리 타입
+   * @example "UPDATE"
+   */
+  actionType?: string;
+  /**
+   * 건물명
+   * @example "강남아파트"
+   */
+  buildingName?: string;
+  /**
+   * 건물동명
+   * @example "101동"
+   */
+  buildingNumber?: string;
+  /**
+   * 계약 종료일
+   * @example "2025.04.23"
+   */
+  contractEnd?: string;
+  /**
+   * 계약 시작일
+   * @example "2023.04.23"
+   */
+  contractStart?: string;
+  /**
+   * 부동산 ID
+   * @format int32
+   * @example 12345
+   */
+  estateId?: number;
+  /**
+   * 전세 금액
+   * @format int32
+   * @example 200
+   */
+  jeonseAmount?: number;
+  /**
+   * 월세 보증금
+   * @format int32
+   * @example 300
+   */
+  monthlyDeposit?: number;
+  /**
+   * 월세 금액
+   * @format int32
+   * @example 50
+   */
+  monthlyRent?: number;
+  /**
+   * 등록일
+   * @example "2023-04-23T10:30:00"
+   */
+  regDate?: string;
+  /**
+   * 거래 유형
+   * @format int32
+   * @example 1
+   */
+  rentType?: number;
 }
 
 /** HospitalDTO */
@@ -323,6 +497,45 @@ export interface SearchHistoryResponseDTO {
   keyword?: string;
 }
 
+/**
+ * SidoDto
+ * 시/도 정보
+ */
+export interface SidoDto {
+  /**
+   * 시/도 코드
+   * @example 11
+   */
+  sidoCd?: string;
+  /**
+   * 시/도 이름
+   * @example "서울"
+   */
+  sidoNm?: string;
+}
+
+/**
+ * SigugunDto
+ * 시/군/구 정보
+ */
+export interface SigugunDto {
+  /**
+   * 시/군/구 코드
+   * @example 110
+   */
+  sggCd?: string;
+  /**
+   * 시/군/구 이름
+   * @example "종로구"
+   */
+  sggNm?: string;
+  /**
+   * 시/도 코드
+   * @example 11
+   */
+  sidoCd?: string;
+}
+
 /** TransactionRequestDTO */
 export interface TransactionRequestDTO {
   buildingName?: string;
@@ -393,6 +606,16 @@ export interface YouthContentDTO {
   pstWholCn?: string;
 }
 
+/** ApiResponse«BuildingResponseDto» */
+export interface ApiResponseBuildingResponseDto {
+  /** @format int32 */
+  code?: number;
+  /** 건물 검색 결과 */
+  data?: BuildingResponseDto;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«EstateDTO» */
 export interface ApiResponseEstateDTO {
   /** @format int32 */
@@ -411,11 +634,30 @@ export interface ApiResponseFacilityDTO {
   success?: boolean;
 }
 
+/** ApiResponse«HomeRegisterResponseDTO» */
+export interface ApiResponseHomeRegisterResponseDTO {
+  /** @format int32 */
+  code?: number;
+  /** 나의 집 저장 응답 데이터 */
+  data?: HomeRegisterResponseDTO;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«HospitalDTO» */
 export interface ApiResponseHospitalDTO {
   /** @format int32 */
   code?: number;
   data?: HospitalDTO;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«DongDto»» */
+export interface ApiResponseListDongDto {
+  /** @format int32 */
+  code?: number;
+  data?: DongDto[];
   message?: string;
   success?: boolean;
 }
@@ -479,6 +721,24 @@ export interface ApiResponseListSearchHistoryResponseDTO {
   /** @format int32 */
   code?: number;
   data?: SearchHistoryResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«SidoDto»» */
+export interface ApiResponseListSidoDto {
+  /** @format int32 */
+  code?: number;
+  data?: SidoDto[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«SigugunDto»» */
+export interface ApiResponseListSigugunDto {
+  /** @format int32 */
+  code?: number;
+  data?: SigugunDto[];
   message?: string;
   success?: boolean;
 }

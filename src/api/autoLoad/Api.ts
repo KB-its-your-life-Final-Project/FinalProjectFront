@@ -12,9 +12,12 @@
 
 import {
   ApiResponseBoolean,
+  ApiResponseBuildingResponseDto,
   ApiResponseEstateDTO,
   ApiResponseFacilityDTO,
+  ApiResponseHomeRegisterResponseDTO,
   ApiResponseHospitalDTO,
+  ApiResponseListDongDto,
   ApiResponseListEstateWishlistResponseDTO,
   ApiResponseListLawdCdResponseDTO,
   ApiResponseListLocalInfoResponseDTO,
@@ -22,6 +25,8 @@ import {
   ApiResponseListRecentSafeReportResponseDto,
   ApiResponseListRegionWishlistResponseDTO,
   ApiResponseListSearchHistoryResponseDTO,
+  ApiResponseListSidoDto,
+  ApiResponseListSigugunDto,
   ApiResponseListYouthContentDTO,
   ApiResponseMemberDTO,
   ApiResponsePopulationDTO,
@@ -31,6 +36,7 @@ import {
   ApiResponseVoid,
   ApiResponseWeatherDTO,
   EstateWishlistRequestDTO,
+  HomeRegisterRequestDTO,
   LoginDTO,
   RegionWishlistRequestDTO,
   SafeReportRequestDto,
@@ -111,6 +117,81 @@ export class Api<
       path: `/api/lawdCd`,
       method: "GET",
       query: query,
+      ...params,
+    });
+  /**
+   * @description 지역코드와 읍면동명을 이용하여 해당 지역의 건물명 목록을 조회합니다. 예: 지역코드 11110, 읍면동명 '목동'으로 검색 시 해당 지역의 모든 건물명을 반환합니다.
+   *
+   * @tags lawdCd 정보 조회
+   * @name GetBuildingListUsingGet
+   * @summary 건물명 목록 조회
+   * @request GET:/api/lawdCd/buildings
+   */
+  getBuildingListUsingGet = (
+    query: {
+      /**
+       * 읍면동 한글 이름
+       * @example "목동"
+       */
+      dongName: string;
+      /**
+       * 5자리 지역코드 (sido_cd + sgg_cd)
+       * @example "11110"
+       */
+      regionCode: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseBuildingResponseDto, void>({
+      path: `/api/lawdCd/buildings`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * @description 선택된 시/군/구의 읍/면/동 목록을 조회합니다. 예: 종로구(110) 선택 시 원서동, 훈정동, 묘동 등의 동 목록을 반환합니다.
+   *
+   * @tags lawdCd 정보 조회
+   * @name GetDongListUsingGet
+   * @summary 읍/면/동 목록 조회
+   * @request GET:/api/lawdCd/dong/{sidoCd}/{sggCd}
+   */
+  getDongListUsingGet = (
+    sggCd: string,
+    sidoCd: string,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListDongDto, void>({
+      path: `/api/lawdCd/dong/${sidoCd}/${sggCd}`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * @description 전국의 시/도 목록을 조회합니다. 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종, 경기, 강원, 충북, 충남, 전북, 전남, 경북, 경남, 제주를 포함합니다.
+   *
+   * @tags lawdCd 정보 조회
+   * @name GetSidoListUsingGet
+   * @summary 시/도 목록 조회
+   * @request GET:/api/lawdCd/sido
+   */
+  getSidoListUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseListSidoDto, void>({
+      path: `/api/lawdCd/sido`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * @description 선택된 시/도의 시/군/구 목록을 조회합니다. 예: 서울(11) 선택 시 종로구, 중구, 용산구 등의 구 목록을 반환합니다.
+   *
+   * @tags lawdCd 정보 조회
+   * @name GetSigugunListUsingGet
+   * @summary 시/군/구 목록 조회
+   * @request GET:/api/lawdCd/sigugun/{sidoCd}
+   */
+  getSigugunListUsingGet = (sidoCd: string, params: RequestParams = {}) =>
+    this.request<ApiResponseListSigugunDto, void>({
+      path: `/api/lawdCd/sigugun/${sidoCd}`,
+      method: "GET",
       ...params,
     });
   /**
@@ -402,6 +483,39 @@ export class Api<
       path: `/api/member/${id}`,
       method: "GET",
       body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 사용자의 집 정보를 조회합니다.
+   *
+   * @tags MyHomeRegister
+   * @name GetHomeInfoUsingGet
+   * @summary 나의 집 정보 조회
+   * @request GET:/api/myhome/info
+   */
+  getHomeInfoUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseHomeRegisterResponseDTO, void>({
+      path: `/api/myhome/info`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * @description 사용자의 집 정보를 등록합니다.
+   *
+   * @tags MyHomeRegister
+   * @name RegisterHomeUsingPost
+   * @summary 나의 집 정보 등록
+   * @request POST:/api/myhome/register
+   */
+  registerHomeUsingPost = (
+    requestDTO: HomeRegisterRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseHomeRegisterResponseDTO, void>({
+      path: `/api/myhome/register`,
+      method: "POST",
+      body: requestDTO,
       type: ContentType.Json,
       ...params,
     });

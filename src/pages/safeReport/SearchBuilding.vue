@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
 import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
+import SelectAddressPage from "@/components/common/SelectAddressPage.vue";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -15,9 +16,8 @@ const lat = ref<number>(store.formData.lat || 0);
 const lng = ref<number>(store.formData.lng || 0);
 const naverReady = ref(false);
 const showAddressLayer = ref(false);
-const showBuildingNotFoundModal = ref(false);
 const showBuildingNameInputModal = ref(false);
-const buildingNameInput = ref(''); // 건물명 입력값
+const showBuildingNotFoundPage = ref(false);
 
 // 버튼 활성화 상태 디버깅
 const isButtonEnabled = computed(() => {
@@ -105,32 +105,7 @@ function handleAddressComplete(payload: {
   }
 }
 
-// 건물명 입력 처리
-function handleBuildingNameSubmit() {
-  if (buildingNameInput.value.trim()) {
-    const inputBuildingName = buildingNameInput.value.trim();
-    buildingName.value = inputBuildingName;
 
-    // store 업데이트 (위도/경도는 빈 상태로)
-    store.updateFormData({
-      buildingName: inputBuildingName,
-      roadAddress: roadAddress.value,
-      jibunAddress: jibunAddress.value,
-      dongName: dongName.value,
-      lat: undefined, // 위도 초기화
-      lng: undefined  // 경도 초기화
-    });
-
-    // store에서 업데이트된 값으로 동기화
-    buildingName.value = store.formData.buildingName || inputBuildingName;
-
-    showBuildingNameInputModal.value = false;
-    buildingNameInput.value = ''; // 입력값 초기화
-
-    // 다음 화면으로 이동
-    next();
-  }
-}
 
 // 주소 레이어 닫기 핸들러
 function handleAddressLayerClose() {
@@ -189,6 +164,37 @@ function resetFormData() {
   lng.value = 0;
 }
 
+// 주소 선택 페이지 이벤트 핸들러
+function handleAddressSelected(addressData: {
+  sido: string;
+  sigugun: string;
+  dong: string;
+  fullAddress: string;
+}) {
+  console.log("선택된 주소:", addressData);
+
+  // 선택된 주소를 건물명으로 설정
+  buildingName.value = addressData.fullAddress;
+
+  // store 업데이트 (위도/경도는 빈 상태로)
+  store.updateFormData({
+    buildingName: addressData.fullAddress,
+    roadAddress: roadAddress.value,
+    jibunAddress: jibunAddress.value,
+    dongName: addressData.dong,
+    lat: undefined, // 위도 초기화
+    lng: undefined  // 경도 초기화
+  });
+
+  // store에서 업데이트된 값으로 동기화
+  buildingName.value = store.formData.buildingName || addressData.fullAddress;
+
+  showBuildingNotFoundPage.value = false;
+
+  // 다음 화면으로 이동
+  next();
+}
+
 
 </script>
 
@@ -216,6 +222,16 @@ function resetFormData() {
       </button>
     </div>
 
+    <!-- 원하는 단지가 안나온다면 링크 -->
+    <div class="w-full max-w-lg mx-auto flex justify-end">
+      <button
+        @click="showBuildingNotFoundPage = true"
+        class="text-sm text-kb-ui-05 hover:text-kb-ui-03 transition-colors cursor-pointer"
+      >
+        원하는 단지가 안나온다면? >
+      </button>
+    </div>
+
     <!-- 주소 검색 레이어 -->
     <teleport to="body">
       <SearchAddressLayer
@@ -227,6 +243,13 @@ function resetFormData() {
       />
     </teleport>
 
+    <!-- 주소 선택 페이지 -->
+    <SelectAddressPage
+      v-if="showBuildingNotFoundPage"
+      @go-back="showBuildingNotFoundPage = false"
+      @address-selected="handleAddressSelected"
+    />
+
     <div class="fixed z-0 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
@@ -237,55 +260,30 @@ function resetFormData() {
       </button>
     </div>
 
-    <!-- 건물명 입력 모달 -->
+    <!-- 건물 없음 모달 -->
     <ModalForm
       v-if="showBuildingNameInputModal"
       title="건물을 찾을 수 없습니다."
-      :handle-confirm="() => {
-        if (buildingNameInput.value.trim()) {
-          handleBuildingNameSubmit();
-          return { success: true, message: '' };
-        } else {
-          return { success: false, message: '건물명을 입력해주세요.' };
-        }
-      }"
+      :handle-confirm="() => ({ success: true, message: '' })"
       @close="showBuildingNameInputModal = false"
     >
       <div class="text-center">
-        <!-- <div class="mb-4">
-          <svg class="mx-auto h-12 w-12 text-kb-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
-          </svg>
-        </div> -->
         <p class="text-medium text-kb-ui-02">
-          건물명을 입력해주세요.<br>
-          입력하신 건물명으로 안심 진단을 진행합니다.
+          검색하신 주소에 해당하는 건물 정보가 없습니다.<br>
+          다시 검색해주세요.
         </p>
-        <input
-          v-model="buildingNameInput"
-          type="text"
-          placeholder="건물명을 입력하세요"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kb-yellow focus:border-transparent mt-4"
-          @keyup.enter="handleBuildingNameSubmit"
-        />
       </div>
+      <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+          <h3 class="text-sm font-medium text-gray-800 mb-2">💡 도움말</h3>
+          <ul class="text-sm text-gray-600 space-y-1 text-left">
+            <li>• 정확한 도로명 주소를 입력해보세요</li>
+            <li>• 건물명 대신 동/호수로 검색해보세요</li>
+            <li>• 새로 지어진 건물은 등록이 지연될 수 있습니다</li>
+          </ul>
+        </div>
     </ModalForm>
 
-    <!-- 건물 없음 모달 -->
-    <ModalForm
-      v-if="showBuildingNotFoundModal"
-      title="건물 정보 없음"
-      :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
-      @close="showBuildingNotFoundModal = false"
-    >
-      <div class="text-center">
-        <p class="text-gray-600">
-          해당 주소에 건물이 없습니다.<br>
-          다른 주소를 선택해주세요.
-        </p>
-      </div>
-    </ModalForm>
+
   </div>
 </template>
 
