@@ -14,12 +14,15 @@ import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
 import ToastList from "@/components/common/ToastList.vue";
 
-import { markRaw, ref, reactive } from "vue";
+import { markRaw, ref, reactive, onMounted } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
 import defaultProfile from "@/assets/imgs/profile.jpg";
 import ProfileImage from "@/components/common/ProfileImage.vue";
 import ProfileInfo from "@/components/common/ProfileInfo.vue";
+import { Api } from "@/api/autoLoad/Api";
+import type { HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
+
 const modalMap = {
   name: markRaw(ChangeNameModal),
   editHouse: markRaw(ChangeHouseModal),
@@ -56,6 +59,7 @@ type ModalPropsMap = {
 const isOpenDrawer = ref(false);
 const currentModalName = ref<null | ModalNames>(null);
 const modalProps = ref<ModalPropsMap[ModalNames] | null>(null);
+const api = new Api();
 
 const user = reactive({
   name: "홍길동",
@@ -64,6 +68,9 @@ const user = reactive({
   imagePath: defaultProfile,
 });
 
+const isLoading = ref(false);
+const homeData = ref<HomeRegisterResponseDTO | null>(null);
+
 function openDrawer() {
   isOpenDrawer.value = !isOpenDrawer.value;
 }
@@ -71,10 +78,73 @@ function openModal<T extends ModalNames>(type: T, props: ModalPropsMap[T]) {
   currentModalName.value = type;
   modalProps.value = props;
 }
+const handleModalClose = () => {
+  closeModal();
+  if(currentModalName.value === 'newHouse'||currentModalName.value=='editHouse'){
+    fetchHomeData();
+  }
+};
 function closeModal() {
   currentModalName.value = null;
   modalProps.value = null;
 }
+
+const fetchHomeData = async () => {
+  try{
+    isLoading.value = true;
+    const response = await api.getHomeInfoUsingGet();
+
+    if(response.data?.data){
+      homeData.value = response.data.data;
+      user.isRegistered = true;
+    }else{
+      homeData.value = null;
+      user.isRegistered = false;
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+// 기존 함수들 아래에 추가
+const calculateRemainingDays = (contractEnd?: string) => {
+  if (!contractEnd) return '종료일 정보 없음';
+
+  const today = new Date();
+  const endDate = new Date(contractEnd);
+  const diffTime = endDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays > 0) {
+    return `${diffDays}일 남음`;
+  } else if (diffDays === 0) {
+    return '오늘 만료';
+  } else {
+    return `${Math.abs(diffDays)}일 지남`;
+  }
+};
+
+const getRentTypeText = (rentType?: number) => {
+  switch (rentType) {
+    case 1: return '전세';
+    case 2: return '월세';
+    case 3: return '반전세';
+    default: return '임대 유형';
+  }
+};
+
+const formatRentAmount = (homeData: HomeRegisterResponseDTO) => {
+  if (homeData.rentType === 1) {
+    return `${homeData.jeonseAmount || 0}만원`;
+  } else {
+    return `${homeData.monthlyRent || 0}만원`;
+  }
+};
+
+onMounted(() => {
+  fetchHomeData();
+});
 /*회원가입한 데이터를 받아오기!*/
 /* (예시) const userStore = useUserStore()
 const name = userStore.name
@@ -152,14 +222,33 @@ const email = userStore.email*/
     </div>
   </div>
 
-  <div v-if="user.isRegistered" class="h-100">
-    <h2 class="text-lg mx-4 mt-4">계약 만료 정보</h2>
-    <div class="mx-4 text-xs text-gray-400">다음 만료일까지</div>
-    <InfoCard :title="'계약 만료일'" :content="'2024-08-15'" :sub-content="'5일 남음'" />
-    <h2 class="text-lg mx-4 mt-4">시세 변화</h2>
-    <div class="mx-4 text-xs text-gray-400">시장 시세 업데이트</div>
-    <InfoCard :title="'시세 변화'" :content="'₩300,000,000'" :sub-content="'+5% (지난주 대비)'" />
-  </div>
+  <div v-if="isLoading" class="h-100 flex items-center justify-center">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+</div>
+<div v-else-if="homeData" class="h-100">
+  <!-- 등록된 집 정보 -->
+  <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
+  <div class="mx-4 text-xs text-gray-400">{{ homeData.aptNm || '등록된 아파트' }}</div>
+  <InfoCard :title="'등록된 아파트'" :content="homeData.aptNm || '정보 없음'" />
+
+  <!-- 계약 정보 -->
+  <h2 class="text-lg mx-4 mt-4">계약 정보</h2>
+  <div class="mx-4 text-xs text-gray-400">계약 기간</div>
+  <InfoCard
+    :title="'계약 기간'"
+    :content="`${homeData.contractStart || '시작일 없음'} ~ ${homeData.contractEnd || '종료일 없음'}`"
+    :sub-content="calculateRemainingDays(homeData.contractEnd)"
+  />
+
+  <!-- 임대료 정보 -->
+  <h2 class="text-lg mx-4 mt-4">임대료 정보</h2>
+  <div class="mx-4 text-xs text-gray-400">계약 조건</div>
+  <InfoCard
+    :title="getRentTypeText(homeData.rentType)"
+    :content="formatRentAmount(homeData)"
+    :sub-content="`보증금: ${homeData.monthlyDeposit || 0}만원`"
+  />
+</div>
   <div v-else class="h-100 flex flex-col items-center justify-center">
     <div class="font-pretendard-bold text-xl">나의 집을 등록하고 정보를 받아보세요!</div>
     <button
@@ -183,6 +272,6 @@ const email = userStore.email*/
   <component
     :is="currentModalName ? modalMap[currentModalName] : null"
     v-bind="modalProps"
-    @close="closeModal"
+    @close="handleModalClose"
   ></component>
 </template>
