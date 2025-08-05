@@ -94,7 +94,7 @@ import { mainRouteName } from "@/router/mainRoute.ts";
 import DatePicker from "@/components/common/DatePicker.vue";
 
 const route = useRoute();
-const selectedAptName = ref<string>((route.params.aptName as string) || "");
+const selectedAptName = ref<string>((route.query.aptName as string) || "");
 
 const selectedType = ref("전체");
 const selectedYear = ref<number | "전체">(1);
@@ -139,7 +139,12 @@ const filteredData = async (aptName: string) => {
   console.log("실제 axios 요청 발생!", selectedAptName.value, startDate.value, endDate.value);
 
   const body = {
-    buildingName: selectedAptName.value,
+    jibunAddress: marker.jibunAddress,  // 있으면 전달, 없으면 null
+    lat: marker.latlng.lat(),
+    lng: marker.latlng.lng(),
+    lat: props.marker.latlng.lat(),
+    lng: props.marker.latlng.lng(),
+    buildingName: props.marker.buildingName || null,
     tradeType: getTradeTypeCode(selectedType.value),
     startDate: startDate.value ? formatDateLocal(startDate.value) : null,
     endDate: endDate.value ? formatDateLocal(endDate.value) : null,
@@ -169,14 +174,14 @@ const setYear = (year) => {
     startDate.value = past;
     endDate.value = now;
   }
-  filteredData(selectedAptName.value);
-  //filteredData();
+
+  filteredData();
 };
 
 const setType = (type: string) => {
   console.log("거래 형식 선택됨:", type);
   selectedType.value = type;
-  filteredData(selectedAptName.value);
+  filteredData();
 };
 //수동으로 버튼 누르면... 해제
 const handleDateChange = () => {
@@ -188,7 +193,7 @@ const handleDateChange = () => {
 
 //url은 변경되어있지만, 컴포넌트는 남아있는 경우를 방지
 watch(
-  () => route.params.aptName,
+  () => route.query.aptName,
   (newName) => {
     if (newName) {
       selectedAptName.value = newName as string;
@@ -198,7 +203,7 @@ watch(
 );
 
 onMounted(() => {
-  const aptName = route.params.aptName as string;
+  const aptName = route.query.aptName as string;
   if (aptName) {
     selectedAptName.value = aptName;
     filteredData(aptName);

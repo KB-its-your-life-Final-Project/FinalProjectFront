@@ -32,6 +32,17 @@ const favoriteApts = [
   { id: 2, name: "아파트2", address: "4 성수역 필루시드", price: "₩250,000,000" },
   { id: 3, name: "아파트3", address: "5 뚝섬역 필루시드", price: "₩180,000,000" },
 ];
+
+// 새로운 지역 추가 함수
+const addNewRegion = (regionName: string) => {
+  // 이미 존재하는지 확인
+  const exists = favoriteRegions.value.some(
+    (region: { name: string; liked: boolean }) => region.name === regionName,
+  );
+  if (!exists) {
+    favoriteRegions.value.push({ name: regionName, liked: true });
+  }
+};
 </script>
 
 <template>

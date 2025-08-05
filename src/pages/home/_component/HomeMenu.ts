@@ -33,7 +33,7 @@ export const HomeCardTypes: HomeCardType[] = [
     name: mainRouteName.localInfo,
   },
   {
-    title: "AI 안심 레포트",
+    title: "안심 진단 레포트",
     info: "지금 보고 있는 곳 위험하지 않다면?",
     imgSrc: imgSafe,
     name: mainRouteName.safeReport,
