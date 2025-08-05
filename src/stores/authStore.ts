@@ -5,10 +5,11 @@ import type { LoginRequestDTO, MemberResponseDTO } from "@/api/autoLoad/data-con
 import { useToast } from "@/utils/useToast";
 
 const api = new Api();
-const {addToast, createToast} = useToast();
+const { addToast, createToast } = useToast();
 
 // 사용자 인터페이스
 interface Member {
+  id?: number;
   email?: string;
   kakaoId?: string;
   googleId?: string;
@@ -19,6 +20,7 @@ interface Member {
 }
 
 const getDefaultMember = (): Member => ({
+  id: 0,
   email: "",
   kakaoId: "",
   googleId: "",
@@ -134,6 +136,6 @@ export const authStore = defineStore("auth", () => {
     checkLoginStatus,
     login,
     logout,
-    setMember
+    setMember,
   };
 });

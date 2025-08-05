@@ -2,9 +2,11 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import type { YouthContentDTO } from "@/api/autoLoad/data-contracts";
 import { Api } from "@/api/autoLoad/Api";
+import { authStore } from "@/stores/authStore";
 
 const api = new Api();
-const memberId = 123; // 실제 로그인한 회원 ID를 적절히 교체하세요
+const auth = authStore();
+const memberId = auth.member.id || 0;
 
 const allowedPstSeNm = ["취업지원", "직업훈련", "대외활동"]; // 필터링 조건
 
@@ -22,7 +24,6 @@ async function fetchUnreadContents(page: number) {
   loading.value = true;
 
   try {
-    // Swagger API 메서드 호출 (query 인자에 memberId, page, size 전달)
     const { data } = await api.getUnreadContentsUsingGet({
       memberId,
       page,
@@ -34,8 +35,7 @@ async function fetchUnreadContents(page: number) {
     const filtered = newItems
       .filter(
         (item) =>
-          allowedPstSeNm.includes(item.pstSeNm ?? "") &&
-          !!item.pstWholCn?.match(/href="([^"]+)"/)
+          allowedPstSeNm.includes(item.pstSeNm ?? "") && !!item.pstWholCn?.match(/href="([^"]+)"/),
       )
       .map((item) => {
         const hrefMatch = item.pstWholCn?.match(/href="([^"]+)"/);
@@ -55,7 +55,7 @@ async function fetchUnreadContents(page: number) {
     } else {
       currentPage.value = page;
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("청년 프로그램 불러오기 실패:", error);
   } finally {
     loading.value = false;
@@ -65,7 +65,6 @@ async function fetchUnreadContents(page: number) {
 // IntersectionObserver 설정 (스크롤 끝 감지)
 function setupObserver() {
   if (!loadMoreTrigger.value) return;
-
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting && hasMore.value && !loading.value) {
@@ -73,9 +72,7 @@ function setupObserver() {
       }
     });
   });
-
   observer.observe(loadMoreTrigger.value);
-
   onUnmounted(() => {
     observer.disconnect();
   });
@@ -83,7 +80,7 @@ function setupObserver() {
 async function handleClick(program: YouthContentDTO) {
   try {
     await api.markAsReadUsingPost({
-      memberId: memberId,     // 당신의 변수 이름에 맞게 조정
+      memberId: memberId, // 당신의 변수 이름에 맞게 조정
       contentId: program.id,
     });
     console.log(`읽음 처리 완료 - contentId: ${program.id}`);
@@ -127,7 +124,7 @@ onMounted(async () => {
         class="flex item-start h-[5rem] justify-between gap-2 break-words overflow-hidden"
       >
         <div class="flex-1 pr-4 min-w-0">
-          <h3 class="text-small text-base text-kb-ui-04 break-words underline">
+          <h3 class="title">
             <a
               v-if="program.hrefUrl"
               :href="program.hrefUrl"
@@ -166,7 +163,7 @@ onMounted(async () => {
       <li ref="loadMoreTrigger" class="h-1"></li>
     </ul>
 
-    <p v-if="loading" class="text-gray-500 mt-2">로딩 중...</p>
+    <p v-if="loading" class="loading">로딩중...</p>
     <p v-else-if="!hasMore && youthProgramList.length === 0" class="text-gray-500 mt-2">
       표시할 콘텐츠가 없습니다.
     </p>
@@ -179,9 +176,15 @@ ul::-webkit-scrollbar {
   @apply w-[0.5rem];
 }
 ul::-webkit-scrollbar-thumb {
-  @apply bg-kb-yellow rounded-lg;
+  @apply bg-kb-yellow/50 rounded-lg;
 }
 ul::-webkit-scrollbar-thumb:hover {
   @apply bg-kb-yellow-positive;
+}
+.title {
+  @apply text-[0.9rem] text-base text-kb-ui-04 break-words underline;
+}
+.loading {
+  @apply text-[0.8rem] font-pretendard-regular text-kb-ui-06;
 }
 </style>

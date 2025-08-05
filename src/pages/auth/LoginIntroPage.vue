@@ -87,7 +87,7 @@ const loginGoogle = async () => {
       <!-- 회원가입 영역 -->
       <RegisterLink />
       <!-- // 회원가입 영역 -->
-       <span class="text-kb-gray-dark underline" @click="movePage.back">뒤로가기</span>
+      <span class="text-kb-gray-dark underline" @click="movePage.back">뒤로가기</span>
     </div>
     <!-- // 로그인 버튼 및 회원가입 영역 -->
   </div>

@@ -50,10 +50,10 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
     return { success: false, message: "기존 비밀번호를 인증하세요" };
   }
   if (isEmpty(newPwd.value) || isEmpty(newPwdChk.value)) {
-    return { success: false, message: "새 비밀번호 및 비밀번호 확인을 입력하세요 (공백 불가)"};
+    return { success: false, message: "새 비밀번호 및 비밀번호 확인을 입력하세요 (공백 불가)" };
   }
   if (!isValidPasswordFormat(newPwd.value) || !isValidPasswordFormat(newPwdChk.value)) {
-    return { success: false, message: "새 비밀번호의 형식이 올바르지 않습니다"}
+    return { success: false, message: "새 비밀번호의 형식이 올바르지 않습니다" };
   }
   if (!isValidPasswordChk(newPwd.value, newPwdChk.value)) {
     return { success: false, message: "새 비밀번호 및 비밀번호 확인이 불일치 합니다" };

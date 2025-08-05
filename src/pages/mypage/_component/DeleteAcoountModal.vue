@@ -3,8 +3,8 @@ import { ref } from "vue";
 import ModalForm from "@/components/common/ModalForm.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { VerifyPwdRequestDTO, ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
-import { isEmpty, isValidPasswordFormat } from "@/utils/validate";
+import type { VerifyPwdRequestDTO } from "@/api/autoLoad/data-contracts";
+import { isEmpty } from "@/utils/validate";
 import movePage from "@/utils/movePage";
 import { useToast } from "@/utils/useToast";
 import { authStore } from "@/stores/authStore";
@@ -22,7 +22,7 @@ const api = new Api();
 const auth = authStore();
 const { addToast, createToast } = useToast();
 
-async function handleConfirm(): { success: boolean; message: string } {
+async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   if (!isVerified.value) {
     return { success: false, message: "본인인증을 먼저 해야 합니다" };
   }
@@ -36,10 +36,10 @@ async function handleConfirm(): { success: boolean; message: string } {
   }
   try {
     if (auth.logout) {
-    await auth.logout();
-  } else {
-    console.error("logoutUser is undefined");
-  }
+      await auth.logout();
+    } else {
+      console.error("logoutUser is undefined");
+    }
   } catch (error: unknown) {
     console.error("로그아웃 실패: ", error);
     return { success: false, message: "로그아웃 중 오류가 발생했습니다" };
@@ -50,7 +50,6 @@ async function handleConfirm(): { success: boolean; message: string } {
     movePage.homeMain();
   }, 1500);
   return { success: true, message: "탈퇴가 완료되었습니다" };
-
 }
 
 async function checkPassword(password: string) {
