@@ -14,8 +14,10 @@ import {
   ApiResponseBoolean,
   ApiResponseEstateDTO,
   ApiResponseFacilityDTO,
+  ApiResponseHomeRegisterResponseDTO,
   ApiResponseHospitalDTO,
   ApiResponseListEstateWishlistResponseDTO,
+  ApiResponseListLawdCdResponseDTO,
   ApiResponseListLocalInfoResponseDTO,
   ApiResponseListMemberDTO,
   ApiResponseListRecentSafeReportResponseDto,
@@ -30,6 +32,7 @@ import {
   ApiResponseVoid,
   ApiResponseWeatherDTO,
   EstateWishlistRequestDTO,
+  HomeRegisterRequestDTO,
   LoginDTO,
   RegionWishlistRequestDTO,
   SafeReportRequestDto,
@@ -81,6 +84,33 @@ export class Api<
   ) =>
     this.request<ApiResponseEstateDTO, void>({
       path: `/api/estate/latlng`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags lawdCd 정보 조회
+   * @name GetAllLawdCdUsingGet
+   * @summary getAllLawdCd
+   * @request GET:/api/lawdCd
+   */
+  getAllLawdCdUsingGet = (
+    query?: {
+      /** @format int32 */
+      limit?: number;
+      /** @format int32 */
+      offset?: number;
+      regionCd?: string;
+      sggCd?: string;
+      sidoCd?: string;
+      umdCd?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListLawdCdResponseDTO, void>({
+      path: `/api/lawdCd`,
       method: "GET",
       query: query,
       ...params,
@@ -374,6 +404,39 @@ export class Api<
       path: `/api/member/${id}`,
       method: "GET",
       body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 사용자의 집 정보를 조회합니다.
+   *
+   * @tags MyHomeRegister
+   * @name GetHomeInfoUsingGet
+   * @summary 나의 집 정보 조회
+   * @request GET:/api/myhome/info
+   */
+  getHomeInfoUsingGet = (params: RequestParams = {}) =>
+    this.request<ApiResponseHomeRegisterResponseDTO, void>({
+      path: `/api/myhome/info`,
+      method: "GET",
+      ...params,
+    });
+  /**
+   * @description 사용자의 집 정보를 등록합니다.
+   *
+   * @tags MyHomeRegister
+   * @name RegisterHomeUsingPost
+   * @summary 나의 집 정보 등록
+   * @request POST:/api/myhome/register
+   */
+  registerHomeUsingPost = (
+    requestDTO: HomeRegisterRequestDTO,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseHomeRegisterResponseDTO, void>({
+      path: `/api/myhome/register`,
+      method: "POST",
+      body: requestDTO,
       type: ContentType.Json,
       ...params,
     });

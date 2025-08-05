@@ -86,6 +86,131 @@ export interface FloorAndPurpose {
   resUseType?: string;
 }
 
+/**
+ * HomeRegisterRequestDTO
+ * 나의 집 저장 요청 데이터
+ */
+export interface HomeRegisterRequestDTO {
+  /**
+   * 건물동 이름
+   * @example "101동"
+   */
+  buildingNumber?: string;
+  /**
+   * 계약 종료일
+   * @example "2025.04.23"
+   */
+  contractEnd?: string;
+  /**
+   * 계약 시작일
+   * @example "2023.04.23"
+   */
+  contractStart?: string;
+  /**
+   * 전세 금액
+   * @format int32
+   * @example 200
+   */
+  jeonseAmount?: number;
+  /**
+   * 위도
+   * @format double
+   * @example 37.5665
+   */
+  lat?: number;
+  /**
+   * 경도
+   * @format double
+   * @example 126.978
+   */
+  lng?: number;
+  /**
+   * 월세 보증금
+   * @format int32
+   * @example 300
+   */
+  monthlyDeposit?: number;
+  /**
+   * 월세 금액
+   * @format int32
+   * @example 50
+   */
+  monthlyRent?: number;
+  /**
+   * 거래 유형
+   * @format int32
+   * @example 1
+   */
+  rentType?: number;
+}
+
+/**
+ * HomeRegisterResponseDTO
+ * 나의 집 저장 응답 데이터
+ */
+export interface HomeRegisterResponseDTO {
+  /**
+   * 처리 타입
+   * @example "UPDATE"
+   */
+  actionType?: string;
+  /**
+   * 건물명
+   * @example "강남아파트"
+   */
+  buildingName?: string;
+  /**
+   * 건물동명
+   * @example "101동"
+   */
+  buildingNumber?: string;
+  /**
+   * 계약 종료일
+   * @example "2025.04.23"
+   */
+  contractEnd?: string;
+  /**
+   * 계약 시작일
+   * @example "2023.04.23"
+   */
+  contractStart?: string;
+  /**
+   * 부동산 ID
+   * @format int32
+   * @example 12345
+   */
+  estateId?: number;
+  /**
+   * 전세 금액
+   * @format int32
+   * @example 200
+   */
+  jeonseAmount?: number;
+  /**
+   * 월세 보증금
+   * @format int32
+   * @example 300
+   */
+  monthlyDeposit?: number;
+  /**
+   * 월세 금액
+   * @format int32
+   * @example 50
+   */
+  monthlyRent?: number;
+  /**
+   * 등록일
+   * @example "2023-04-23T10:30:00"
+   */
+  regDate?: string;
+  /**
+   * 거래 유형
+   * @format int32
+   * @example 1
+   */
+  rentType?: number;
+}
+
 /** HospitalDTO */
 export interface HospitalDTO {
   locataddNm?: string;
@@ -93,6 +218,30 @@ export interface HospitalDTO {
   regionName?: string;
   /** @format int64 */
   totalCount?: number;
+}
+
+/** LawdCdResponseDTO */
+export interface LawdCdResponseDTO {
+  adptDe?: string;
+  /** @format int32 */
+  gridX?: number;
+  /** @format int32 */
+  gridY?: number;
+  locallowNm?: string;
+  /** @format int32 */
+  locatOrder?: number;
+  locatRm?: string;
+  locataddNm?: string;
+  locathightCd?: string;
+  locatjijukCd?: string;
+  locatjuminCd?: string;
+  /** @format date-time */
+  regDate?: string;
+  regionCd?: string;
+  riCd?: string;
+  sggCd?: string;
+  sidoCd?: string;
+  umdCd?: string;
 }
 
 /** LocalInfoResponseDTO */
@@ -386,6 +535,16 @@ export interface ApiResponseFacilityDTO {
   success?: boolean;
 }
 
+/** ApiResponse«HomeRegisterResponseDTO» */
+export interface ApiResponseHomeRegisterResponseDTO {
+  /** @format int32 */
+  code?: number;
+  /** 나의 집 저장 응답 데이터 */
+  data?: HomeRegisterResponseDTO;
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«HospitalDTO» */
 export interface ApiResponseHospitalDTO {
   /** @format int32 */
@@ -400,6 +559,15 @@ export interface ApiResponseListEstateWishlistResponseDTO {
   /** @format int32 */
   code?: number;
   data?: EstateWishlistResponseDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«LawdCdResponseDTO»» */
+export interface ApiResponseListLawdCdResponseDTO {
+  /** @format int32 */
+  code?: number;
+  data?: LawdCdResponseDTO[];
   message?: string;
   success?: boolean;
 }

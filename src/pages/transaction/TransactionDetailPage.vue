@@ -90,10 +90,10 @@ import TransactionGraph from "@/pages/transaction/TransactionGraph.vue";
 import { onMounted, ref, watch } from "vue";
 import axios from "axios";
 import { mainRouteName } from "@/router/mainRoute.ts";
-
+import { computed } from "vue";
 import DatePicker from "@/components/common/DatePicker.vue";
 import type { MarkerDataType } from "@/types/markerDataType";
-import mapUtil from "@/utils/naverMap/naverMap";
+//import mapUtil from "@/utils/naverMap/naverMap";
 
 // Props 정의
 interface Props {
@@ -132,6 +132,12 @@ const toggleFavorite = () => {
 //전체 거래 데이터 및 그래프들 데이터
 
 //const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([])
+//더미 데이터
+const dummyMarkerData = {
+  jibunAddress: "덕풍동 357-19",
+  roadAddress: null,
+  latlng: { lat: () => 37.5409966, lng: () => 127.1989472 },
+};
 
 //날짜 달력
 const formatDateLocal = (date: Date): string => {
@@ -148,35 +154,43 @@ const getTradeTypeCode = (label: string | null): number | null => {
   return null; // "전체" 혹은 그 외
 };
 
-const filteredData = async (markerData: { jibunAddress: string; roadAddress: string; latlng: naver.maps.LatLng }) => {
-  console.log("실제 axios 요청 발생!", selectedAptName.value, startDate.value, endDate.value);
- // console.log("요청 보낼 aptName:", aptName);
-  console.log("시작일:", startDate.value, "종료일:", endDate.value);
-  // 실제 API 호출
+
+
+// API 호출
+const filteredData = async (markerData: {
+  jibunAddress: string;
+  roadAddress: string;
+  latlng: { lat: () => number; lng: () => number };
+}) => {
   const body = {
-    jibunAddress: markerData.jibunAddress || null,
-    lat: markerData.latlng?.lat() || null,
-    lng: markerData.latlng?.lng() || null,
+    jibunAddress: markerData.jibunAddress,
+    roadAddress: markerData.roadAddress,
+    lat: markerData.latlng.lat(),
+    lng: markerData.latlng.lng(),
     buildingName: selectedAptName.value,
     tradeType: getTradeTypeCode(selectedType.value),
     startDate: startDate.value ? formatDateLocal(startDate.value) : null,
     endDate: endDate.value ? formatDateLocal(endDate.value) : null,
+    /* jibunAddress: markerData.jibunAddress,
+    roadAddress: markerData.roadAddress,
+    lat: markerData.latlng.lat(),
+    lng: markerData.latlng.lng(),
+    buildingName: selectedAptName.value,
+    tradeType: getTradeTypeCode(selectedType.value),
+    startDate: startDate.value ? formatDateLocal(startDate.value) : null,
+    endDate: endDate.value ? formatDateLocal(endDate.value) : null,*/
   };
-
   console.log("API 요청 데이터:", body);
-  console.log("props.marker:", props.marker);
 
   try {
-    const res = await axios.post("/api/transactions/detail", body);
+    const res = await axios.post("http://localhost:8080/api/transactions/detail", body);
     console.log("백엔드 응답 받음:", res.data);
     graphData.value = res.data;
   } catch (error) {
     console.error("데이터 가져오기 실패", error);
-    // API 실패 시 빈 배열 사용
     graphData.value = [];
   }
 };
-
 //연도 버튼 클릭으로 필터링 기능
 const setYear = (year: number | "전체") => {
   selectedYear.value = year;
@@ -188,52 +202,45 @@ const setYear = (year: number | "전체") => {
     const now = new Date();
     const past = new Date();
     past.setFullYear(now.getFullYear() - Number(year));
+    
 
+    //값설정 (날짜 필드)
     startDate.value = past;
     endDate.value = now;
+ 
   }
-  // URL 업데이트
-  router.push({
-    query: {
-      ...route.query,
-      year: year === "전체" ? undefined : year.toString(),
-    },
-  });
-
-  filteredData(selectedAptName.value);
+  updateURLQuery();
+  filteredData(dummyMarkerData);
 };
 
 const setType = (type: string) => {
   console.log("거래 형식 선택됨:", type);
   selectedType.value = type;
 
-  // URL 업데이트
-  router.push({
-    query: {
-      ...route.query,
-      type: type === "전체" ? undefined : type,
-    },
-  });
-  filteredData(selectedAptName.value);
+  updateURLQuery();
+  filteredData(dummyMarkerData);
 };
 //수동으로 버튼 누르면... 해제
 const handleDateChange = () => {
   selectedYear.value = "전체";
   //startDate.value = null
   // endDate.value = null
-
-  // URL 업데이트
+  updateURLQuery();
+  filteredData(dummyMarkerData);
+};
+// URL Query 업데이트
+const updateURLQuery = () => {
   router.push({
     query: {
-      ...route.query,
+      aptName: selectedAptName.value,
+      type: selectedType.value !== "전체" ? selectedType.value : undefined,
+      year: selectedYear.value !== "전체" ? String(selectedYear.value) : undefined,
       startDate: startDate.value ? formatDateLocal(startDate.value) : undefined,
       endDate: endDate.value ? formatDateLocal(endDate.value) : undefined,
-      year: undefined, // 수동 날짜 선택 시 year 파라미터 제거
     },
   });
-
-  filteredData(selectedAptName.value);
 };
+
 
 //url은 변경되어있지만, 컴포넌트는 남아있는 경우를 방지
 watch(
@@ -256,17 +263,16 @@ watch(
   { deep: true },
 );
 
-onMounted(async() => {
+onMounted(async () => {
   const aptName = route.query.aptName as string;
   if (aptName) {
     selectedAptName.value = aptName;
-    await mapUtil.loadNaverMapScript();
-    const markerData = await mapUtil.searchAddressToCoordinate(aptName);
-    console.log("네이버 지도 API로 받은 markerData:", markerData);
-
-    // 받아온 데이터를 filteredData에 넘겨서 API 호출
-    await filteredData(markerData);
-  //  filteredData(aptName);
+    const dummyMarkerData = {
+      jibunAddress: "357-19",
+      roadAddress: null,
+      latlng: { lat: () => 37.5409966, lng: () => 127.1989472 },
+    };
+    await filteredData(dummyMarkerData);
   }
 });
 </script>
