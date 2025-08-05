@@ -58,15 +58,15 @@ const handleHeartClick = () => {
 
 <template>
   <Header headerShowtype="localInfo">
-    <div class="mt-23">
-      <div class="font-pretendard-bold text-5xl text-kb-ui-10 flex items-center gap-3">
-        {{ getLastDong(selectedRegion) }} 동네이야기
-        <font-awesome-icon
-          icon="fa-solid fa-heart"
-          class="text-rose-500 text-4xl cursor-pointer hover:text-rose-700 transition-colors"
-          @click="handleHeartClick"
-        />
-      </div>
+    <div class="mt-23 flex text-center justify-between">
+      <h2 class="font-pretendard-bold text-2xl text-kb-ui-10">
+        {{ getLastDong(selectedRegion) }} 동네정보
+      </h2>
+      <font-awesome-icon
+        icon="fa-solid fa-heart"
+        class="text-rose-500 text-xl cursor-pointer hover:text-rose-700 transition-colors"
+        @click="handleHeartClick"
+      />
     </div>
   </Header>
 
@@ -77,11 +77,11 @@ const handleHeartClick = () => {
   <div class="px-4 mt-10">
     <!-- 날씨 정보 박스 -->
     <div class="mt-8">
-      <WeatherCard :region="selectedRegion" :regionCd="selectedRegionCd" :weather-data="null" />
+      <WeatherCard :region="selectedRegion" :regionCd="selectedRegionCd" />
     </div>
 
     <!-- 카드 4개 2x2 그리드로 표시 -->
-    <div class="grid grid-cols-2 gap-4 mt-4">
+    <div class="grid grid-cols-2 gap-4 mt-3">
       <InfoCard
         v-for="(card, i) in InfoCardList"
         :key="i"
@@ -91,6 +91,5 @@ const handleHeartClick = () => {
     </div>
   </div>
 
-  <Footer />
-  <div class="h-15"></div>
+  <div class="h-15"><Footer /></div>
 </template>

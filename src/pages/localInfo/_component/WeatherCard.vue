@@ -99,11 +99,18 @@ const fetchWeatherInfo = async (regionCd: string) => {
 watch(
   () => [props.weatherData, props.regionCd],
   ([newWeatherData, newRegionCd]: [Weather | null, string]) => {
+    console.log("WeatherCard watch 실행:", { newWeatherData, newRegionCd });
+
     if (newWeatherData) {
       internalWeatherData.value = newWeatherData;
       error.value = "";
-    } else if (newRegionCd) {
+      console.log("weatherData로 설정됨:", newWeatherData);
+    } else if (newRegionCd && newRegionCd.trim() !== "") {
+      console.log("regionCd로 API 호출:", newRegionCd);
       fetchWeatherInfo(newRegionCd);
+    } else {
+      console.log("유효하지 않은 regionCd:", newRegionCd);
+      internalWeatherData.value = MOCK_WEATHER_DATA;
     }
   },
   { immediate: true },
