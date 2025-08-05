@@ -107,7 +107,12 @@ const props = withDefaults(defineProps<Props>(), {
 const route = useRoute();
 const router = useRouter();
 
-const selectedAptName = ref<string>((route.query.aptName as string) || "");
+
+const selectedAptName = ref<string>(
+  route.query.aptName
+    ? decodeURIComponent(route.query.aptName as string)
+    : ""
+);
 
 const selectedType = ref("전체");
 const selectedYear = ref<number | "전체">(1);
@@ -169,15 +174,11 @@ const filteredData = async (markerData: {
     tradeType: getTradeTypeCode(selectedType.value),
     startDate: startDate.value ? formatDateLocal(startDate.value) : null,
     endDate: endDate.value ? formatDateLocal(endDate.value) : null,
-    /* jibunAddress: markerData.jibunAddress,
-    roadAddress: markerData.roadAddress,
-    lat: markerData.latlng.lat(),
-    lng: markerData.latlng.lng(),
-    buildingName: selectedAptName.value,
-    tradeType: getTradeTypeCode(selectedType.value),
-    startDate: startDate.value ? formatDateLocal(startDate.value) : null,
-    endDate: endDate.value ? formatDateLocal(endDate.value) : null,*/
+
   };
+
+
+
   console.log("API 요청 데이터:", body);
 
   try {
@@ -201,10 +202,11 @@ const setYear = (year: number | "전체") => {
     const past = new Date();
     past.setFullYear(now.getFullYear() - Number(year));
 
-    //값설정 (날짜 필드)
+    // 날짜 입력란 자동 설정
     startDate.value = past;
     endDate.value = now;
   }
+
   updateURLQuery();
   filteredData(dummyMarkerData);
 };
@@ -241,6 +243,9 @@ const updateURLQuery = () => {
 watch(
   () => route.query,
   (newQuery) => {
+    if (newQuery.aptName) {
+      selectedAptName.value = decodeURIComponent(newQuery.aptName as string);
+    }
     if (newQuery.type !== undefined) {
       selectedType.value = newQuery.type as string;
     }
@@ -259,7 +264,9 @@ watch(
 );
 
 onMounted(async () => {
-  const aptName = route.query.aptName as string;
+  const aptName = route.query.aptName
+    ? decodeURIComponent(route.query.aptName as string)
+    : "";
   if (aptName) {
     selectedAptName.value = aptName;
     const dummyMarkerData = {
