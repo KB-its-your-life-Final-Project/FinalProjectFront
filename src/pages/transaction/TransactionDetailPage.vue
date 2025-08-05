@@ -92,7 +92,8 @@ import axios from "axios";
 import { mainRouteName } from "@/router/mainRoute.ts";
 
 import DatePicker from "@/components/common/DatePicker.vue";
-import type { MarkerDataType } from "@/types/marker";
+import type { MarkerDataType } from "@/types/markerDataType";
+import mapUtil from "@/utils/naverMap/naverMap";
 
 // Props 정의
 interface Props {
@@ -147,51 +148,23 @@ const getTradeTypeCode = (label: string | null): number | null => {
   return null; // "전체" 혹은 그 외
 };
 
-const filteredData = async (aptName: string) => {
+const filteredData = async (markerData: { jibunAddress: string; roadAddress: string; latlng: naver.maps.LatLng }) => {
   console.log("실제 axios 요청 발생!", selectedAptName.value, startDate.value, endDate.value);
-
-  // 임시 테스트 데이터 사용
-  const allTestData = [
-    { date: "2024-01", price: 50000, type: "매매" },
-    { date: "2024-02", price: 52000, type: "매매" },
-    { date: "2024-03", price: 48000, type: "전월세" },
-    { date: "2024-04", price: 51000, type: "매매" },
-    { date: "2023-11", price: 49000, type: "매매" },
-    { date: "2023-12", price: 47000, type: "전월세" },
-    { date: "2022-06", price: 45000, type: "매매" },
-    { date: "2022-08", price: 46000, type: "전월세" },
-  ];
-
-  // 거래 형식 필터링
-  let filteredData = allTestData;
-  if (selectedType.value !== "전체") {
-    filteredData = allTestData.filter((item) => item.type === selectedType.value);
-  }
-
-  // 날짜 범위 필터링
-  if (startDate.value && endDate.value) {
-    const startDateStr = formatDateLocal(startDate.value).substring(0, 7); // YYYY-MM 형식
-    const endDateStr = formatDateLocal(endDate.value).substring(0, 7);
-
-    filteredData = filteredData.filter((item) => {
-      return item.date >= startDateStr && item.date <= endDateStr;
-    });
-  }
-
-  console.log("필터링된 데이터:", filteredData);
-  graphData.value = filteredData;
-
-  // 실제 API 호출은 나중에 활성화
-  /*
+ // console.log("요청 보낼 aptName:", aptName);
+  console.log("시작일:", startDate.value, "종료일:", endDate.value);
+  // 실제 API 호출
   const body = {
-    jibunAddress: props.marker?.jibunAddress || "서울특별시 광명시",
-    lat: props.marker?.latlng?.lat() || 37.5665,
-    lng: props.marker?.latlng?.lng() || 126.978,
-    buildingName: props.marker?.buildingName || aptName,
+    jibunAddress: markerData.jibunAddress || null,
+    lat: markerData.latlng?.lat() || null,
+    lng: markerData.latlng?.lng() || null,
+    buildingName: selectedAptName.value,
     tradeType: getTradeTypeCode(selectedType.value),
     startDate: startDate.value ? formatDateLocal(startDate.value) : null,
     endDate: endDate.value ? formatDateLocal(endDate.value) : null,
   };
+
+  console.log("API 요청 데이터:", body);
+  console.log("props.marker:", props.marker);
 
   try {
     const res = await axios.post("/api/transactions/detail", body);
@@ -199,8 +172,9 @@ const filteredData = async (aptName: string) => {
     graphData.value = res.data;
   } catch (error) {
     console.error("데이터 가져오기 실패", error);
+    // API 실패 시 빈 배열 사용
+    graphData.value = [];
   }
-  */
 };
 
 //연도 버튼 클릭으로 필터링 기능
@@ -282,11 +256,17 @@ watch(
   { deep: true },
 );
 
-onMounted(() => {
+onMounted(async() => {
   const aptName = route.query.aptName as string;
   if (aptName) {
     selectedAptName.value = aptName;
-    filteredData(aptName);
+    await mapUtil.loadNaverMapScript();
+    const markerData = await mapUtil.searchAddressToCoordinate(aptName);
+    console.log("네이버 지도 API로 받은 markerData:", markerData);
+
+    // 받아온 데이터를 filteredData에 넘겨서 API 호출
+    await filteredData(markerData);
+  //  filteredData(aptName);
   }
 });
 </script>
