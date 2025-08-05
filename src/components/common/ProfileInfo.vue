@@ -15,7 +15,7 @@ defineProps<{
     <p class="text-xl font-pretendard-bold flex items-center gap-1">
       {{ email }}
       <font-awesome-icon
-      v-if="auth.member.createdType != 0"
+        v-if="auth.member.createdType != 0"
         class="border rounded-full p-[2px] w-2 h-2 text-success"
         :icon="['fas', 'check']"
       />

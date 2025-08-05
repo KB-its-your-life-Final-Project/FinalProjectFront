@@ -24,4 +24,4 @@ export const isValidPasswordChk = (password1: string, password2: string): boolea
 export const isValidName = (name: string): boolean => {
   const regex = /^[가-힣a-zA-Z]{2,20}$/;
   return regex.test(name.trim());
-}
+};

@@ -44,10 +44,15 @@ function openInquiry() {
     <div class="pl-3 pr-8 pt-8 pb-8">
       <div class="mt-[1.5rem] flex items-center justify-center text-center">
         <div class="flex-[1]">
-          <ProfileImage :src="auth.member.createdType === 0 ? logo : (auth.member.profileImg || defaultProfile)" />
+          <ProfileImage
+            :src="auth.member.createdType === 0 ? logo : auth.member.profileImg || defaultProfile"
+          />
         </div>
         <div class="flex-[3]">
-          <ProfileInfo :name="auth.member.name || '안전한 거래의 시작,'" :email="auth.member.createdType === 0 ? 'Light House' : (auth.member.email || '')"></ProfileInfo>
+          <ProfileInfo
+            :name="auth.member.name || '안전한 거래의 시작,'"
+            :email="auth.member.createdType === 0 ? 'Light House' : auth.member.email || ''"
+          ></ProfileInfo>
         </div>
       </div>
     </div>
@@ -80,5 +85,5 @@ function openInquiry() {
   </div>
   <Footer />
   <div class="h-15"></div>
-   <ToastList />
+  <ToastList />
 </template>

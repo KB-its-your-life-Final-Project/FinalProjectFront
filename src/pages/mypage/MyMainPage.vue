@@ -88,7 +88,7 @@ function handleNameChanged(newName: string) {
   auth.member.name = newName;
 }
 
-onMounted (async () => {
+onMounted(async () => {
   try {
     const { data } = await api.checkLoginStatusUsingGet();
     if (data.success && data.data) {
@@ -97,7 +97,7 @@ onMounted (async () => {
     }
   } catch (error: unknown) {
     console.error("로그인 여부 확인 중 오류: ", error);
-    }
+  }
 });
 </script>
 
