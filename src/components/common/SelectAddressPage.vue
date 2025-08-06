@@ -42,10 +42,17 @@ const STEPS = {
   BUILDING: 4
 } as const;
 
-// 예외 필터링해야 하는 경기도, 전북 코드드
+// 필터링이 필요한 시/도 코드
 const SIDO_CODES = {
   GYEONGGI: '41',
-  JEONBUK: '52'
+  JEONBUK: '52',
+  GYEONGNAM: '48',
+  GYEONGBUK: '47',
+  JEONNAM: '46',
+  CHUNGBUK: '43',
+  CHUNGNAM: '44',
+  JEJU: '50',
+  SEJONG: '36'
 } as const;
 
 const api = new Api();
@@ -65,36 +72,72 @@ const createAddressData = (): AddressData => ({
 });
 
 const buildFullAddress = (): string => {
+  // 세종시의 경우 읍/면/동 없이 주소 생성
+  if (selectedSido.value?.sidoCd === SIDO_CODES.SEJONG) {
+    return `${selectedSido.value?.sidoNm || ''} ${selectedSigugun.value?.sggNm || ''}`.trim();
+  }
   return `${selectedSido.value?.sidoNm || ''} ${selectedSigugun.value?.sggNm || ''} ${selectedDong.value?.dongNm || ''}`.trim();
 };
 
 const shouldFilterSigugun = (sggNm: string, sidoCd: string, allData?: SigugunDto[]): boolean => {
-  if (sidoCd === SIDO_CODES.GYEONGGI) {
-    // 시 뒤에 읍/면/동이 붙은 경우 제외
-    if (sggNm.includes('시') && (sggNm.includes('읍') || sggNm.includes('면') || sggNm.includes('동'))) {
+  // 광역시/특별시/특별자치도 이름 제거
+  const metropolitanCityNames = [
+    '광주광역시',
+    '대구광역시',
+    '대전광역시',
+    '부산광역시',
+    '서울특별시',
+    '세종특별자치시',
+    '울산광역시',
+    '인천광역시',
+    '제주특별자치도'
+  ];
+
+  if (metropolitanCityNames.includes(sggNm)) {
+    return true;
+  }
+
+  // 특정 지역들에 대한 추가 필터링 로직
+  const filteringCodes = ['41', '52', '48', '47', '46', '43', '44', '50'];
+  const needsFiltering = filteringCodes.includes(sidoCd);
+
+  if (needsFiltering) {
+    // 기본적으로 시/군/구가 포함되지 않은 경우 제외
+    const hasCityCountyGu = sggNm.includes('시') || sggNm.includes('군') || sggNm.includes('구');
+    if (!hasCityCountyGu) {
       return true;
     }
 
-    // "시"로 끝나는 경우, 같은 시에 구가 있는지 확인
-    if (sggNm.endsWith('시')) {
-      if (allData) {
-        const hasGu = allData.some(item =>
-          item.sggNm &&
-          item.sggNm.includes(sggNm) &&
-          item.sggNm.includes('구')
-        );
-        // 같은 시에 구가 있으면 시만 있는 항목 제외
-        if (hasGu) {
-          return true;
+    // 시/군/구 뒤에 읍/면/동이 붙은 경우 제외 (예: "거제시 남부면" → 제외)
+    if ((sggNm.includes('시') || sggNm.includes('군') || sggNm.includes('구')) &&
+        (sggNm.includes('읍') || sggNm.includes('면') || sggNm.includes('동'))) {
+      return true;
+    }
+
+    // 경기도, 경남, 경북의 경우 추가 로직: "시"만 있는데 같은 시에 "구"가 있으면 제외
+    if (sidoCd === SIDO_CODES.GYEONGGI || sidoCd === SIDO_CODES.GYEONGNAM || sidoCd === SIDO_CODES.GYEONGBUK) {
+      // "시"로 끝나는 경우, 같은 시에 구가 있는지 확인
+      if (sggNm.endsWith('시')) {
+        if (allData) {
+          const hasGu = allData.some(item =>
+            item.sggNm &&
+            item.sggNm.includes(sggNm) &&
+            item.sggNm.includes('구')
+          );
+          // 같은 시에 구가 있으면 시만 있는 항목 제외
+          if (hasGu) {
+            return true;
+          }
         }
       }
     }
-  }
 
-  if (sidoCd === SIDO_CODES.JEONBUK) {
-    // 시/군 뒤에 읍/면/동이 붙은 경우 제외 (기본 시/군만 남기기 위해)
-    if ((sggNm.includes('시') || sggNm.includes('군')) && (sggNm.includes('읍') || sggNm.includes('면') || sggNm.includes('동'))) {
-      return true;
+    // 제주도의 경우 추가 로직: "시 + 읍/면" 형태 제외
+    if (sidoCd === SIDO_CODES.JEJU) {
+      // "제주시 구좌읍", "서귀포시 대정읍" 같은 형태 제외, "제주시", "서귀포시"만 남김
+      if (sggNm.includes('시') && (sggNm.includes('읍') || sggNm.includes('면'))) {
+        return true;
+      }
     }
   }
 
@@ -165,10 +208,8 @@ async function loadSigugunList(sidoCd: string) {
     console.log(`🔍 시/군/구 API 응답 (sidoCd: ${sidoCd}):`, response.data);
 
           if (response.data.success && response.data.data) {
-        console.log('📋 전체 시/군/구 데이터:', response.data.data);
-        // 충북(sidoCd: '43')의 경우 첫 번째 원소도 포함, 다른 지역은 첫 번째 원소 제외
-        const startIndex = sidoCd === '43' ? 0 : 1;
-        const allData = response.data.data.slice(startIndex);
+        // 모든 데이터 사용 (첫 번째 요소 제거하지 않음)
+        const allData = response.data.data;
         const filteredData = allData.filter(sigugun => {
           const sggNm = sigugun.sggNm?.trim() || '';
 
@@ -191,7 +232,6 @@ async function loadSigugunList(sidoCd: string) {
       // 가나다순 정렬
       sigugunList.value = uniqueData.sort((a, b) => (a.sggNm || '').localeCompare(b.sggNm || '', 'ko'));
 
-        console.log('📝 최종 시/군/구 목록:', sigugunList.value);
     } else {
       console.error('시/군/구 목록 로드 실패:', response.data.message);
       sigugunList.value = [];
@@ -268,10 +308,17 @@ async function selectSido(sido: SidoDto) {
 async function selectSigugun(sigugun: SigugunDto) {
   selectedSigugun.value = sigugun;
 
-  // 선택된 시/도와 시/군/구에 따른 읍/면/동 목록 로드
-  await loadDongList(selectedSido.value?.sidoCd || '', sigugun.sggCd || '');
-
-  currentStep.value = STEPS.DONG;
+  // 세종시의 경우 바로 건물 목록으로 이동
+  if (selectedSido.value?.sidoCd === SIDO_CODES.SEJONG) {
+    // 세종시는 읍/면/동 단계를 건너뛰고 바로 건물 목록 로드
+    const regionCode = `${selectedSido.value?.sidoCd}${sigugun.sggCd}`;
+    await loadBuildingList('', regionCode); // 동 이름 없이 지역 코드만으로 검색
+    currentStep.value = STEPS.BUILDING;
+  } else {
+    // 다른 지역은 기존처럼 읍/면/동 목록 로드
+    await loadDongList(selectedSido.value?.sidoCd || '', sigugun.sggCd || '');
+    currentStep.value = STEPS.DONG;
+  }
 }
 
 // 읍/면/동 선택
@@ -381,17 +428,21 @@ function goBack() {
           >
             {{ selectedSigugun?.sggNm || '시/군/구' }}
           </span>
-          <span class="mx-2" :class="selectedSigugun ? 'text-gray-800' : 'text-gray-400'"> > </span>
+          <!-- 세종시가 아닌 경우에만 읍/면/동 표시 -->
+          <template v-if="selectedSido?.sidoCd !== '36'">
+            <span class="mx-2" :class="selectedSigugun ? 'text-gray-800' : 'text-gray-400'"> > </span>
+            <span
+              class="cursor-pointer hover:text-gray-800"
+              :class="selectedDong ? 'font-semibold text-gray-800' : 'text-gray-400'"
+              @click="goToStep(3)"
+            >
+              {{ selectedDong?.dongNm || '읍/면/동' }}
+            </span>
+          </template>
+          <!-- 세종시의 경우 시/군/구 선택 후 바로 건물 선택, 다른 지역은 읍/면/동 선택 후 건물 선택 -->
+          <span v-if="buildingList.length > 0 && (selectedSido?.sidoCd === '36' ? selectedSigugun : selectedDong)" class="mx-2 text-gray-400"> > </span>
           <span
-            class="cursor-pointer hover:text-gray-800"
-            :class="selectedDong ? 'font-semibold text-gray-800' : 'text-gray-400'"
-            @click="goToStep(3)"
-          >
-            {{ selectedDong?.dongNm || '읍/면/동' }}
-          </span>
-          <span v-if="buildingList.length > 0" class="mx-2 text-gray-400"> > </span>
-          <span
-            v-if="buildingList.length > 0"
+            v-if="buildingList.length > 0 && (selectedSido?.sidoCd === '36' ? selectedSigugun : selectedDong)"
             class="cursor-pointer hover:text-gray-800 text-gray-400"
             @click="goToStep(4)"
           >
@@ -466,7 +517,8 @@ function goBack() {
 
         <!-- 건물 선택 -->
         <div v-else-if="currentStep === 4" class="h-full overflow-y-auto">
-          <div class="grid grid-cols-1 gap-3 p-4 pb-8">
+          <!-- 건물 목록이 있는 경우 -->
+          <div v-if="buildingList.length > 0" class="grid grid-cols-1 gap-3 p-4 pb-8">
             <button
               v-for="building in buildingList"
               :key="building.buildingName"
@@ -478,6 +530,15 @@ function goBack() {
             >
               {{ building.buildingName }}
             </button>
+          </div>
+
+          <!-- 건물 목록이 비어있는 경우 -->
+          <div v-else class="flex flex-col items-center justify-center py-16 px-4">
+            <div class="text-gray-500 text-center">
+              <div class="text-lg mb-2">🏢</div>
+              <div class="text-base font-medium mb-1">해당하는 위치에 건물이 없습니다</div>
+              <div class="text-sm text-gray-400">다른 지역을 선택해보세요</div>
+            </div>
           </div>
         </div>
       </div>
