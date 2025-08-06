@@ -79,7 +79,7 @@ function setupObserver() {
 }
 
 async function handleClick(program: YouthProgramDTO) {
-    if (!program.id) {
+  if (!program.id) {
     console.error("프로그램 ID가 없습니다.");
     // 링크만 열고 읽음 처리는 하지 않음
     if (program.hrefUrl) {
@@ -122,10 +122,7 @@ onMounted(async () => {
         </h2>
       </div>
     </div>
-    <ul
-      v-if="youthProgramList.length > 0"
-      class="list-wrapper"
-    >
+    <ul v-if="youthProgramList.length > 0" class="list-wrapper">
       <li
         v-for="(program, index) in youthProgramList"
         :key="program.id ?? index"
@@ -153,18 +150,9 @@ onMounted(async () => {
             rel="noopener noreferrer"
             @click.prevent="handleClick(program)"
           >
-            <img
-              :src="program.atchFile"
-              alt="프로그램 이미지"
-              class="program-img"
-            />
+            <img :src="program.atchFile" alt="프로그램 이미지" class="program-img" />
           </a>
-          <img
-            v-else
-            :src="program.atchFile"
-            alt="프로그램 이미지"
-            class="program-img"
-          />
+          <img v-else :src="program.atchFile" alt="프로그램 이미지" class="program-img" />
         </div>
       </li>
       <!-- 무한 스크롤 트리거 요소 -->

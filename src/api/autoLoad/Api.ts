@@ -358,6 +358,45 @@ export class Api<
    * No description
    *
    * @tags member-controller
+   * @name UploadProfileImageUsingPost
+   * @summary uploadProfileImage
+   * @request POST:/api/member/profileimg
+   */
+  uploadProfileImageUsingPost = (
+    data: {
+      /**
+       * file
+       * @format binary
+       */
+      file: File;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseMemberResponseDTO, void>({
+      path: `/api/member/profileimg`,
+      method: "POST",
+      body: data,
+      type: ContentType.FormData,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
+   * @name DeleteProfileImageUsingDelete
+   * @summary deleteProfileImage
+   * @request DELETE:/api/member/profileimg
+   */
+  deleteProfileImageUsingDelete = (params: RequestParams = {}) =>
+    this.request<ApiResponseMemberResponseDTO, void>({
+      path: `/api/member/profileimg`,
+      method: "DELETE",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags member-controller
    * @name RegisterByEmailUsingPost
    * @summary registerByEmail
    * @request POST:/api/member/register/email

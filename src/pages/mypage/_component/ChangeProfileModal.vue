@@ -37,14 +37,16 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   }
   const formData = new FormData();
   formData.append("file", selectedFile.value);
-  formData.append("changeType", "3");
+  for (const [key, value] of formData.entries()) {
+  console.log(`${key}:`, value);
+}
   try {
-    const { data } = await api.changeMemberInfoUsingPut(formData);
+    const { data } = await api.uploadProfileImageUsingPost(formData);
     console.log("data: ", data);
     return { success: true, message: "프로필이 변경되었습니다" };
   } catch (error: unknown) {
     console.error("업로드 실패", error);
-    return { success: false, message: "업로드 중 오류가 발생했습니다." };
+    return { success: false, message: "업로드 중 오류가 발생했습니다" };
   }
 }
 </script>
