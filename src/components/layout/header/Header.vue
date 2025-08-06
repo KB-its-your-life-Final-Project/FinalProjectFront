@@ -36,14 +36,10 @@ const showItems = reactive(
 );
 
 function handleBackClick() {
-  console.log("뒤로가기 버튼 클릭됨!");
-  console.log("현재 route.name:", route.name);
 
   if (route.name === "safeReport") {
-    console.log("SafeReport 페이지 - emit 실행");
     emit("back-click");
   } else {
-    console.log("다른 페이지 - movePage.back() 실행");
     movePage.back();
   }
 }

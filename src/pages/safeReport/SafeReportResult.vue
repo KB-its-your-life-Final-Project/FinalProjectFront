@@ -2,201 +2,186 @@
 import { useRouter } from "vue-router";
 import { computed, ref, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
-import axios from "axios";
 import ModalForm from "@/components/common/ModalForm.vue";
-
-interface ResultData {
-  dealAmount: number;
-  buildYear: number;
-  reverse_rental_ratio: number;
-  score: number;
-}
+import ToolTip from "@/components/common/ToolTip.vue";
+import Header from "@/components/layout/header/Header.vue";
+import { mainRouteName } from "@/router/mainRoute";
+import { useGradeCalculation } from "./composables/useGradeCalculation";
+import { useModalState } from "./composables/useModalState";
+import { useIllegalBuildingStatus } from "./composables/useIllegalBuildingStatus";
+import { SafeReportService } from "./services/safeReportService";
+import { getFloorLabel } from "./composables/floorUtils";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
 const router = useRouter();
-const showModal_financial = ref(false);
-const showModal_building = ref(false);
-const showNoDataModal = ref(false); // 데이터 없음 모달
-const showHighRatioModal = ref(false); // 전세가율 높음 모달
+
+// 독립적인 페이지로 접근했는지 확인 (라우터를 통해 직접 접근)
+const isStandalonePage = computed(() => {
+  return router.currentRoute.value.name === 'safeReportResult';
+});
+
+// 모달 상태 관리
+const {
+  showModal_financial,
+  showModal_building,
+  showNoDataModal,
+  showHighRatioModal,
+  resetModals,
+  openNoDataModal,
+  openHighRatioModal,
+} = useModalState();
+
 const isLoading = ref(true); // 로딩 상태
+
+// 등급 계산
+const { gradeText, gradeColor, riskText } = useGradeCalculation(() => store.resultData);
+
+// 불법건축물 상태 계산
+const { illegalBox } = useIllegalBuildingStatus(() => store.violationStatus);
 
 // dealAmount가 0인지 체크
 const isNoData = computed(() => {
-  // dealAmount가 0일 때 데이터 없음으로 처리
   return store.resultData?.dealAmount === 0;
-});
-
-const gradeText = computed(() => {
-  if (!store.resultData || typeof store.resultData.score !== "number") return "-";
-  if (store.resultData.score >= 8) return "위험";
-  if (store.resultData.score >= 5) return "주의";
-  if (store.resultData.score >= 3) return "안전";
-  return "매우 안전";
-});
-
-const gradeColor = computed(() => {
-  if (!store.resultData || typeof store.resultData.score !== "number") {
-    return {
-      bg: "bg-gray-100",
-      text: "text-gray-400",
-      label: "-",
-    };
-  }
-  if (store.resultData.score >= 8) {
-    return {
-      bg: "bg-red-100",
-      text: "text-red-600",
-      label: "위험",
-    };
-  } else if (store.resultData.score >= 5) {
-    return {
-      bg: "bg-orange-100",
-      text: "text-orange-500",
-      label: "주의",
-    };
-  } else if (store.resultData.score >= 3) {
-    return {
-      bg: "bg-yellow-100",
-      text: "text-yellow-600",
-      label: "안전",
-    };
-  } else {
-    return {
-      bg: "bg-blue-100",
-      text: "text-blue-600",
-      label: "매우 안전",
-    };
-  }
-});
-
-const riskText = computed(() => {
-  if (gradeText.value === "위험" || gradeText.value === "주의") {
-    return "보증금 회수에 대한 리스크가 있습니다.";
-  } else if (gradeText.value === "안전" || gradeText.value === "매우 안전") {
-    return "보증금 회수에 대한 리스크가 없습니다.";
-  }
-  return "";
 });
 
 onMounted(async () => {
   // 모달 상태 초기화
-  showNoDataModal.value = false;
-  showHighRatioModal.value = false;
+  resetModals();
   isLoading.value = true;
 
+  // localStorage에서 데이터 확인
+  const fromRecentReports = localStorage.getItem('fromRecentReports');
+
+  if (fromRecentReports === 'true') {
+    // 최근 본 레포트에서 온 경우
+    await loadSavedReportData();
+  } else {
+    // 일반적인 안심 진단 플로우 - 서버에 API 요청
+    await loadReportFromAPI();
+  }
+});
+
+// 저장된 리포트 데이터 로드
+async function loadSavedReportData() {
   try {
-    console.log("보낼 데이터", { ...store.formData });
-    const response = await axios.post("/api/report/requestData", { ...store.formData });
-    console.log("서버 응답:", response.data);
-
-    store.updateResultData(response.data.data.rentalRatioAndBuildyear);
-
-    if (response.data.data.violationStatus) {
-      store.updateViolationStatusVO(response.data.data.violationStatus);
+    const savedData = SafeReportService.loadSavedReportData();
+    if (!savedData) {
+      console.error("저장된 데이터가 없습니다.");
+      isLoading.value = false;
+      return;
     }
 
-    if (response.data.data.floorAndPurposeList) {
-      store.updateFloorAndPurposeList(response.data.data.floorAndPurposeList);
+    // store 초기화 (이전 데이터 제거)
+    store.resetStore();
+
+    // localStorage에서 건물 정보 로드
+    const buildingInfo = SafeReportService.loadBuildingInfo();
+    store.updateFormData(buildingInfo);
+
+    // 전달받은 데이터로 store 업데이트
+    store.updateResultData(savedData.rentalRatioAndBuildyear);
+
+    if (savedData.violationStatus) {
+      store.updateViolationStatusVO(savedData.violationStatus);
     }
 
-    // dealAmount가 0인지 체크
-    if (response.data.data.rentalRatioAndBuildyear?.dealAmount === 0) {
-      showNoDataModal.value = true;
+    if (savedData.floorAndPurposeList) {
+      store.updateFloorAndPurposeList(savedData.floorAndPurposeList);
     }
 
-    // reverse_rental_ratio가 100 이상인지 체크
-    console.log(
-      "reverse_rental_ratio 체크:",
-      response.data.data.rentalRatioAndBuildyear?.reverse_rental_ratio,
-    );
-    if (response.data.data.rentalRatioAndBuildyear?.reverse_rental_ratio >= 100) {
-      console.log("전세가율 100% 이상 - 모달 표시");
-      showHighRatioModal.value = true;
+    // 데이터 유효성 검사 및 모달 표시
+    const validation = SafeReportService.validateReportData(savedData);
+    if (validation.hasNoData) {
+      openNoDataModal();
+    }
+    if (validation.hasHighRatio) {
+      openHighRatioModal();
     }
 
-    console.log("저장된 resultData:", store.resultData);
-    console.log("저장된 violationStatus:", store.violationStatus);
-    console.log("저장된 floorAndPurposeList:", store.floorAndPurposeList);
-    console.log("resultData.score:", store.resultData?.score);
-    console.log("resultData.buildYear:", store.resultData?.buildYear);
+    // localStorage 정리
+    SafeReportService.clearLocalStorage();
+
+    isLoading.value = false;
+  } catch (error) {
+    console.error("저장된 데이터 로드 실패:", error);
+    isLoading.value = false;
+  }
+}
+
+// API에서 리포트 데이터 로드
+async function loadReportFromAPI() {
+  try {
+    const requestDto = store.createRequestDto();
+    const reportData = await SafeReportService.generateSafeReport(requestDto);
+
+    store.updateResultData(reportData.rentalRatioAndBuildyear);
+
+    if (reportData.violationStatus) {
+      store.updateViolationStatusVO(reportData.violationStatus);
+    }
+
+    if (reportData.floorAndPurposeList) {
+      store.updateFloorAndPurposeList(reportData.floorAndPurposeList);
+    }
+
+    // 데이터 유효성 검사 및 모달 표시
+    const validation = SafeReportService.validateReportData(reportData);
+    if (validation.hasNoData) {
+      openNoDataModal();
+    }
+    if (validation.hasHighRatio) {
+      openHighRatioModal();
+    }
 
     isLoading.value = false;
   } catch (error) {
     console.error("전송 실패: ", error);
     isLoading.value = false;
   }
+}
+
+// resUseType이 빈 문자열이 아닌 항목만 필터링
+const filteredFloorAndPurposeList = computed(() => {
+  if (!store.floorAndPurposeList) return [];
+  return store.floorAndPurposeList.filter(info =>
+    info.resUseType && info.resUseType.trim() !== ''
+  );
 });
 
-function getFloorLabel(floor: string) {
-  if (floor.startsWith("지")) {
-    return "지하" + floor.slice(1) + "층";
-  }
-  if (floor.startsWith("상")) {
-    return "지상" + floor.slice(1) + "층";
-  }
-  if (floor.startsWith("하")) {
-    return "지하" + floor.slice(1) + "층";
-  }
-  if (floor.startsWith("탑")) {
-    return "옥탑" + floor.slice(1) + "층";
-  }
-  return floor;
-}
+// 층별 용도 펼침/접힘 상태
+const showFloorDetails = ref(false);
 
 function goHome() {
   store.resetStore();
   router.push({ name: "homeMain" });
 }
+
 function goToSelectBudget() {
   // 예산만 초기화하고 건물 정보는 유지
-  store.updateFormData({ budget: null });
+  store.updateFormData({ budget: undefined });
   store.updateResultData(null);
   emit("prev");
 }
+
 function goToKB() {
   window.open("https://m.naver.com/");
 }
-
-// 박스2(불법건축물) 색상 및 텍스트 동적 처리
-const illegalBox = computed(() => {
-  const status = store.violationStatus;
-  // 조회 불가
-  if (status === null || status === undefined) {
-    return {
-      bg: "bg-gray-200",
-      text: "text-gray-500",
-      label: "조회 불가",
-    };
-  }
-  // 위험 (위반건축물)
-  else if (status === "위반건축물") {
-    return {
-      bg: "bg-red-100",
-      text: "text-red-600",
-      label: "있음",
-    };
-  }
-  // 안전 건축물물
-  else {
-    return {
-      bg: "bg-green-100",
-      text: "text-green-700",
-      label: "없음",
-    };
-  }
-});
-
-// resUseType이 빈 문자열이 아닌 항목만 필터링
-const filteredFloorAndPurposeList = computed(() => {
-  if (!store.floorAndPurposeList) return [];
-  return store.floorAndPurposeList.filter(
-    (info) => info.resUseType && info.resUseType.trim() !== "",
-  );
-});
 </script>
 
 <template>
+  <!-- 독립적인 페이지로 접근했을 때만 헤더 표시 -->
+  <Header v-if="isStandalonePage" :headerShowtype="mainRouteName.safeReportResult">
+    <div class="mt-23">
+      <img
+      src="@/assets/imgs/safereport.png"
+      alt="AI 안심 진단 리포트"
+      class="absolute right-1 top-13/20 -translate-y-1/2 h-30"
+      style="z-index:1;"
+    />
+    </div>
+  </Header>
+
   <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen">
     <div class="text-center">
       <div
@@ -210,8 +195,8 @@ const filteredFloorAndPurposeList = computed(() => {
   <div v-else>
     <!-- 회색 처리된 메인 컨텐츠 -->
     <div :class="{ 'opacity-50 pointer-events-none': isNoData }">
-      <section class="flex flex-col gap-9 items-center mt">
-        <div class="text-center font-pretendard-bold text-lg foont-semibold">
+      <section class="flex flex-col gap-9 items-center" :class="isStandalonePage ? 'mt-6' : 'mt'">
+        <div class="text-center font-pretendard-bold text-xl font-medium">
           {{ store.formData.buildingName }}의 안심 진단 리포트입니다.
         </div>
         <div
@@ -225,7 +210,7 @@ const filteredFloorAndPurposeList = computed(() => {
               :class="gradeColor.text"
             />
             <span class="text-xl font-bold" :class="gradeColor.text">
-              {{ store.resultData?.score ?? "-" }}<span class="text-sm">/10</span>
+              {{ store.resultData?.score ?? "-" }}<span class="text-base">/10</span>
             </span>
           </div>
         </div>
@@ -240,42 +225,41 @@ const filteredFloorAndPurposeList = computed(() => {
 
       <section class="flex justify-center gap-4 px-4 mt-6 text-center text-xs font-medium">
         <!--    박스1-->
-        <div
-          class="flex flex-col items-center justify-center w-32 h-24 rounded"
-          :class="gradeColor.bg"
-        >
-          <svg
-            class="w-8 h-8 mb-1"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            :class="gradeColor.text"
+        <div class="relative">
+          <!-- 툴팁을 박스 바깥 좌측 상단에 배치 -->
+          <div class="absolute -top-2 -left-2 z-10">
+            <ToolTip>
+              깡통전세란 전세가와 매매가가 비슷한 주택을 의미합니다. 깡통 전세의 경우우 전세 계약이 만료된 후 세입자가<span class="text-error font-semibold">전세 보증금을 돌려받기 어려울 수 있습니다.</span>
+            </ToolTip>
+          </div>
+
+          <div
+            class="flex flex-col items-center justify-center w-32 h-24 rounded"
+            :class="gradeColor.bg"
           >
-            <path
-              d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.597c.75 1.336-.213 2.998-1.742 2.998H3.48c-1.529 0-2.492-1.662-1.742-2.998L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 012 0v3a1 1 0 01-1 1z"
-            />
-          </svg>
-          <span :class="gradeColor.text" class="text-md">깡통전세</span>
-          <span class="text-[11px]" :class="gradeColor.text">{{ gradeText }}</span>
+            <svg class="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20" :class="gradeColor.text">
+              <path
+                d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.597c.75 1.336-.213 2.998-1.742 2.998H3.48c-1.529 0-2.492-1.662-1.742-2.998L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 012 0v3a1 1 0 01-1 1z"
+              />
+            </svg>
+            <span :class="gradeColor.text" class="text-base font-semibold">깡통전세</span>
+            <span class="text-[11px] font-semibold" :class="gradeColor.text">{{ gradeText }}</span>
+          </div>
         </div>
 
-        <!-- 박스 2 -->
-        <div
-          class="flex flex-col items-center justify-center w-32 h-24 rounded"
-          :class="illegalBox.bg"
-        >
-          <svg
-            class="w-8 h-8 mb-1"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            :class="illegalBox.text"
-          >
-            <path
-              d="M3 2a1 1 0 011-1h12a1 1 0 011 1v15h-5v-4H8v4H3V2zm2 3v2h2V5H5zm0 4v2h2V9H5zm0 4v2h2v-2H5zm4-8v2h2V5H9zm0 4v2h2V9H9zm0 4v2h2v-2H9zm4-8v2h2V5h-2zm0 4v2h2V9h-2zm0 4v2h2v-2h-2z"
-            />
-          </svg>
-          <span class="text-md" :class="illegalBox.text">불법건축물</span>
-          <span class="text-[11px]" :class="illegalBox.text">{{ illegalBox.label }}</span>
-        </div>
+              <!-- 박스 2 -->
+      <div
+        class="flex flex-col items-center justify-center w-32 h-24 rounded"
+        :class="illegalBox.bg"
+      >
+        <svg class="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20" :class="illegalBox.text">
+          <path
+            d="M3 2a1 1 0 011-1h12a1 1 0 011 1v15h-5v-4H8v4H3V2zm2 3v2h2V5H5zm0 4v2h2V9H5zm0 4v2h2v-2H5zm4-8v2h2V5H9zm0 4v2h2V9H9zm0 4v2h2v-2H9zm4-8v2h2V5h-2zm0 4v2h2V9h-2zm0 4v2h2v-2h-2z"
+          />
+        </svg>
+        <span class="text-base font-semibold" :class="illegalBox.text">불법건축물</span>
+        <span class="text-[11px] font-semibold" :class="illegalBox.text">{{ illegalBox.label }}</span>
+      </div>
       </section>
 
       <div class="text-base font-semibold text-left px-4 mt-6 mb-2">상세 분석 결과</div>
@@ -325,19 +309,22 @@ const filteredFloorAndPurposeList = computed(() => {
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
       @close="showModal_financial = false"
     >
-      <p>예산 금액 {{ store.formData.budget }}만원에 기반하여 분석한 결과는 다음과 같습니다.</p>
-      <p class="mt-4">
-        {{ store.formData.buildingName }}의 최근 거래 가격은 {{ store.resultData?.dealAmount }}만원
-        입니다. 이에 따라 역전세율은
-        {{
-          store.resultData?.reverse_rental_ratio != null &&
-          !isNaN(Number(store.resultData.reverse_rental_ratio))
-            ? Number(store.resultData.reverse_rental_ratio).toFixed(2)
-            : "-"
-        }}%이며 깡통 전세 위험 점수는 {{ store.resultData?.score }}/10점 입니다. 이 수치는
-        <span :class="gradeColor.text + ' font-bold'">{{ gradeText }}</span> 구간으로 평가되며
-        <span :class="gradeColor.text + ' font-bold'">{{ riskText }}</span>
+      <p>
+        예산 금액 {{ store.formData.budget }}만원에 기반하여 분석한 결과는 다음과
+        같습니다.
       </p>
+              <p class="mt-4">
+          {{ store.formData.buildingName }}의 최근 거래 가격은
+          {{ store.resultData?.dealAmount }}만원 입니다. 이에 따라 역전세율은
+                      {{
+              store.resultData?.reverseRentalRatio != null &&
+              !isNaN(Number(store.resultData.reverseRentalRatio))
+                ? Number(store.resultData.reverseRentalRatio).toFixed(2)
+                : "-"
+            }}%이며 깡통 전세 위험 점수는 {{ store.resultData?.score }}/10점 입니다. 이 수치는
+                    <span :class="gradeColor.text + ' font-bold'">{{ gradeText }}</span> 구간으로 평가되며
+          <span :class="gradeColor.text + ' font-bold'">{{ riskText }}</span>
+        </p>
     </ModalForm>
 
     <!-- 건축물 정보 모달 -->
@@ -345,39 +332,71 @@ const filteredFloorAndPurposeList = computed(() => {
       v-if="showModal_building"
       title="건축물 정보"
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
-      @close="showModal_building = false"
+      @close="() => { showModal_building = false; showFloorDetails = false; }"
     >
       <div v-if="store.floorAndPurposeList && store.floorAndPurposeList.length">
-        <p>
-          <span
-            :class="
-              store.violationStatus === '위반건축물'
-                ? 'text-red-600 font-extrabold'
-                : 'text-green-600 font-extrabold'
-            "
-          >
-            위반 건축물 여부:
-            {{ store.violationStatus === "위반건축물" ? "위반 건축물" : "정상 건축물" }}
+        <!-- 위반건축물 여부 섹션 -->
+        <div class="flex justify-between items-center py-3 border-b border-kb-ui-09">
+          <span class="text-kb-ui-02 font-medium">위반건축물등록여부</span>
+          <span :class="store.violationStatus === '위반건축물' ? 'text-error font-semibold' : 'text-positive font-semibold'">
+            {{ store.violationStatus === '위반건축물' ? '위반건축물' : '정상건축물' }}
           </span>
-        </p>
-        <p class="mt-2">
-          각 층의 용도는 다음과 같습니다. 주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를
-          받을 수 없습니다.
-          <span class="text-red-600 font-semibold"
-            >주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span
+        </div>
+
+        <!-- 건축년도 섹션 -->
+        <div class="flex justify-between items-center py-3 border-b border-kb-ui-09">
+          <span class="text-kb-ui-02 font-medium">건축년도</span>
+          <span class="text-positive font-semibold">
+            {{ store.resultData?.buildYear ? `${store.resultData.buildYear}년` : '정보 없음' }}
+          </span>
+        </div>
+
+        <!-- 층별 용도 섹션 -->
+        <div class="py-3">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            @click="showFloorDetails = !showFloorDetails"
           >
-        </p>
-        <div class="mt-4">
-          <div v-if="filteredFloorAndPurposeList.length > 0">
-            <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2">
-              {{ getFloorLabel(info.resFloor) }}: {{ info.resUseType }}
-              <!-- <span class="text-sm text-gray-500">({{ info.resStructure }})</span> -->
+            <span class="text-ui-02 font-medium">층별 용도</span>
+            <div class="flex items-center">
+              <span class="text-positive font-semibold mr-2">
+                {{ filteredFloorAndPurposeList.length > 0 ? `${filteredFloorAndPurposeList.length}개 층` : '정보 없음' }}
+              </span>
+              <font-awesome-icon
+                :icon="['fas', 'chevron-down']"
+                class="text-kb-ui-05 transition-transform duration-200"
+                :class="{ 'rotate-180': showFloorDetails }"
+              />
             </div>
           </div>
-          <div v-else class="text-center text-gray-500">층별 용도 정보가 없습니다.</div>
+
+          <!-- 펼쳐진 층별 용도 상세 정보 -->
+          <div v-if="showFloorDetails" class="mt-3 pl-4 border-l-2 border-kb-ui-09">
+            <div class="flex items-center mb-3">
+              <span class="text-sm text-kb-ui-02">층별 용도 정보</span>
+              <div class="ml-2 relative">
+                <ToolTip>
+                  <div class="max-w-[160px] text-xs">
+                    주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-error font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
+                  </div>
+                </ToolTip>
+              </div>
+            </div>
+            <div v-if="filteredFloorAndPurposeList.length > 0">
+              <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2 text-sm">
+                <span class="font-medium">{{ getFloorLabel(info.resFloor) }}:</span>
+                <span class="text-kb-ui-02">{{ info.resUseType }}</span>
+              </div>
+            </div>
+            <div v-else class="text-center text-kb-ui-02 text-sm">
+              층별 용도 정보가 없습니다.
+            </div>
+          </div>
         </div>
       </div>
-      <div v-else class="text-center text-gray-500">건축물 정보가 없습니다.</div>
+      <div v-else class="text-center text-kb-ui-02">
+        건축물 정보가 없습니다.
+      </div>
     </ModalForm>
 
     <!-- 데이터 없음 모달 -->
@@ -388,23 +407,15 @@ const filteredFloorAndPurposeList = computed(() => {
       <div class="rounded-lg shadow-lg p-6 w-80 bg-white">
         <div class="text-center">
           <div class="mb-4">
-            <svg
-              class="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"
-              />
+            <svg class="mx-auto h-12 w-12 text-kb-ui-05" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">데이터 없음</h3>
-          <p class="text-sm text-gray-500 mb-6">
-            해당 건물에 대한 매매 거래 내역이 존재하지 않아<br />
+          <h3 class="text-lg font-medium text-kb-ui-02 mb-2">
+            데이터 없음
+          </h3>
+          <p class="text-sm text-kb-ui-02 mb-6">
+            해당 건물에 대한 매매 거래 내역이 존재하지 않아<br>
             안심 레포트를 제공할 수 없습니다.
           </p>
           <button
@@ -420,28 +431,20 @@ const filteredFloorAndPurposeList = computed(() => {
     <!-- 전세가율 높음 모달 -->
     <div
       v-if="showHighRatioModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-kb-ui-01 bg-opacity-50"
     >
-      <div class="rounded-lg shadow-lg p-6 w-80 bg-white">
+      <div class="rounded-lg shadow-lg p-6 w-80 bg-kb-ui-11">
         <div class="text-center">
           <div class="mb-4">
-            <svg
-              class="mx-auto h-12 w-12 text-orange-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
+            <svg class="mx-auto h-12 w-12 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">전세가율 초과</h3>
-          <p class="text-sm text-gray-500 mb-6">
-            전세가율이 100%를 초과했습니다.<br />
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            전세가율 초과
+          </h3>
+          <p class="text-sm text-kb-ui-04 mb-6">
+            전세가율이 100%를 초과했습니다.<br>
             입력하신 예산 금액이 현실적인지 다시 확인해 주세요.
           </p>
           <button

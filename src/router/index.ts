@@ -22,7 +22,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/maps",
     name: "maps",
-    component: () => import("@/pages/mapSearch/MapPage.vue"),
+    component: () => import("@/pages/mapSearch/MapSearch.vue"),
   },
   // 404 NotFound
   {
