@@ -1,11 +1,11 @@
-import { reactive, ref } from 'vue';
+import { reactive, ref } from "vue";
 import type {
   SafeReportRequestDto,
   RentalRatioAndBuildyear,
   FloorAndPurpose,
-  ViolationStatus
-} from '../types';
-import { INIT_FORM_DATA } from '../types';
+  ViolationStatus,
+} from "../types";
+import { INIT_FORM_DATA } from "../types";
 
 export function useDataManagement() {
   const formData = reactive<SafeReportRequestDto>({ ...INIT_FORM_DATA });

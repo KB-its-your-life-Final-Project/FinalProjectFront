@@ -68,7 +68,7 @@ export function validateBudgetInput(value: string, maxValue = 999999) {
     return {
       isValid: false,
       value: maxValue.toString(),
-      error: `최대 ${maxValue}까지 입력 가능합니다.`
+      error: `최대 ${maxValue}까지 입력 가능합니다.`,
     };
   }
 

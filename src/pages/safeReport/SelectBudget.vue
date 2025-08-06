@@ -9,14 +9,9 @@ const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
 
 // 예산 입력 관리
-const {
-  rawInput,
-  budget,
-  displayValue,
-  inputRef,
-  handleInput,
-  focusInput,
-} = useBudgetInput(store.formData.budget);
+const { rawInput, budget, displayValue, inputRef, handleInput, focusInput } = useBudgetInput(
+  store.formData.budget,
+);
 
 // 예산 검증 관리
 const {

@@ -4,14 +4,8 @@ import { useDataManagement } from "@/pages/safeReport/composables/useDataManagem
 
 export const safeReportStore = defineStore("safeReport", () => {
   // 스텝 관리
-  const {
-    currentStep,
-    nextStep,
-    prevStep,
-    goToStep,
-    isCurrentStep,
-    resetStep,
-  } = useStepManagement();
+  const { currentStep, nextStep, prevStep, goToStep, isCurrentStep, resetStep } =
+    useStepManagement();
 
   // 데이터 관리
   const {

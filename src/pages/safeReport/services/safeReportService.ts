@@ -1,5 +1,10 @@
-import { Api } from '@/api/autoLoad/Api';
-import type { SafeReportRequestDto, RentalRatioAndBuildyear, ViolationStatus, FloorAndPurpose } from '@/api/autoLoad/data-contracts';
+import { Api } from "@/api/autoLoad/Api";
+import type {
+  SafeReportRequestDto,
+  RentalRatioAndBuildyear,
+  ViolationStatus,
+  FloorAndPurpose,
+} from "@/api/autoLoad/data-contracts";
 
 const api = new Api();
 
@@ -34,7 +39,7 @@ export class SafeReportService {
    * localStorage에서 저장된 리포트 데이터 로드
    */
   static loadSavedReportData(): SafeReportData | null {
-    const savedReportDataStr = localStorage.getItem('savedReportData');
+    const savedReportDataStr = localStorage.getItem("savedReportData");
     if (!savedReportDataStr) return null;
 
     try {
@@ -55,9 +60,11 @@ export class SafeReportService {
    */
   static loadBuildingInfo() {
     return {
-      buildingName: localStorage.getItem('buildingName') || '',
-      budget: localStorage.getItem('budget') ? parseInt(localStorage.getItem('budget')!) : undefined,
-      roadAddress: localStorage.getItem('roadAddress') || '',
+      buildingName: localStorage.getItem("buildingName") || "",
+      budget: localStorage.getItem("budget")
+        ? parseInt(localStorage.getItem("budget")!)
+        : undefined,
+      roadAddress: localStorage.getItem("roadAddress") || "",
     };
   }
 
@@ -65,11 +72,11 @@ export class SafeReportService {
    * localStorage 정리
    */
   static clearLocalStorage() {
-    localStorage.removeItem('savedReportData');
-    localStorage.removeItem('fromRecentReports');
-    localStorage.removeItem('buildingName');
-    localStorage.removeItem('budget');
-    localStorage.removeItem('roadAddress');
+    localStorage.removeItem("savedReportData");
+    localStorage.removeItem("fromRecentReports");
+    localStorage.removeItem("buildingName");
+    localStorage.removeItem("budget");
+    localStorage.removeItem("roadAddress");
   }
 
   /**

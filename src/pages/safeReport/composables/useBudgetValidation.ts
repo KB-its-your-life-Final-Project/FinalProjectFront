@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref } from "vue";
 
 export interface BudgetValidationResult {
   isValid: boolean;
@@ -21,20 +21,20 @@ export function useBudgetValidation() {
     if (budget == null || budgetValue <= 0 || !Number.isFinite(budgetValue)) {
       return {
         isValid: false,
-        message: "예산을 올바르게 입력해주세요!"
+        message: "예산을 올바르게 입력해주세요!",
       };
     }
 
     if (budgetValue < 100) {
       return {
         isValid: false,
-        message: "예산은 100만원 이상이어야 합니다!"
+        message: "예산은 100만원 이상이어야 합니다!",
       };
     }
 
     return {
       isValid: true,
-      message: ""
+      message: "",
     };
   };
 

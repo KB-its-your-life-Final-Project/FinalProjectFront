@@ -38,8 +38,8 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   const formData = new FormData();
   formData.append("file", selectedFile.value);
   for (const [key, value] of formData.entries()) {
-  console.log(`${key}:`, value);
-}
+    console.log(`${key}:`, value);
+  }
   try {
     const { data } = await api.uploadProfileImageUsingPost(formData);
     console.log("data: ", data);

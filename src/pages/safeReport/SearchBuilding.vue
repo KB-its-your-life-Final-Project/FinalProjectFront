@@ -23,7 +23,6 @@ const isButtonEnabled = computed(() => {
   const hasRoadAddress = roadAddress.value?.trim();
   const hasJibunAddress = jibunAddress.value?.trim();
 
-
   // 모든 필수 주소 정보가 있어야 활성화
   return hasBuildingName && hasRoadAddress && hasJibunAddress;
 });
@@ -147,8 +146,6 @@ function resetFormData() {
   lat.value = 0;
   lng.value = 0;
 }
-
-
 </script>
 
 <template>
@@ -205,7 +202,7 @@ function resetFormData() {
     >
       <div class="text-center">
         <p class="text-gray-600">
-          해당 주소에 건물이 없습니다.<br>
+          해당 주소에 건물이 없습니다.<br />
           다른 주소를 선택해주세요.
         </p>
       </div>
