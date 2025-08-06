@@ -11,15 +11,44 @@
  */
 
 /**
+ * BuildingInfoDto
+ * 건물 정보
+ */
+export interface BuildingInfoDto {
+  /**
+   * 건물명
+   * @example "목동아파트"
+   */
+  buildingName?: string;
+  /**
+   * 지번 주소
+   * @example "역삼동 123-45"
+   */
+  jibunAddr?: string;
+  /**
+   * 위도
+   * @format double
+   * @example 37.5665
+   */
+  latitude?: number;
+  /**
+   * 경도
+   * @format double
+   * @example 126.978
+   */
+  longitude?: number;
+}
+
+/**
  * BuildingResponseDto
  * 건물 검색 결과
  */
 export interface BuildingResponseDto {
   /**
-   * 건물명 목록
-   * @example ["목동아파트","목동빌라"]
+   * 건물 정보 목록
+   * @example [{"buildingName":"목동아파트","latitude":37.5665,"longitude":126.978}]
    */
-  buildingNames?: string[];
+  buildingInfos?: BuildingInfoDto[];
   /**
    * 읍면동 이름
    * @example "목동"
@@ -358,6 +387,8 @@ export interface RecentSafeReportResponseDto {
   id?: number;
   resultGrade?: string;
   roadAddress?: string;
+  /** @format int32 */
+  score?: number;
   updatedAt?: string;
 }
 
@@ -432,7 +463,7 @@ export interface SafeReportRequestDto {
   buildingName?: string;
   /**
    * 동명
-   * @example "문동동동"
+   * @example "문동동"
    */
   dongName?: string;
   /**
