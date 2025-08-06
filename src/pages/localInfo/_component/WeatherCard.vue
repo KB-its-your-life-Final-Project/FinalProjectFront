@@ -143,17 +143,17 @@ const minTemperature = computed(
 </script>
 
 <template>
-  <div class="bg-kb-ui-11 rounded-xl border-1 border-kb-yellow shadow-md p-4 w-full">
+  <div class="bg-kb-ui-11 rounded-xl border-1 border-kb-ui-09 shadow-md p-2 w-full">
     <div class="flex items-center justify-between mt-3">
       <!-- 온도 정보 -->
-      <div class="flex flex-col items-center w-full gap-3">
-        <div v-if="loading" class="font-pretendard-bold text-4xl text-kb-ui-02">로딩중...</div>
+      <div class="flex flex-col items-center w-full gap-2">
+        <div v-if="loading" class="font-pretendard-bold text-2xl text-kb-ui-02">로딩중...</div>
         <div v-else-if="error" class="font-pretendard-bold text-sm text-red-500">
           {{ error }}
         </div>
         <div
           v-else-if="temperature && temperature !== '--'"
-          class="font-pretendard-bold text-4xl text-kb-ui-02"
+          class="font-pretendard-bold text-2xl text-kb-ui-02"
         >
           {{ temperature }}°
         </div>
@@ -165,7 +165,7 @@ const minTemperature = computed(
 
       <!-- 날씨 이미지 -->
       <div class="flex flex-col items-center w-full gap-3">
-        <div class="text-5xl">{{ weatherIcon }}</div>
+        <div class="text-4xl">{{ weatherIcon }}</div>
         <div class="text-xs text-kb-ui-05">출처 : 기상청</div>
       </div>
     </div>
