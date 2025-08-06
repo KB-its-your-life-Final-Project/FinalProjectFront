@@ -151,7 +151,7 @@ const shouldFilterBuilding = (buildingName: string): boolean => {
   }
 
   // 숫자와 특수문자만으로 구성된 경우 제외 (예: "640-2", "123", "A-1" 등)
-  const numericOnly = /^[\d\-\s\(\)]+$/.test(buildingName.trim());
+  const numericOnly = /^[\d\-\s()]+$/.test(buildingName.trim());
   return numericOnly;
 };
 
@@ -269,7 +269,7 @@ async function loadBuildingList(dongName: string, regionCode: string) {
     if (response.data.success && response.data.data?.buildingInfos) {
 
       // 건물명 필터링
-      const filteredBuildings = response.data.data.buildingInfos.filter(building =>
+      const filteredBuildings: BuildingInfoDto[] = response.data.data.buildingInfos.filter((building: BuildingInfoDto) =>
         !shouldFilterBuilding(building.buildingName || '')
       );
 
