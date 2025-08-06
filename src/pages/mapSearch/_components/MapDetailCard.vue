@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MarkerDataType } from "@/utils/naverMap/naverMapCustomType";
+import { MarkerDataType } from "@/types/markerDataType";
 import { onMounted, ref } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MarkerDataType } from "@/utils/naverMap/naverMapCustomType";
+import type { MarkerDataType } from "@/types/markerDataType";
 import MapDetailCard from "./MapDetailCard.vue";
 
 defineProps<{

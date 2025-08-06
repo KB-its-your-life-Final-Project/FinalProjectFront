@@ -4,7 +4,7 @@ import mapUtil from "@/utils/naverMap/naverMap";
 import { useRoute } from "vue-router";
 import MapFilter from "@/pages/mapSearch/_components/MapFilter.vue";
 import MapDetailList from "@/pages/mapSearch/_components/MapDetailList.vue";
-import { MarkerDataType } from "@/utils/naverMap/naverMapCustomType";
+import { MarkerDataType } from "@/types/markerDataType";
 
 //지도 필수 변수
 const mapEl = ref<HTMLDivElement | null>(null);
@@ -14,7 +14,7 @@ let markerManager: any;
 let mapMoveTimer: any;
 
 const route = useRoute();
-const mapDetailShow = ref(true);
+const mapDetailShow = ref(false);
 
 //주소 검색시
 const searchInput = route.query.searchInput
@@ -118,7 +118,7 @@ const updateMarkersOnMapMove = () => {
   // 마커 업데이트 (화면 이동이 끝나면 실행)
   mapMoveTimer = setTimeout(async () => {
     await loadMarkers();
-  }, 3000);
+  }, 1000);
 };
 
 onMounted(async () => {
@@ -135,7 +135,6 @@ onMounted(async () => {
       //아무것도 없으면 현재주소
       if (!addresssList.value?.length && !latlngList.value?.length && !searchInput.value) {
         const currentLatLng = await mapUtil.getCurrentLocation();
-        console.log(currentLatLng);
         map.setCenter(currentLatLng);
       }
 
@@ -147,7 +146,7 @@ onMounted(async () => {
         mapBounds,
         () => {
           if (mapBounds.value !== null) {
-            // updateMarkersOnMapMove();
+            updateMarkersOnMapMove();
           }
         },
         { deep: true },

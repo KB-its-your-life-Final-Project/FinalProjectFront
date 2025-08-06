@@ -1,39 +1,48 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { MarkerDataType } from "@/types/markerDataType";
+import { EstateDTO, EstateSalesDTO } from "@/api/autoLoad/data-contracts";
 
 const props = defineProps<{
-  jibunAddress: string;
-  roadAddress: string;
-  latlng: naver.maps.LatLng;
+  markerData: MarkerDataType;
+  estateData: EstateDTO;
+  estateSalesData: EstateSalesDTO[];
 }>();
 
-//도로명 주소 우선
+//표기
 const address = computed(() => {
-  return props.roadAddress || props.jibunAddress;
+  if (props.estateData?.buildingName) {
+    return props.estateData.buildingName;
+  } else if (props.markerData?.jibunAddress) {
+    return props.markerData.jibunAddress;
+  } else {
+    return props.markerData?.roadAddress;
+  }
 });
 
-const data = {
-  address: "00아파트",
-  price: "14억원",
-  width: "30평",
-};
+//금액
+const dealAmount = computed(() => {
+  // 배열의 첫 번째 요소에서 dealAmount 가져오기
+  const amount = props.estateSalesData[0]?.dealAmount;
+
+  if (amount == null) return "거래정보 없음";
+  return `${amount}만원`;
+});
 </script>
 
 <template>
   <div
-    class="custom-marker relative flex flex-col bg-purple-500 br-2 border-2 border-purple-500 rounded-md w-[5rem] bt-0"
+    class="custom-marker relative flex flex-col bg-purple-500 br-2 border-2 border-purple-500 rounded-md w-[8rem] top-0"
   >
     <div class="flex bg-white">
-      <div class="text-sm p-1">{{ address }}</div>
-    </div>
-
-    <div class="flex">
-      <div class="text-xl text-white p-1">
-        {{ data.price }}
+      <div class="text-sm p-1 overflow-hidden text-ellipsis whitespace-nowrap max-w-[6rem]">
+        {{ address }}
       </div>
     </div>
 
-    <div class="text-sm">{{ data.width }}</div>
+    <div class="flex">
+      <div class="text-xl text-white p-1 deal-amount">{{ dealAmount }}</div>
+    </div>
   </div>
 </template>
 
