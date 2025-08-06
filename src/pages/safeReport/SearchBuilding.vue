@@ -166,28 +166,46 @@ function resetFormData() {
 
 // 주소 선택 페이지 이벤트 핸들러
 function handleAddressSelected(addressData: {
-  sido: string;
-  sigugun: string;
-  dong: string;
+  sido: string | undefined;
+  sigugun: string | undefined;
+  dong: string | undefined;
+  buildingName: string | undefined;
   fullAddress: string;
+  sidoCd: string | undefined;
+  sggCd: string | undefined;
+  umdCd: string | undefined;
+  latitude: number | undefined;
+  longitude: number | undefined;
+  jibunAddr: string | undefined;
 }) {
-  console.log("선택된 주소:", addressData);
+  console.log("🏢 SelectAddressPage에서 선택된 건물 데이터:", addressData);
 
-  // 선택된 주소를 건물명으로 설정
-  buildingName.value = addressData.fullAddress;
+  // 선택된 건물명 설정
+  buildingName.value = addressData.buildingName || addressData.fullAddress;
 
-  // store 업데이트 (위도/경도는 빈 상태로)
+  // 주소 정보 설정 (jibunAddr 우선, 없으면 fullAddress 사용)
+  const addressToUse = addressData.jibunAddr || addressData.fullAddress;
+  roadAddress.value = addressToUse;
+  jibunAddress.value = addressToUse;
+
+  // store 업데이트 (위도/경도 포함)
   store.updateFormData({
-    buildingName: addressData.fullAddress,
+    buildingName: buildingName.value,
     roadAddress: roadAddress.value,
     jibunAddress: jibunAddress.value,
-    dongName: addressData.dong,
-    lat: undefined, // 위도 초기화
-    lng: undefined  // 경도 초기화
+    dongName: addressData.dong || '',
+    lat: addressData.latitude, // 서버에서 받은 위도
+    lng: addressData.longitude  // 서버에서 받은 경도
   });
 
-  // store에서 업데이트된 값으로 동기화
-  buildingName.value = store.formData.buildingName || addressData.fullAddress;
+  console.log("🎯 Store에 저장된 데이터:", {
+    buildingName: store.formData.buildingName,
+    roadAddress: store.formData.roadAddress,
+    jibunAddress: store.formData.jibunAddress,
+    dongName: store.formData.dongName,
+    lat: store.formData.lat,
+    lng: store.formData.lng
+  });
 
   showBuildingNotFoundPage.value = false;
 

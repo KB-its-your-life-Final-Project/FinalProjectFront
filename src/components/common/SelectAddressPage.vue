@@ -205,8 +205,6 @@ async function loadSigugunList(sidoCd: string) {
     isLoading.value = true;
     const response = await api.getSigugunListUsingGet(sidoCd);
 
-    console.log(`🔍 시/군/구 API 응답 (sidoCd: ${sidoCd}):`, response.data);
-
           if (response.data.success && response.data.data) {
         // 모든 데이터 사용 (첫 번째 요소 제거하지 않음)
         const allData = response.data.data;
@@ -219,16 +217,10 @@ async function loadSigugunList(sidoCd: string) {
           // 필터링 조건 확인
           return !shouldFilterSigugun(sggNm, sidoCd, allData);
         });
-
-        console.log('✅ 필터링된 시/군/구 데이터:', filteredData);
-
       // 중복 제거 (sggNm 기준)
       const uniqueData = filteredData.filter((sigugun, index, self) =>
         index === self.findIndex(s => s.sggNm === sigugun.sggNm)
       );
-
-        console.log('🔄 중복 제거된 시/군/구 데이터:', uniqueData);
-
       // 가나다순 정렬
       sigugunList.value = uniqueData.sort((a, b) => (a.sggNm || '').localeCompare(b.sggNm || '', 'ko'));
 
@@ -275,15 +267,15 @@ async function loadBuildingList(dongName: string, regionCode: string) {
     });
 
     if (response.data.success && response.data.data?.buildingInfos) {
+
       // 건물명 필터링
       const filteredBuildings = response.data.data.buildingInfos.filter(building =>
         !shouldFilterBuilding(building.buildingName || '')
       );
 
       buildingList.value = filteredBuildings;
-      console.log('🏢 필터링된 건물 목록:', buildingList.value);
     } else {
-      console.error('건물 목록 로드 실패:', response.data.message);
+      console.error('❌ 건물 목록 로드 실패:', response.data.message);
       buildingList.value = [];
     }
   } catch (error) {
@@ -343,8 +335,6 @@ function selectBuilding(building: BuildingInfoDto) {
     longitude: building.longitude,
     jibunAddr: building.jibunAddr
   };
-
-  console.log("🏢 SelectAddressPage에서 전달하는 건물 데이터:", addressData);
 
   if (props.handleBuildingSelection === 'map') {
     // 수동 처리: 부모 컴포넌트에서 처리하도록 이벤트만 발생

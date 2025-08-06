@@ -417,7 +417,7 @@ function goToKB() {
               <span class="text-sm text-kb-ui-02">층별 용도 정보</span>
               <div class="ml-2 relative">
                 <ToolTip>
-                  <div class="max-w-[160px] text-xs">
+                  <div class="max-w-[180px] text-xs">
                     주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-error font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
                   </div>
                 </ToolTip>
@@ -426,7 +426,7 @@ function goToKB() {
             <div v-if="filteredFloorAndPurposeList.length > 0">
               <div v-for="(info, idx) in filteredFloorAndPurposeList" :key="idx" class="mb-2 text-sm">
                 <span class="font-medium">{{ getFloorLabel(info.resFloor) }}:</span>
-                <span class="text-kb-ui-02">{{ info.resUseType }}</span>
+                <span class="text-kb-ui-02">{{ info.resUseType?.endsWith('(') ? info.resUseType.slice(0, -1) : info.resUseType }}</span>
               </div>
             </div>
             <div v-else class="text-center text-kb-ui-02 text-sm">
