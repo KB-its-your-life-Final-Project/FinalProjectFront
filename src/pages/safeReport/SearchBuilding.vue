@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
 import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
+import mapUtil from "@/utils/naverMap/naverMap";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -13,7 +14,6 @@ const jibunAddress = ref(store.formData.jibunAddress);
 const dongName = ref(store.formData.dongName);
 const lat = ref<number>(store.formData.lat || 0);
 const lng = ref<number>(store.formData.lng || 0);
-const naverReady = ref(false);
 const showAddressLayer = ref(false);
 const showBuildingNotFoundModal = ref(false);
 
@@ -28,8 +28,8 @@ const isButtonEnabled = computed(() => {
   return hasBuildingName && hasRoadAddress && hasJibunAddress;
 });
 
-// Naver Maps API 호출
-onMounted(() => {
+// 컴포넌트 초기화
+onMounted(async () => {
   // 검색바 초기화
   buildingName.value = "";
   roadAddress.value = "";
@@ -38,17 +38,11 @@ onMounted(() => {
   lat.value = 0;
   lng.value = 0;
 
-  if (!window.naver?.maps) {
-    const naverScript = document.createElement("script");
-    naverScript.src =
-      "https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=55s76chbvh&submodules=geocoder";
-    naverScript.async = true;
-    naverScript.onload = () => {
-      naverReady.value = true;
-    };
-    document.head.appendChild(naverScript);
-  } else {
-    naverReady.value = true;
+  // Naver Maps API 로드
+  try {
+    await mapUtil.loadNaverMapScript();
+  } catch (error) {
+    console.error('네이버 지도 API 로드 실패:', error);
   }
 });
 
@@ -86,7 +80,7 @@ function handleAddressComplete(payload: {
   });
 
   // 좌표 변환
-  if (roadAddress.value && naverReady.value && jibunAddress.value) {
+  if (roadAddress.value && jibunAddress.value) {
     searchAddressToCoordinate(jibunAddress.value);
   }
 }
@@ -100,35 +94,19 @@ function handleAddressLayerClose() {
   }
 }
 
-function searchAddressToCoordinate(address: string) {
-  if (!window.naver?.maps?.Service) {
-    alert("네이버 지도 API가 아직 로드되지 않았습니다.");
-    return;
-  }
-
-  naver.maps.Service.geocode({ query: address }, function (status, response) {
-    if (status !== naver.maps.Service.Status.OK) {
-      alert("주소를 좌표로 변환하는 데 실패했습니다.");
-      return;
-    }
-
-    const result = response.v2;
-    if (result.meta.totalCount === 0) {
-      alert("DB에 해당하는 주소 데이터가 없습니다.");
-      return;
-    }
-
-    const { x, y } = result.addresses[0];
-    const latVal = parseFloat(y);
-    const lngVal = parseFloat(x);
-
-    console.log("✅ 위도:", latVal, "경도:", lngVal);
+async function searchAddressToCoordinate(address: string) {
+  try {
+    const result = await mapUtil.searchAddressToCoordinate(address);
+    console.log("✅ 위도:", result.latlng.lat(), "경도:", result.latlng.lng());
 
     store.updateFormData({
-      lat: latVal,
-      lng: lngVal,
+      lat: result.latlng.lat(),
+      lng: result.latlng.lng(),
     });
-  });
+  } catch (error) {
+    console.error("주소를 좌표로 변환하는 데 실패했습니다:", error);
+    alert("주소를 좌표로 변환하는 데 실패했습니다.");
+  }
 }
 
 function next() {
