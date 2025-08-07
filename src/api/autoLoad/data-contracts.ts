@@ -10,6 +10,34 @@
  * ---------------------------------------------------------------
  */
 
+/** AlarmResponseDto */
+export interface AlarmResponseDto {
+  /** @format int32 */
+  getAlarm?: number;
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  isChecked?: number;
+  /** @format int32 */
+  memberId?: number;
+  /** @format date-time */
+  regDate?: string;
+  text?: string;
+  /** @format int32 */
+  type?: number;
+}
+
+/**
+ * AlarmSettingRequestDto
+ * 알림 설정 변경 요청 데이터
+ */
+export interface AlarmSettingRequestDto {
+  /** @format int32 */
+  isChecked?: number;
+  /** @format int32 */
+  type?: number;
+}
+
 /**
  * BuildingInfoDto
  * 건물 정보
@@ -113,6 +141,28 @@ export interface EstateDTO {
   /** @format int32 */
   sourceTable?: number;
   umdNm?: string;
+}
+
+/** EstateSalesDTO */
+export interface EstateSalesDTO {
+  /** @format int32 */
+  dealAmount?: number;
+  /** @format int32 */
+  dealDay?: number;
+  /** @format int32 */
+  dealMonth?: number;
+  /** @format int32 */
+  dealYear?: number;
+  /** @format int32 */
+  deposit?: number;
+  /** @format int32 */
+  estateId?: number;
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  monthlyRent?: number;
+  /** @format int32 */
+  tradeType?: number;
 }
 
 /** EstateWishlistRequestDTO */
@@ -329,8 +379,9 @@ export interface LocalInfoResponseDTO {
   /** @format int32 */
   gridY?: number;
   locataddNm?: string;
-  region?: string;
   regionCd?: string;
+  sggCd?: string;
+  sidoCd?: string;
 }
 
 /** LoginDTO */
@@ -376,6 +427,8 @@ export interface PopulationDTO {
   populationYouth?: number;
   regionCd?: string;
   regionName?: string;
+  /** @format double */
+  youthRatio?: number;
 }
 
 /** RecentSafeReportResponseDto */
@@ -602,19 +655,25 @@ export interface ViolationStatus {
   violationStatus?: string;
 }
 
-/** WeatherDTO */
-export interface WeatherDTO {
+/** Weather */
+export interface Weather {
+  baseDate?: string;
+  baseTime?: string;
+  fcstDate?: string;
+  fcstTime?: string;
   /** @format int32 */
   gridX?: number;
   /** @format int32 */
   gridY?: number;
-  locataddNm?: string;
+  /** @format int64 */
+  id?: number;
   /** @format int32 */
   maxTemperature?: number;
   /** @format int32 */
   minTemperature?: number;
   region?: string;
-  regionCd?: string;
+  sggCd?: string;
+  sidoCd?: string;
   skyCondition?: string;
   /** @format int32 */
   temperature?: number;
@@ -684,11 +743,38 @@ export interface ApiResponseHospitalDTO {
   success?: boolean;
 }
 
+/** ApiResponse«List«AlarmResponseDto»» */
+export interface ApiResponseListAlarmResponseDto {
+  /** @format int32 */
+  code?: number;
+  data?: AlarmResponseDto[];
+  message?: string;
+  success?: boolean;
+}
+
 /** ApiResponse«List«DongDto»» */
 export interface ApiResponseListDongDto {
   /** @format int32 */
   code?: number;
   data?: DongDto[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«EstateDTO»» */
+export interface ApiResponseListEstateDTO {
+  /** @format int32 */
+  code?: number;
+  data?: EstateDTO[];
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«List«EstateSalesDTO»» */
+export interface ApiResponseListEstateSalesDTO {
+  /** @format int32 */
+  code?: number;
+  data?: EstateSalesDTO[];
   message?: string;
   success?: boolean;
 }
@@ -837,11 +923,11 @@ export interface ApiResponseVoid {
   success?: boolean;
 }
 
-/** ApiResponse«WeatherDTO» */
-export interface ApiResponseWeatherDTO {
+/** ApiResponse«Weather» */
+export interface ApiResponseWeather {
   /** @format int32 */
   code?: number;
-  data?: WeatherDTO;
+  data?: Weather;
   message?: string;
   success?: boolean;
 }
@@ -851,6 +937,16 @@ export interface ApiResponseBoolean {
   /** @format int32 */
   code?: number;
   data?: boolean;
+  message?: string;
+  success?: boolean;
+}
+
+/** ApiResponse«int» */
+export interface ApiResponseInt {
+  /** @format int32 */
+  code?: number;
+  /** @format int32 */
+  data?: number;
   message?: string;
   success?: boolean;
 }

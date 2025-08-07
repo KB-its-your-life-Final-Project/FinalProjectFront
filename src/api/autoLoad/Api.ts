@@ -11,13 +11,18 @@
  */
 
 import {
+  AlarmSettingRequestDto,
   ApiResponseBoolean,
   ApiResponseBuildingResponseDto,
   ApiResponseEstateDTO,
   ApiResponseFacilityDTO,
   ApiResponseHomeRegisterResponseDTO,
   ApiResponseHospitalDTO,
+  ApiResponseInt,
+  ApiResponseListAlarmResponseDto,
   ApiResponseListDongDto,
+  ApiResponseListEstateDTO,
+  ApiResponseListEstateSalesDTO,
   ApiResponseListEstateWishlistResponseDTO,
   ApiResponseListLawdCdResponseDTO,
   ApiResponseListLocalInfoResponseDTO,
@@ -34,7 +39,7 @@ import {
   ApiResponseSafeReportResponseDto,
   ApiResponseSafetyDTO,
   ApiResponseVoid,
-  ApiResponseWeatherDTO,
+  ApiResponseWeather,
   EstateWishlistRequestDTO,
   HomeRegisterRequestDTO,
   LoginDTO,
@@ -49,6 +54,119 @@ import { ContentType, HttpClient, RequestParams } from "./http-client";
 export class Api<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags alarm-controller
+   * @name GetUnreadAlarmCountUsingGet
+   * @summary getUnreadAlarmCount
+   * @request GET:/api/alarm/count
+   */
+  getUnreadAlarmCountUsingGet = (token: string, params: RequestParams = {}) =>
+    this.request<ApiResponseInt, void>({
+      path: `/api/alarm/count`,
+      method: "GET",
+      body: token,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags alarm-controller
+   * @name GetAlarmListUsingGet
+   * @summary getAlarmList
+   * @request GET:/api/alarm/list
+   */
+  getAlarmListUsingGet = (token: string, params: RequestParams = {}) =>
+    this.request<ApiResponseListAlarmResponseDto, void>({
+      path: `/api/alarm/list`,
+      method: "GET",
+      body: token,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags alarm-controller
+   * @name UpdateAlarmSettingUsingPut
+   * @summary updateAlarmSetting
+   * @request PUT:/api/alarm/settings
+   */
+  updateAlarmSettingUsingPut = (
+    token: AlarmSettingRequestDto,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/alarm/settings`,
+      method: "PUT",
+      body: token,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags alarm-controller
+   * @name MarkAlarmReadUsingPut
+   * @summary markAlarmRead
+   * @request PUT:/api/alarm/{alarmId}/read
+   */
+  markAlarmReadUsingPut = (
+    alarmId: number,
+    token: string,
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseVoid, void>({
+      path: `/api/alarm/${alarmId}/read`,
+      method: "PUT",
+      body: token,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Estate 정보 조회
+   * @name GetEstateByElementUsingGet
+   * @summary getEstateByElement
+   * @request GET:/api/estate
+   */
+  getEstateByElementUsingGet = (
+    query?: {
+      /** @format int32 */
+      buildYear?: number;
+      buildingName?: string;
+      /** @format int32 */
+      buildingType?: number;
+      /** @format int32 */
+      id?: number;
+      jibun?: string;
+      jibunAddr?: string;
+      /** @format double */
+      latitude?: number;
+      /** @format double */
+      longitude?: number;
+      mhouseType?: string;
+      /** @format int32 */
+      originalId?: number;
+      /** @format int32 */
+      sggCd?: number;
+      sggNm?: string;
+      shouseType?: string;
+      /** @format int32 */
+      sourceTable?: number;
+      umdNm?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListEstateDTO, void>({
+      path: `/api/estate`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
   /**
    * No description
    *
@@ -88,6 +206,70 @@ export class Api<
   ) =>
     this.request<ApiResponseEstateDTO, void>({
       path: `/api/estate/latlng`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Estate 정보 조회
+   * @name GetEstateSalesByElementUsingGet
+   * @summary getEstateSalesByElement
+   * @request GET:/api/estate/sales
+   */
+  getEstateSalesByElementUsingGet = (
+    query?: {
+      /** @format int32 */
+      dealAmount?: number;
+      /** @format int32 */
+      dealDay?: number;
+      /** @format int32 */
+      dealMonth?: number;
+      /** @format int32 */
+      dealYear?: number;
+      /** @format int32 */
+      deposit?: number;
+      /** @format int32 */
+      estateId?: number;
+      /** @format int32 */
+      id?: number;
+      /** @format int32 */
+      monthlyRent?: number;
+      /** @format int32 */
+      tradeType?: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListEstateSalesDTO, void>({
+      path: `/api/estate/sales`,
+      method: "GET",
+      query: query,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Estate 정보 조회
+   * @name GetEstateBySquareUsingGet
+   * @summary getEstateBySquare
+   * @request GET:/api/estate/sqaure
+   */
+  getEstateBySquareUsingGet = (
+    query?: {
+      /** @format double */
+      maxLat?: number;
+      /** @format double */
+      maxLng?: number;
+      /** @format double */
+      minLat?: number;
+      /** @format double */
+      minLng?: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ApiResponseListEstateDTO, void>({
+      path: `/api/estate/sqaure`,
       method: "GET",
       query: query,
       ...params,
@@ -195,19 +377,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드(regionCd)로 해당 지역의 편의시설(예: 자전거 대수) 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name GetFacilityCountsByRegionCdUsingGet
-   * @summary 법정동코드로 편의시설 수 조회
+   * @summary getFacilityCountsByRegionCd
    * @request GET:/api/localinfo/facilities-count
    */
   getFacilityCountsByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
@@ -219,19 +398,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드(regionCd)로 해당 지역의 병원 수 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name GetHospitalCountsByRegionCdUsingGet
-   * @summary 법정동코드로 병원 수 조회
+   * @summary getHospitalCountsByRegionCd
    * @request GET:/api/localinfo/hospitals-count
    */
   getHospitalCountsByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
@@ -243,19 +419,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드(regionCd)로 해당 지역의 인구 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name GetPopulationByRegionCdUsingGet
-   * @summary 법정동코드로 인구 조회
+   * @summary getPopulationByRegionCd
    * @request GET:/api/localinfo/population
    */
   getPopulationByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
@@ -267,25 +440,23 @@ export class Api<
       ...params,
     });
   /**
-   * @description 위도/경도(latitude, longitude)를 이용하여 법정동 주소 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name ReverseGeocodeUsingGet
-   * @summary 좌표로 법정동 주소 조회
+   * @summary reverseGeocode
    * @request GET:/api/localinfo/reverse-geocode
    */
   reverseGeocodeUsingGet = (
     query: {
       /**
-       * 위도 (Latitude)
+       * latitude
        * @format double
-       * @example 37.5665
        */
       latitude: number;
       /**
-       * 경도 (Longitude)
+       * longitude
        * @format double
-       * @example 126.978
        */
       longitude: number;
     },
@@ -298,19 +469,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드(regionCd)로 해당 지역의 안전시설(안심벨) 수 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name GetSafetyCountsByRegionCdUsingGet
-   * @summary 법정동코드로 안전시설 수 조회
+   * @summary getSafetyCountsByRegionCd
    * @request GET:/api/localinfo/safety-count
    */
   getSafetyCountsByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
@@ -322,19 +490,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 키워드로 지역을 검색합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name SearchRegionsUsingGet
-   * @summary 지역 검색
+   * @summary searchRegions
    * @request GET:/api/localinfo/search
    */
   searchRegionsUsingGet = (
     query: {
-      /**
-       * 검색 키워드
-       * @example "강남"
-       */
+      /** keyword */
       keyword: string;
     },
     params: RequestParams = {},
@@ -346,24 +511,21 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드로 날씨 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
-   * @name GetWeatherByRegionNameUsingGet
-   * @summary 법정동코드로 날씨 조회
+   * @tags local-info-controller
+   * @name GetWeatherByRegionCdUsingGet
+   * @summary getWeatherByRegionCd
    * @request GET:/api/localinfo/weather
    */
-  getWeatherByRegionNameUsingGet = (
+  getWeatherByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
   ) =>
-    this.request<ApiResponseWeatherDTO, void>({
+    this.request<ApiResponseWeather, void>({
       path: `/api/localinfo/weather`,
       method: "GET",
       query: query,
@@ -494,10 +656,12 @@ export class Api<
    * @summary 나의 집 정보 조회
    * @request GET:/api/myhome/info
    */
-  getHomeInfoUsingGet = (params: RequestParams = {}) =>
+  getHomeInfoUsingGet = (token: string, params: RequestParams = {}) =>
     this.request<ApiResponseHomeRegisterResponseDTO, void>({
       path: `/api/myhome/info`,
       method: "GET",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -509,13 +673,13 @@ export class Api<
    * @request POST:/api/myhome/register
    */
   registerHomeUsingPost = (
-    requestDTO: HomeRegisterRequestDTO,
+    token: HomeRegisterRequestDTO,
     params: RequestParams = {},
   ) =>
     this.request<ApiResponseHomeRegisterResponseDTO, void>({
       path: `/api/myhome/register`,
       method: "POST",
-      body: requestDTO,
+      body: token,
       type: ContentType.Json,
       ...params,
     });
@@ -541,10 +705,12 @@ export class Api<
    * @summary 최근 본 안심레포트 목록 조회
    * @request GET:/api/report/recentSafeReport
    */
-  getRecentReportsUsingGet = (params: RequestParams = {}) =>
+  getRecentReportsUsingGet = (token: string, params: RequestParams = {}) =>
     this.request<ApiResponseListRecentSafeReportResponseDto, void>({
       path: `/api/report/recentSafeReport`,
       method: "GET",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -555,10 +721,16 @@ export class Api<
    * @summary 최근 본 안심레포트 상세 조회
    * @request GET:/api/report/recentSafeReport/{id}
    */
-  getRecentReportDetailUsingGet = (id: number, params: RequestParams = {}) =>
+  getRecentReportDetailUsingGet = (
+    id: number,
+    token: string,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseSafeReportResponseDto, void>({
       path: `/api/report/recentSafeReport/${id}`,
       method: "GET",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -569,10 +741,16 @@ export class Api<
    * @summary 최근 본 안심레포트 삭제
    * @request DELETE:/api/report/recentSafeReport/{id}
    */
-  deleteRecentReportUsingDelete = (id: number, params: RequestParams = {}) =>
+  deleteRecentReportUsingDelete = (
+    id: number,
+    token: string,
+    params: RequestParams = {},
+  ) =>
     this.request<ApiResponseVoid, void>({
       path: `/api/report/recentSafeReport/${id}`,
       method: "DELETE",
+      body: token,
+      type: ContentType.Json,
       ...params,
     });
   /**
@@ -584,13 +762,13 @@ export class Api<
    * @request POST:/api/report/requestSafeReport
    */
   generateSafeReportUsingPost = (
-    dto: SafeReportRequestDto,
+    token: SafeReportRequestDto,
     params: RequestParams = {},
   ) =>
     this.request<ApiResponseSafeReportResponseDto, void>({
       path: `/api/report/requestSafeReport`,
       method: "POST",
-      body: dto,
+      body: token,
       type: ContentType.Json,
       ...params,
     });
