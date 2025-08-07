@@ -11,121 +11,99 @@ export type InfoCardType = {
 
 const api = new Api();
 
-const fetchPopulationInfo = async (regionCd: string): Promise<string> => {
+// 공통 API 호출 함수
+const fetchApiData = async (
+  apiMethod: (query: { regionCd: string }, params?: any) => Promise<any>,
+  regionCd: string,
+  dataKey: string,
+  errorMessage: string,
+): Promise<string> => {
   try {
-    const response = await api.getPopulationUsingGet({ regionCd: regionCd }, {});
-    console.log("인구 API 응답:", response);
+    const response = await apiMethod({ regionCd });
 
-    const population = response.data?.data;
-    if (population && population.populationYouth) {
-      const youth = population.populationYouth;
-      return `${youth.toLocaleString()}명`;
-    } else {
+    if (!response.data?.success) {
       return "--";
     }
+
+    const data = response.data?.data;
+    if (data && data[dataKey] !== null && data[dataKey] !== undefined) {
+      const value = data[dataKey];
+
+      // 청년 비율인 경우 퍼센트로 변환
+      if (dataKey === "youthRatio") {
+        return `${(value * 100).toFixed(1)}%`;
+      }
+
+      // 나머지는 숫자 포맷팅
+      return `${value.toLocaleString()}개`;
+    }
+
+    return "--";
   } catch (err: unknown) {
-    console.error("인구 정보 조회 실패:", err);
+    console.error(errorMessage, err);
     return "--";
   }
 };
 
-const fetchFacilityInfo = async (regionCd: string): Promise<string> => {
-  try {
-    const response = await api.getFacilityCountsUsingGet({ regionCd: regionCd }, {});
-    console.log("편의시설 API 응답:", response);
+// 각 카드별 API 호출 함수들
+const fetchPopulationInfo = (regionCd: string) =>
+  fetchApiData(api.getPopulationByRegionCdUsingGet, regionCd, "youthRatio", "인구 정보 조회 실패");
 
-    const facility = response.data?.data;
-    if (facility && facility.totalBicycleCount) {
-      // 자전거 대수를 표시
-      const bicycleCount = facility.totalBicycleCount;
-      return `${bicycleCount.toLocaleString()}개`;
-    } else {
-      return "--"; // 기본값
-    }
-  } catch (err: unknown) {
-    console.error("편의시설 정보 조회 실패:", err);
-    return "--"; // 에러 시 기본값
-  }
-};
+const fetchFacilityInfo = (regionCd: string) =>
+  fetchApiData(
+    api.getFacilityCountsByRegionCdUsingGet,
+    regionCd,
+    "totalBicycleCount",
+    "편의시설 정보 조회 실패",
+  );
 
-const fetchSafetyInfo = async (regionCd: string): Promise<string> => {
-  try {
-    const response = await api.getSafetyCountsUsingGet({ regionCd: regionCd }, {});
-    console.log("치안시설 API 응답:", response);
+const fetchSafetyInfo = (regionCd: string) =>
+  fetchApiData(
+    api.getSafetyCountsByRegionCdUsingGet,
+    regionCd,
+    "totalCount",
+    "치안시설 정보 조회 실패",
+  );
 
-    const safety = response.data?.data;
-    if (safety && safety.totalCount) {
-      // 안심벨 개수를 표시 (백엔드에서 totalCount로 반환)
-      const safetyBellCount = safety.totalCount;
-      return `${safetyBellCount.toLocaleString()}개`;
-    } else {
-      return "--"; // 기본값
-    }
-  } catch (err: unknown) {
-    console.error("치안시설 정보 조회 실패:", err);
-    return "--"; // 에러 시 기본값
-  }
-};
-
-const fetchHospitalInfo = async (regionCd: string): Promise<string> => {
-  try {
-    console.log("병원 API 호출 시작 - regionCd:", regionCd);
-    const response = await api.getHospitalCountsUsingGet({ regionCd: regionCd }, {});
-    console.log("병원 API 응답 전체:", response);
-    console.log("병원 API 응답 data:", response.data);
-    console.log("병원 API 응답 data.data:", response.data?.data);
-    console.log("병원 API 응답 data.data 타입:", typeof response.data?.data);
-    console.log("병원 API 응답 data.data 키들:", Object.keys(response.data?.data || {}));
-
-    const hospital = response.data?.data;
-    if (hospital && hospital.totalCount) {
-      // 병원 개수를 표시 (백엔드에서 totalCount로 반환)
-      const hospitalCount = hospital.totalCount;
-      console.log("병원 개수:", hospitalCount);
-      return `${hospitalCount.toLocaleString()}개`;
-    } else {
-      console.log("병원 데이터 없음 또는 totalCount 없음");
-      console.log("hospital 객체:", hospital);
-      console.log("hospital.totalCount:", hospital?.totalCount);
-      return "--"; // 기본값
-    }
-  } catch (err: unknown) {
-    console.error("병원 정보 조회 실패:", err);
-    return "--"; // 에러 시 기본값
-  }
-};
+const fetchHospitalInfo = (regionCd: string) =>
+  fetchApiData(
+    api.getHospitalCountsByRegionCdUsingGet,
+    regionCd,
+    "totalCount",
+    "병원 정보 조회 실패",
+  );
 
 export const InfoCardList: InfoCardType[] = [
   {
     icon: "fa-solid fa-users",
-    title: "인구수",
-    value: "20만", // Initial static value
-    description: "청년 인구수",
-    color: "text-blue-500", // 텍스트 색상
-    apiCall: fetchPopulationInfo, // Linked API call
+    title: "청년 인구비율",
+    value: "--",
+    description: "전체 주민 대비 청년 주민수",
+    color: "text-blue-500",
+    apiCall: fetchPopulationInfo,
   },
   {
     icon: "fa-solid fa-motorcycle",
     title: "공공자전거",
-    value: "1,234", // Initial static value
-    description: "대여소 수",
-    color: "text-green-500", // 텍스트 색상
-    apiCall: fetchFacilityInfo, // Linked API call
+    value: "--",
+    description: "따릉이 대여소 수",
+    color: "text-green-500",
+    apiCall: fetchFacilityInfo,
   },
   {
     icon: "fa-solid fa-shield-halved",
     title: "치안시설",
-    value: "50", // Initial static value
-    description: "안심벨 수",
-    color: "text-yellow-500", // 텍스트 색상
-    apiCall: fetchSafetyInfo, // Linked API call
+    value: "--",
+    description: "안심벨 개수",
+    color: "text-yellow-500",
+    apiCall: fetchSafetyInfo,
   },
   {
     icon: "fa-solid fa-first-aid",
     title: "병원",
-    value: "15", // Initial static value
-    description: "의료기관 수",
-    color: "text-red-500", // 텍스트 색상
-    apiCall: fetchHospitalInfo, // Linked API call
+    value: "--",
+    description: "자치구 응급의료기관 수",
+    color: "text-red-500",
+    apiCall: fetchHospitalInfo,
   },
 ];

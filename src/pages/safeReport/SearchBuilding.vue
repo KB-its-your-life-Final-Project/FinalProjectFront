@@ -3,6 +3,8 @@ import { ref, onMounted, computed } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
 import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
+import SelectAddressPage from "@/components/common/SelectAddressPage.vue";
+import mapUtil from "@/utils/naverMap/naverMap";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -13,9 +15,9 @@ const jibunAddress = ref(store.formData.jibunAddress);
 const dongName = ref(store.formData.dongName);
 const lat = ref<number>(store.formData.lat || 0);
 const lng = ref<number>(store.formData.lng || 0);
-const naverReady = ref(false);
 const showAddressLayer = ref(false);
-const showBuildingNotFoundModal = ref(false);
+const showBuildingNameInputModal = ref(false);
+const showBuildingNotFoundPage = ref(false);
 
 // 버튼 활성화 상태 디버깅
 const isButtonEnabled = computed(() => {
@@ -29,25 +31,31 @@ const isButtonEnabled = computed(() => {
 
 // Naver Maps API 호출
 onMounted(() => {
-  // 검색바 초기화
-  buildingName.value = "";
-  roadAddress.value = "";
-  jibunAddress.value = "";
-  dongName.value = "";
-  lat.value = 0;
-  lng.value = 0;
+  // 검색바 초기화 (store에 값이 있으면 유지)
+  if (!store.formData.buildingName) {
+    buildingName.value = "";
+  }
+  if (!store.formData.roadAddress) {
+    roadAddress.value = "";
+  }
+  if (!store.formData.jibunAddress) {
+    jibunAddress.value = "";
+  }
+  if (!store.formData.dongName) {
+    dongName.value = "";
+  }
+  if (!store.formData.lat) {
+    lat.value = 0;
+  }
+  if (!store.formData.lng) {
+    lng.value = 0;
+  }
 
-  if (!window.naver?.maps) {
-    const naverScript = document.createElement("script");
-    naverScript.src =
-      "https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=55s76chbvh&submodules=geocoder";
-    naverScript.async = true;
-    naverScript.onload = () => {
-      naverReady.value = true;
-    };
-    document.head.appendChild(naverScript);
-  } else {
-    naverReady.value = true;
+  // Naver Maps API 로드
+  try {
+    await mapUtil.loadNaverMapScript();
+  } catch (error) {
+    console.error('네이버 지도 API 로드 실패:', error);
   }
 });
 
@@ -64,9 +72,9 @@ function handleAddressComplete(payload: {
 }) {
   console.log("전체 주소 데이터:", payload);
 
-  // 건물명이 없으면 모달 표시
+  // 건물명이 없으면 건물명 입력 모달 표시
   if (!payload.buildingName || payload.buildingName.trim() === "") {
-    showBuildingNotFoundModal.value = true;
+    showBuildingNameInputModal.value = true;
     return;
   }
 
@@ -85,10 +93,12 @@ function handleAddressComplete(payload: {
   });
 
   // 좌표 변환
-  if (roadAddress.value && naverReady.value && jibunAddress.value) {
+  if (roadAddress.value && jibunAddress.value) {
     searchAddressToCoordinate(jibunAddress.value);
   }
 }
+
+
 
 // 주소 레이어 닫기 핸들러
 function handleAddressLayerClose() {
@@ -99,35 +109,19 @@ function handleAddressLayerClose() {
   }
 }
 
-function searchAddressToCoordinate(address: string) {
-  if (!window.naver?.maps?.Service) {
-    alert("네이버 지도 API가 아직 로드되지 않았습니다.");
-    return;
-  }
-
-  naver.maps.Service.geocode({ query: address }, function (status, response) {
-    if (status !== naver.maps.Service.Status.OK) {
-      alert("주소를 좌표로 변환하는 데 실패했습니다.");
-      return;
-    }
-
-    const result = response.v2;
-    if (result.meta.totalCount === 0) {
-      alert("DB에 해당하는 주소 데이터가 없습니다.");
-      return;
-    }
-
-    const { x, y } = result.addresses[0];
-    const latVal = parseFloat(y);
-    const lngVal = parseFloat(x);
-
-    console.log("✅ 위도:", latVal, "경도:", lngVal);
+async function searchAddressToCoordinate(address: string) {
+  try {
+    const result = await mapUtil.searchAddressToCoordinate(address);
+    console.log("✅ 위도:", result.latlng.lat(), "경도:", result.latlng.lng());
 
     store.updateFormData({
-      lat: latVal,
-      lng: lngVal,
+      lat: result.latlng.lat(),
+      lng: result.latlng.lng(),
     });
-  });
+  } catch (error) {
+    console.error("주소를 좌표로 변환하는 데 실패했습니다:", error);
+    alert("주소를 좌표로 변환하는 데 실패했습니다.");
+  }
 }
 
 function next() {
@@ -146,6 +140,57 @@ function resetFormData() {
   lat.value = 0;
   lng.value = 0;
 }
+
+// 주소 선택 페이지 이벤트 핸들러
+function handleAddressSelected(addressData: {
+  sido: string | undefined;
+  sigugun: string | undefined;
+  dong: string | undefined;
+  buildingName: string | undefined;
+  fullAddress: string;
+  sidoCd: string | undefined;
+  sggCd: string | undefined;
+  umdCd: string | undefined;
+  latitude: number | undefined;
+  longitude: number | undefined;
+  jibunAddr: string | undefined;
+}) {
+  console.log("🏢 SelectAddressPage에서 선택된 건물 데이터:", addressData);
+
+  // 선택된 건물명 설정
+  buildingName.value = addressData.buildingName || addressData.fullAddress;
+
+  // 주소 정보 설정 (jibunAddr 우선, 없으면 fullAddress 사용)
+  const addressToUse = addressData.jibunAddr || addressData.fullAddress;
+  roadAddress.value = addressToUse;
+  jibunAddress.value = addressToUse;
+
+  // store 업데이트 (위도/경도 포함)
+  store.updateFormData({
+    buildingName: buildingName.value,
+    roadAddress: roadAddress.value,
+    jibunAddress: jibunAddress.value,
+    dongName: addressData.dong || '',
+    lat: addressData.latitude, // 서버에서 받은 위도
+    lng: addressData.longitude  // 서버에서 받은 경도
+  });
+
+  console.log("🎯 Store에 저장된 데이터:", {
+    buildingName: store.formData.buildingName,
+    roadAddress: store.formData.roadAddress,
+    jibunAddress: store.formData.jibunAddress,
+    dongName: store.formData.dongName,
+    lat: store.formData.lat,
+    lng: store.formData.lng
+  });
+
+  showBuildingNotFoundPage.value = false;
+
+  // 다음 화면으로 이동
+  next();
+}
+
+
 </script>
 
 <template>
@@ -172,6 +217,16 @@ function resetFormData() {
       </button>
     </div>
 
+    <!-- 원하는 단지가 안나온다면 링크 -->
+    <div class="w-full max-w-lg mx-auto flex justify-end">
+      <button
+        @click="showBuildingNotFoundPage = true"
+        class="text-sm text-kb-ui-05 hover:text-kb-ui-03 transition-colors cursor-pointer"
+      >
+        원하는 단지가 안나온다면? >
+      </button>
+    </div>
+
     <!-- 주소 검색 레이어 -->
     <teleport to="body">
       <SearchAddressLayer
@@ -182,6 +237,13 @@ function resetFormData() {
         @close="handleAddressLayerClose"
       />
     </teleport>
+
+    <!-- 주소 선택 페이지 -->
+    <SelectAddressPage
+      v-if="showBuildingNotFoundPage"
+      @go-back="showBuildingNotFoundPage = false"
+      @address-selected="handleAddressSelected"
+    />
 
     <div class="fixed z-0 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
@@ -195,18 +257,28 @@ function resetFormData() {
 
     <!-- 건물 없음 모달 -->
     <ModalForm
-      v-if="showBuildingNotFoundModal"
-      title="건물 정보 없음"
-      :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
-      @close="showBuildingNotFoundModal = false"
+      v-if="showBuildingNameInputModal"
+      title="건물을 찾을 수 없습니다."
+      :handle-confirm="() => ({ success: true, message: '' })"
+      @close="showBuildingNameInputModal = false"
     >
       <div class="text-center">
-        <p class="text-gray-600">
-          해당 주소에 건물이 없습니다.<br />
-          다른 주소를 선택해주세요.
+        <p class="text-medium text-kb-ui-02">
+          검색하신 주소에 해당하는 건물 정보가 없습니다.<br>
+          다시 검색해주세요.
         </p>
       </div>
+      <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+          <h3 class="text-sm font-medium text-gray-800 mb-2">💡 도움말</h3>
+          <ul class="text-sm text-gray-600 space-y-1 text-left">
+            <li>• 정확한 도로명 주소를 입력해보세요</li>
+            <li>• 건물명 대신 동/호수로 검색해보세요</li>
+            <li>• 새로 지어진 건물은 등록이 지연될 수 있습니다</li>
+          </ul>
+        </div>
     </ModalForm>
+
+
   </div>
 </template>
 

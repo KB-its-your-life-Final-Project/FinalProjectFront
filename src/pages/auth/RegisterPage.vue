@@ -106,11 +106,11 @@ const registerUser = async () => {
     checkSubmitMsg.value = "비밀번호가 일치하지 않습니다";
     return;
   }
-  if (!isValidPasswordFormat(member.password1)) {
-    checkSubmitMsg.value =
-      "영문 대·소문자, 숫자, 특수문자를 각각 포함한 8자 이상의 비밀번호를 입력하세요";
-    return;
-  }
+  // if (!isValidPasswordFormat(member.password1)) {
+  //   checkSubmitMsg.value =
+  //     "영문 대·소문자, 숫자, 특수문자를 각각 포함한 8자 이상의 비밀번호를 입력하세요";
+  //   return;
+  // }
   try {
     const response = await api.registerByEmailUsingPost(member);
     console.log("response: ", response);

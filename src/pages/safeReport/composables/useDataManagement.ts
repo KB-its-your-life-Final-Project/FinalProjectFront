@@ -3,13 +3,15 @@ import type {
   SafeReportRequestDto,
   RentalRatioAndBuildyear,
   FloorAndPurpose,
-  ViolationStatus,
-} from "../types";
-import { INIT_FORM_DATA } from "../types";
+  ViolationStatus
+} from '../types';
+import type { SafeReportResponseDto } from '@/api/autoLoad/data-contracts';
+import { INIT_FORM_DATA } from '../types';
 
 export function useDataManagement() {
   const formData = reactive<SafeReportRequestDto>({ ...INIT_FORM_DATA });
   const resultData = ref<RentalRatioAndBuildyear | null>(null);
+  const safeReportData = ref<SafeReportResponseDto | null>(null);
   const violationStatus = ref<string | null>(null);
   const floorAndPurposeList = ref<FloorAndPurpose[] | null>(null);
 
@@ -46,6 +48,14 @@ export function useDataManagement() {
   };
 
   /**
+   * 전체 SafeReport 데이터 업데이트
+   * @param data - 전체 SafeReport 데이터
+   */
+  const updateSafeReportData = (data: SafeReportResponseDto | null) => {
+    safeReportData.value = data;
+  };
+
+  /**
    * 위반 상태 업데이트
    * @param status - 위반 상태
    */
@@ -75,6 +85,7 @@ export function useDataManagement() {
   const resetAllData = () => {
     Object.assign(formData, INIT_FORM_DATA);
     resultData.value = null;
+    safeReportData.value = null;
     violationStatus.value = null;
     floorAndPurposeList.value = null;
   };
@@ -90,6 +101,7 @@ export function useDataManagement() {
     // 상태
     formData,
     resultData,
+    safeReportData,
     violationStatus,
     floorAndPurposeList,
 
@@ -97,6 +109,7 @@ export function useDataManagement() {
     updateFormData,
     createRequestDto,
     updateResultData,
+    updateSafeReportData,
     updateViolationStatus,
     updateFloorAndPurposeList,
     updateViolationStatusVO,

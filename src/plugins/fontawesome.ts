@@ -56,7 +56,6 @@ library.add(
   faAngleRight,
   faShieldAlt,
   faChevronRight,
-  faHeart,
   faFileLines,
   faEnvelope,
   faUser,
@@ -72,6 +71,7 @@ library.add(
   faMotorcycle,
   faHeart,
   faFirstAid,
+  faCross,
 );
 
 export { FontAwesomeIcon };

@@ -11,11 +11,13 @@ export const safeReportStore = defineStore("safeReport", () => {
   const {
     formData,
     resultData,
+    safeReportData,
     violationStatus,
     floorAndPurposeList,
     updateFormData,
     createRequestDto,
     updateResultData,
+    updateSafeReportData,
     updateViolationStatus,
     updateFloorAndPurposeList,
     updateViolationStatusVO,
@@ -50,6 +52,7 @@ export const safeReportStore = defineStore("safeReport", () => {
     // 데이터 관련
     formData,
     resultData,
+    safeReportData,
     violationStatus,
     floorAndPurposeList,
 
@@ -57,6 +60,7 @@ export const safeReportStore = defineStore("safeReport", () => {
     updateFormData,
     createRequestDto,
     updateResultData,
+    updateSafeReportData,
     updateViolationStatus,
     updateFloorAndPurposeList,
     updateViolationStatusVO,

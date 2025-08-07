@@ -14,7 +14,11 @@ import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
 import ToastList from "@/components/common/ToastList.vue";
 
+<<<<<<< HEAD
 import { markRaw, ref, computed, onMounted } from "vue";
+=======
+import { markRaw, ref, reactive, onMounted } from "vue";
+>>>>>>> dev
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
 import { authStore } from "@/stores/authStore";
@@ -22,11 +26,10 @@ import { authStore } from "@/stores/authStore";
 import defaultProfile from "@/assets/imgs/profile.jpg";
 import ProfileImage from "@/components/common/ProfileImage.vue";
 import ProfileInfo from "@/components/common/ProfileInfo.vue";
-
 import { Api } from "@/api/autoLoad/Api";
+import type { HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
 
 const api = new Api();
-
 const modalMap = {
   name: markRaw(ChangeNameModal),
   editHouse: markRaw(ChangeHouseModal),
@@ -73,6 +76,9 @@ const user = computed(() => ({
   imagePath: auth.member.profileImg || defaultProfile,
 }));
 
+const isLoading = ref(false);
+const homeData = ref<HomeRegisterResponseDTO | null>(null);
+
 function openDrawer() {
   isOpenDrawer.value = !isOpenDrawer.value;
 }
@@ -80,6 +86,13 @@ function openModal<T extends ModalNames>(type: T, props: ModalPropsMap[T]) {
   currentModalName.value = type;
   modalProps.value = props;
 }
+const handleModalClose = () => {
+  const modalType = currentModalName.value;
+  closeModal();
+  if(modalType === 'newHouse' || modalType === 'editHouse'){
+    fetchHomeData();
+  }
+};
 function closeModal() {
   currentModalName.value = null;
   modalProps.value = null;
@@ -173,14 +186,57 @@ onMounted(async () => {
     </div>
   </div>
 
-  <div v-if="user.isRegistered" class="h-100">
-    <h2 class="text-lg mx-4 mt-4">계약 만료 정보</h2>
-    <div class="mx-4 text-xs text-gray-400">다음 만료일까지</div>
-    <InfoCard :title="'계약 만료일'" :content="'2024-08-15'" :sub-content="'5일 남음'" />
-    <h2 class="text-lg mx-4 mt-4">시세 변화</h2>
-    <div class="mx-4 text-xs text-gray-400">시장 시세 업데이트</div>
-    <InfoCard :title="'시세 변화'" :content="'₩300,000,000'" :sub-content="'+5% (지난주 대비)'" />
+  <div v-if="isLoading" class="h-100 flex items-center justify-center">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+</div>
+<div v-else-if="homeData" class="overflow-y-auto pb-20">
+  <!-- 등록된 집 정보 -->
+  <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
+  <div class="mx-4 text-xs text-gray-400">{{ homeData.buildingName || '등록된 아파트' }}</div>
+  <InfoCard :title="'등록된 아파트'" :content="homeData.buildingName || '정보 없음'" :sub-content="homeData.buildingNumber ? `${homeData.buildingNumber}` : '동 정보 없음'" />
+
+  <!-- 계약 정보 -->
+  <h2 class="text-lg mx-4 mt-4">계약 정보</h2>
+  <div class="mx-4 text-xs text-gray-400">계약 기간</div>
+  <InfoCard
+    :title="'계약 기간'"
+    :content="`${homeData.contractStart || '시작일 없음'} ~ ${homeData.contractEnd || '종료일 없음'}`"
+    :sub-content="calculateRemainingDays(homeData.contractEnd)"
+  />
+
+  <!-- 임대료 정보 -->
+  <h2 class="text-lg mx-4 mt-4">임대료 정보</h2>
+  <div class="mx-4 text-xs text-gray-400">계약 조건</div>
+  <InfoCard
+    :title="getRentTypeText(homeData.rentType)"
+    :content="formatRentAmount(homeData)"
+    :sub-content="getRentSubContent(homeData)"
+  />
+
+  <!-- 나의 집 정보 수정하기 버튼 -->
+  <div class="mx-4 mt-4">
+    <button
+      class="w-full py-3 bg-kb-yellow-positive text-white text-sm rounded-md shadow-inner cursor-pointer"
+      @click="openModal('editHouse', {
+        type: 'edit',
+        address: homeData.buildingName || '',
+        contractDate: homeData.contractStart || '',
+      })"
+    >
+      나의 집 정보 수정하기
+    </button>
   </div>
+
+  <!-- 알림 설정 버튼 -->
+  <div class="mx-4 mt-4">
+    <button
+      class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
+      @click="movePage.mypageStetting()"
+    >
+      알림 설정
+    </button>
+  </div>
+</div>
   <div v-else class="h-100 flex flex-col items-center justify-center">
     <div class="font-pretendard-bold text-xl">나의 집을 등록하고 정보를 받아보세요!</div>
     <button
@@ -190,7 +246,9 @@ onMounted(async () => {
       나의 집 등록하기
     </button>
   </div>
-  <div class="mx-4 mt-4">
+
+  <!-- 알림 설정 버튼 (하단 고정) - 집 정보가 없을 때만 표시 -->
+  <div v-if="!homeData" class="fixed bottom-20 left-4 right-4 z-10">
     <button
       class="w-full py-3 bg-kb-ui-09 text-md rounded-md shadow-inner cursor-pointer"
       @click="movePage.mypageStetting()"
@@ -198,13 +256,14 @@ onMounted(async () => {
       알림 설정
     </button>
   </div>
+
   <ToastList />
   <Section />
 
   <component
     :is="currentModalName ? modalMap[currentModalName] : null"
     v-bind="modalProps"
-    @close="closeModal"
     @nameChanged="handleNameChanged"
+    @close="handleModalClose"
   ></component>
 </template>
