@@ -14,11 +14,7 @@ import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
 import ToastList from "@/components/common/ToastList.vue";
 
-<<<<<<< HEAD
 import { markRaw, ref, computed, onMounted } from "vue";
-=======
-import { markRaw, ref, reactive, onMounted } from "vue";
->>>>>>> dev
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
 import { authStore } from "@/stores/authStore";
@@ -63,6 +59,9 @@ type ModalPropsMap = {
     contractDate?: never;
   };
 };
+
+const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
 const isOpenDrawer = ref(false);
 const currentModalName = ref<null | ModalNames>(null);
 const modalProps = ref<ModalPropsMap[ModalNames] | null>(null);
@@ -75,6 +74,12 @@ const user = computed(() => ({
   isRegistered: false,
   imagePath: auth.member.profileImg || defaultProfile,
 }));
+const profileImgUrl = computed(() => {
+  const path = auth.member.profileImg;
+  if (!path) return defaultProfile;
+  return `${fileBaseUrl}${path}`;
+});
+console.log("profileImgUrl: ", profileImgUrl);
 
 const isLoading = ref(false);
 const homeData = ref<HomeRegisterResponseDTO | null>(null);
@@ -123,7 +128,7 @@ onMounted(async () => {
     >
       <div class="relative">
         <div class="w-25">
-          <ProfileImage :src="auth.member.profileImg || defaultProfile" />
+          <ProfileImage :src="profileImgUrl" />
         </div>
         <button
           class="absolute bottom-0 right-0 cursor-pointer p-1 bg-gray-300 rounded-full"

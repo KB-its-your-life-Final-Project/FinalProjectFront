@@ -43,6 +43,8 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   try {
     const { data } = await api.uploadProfileImageUsingPost(formData);
     console.log("data: ", data);
+    auth.member.profileImg = data.data?.profileImg;
+    console.log("auth.member: ", auth.member);
     return { success: true, message: "프로필이 변경되었습니다" };
   } catch (error: unknown) {
     console.error("업로드 실패", error);

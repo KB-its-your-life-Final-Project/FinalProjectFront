@@ -36,7 +36,7 @@ import {
   ApiResponseSafeReportResponseDto,
   ApiResponseSafetyDTO,
   ApiResponseVoid,
-  ApiResponseWeatherDTO,
+  ApiResponseWeather,
   ChangeRequestDTO,
   EstateWishlistRequestDTO,
   HomeRegisterRequestDTO,
@@ -305,19 +305,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드(regionCd)로 해당 지역의 편의시설(예: 자전거 대수) 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name GetFacilityCountsByRegionCdUsingGet
-   * @summary 법정동코드로 편의시설 수 조회
+   * @summary getFacilityCountsByRegionCd
    * @request GET:/api/localinfo/facilities-count
    */
   getFacilityCountsByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
@@ -329,19 +326,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드(regionCd)로 해당 지역의 병원 수 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name GetHospitalCountsByRegionCdUsingGet
-   * @summary 법정동코드로 병원 수 조회
+   * @summary getHospitalCountsByRegionCd
    * @request GET:/api/localinfo/hospitals-count
    */
   getHospitalCountsByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
@@ -353,19 +347,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드(regionCd)로 해당 지역의 인구 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name GetPopulationByRegionCdUsingGet
-   * @summary 법정동코드로 인구 조회
+   * @summary getPopulationByRegionCd
    * @request GET:/api/localinfo/population
    */
   getPopulationByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
@@ -377,25 +368,23 @@ export class Api<
       ...params,
     });
   /**
-   * @description 위도/경도(latitude, longitude)를 이용하여 법정동 주소 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name ReverseGeocodeUsingGet
-   * @summary 좌표로 법정동 주소 조회
+   * @summary reverseGeocode
    * @request GET:/api/localinfo/reverse-geocode
    */
   reverseGeocodeUsingGet = (
     query: {
       /**
-       * 위도 (Latitude)
+       * latitude
        * @format double
-       * @example 37.5665
        */
       latitude: number;
       /**
-       * 경도 (Longitude)
+       * longitude
        * @format double
-       * @example 126.978
        */
       longitude: number;
     },
@@ -408,19 +397,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드(regionCd)로 해당 지역의 안전시설(안심벨) 수 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name GetSafetyCountsByRegionCdUsingGet
-   * @summary 법정동코드로 안전시설 수 조회
+   * @summary getSafetyCountsByRegionCd
    * @request GET:/api/localinfo/safety-count
    */
   getSafetyCountsByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
@@ -432,19 +418,16 @@ export class Api<
       ...params,
     });
   /**
-   * @description 키워드로 지역을 검색합니다.
+   * No description
    *
-   * @tags 지역 정보 API
+   * @tags local-info-controller
    * @name SearchRegionsUsingGet
-   * @summary 지역 검색
+   * @summary searchRegions
    * @request GET:/api/localinfo/search
    */
   searchRegionsUsingGet = (
     query: {
-      /**
-       * 검색 키워드
-       * @example "강남"
-       */
+      /** keyword */
       keyword: string;
     },
     params: RequestParams = {},
@@ -456,24 +439,21 @@ export class Api<
       ...params,
     });
   /**
-   * @description 법정동코드로 날씨 정보를 조회합니다.
+   * No description
    *
-   * @tags 지역 정보 API
-   * @name GetWeatherByRegionNameUsingGet
-   * @summary 법정동코드로 날씨 조회
+   * @tags local-info-controller
+   * @name GetWeatherByRegionCdUsingGet
+   * @summary getWeatherByRegionCd
    * @request GET:/api/localinfo/weather
    */
-  getWeatherByRegionNameUsingGet = (
+  getWeatherByRegionCdUsingGet = (
     query: {
-      /**
-       * 지역 법정동 코드
-       * @example "1168010800"
-       */
+      /** regionCd */
       regionCd: string;
     },
     params: RequestParams = {},
   ) =>
-    this.request<ApiResponseWeatherDTO, void>({
+    this.request<ApiResponseWeather, void>({
       path: `/api/localinfo/weather`,
       method: "GET",
       query: query,

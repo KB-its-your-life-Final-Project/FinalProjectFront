@@ -359,8 +359,9 @@ export interface LocalInfoResponseDTO {
   /** @format int32 */
   gridY?: number;
   locataddNm?: string;
-  region?: string;
   regionCd?: string;
+  sggCd?: string;
+  sidoCd?: string;
 }
 
 /** LoginRequestDTO */
@@ -406,6 +407,8 @@ export interface PopulationDTO {
   populationYouth?: number;
   regionCd?: string;
   regionName?: string;
+  /** @format double */
+  youthRatio?: number;
 }
 
 /** RecentSafeReportResponseDto */
@@ -638,19 +641,25 @@ export interface ViolationStatus {
   violationStatus?: string;
 }
 
-/** WeatherDTO */
-export interface WeatherDTO {
+/** Weather */
+export interface Weather {
+  baseDate?: string;
+  baseTime?: string;
+  fcstDate?: string;
+  fcstTime?: string;
   /** @format int32 */
   gridX?: number;
   /** @format int32 */
   gridY?: number;
-  locataddNm?: string;
+  /** @format int64 */
+  id?: number;
   /** @format int32 */
   maxTemperature?: number;
   /** @format int32 */
   minTemperature?: number;
   region?: string;
-  regionCd?: string;
+  sggCd?: string;
+  sidoCd?: string;
   skyCondition?: string;
   /** @format int32 */
   temperature?: number;
@@ -893,11 +902,11 @@ export interface ApiResponseVoid {
   success?: boolean;
 }
 
-/** ApiResponse«WeatherDTO» */
-export interface ApiResponseWeatherDTO {
+/** ApiResponse«Weather» */
+export interface ApiResponseWeather {
   /** @format int32 */
   code?: number;
-  data?: WeatherDTO;
+  data?: Weather;
   message?: string;
   success?: boolean;
 }
