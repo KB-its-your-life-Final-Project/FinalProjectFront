@@ -30,3 +30,6 @@ coverage
 
 *.tsbuildinfo
 .env
+
+# Auto-generated API files
+src/api/autoLoad/

@@ -1,190 +1,139 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { LocalInfoResponseDTO } from "@/api/autoLoad/data-contracts";
+import lighthouseIcon from "@/assets/imgs/lighthouse.png";
 
+// 상수 정의
+const PLACEHOLDER_TEXT = "원하는 지역을 검색해주세요";
+const MIN_SEARCH_LENGTH = 2;
+
+// API 인스턴스
 const api = new Api();
 
-// 부모 컴포넌트로 전달할 이벤트 정의
+// 이벤트 정의
 const emit = defineEmits<{
   regionSelected: [region: LocalInfoResponseDTO];
 }>();
 
-// 지역 검색 API 호출
-const searchRegions = async (keyword: string) => {
-  try {
-    const response = await api.searchRegionsUsingGet({ keyword: keyword }, {});
-    return response.data?.data || [];
-  } catch (error) {
-    console.error("지역 검색 API 오류:", error);
-    throw error;
-  }
-};
-
-//검색input
+// 반응형 상태
 const searchInput = ref("");
-
-//검색 input  클리어
-const clearSearch = () => {
-  searchInput.value = "";
-  searchResults.value = [];
-  loading.value = false;
-  searchKeyword.value = "";
-};
-
-const xiconShow = ref(false);
-//x표시 보여주기
-watch(searchInput, () => {
-  if (searchInput.value.length > 0) {
-    xiconShow.value = true;
-  } else if (searchInput.value.length == 0) {
-    xiconShow.value = false;
-  }
-});
-
 const searchResults = ref<LocalInfoResponseDTO[]>([]);
-const searchKeyword = ref("");
 const loading = ref(false);
+const isSelecting = ref(false);
+const dropdownVisible = ref(false); // 드롭다운 표시 여부를 명시적으로 제어
 
-// 실제 API 호출 함수
-const fetchRegionData = async (keyword: string): Promise<LocalInfoResponseDTO[]> => {
+// 계산된 속성
+const showNoResults = computed(
+  () =>
+    dropdownVisible.value &&
+    searchResults.value.length === 0 &&
+    searchInput.value.trim().length >= MIN_SEARCH_LENGTH &&
+    !loading.value,
+);
+
+// 검색 API 호출 함수
+const searchRegions = async (keyword: string) => {
+  if (keyword.trim().length < MIN_SEARCH_LENGTH) {
+    searchResults.value = [];
+    dropdownVisible.value = false;
+    return;
+  }
+
   try {
-    // 실제 API 호출
-    const results = await searchRegions(keyword);
-    console.log("API 호출 성공:", results);
-    return results;
+    loading.value = true;
+    dropdownVisible.value = true;
+    const response = await api.searchRegionsUsingGet({ keyword });
+    searchResults.value = response.data?.data || [];
   } catch (error) {
     console.error("지역 검색 API 오류:", error);
-    return [];
-  }
-};
-
-// 검색 입력 핸들러
-const handleInput = async () => {
-  searchKeyword.value = searchInput.value;
-
-  if (searchKeyword.value.trim() === "") {
-    searchResults.value = [];
-    return;
-  }
-
-  // 자동완성 비활성화 - 엔터키나 클릭으로만 검색
-  // 로딩 상태 시작
-  // loading.value = true;
-
-  // try {
-  //   // 실제 API 호출
-  //   const results = await fetchRegionData(searchKeyword.value);
-  //   searchResults.value = results;
-  // } catch (error) {
-  //   console.error("검색 오류:", error);
-  //   searchResults.value = [];
-  // } finally {
-  //   loading.value = false;
-  // }
-};
-
-// 검색 실행 함수 (엔터키나 클릭 시 호출)
-const executeSearch = async () => {
-  if (searchKeyword.value.trim() === "") {
-    searchResults.value = [];
-    return;
-  }
-
-  // 로딩 상태 시작
-  loading.value = true;
-
-  try {
-    // 실제 API 호출
-    const results = await fetchRegionData(searchKeyword.value);
-    searchResults.value = results;
-  } catch (error) {
-    console.error("검색 오류:", error);
     searchResults.value = [];
   } finally {
     loading.value = false;
   }
 };
 
-// 엔터키 핸들러
-const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === "Enter") {
-    if (searchResults.value.length > 0) {
-      // 첫 번째 결과 선택
-      selectRegion(searchResults.value[0]);
-    } else {
-      // 검색 실행
-      executeSearch();
-    }
+// 검색 입력 감시 - 디바운스 없이 즉시 검색
+watch(searchInput, (newKeyword: string) => {
+  if (isSelecting.value) return;
+
+  if (newKeyword.trim().length < MIN_SEARCH_LENGTH) {
+    searchResults.value = [];
+    dropdownVisible.value = false;
+    return;
   }
+
+  // 디바운스 없이 즉시 API 호출
+  searchRegions(newKeyword);
+});
+
+// 검색 초기화
+const clearSearch = () => {
+  searchInput.value = "";
+  searchResults.value = [];
+  dropdownVisible.value = false;
 };
 
-// 지역 선택 핸들러
+// 지역 선택
 const selectRegion = (region: LocalInfoResponseDTO) => {
-  console.log("선택된 지역:", region);
+  if (isSelecting.value) return;
 
-  // 부모 컴포넌트로 선택된 지역 정보 전달
+  isSelecting.value = true;
+  searchResults.value = [];
+  dropdownVisible.value = false; // 선택 시 드롭다운 명시적으로 숨김
   emit("regionSelected", region);
+  searchInput.value = region.locataddNm || "";
 
-  // 검색바 초기화
-  clearSearch();
+  setTimeout(() => {
+    isSelecting.value = false;
+  }, 300);
 };
 </script>
-
 <template>
-  <div class="relative">
-    <!-- 검색 입력창 -->
-    <div
-      class="flex items-center rounded-xl border-2 border-kb-yellow bg-white shadow-sm px-4 py-2"
-    >
-      <input
-        v-model="searchInput"
-        @input="handleInput"
-        @keydown="handleKeydown"
-        @click="executeSearch"
-        :placeholder="'원하는 지역을 검색해주세요'"
-        type="text"
-        class="w-full focus:outline-none cursor-pointer"
-      />
-      <font-awesome-icon
-        v-if="xiconShow"
-        :icon="['far', 'circle-xmark']"
-        class="text-kb-ui-06 ml-[0.5rem] cursor-pointer hover:text-kb-ui-08"
-        @click="clearSearch()"
-      />
-    </div>
+  <div
+    class="absolute left-1/2 bottom-0 translate-y-1/2 -translate-x-1/2 w-[85%] bg-kb-ui-11 flex items-center px-[1rem] py-[0.5rem] rounded-full shadow-md"
+  >
+    <img
+      :src="lighthouseIcon"
+      alt="검색 아이콘"
+      class="h-full w-auto max-h-[2rem] mr-[0.5rem] object-contain"
+    />
+    <input
+      v-model="searchInput"
+      :placeholder="PLACEHOLDER_TEXT"
+      class="w-full font-italic focus:outline-none placeholder-kb-ui-07 text-sm"
+      type="text"
+      @click="clearSearch"
+    />
+    <font-awesome-icon
+      v-if="searchInput.length > 0"
+      :icon="['far', 'circle-xmark']"
+      class="text-kb-ui-06 ml-[0.5rem] cursor-pointer hover:text-kb-ui-08"
+      @click="clearSearch"
+    />
 
-    <!-- 로딩 상태 -->
+    <!-- 검색 결과 드롭다운 -->
     <div
-      v-if="loading"
+      v-if="loading || searchResults.length > 0 || showNoResults"
       class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+      :class="{ 'max-h-60 overflow-y-auto': searchResults.length > 0 }"
     >
-      <div class="px-4 py-3 text-gray-500 text-center">검색중...</div>
-    </div>
+      <div v-if="loading" class="px-4 py-3 text-gray-500 text-center">검색중...</div>
 
-    <!-- 자동완성 드롭다운 -->
-    <div
-      v-if="searchResults.length > 0"
-      class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
-    >
-      <div
-        v-for="result in searchResults"
-        :key="result.regionCd"
-        class="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-        @click="selectRegion(result)"
-      >
-        <div class="font-medium text-kb-ui-02">
-          {{ result.locataddNm }}
+      <template v-else-if="searchResults.length > 0">
+        <div
+          v-for="result in searchResults"
+          :key="result.regionCd"
+          class="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+          @click="selectRegion(result)"
+        >
+          <div class="font-medium text-kb-ui-02">{{ result.locataddNm }}</div>
         </div>
-      </div>
-    </div>
+      </template>
 
-    <!-- 검색 결과가 없을 때 -->
-    <div
-      v-if="searchInput && !loading && searchResults.length === 0"
-      class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
-    >
-      <div class="px-4 py-3 text-kb-ui-04 text-center">검색 결과가 없습니다.</div>
+      <div v-else-if="showNoResults" class="px-4 py-3 text-kb-ui-04 text-center">
+        검색 결과가 없습니다.
+      </div>
     </div>
   </div>
 </template>
