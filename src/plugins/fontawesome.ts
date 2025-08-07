@@ -27,6 +27,8 @@ import {
   faFirstAid,
   faHeart,
   faCross,
+  faLocationDot,
+  faBuilding,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
@@ -72,6 +74,8 @@ library.add(
   faHeart,
   faFirstAid,
   faCross,
+  faLocationDot,
+  faBuilding,
 );
 
 export { FontAwesomeIcon };

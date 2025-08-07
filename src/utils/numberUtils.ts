@@ -68,9 +68,29 @@ export function validateBudgetInput(value: string, maxValue = 999999) {
     return {
       isValid: false,
       value: maxValue.toString(),
-      error: `최대 ${maxValue}까지 입력 가능합니다.`
+      error: `최대 ${maxValue}까지 입력 가능합니다.`,
     };
   }
 
   return { isValid: true, value, error: null };
+}
+
+/**
+ * 숫자를 억, 만원 단위로 변경
+ * @param amount - 금액(만원 단위)
+ * @returns x,xxx억 y,yyy만원
+ */
+export function formatAmount(amount?: number): string {
+  if (amount === undefined || isNaN(amount)) return "-";
+
+  const billion = Math.floor(amount / 10000);
+  const million = amount % 10000;
+
+  if (billion > 0 && million > 0) {
+    return `${billion}억 ${million.toLocaleString()}만원`;
+  } else if (billion > 0) {
+    return `${billion}억`;
+  } else {
+    return `${million.toLocaleString()}만원`;
+  }
 }
