@@ -15,23 +15,34 @@ import SwiperNavigation from "@/components/common/SwiperNavigation.vue";
 import { SwiperSlide } from "swiper/vue";
 
 import { Api } from "@/api/autoLoad/Api";
-import { RegionWishlistResponseDTO } from "@/api/autoLoad/data-contracts";
-import { useToast } from "@/utils/useToast";
+import {
+  EstateWishlistResponseDTO,
+  RegionWishlistResponseDTO,
+  SearchHistoryDTO,
+} from "@/api/autoLoad/data-contracts";
 import ToastList from "@/components/common/ToastList.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faSmile } from "@fortawesome/free-solid-svg-icons";
 
 const api = new Api();
 
 // 관심 지역 리스트
 const favoriteRegions: Ref<{ name: string; liked: boolean; regionCd: string }[]> = ref([]);
-const toast = useToast();
 
-const favoriteApts = [
-  /*임의의 데이터입니다.*/
-  { id: 1, name: "아파트1", address: "3 구의역 필루시드", price: "₩200,000,000" },
-  { id: 2, name: "아파트2", address: "4 성수역 필루시드", price: "₩250,000,000" },
-  { id: 3, name: "아파트3", address: "5 뚝섬역 필루시드", price: "₩180,000,000" },
-];
+const favoriteBuildings: Ref<
+  {
+    name?: string | undefined;
+    type: number;
+    jibunAddr: string;
+    liked: boolean;
+    estateId?: number;
+    amount?: number | undefined;
+    deposit?: number | undefined;
+    monthlyRent?: number | undefined;
+  }[]
+> = ref([]);
 
+const searchHistories: Ref<{ keyword: string; type: number }[]> = ref([]);
 onMounted(async () => {
   try {
     const regionRes = await api.getRegionsByMemberIdUsingGet();
@@ -42,40 +53,43 @@ onMounted(async () => {
       regionCd: item.regionCd || "",
     }));
   } catch (error) {
-    console.error("관심 데이터 불러오기 실패:", error);
+    console.error("관심 지역 데이터 불러오기 실패:", error);
+  }
+  try {
+    const buildingRes = await api.getEstateIdsByMemberIdUsingGet();
+    const buildings = buildingRes.data.data || [];
+    favoriteBuildings.value = buildings.map((item: EstateWishlistResponseDTO) => ({
+      name: item.buildingName,
+      type: item.buildingType || 5,
+      jibunAddr: item.jibunAddr || "",
+      deposit: item.deposit,
+      monthlyRent: item.monthlyRent,
+      amount: item.amount,
+      liked: true,
+      estateId: item.estateId,
+    }));
+  } catch (error) {
+    console.error("관심 지역 데이터 불러오기 실패:", error);
+  }
+
+  try {
+    const res = await api.getSearchHistoryUsingGet();
+    const datas = res.data.data || [];
+    searchHistories.value = datas.map((item: SearchHistoryDTO) => ({
+      keyword: item.keyword || "",
+      type: item.type || 0,
+    }));
+  } catch (error) {
+    console.error("검색 기록 불러오기 실패", error);
   }
 });
-
-const handleToggle = (
-  region: { liked: boolean; name: string },
-  result: { success: boolean; liked: boolean },
-) => {
-  const toast = useToast();
-
-  if (result.success) {
-    region.liked = result.liked;
-    toast.addToast(
-      toast.createToast(
-        `${region.name} : 관심 지역${result.liked ? "에 추가" : "에서 제거"}되었습니다.`,
-        "success",
-      ),
-    );
-  } else {
-    toast.addToast(
-      toast.createToast(
-        `${region.name} : ${result.liked ? "해제" : "등록"}에 실패했습니다. 다시 시도해주세요.`,
-        "error",
-      ),
-    );
-  }
-};
 </script>
 
 <template>
   <div class="pb-24">
     <Header class="h-30 mb-10" :headerShowtype="mainRouteName.wishlist">
       <div class="px-4 mt-3">
-        <LogoSearchBar placeholder="지역 또는 단지 검색" />
+        <LogoSearchBar placeholder="지역 또는 매물 검색" />
       </div>
     </Header>
     <SubjectSection title="관심 지역">
@@ -89,39 +103,52 @@ const handleToggle = (
         >
           <WishButton
             targetType="region"
-            :liked="region.liked"
-            @toggle="(result) => handleToggle(region, result)"
             :regionCd="region.regionCd"
+            :liked="true"
+            :name="region.name"
+            @click.stop
           />
         </ListItem>
       </ul>
-      <Nodata v-else subtitle="지역"></Nodata>
+      <Nodata v-else subtitle="관심 지역"></Nodata>
     </SubjectSection>
 
-    <SubjectSection title="관심 단지">
-      <div class="flex overflow-x-auto mt-3"></div>
-      <SwiperNavigation
-        :breakpoints="{
-          0: { slidesPerView: 2 },
-          640: { slidesPerView: 3 },
-        }"
-        :spaceBetween="16"
-      >
-        <SwiperSlide v-for="apt in favoriteApts" :key="apt.id">
-          <CardItem class="mx-auto" :apt="apt"></CardItem>
-        </SwiperSlide>
-      </SwiperNavigation>
+    <SubjectSection title="관심 매물">
+      <div class="mt-3">
+        <SwiperNavigation
+          v-if="favoriteBuildings.length > 0"
+          :breakpoints="{
+            0: { slidesPerView: 2 },
+            640: { slidesPerView: 3 },
+          }"
+          :spaceBetween="16"
+        >
+          <SwiperSlide v-for="building in favoriteBuildings" :key="building.jibunAddr">
+            <CardItem class="mx-auto" :building="building"></CardItem>
+          </SwiperSlide>
+        </SwiperNavigation>
+        <Nodata v-else subtitle="관심 매물"></Nodata>
+      </div>
     </SubjectSection>
 
-    <SubjectSection title="최근 본 단지">
-      <ul class="space-y-2">
-        <ListItem name="YY아파트 5층" subName="₩200,000,000">
-          <div class="rounded-full bg-gray-300 aspect-square p-1">Img</div>
-        </ListItem>
-        <ListItem name="ZZ아파트 1층" subName="₩300,000,000">
-          <div class="rounded-full bg-gray-300 aspect-square p-1">Img</div>
+    <SubjectSection title="검색 기록">
+      <ul v-if="true">
+        <ListItem v-for="(item, index) in searchHistories" :key="index" :name="item.keyword">
+          <div class="flex justify-center items-center">
+            <font-awesome-icon
+              v-if="item.type === 1"
+              :icon="['fas', 'location-dot']"
+              class="rounded-full w-4 h-4 bg-kb-ui-08 p-1"
+            />
+            <font-awesome-icon
+              v-else
+              :icon="['fas', 'building']"
+              class="rounded-full w-8 h-8 bg-kb-ui-08"
+            />
+          </div>
         </ListItem>
       </ul>
+      <Nodata v-else subtitle="최근 검색 기록"></Nodata>
     </SubjectSection>
     <Section />
   </div>
