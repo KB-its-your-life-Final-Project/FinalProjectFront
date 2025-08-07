@@ -28,7 +28,7 @@ export const HomeCardTypes: HomeCardType[] = [
   },
   {
     title: "동네.zip",
-    info: "인기 많은 곳은 어디일까?",
+    info: "살기 좋은 동네는 어디일까?",
     imgSrc: imgFind,
     name: mainRouteName.localInfo,
   },
