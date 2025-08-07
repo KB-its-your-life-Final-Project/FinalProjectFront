@@ -22,7 +22,6 @@ import {
 } from "@/api/autoLoad/data-contracts";
 import ToastList from "@/components/common/ToastList.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faSmile } from "@fortawesome/free-solid-svg-icons";
 
 const api = new Api();
 
@@ -73,7 +72,7 @@ onMounted(async () => {
   }
 
   try {
-    const res = await api.getSearchHistoryUsingGet();
+    const res = await api.getSearchHistoryUsingGet({ limit: 3 });
     const datas = res.data.data || [];
     searchHistories.value = datas.map((item: SearchHistoryDTO) => ({
       keyword: item.keyword || "",
@@ -143,7 +142,7 @@ onMounted(async () => {
             <font-awesome-icon
               v-else
               :icon="['fas', 'building']"
-              class="rounded-full w-8 h-8 bg-kb-ui-08"
+              class="rounded-full w-4 h-4 bg-kb-ui-08 p-1"
             />
           </div>
         </ListItem>
