@@ -10,7 +10,7 @@ const mainRouteMap: Record<string, () => Promise<Component>> = {
   mapSearch: () => import("@/pages/mapSearch/MapSearch.vue"),
 
   //찜
-  myLike: () => import("@/pages/myLike/MyLike.vue"),
+  wishlist: () => import("@/pages/wishlist/WishlistPage.vue"),
 
   //메인 메뉴
   mainMenu: () => import("@/pages/mainMenu/MainMenu.vue"),
@@ -39,7 +39,7 @@ const mainRouteMap: Record<string, () => Promise<Component>> = {
 const mainRouteName = {
   homeMain: "homeMain",
   mapSearch: "mapSearch",
-  myLike: "myLike",
+  wishlist: "wishlist",
   mainMenu: "mainMenu",
   safeReport: "safeReport",
   myAlarm: "myAlarm",
@@ -65,9 +65,10 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     component: mainRouteMap.mapSearch,
   },
   {
-    path: "/myLike",
-    name: mainRouteName.myLike,
-    component: mainRouteMap.myLike,
+    path: "/wishlist",
+    name: mainRouteName.wishlist,
+    component: mainRouteMap.wishlist,
+    meta: { requiresAuth: true },
   },
   {
     path: "/mainMenu",

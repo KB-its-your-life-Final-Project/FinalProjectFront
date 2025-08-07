@@ -15,6 +15,7 @@ const jibunAddress = ref(store.formData.jibunAddress);
 const dongName = ref(store.formData.dongName);
 const lat = ref<number>(store.formData.lat || 0);
 const lng = ref<number>(store.formData.lng || 0);
+const naverReady = ref(false);
 const showAddressLayer = ref(false);
 const showBuildingNameInputModal = ref(false);
 const showBuildingNotFoundPage = ref(false);
@@ -30,7 +31,7 @@ const isButtonEnabled = computed(() => {
 });
 
 // Naver Maps API 호출
-onMounted(() => {
+onMounted(async () => {
   // 검색바 초기화 (store에 값이 있으면 유지)
   if (!store.formData.buildingName) {
     buildingName.value = "";
@@ -54,6 +55,7 @@ onMounted(() => {
   // Naver Maps API 로드
   try {
     await mapUtil.loadNaverMapScript();
+    naverReady.value = true;
   } catch (error) {
     console.error('네이버 지도 API 로드 실패:', error);
   }
@@ -93,7 +95,7 @@ function handleAddressComplete(payload: {
   });
 
   // 좌표 변환
-  if (roadAddress.value && jibunAddress.value) {
+  if (roadAddress.value && naverReady.value && jibunAddress.value) {
     searchAddressToCoordinate(jibunAddress.value);
   }
 }
@@ -109,19 +111,35 @@ function handleAddressLayerClose() {
   }
 }
 
-async function searchAddressToCoordinate(address: string) {
-  try {
-    const result = await mapUtil.searchAddressToCoordinate(address);
-    console.log("✅ 위도:", result.latlng.lat(), "경도:", result.latlng.lng());
+function searchAddressToCoordinate(address: string) {
+  if (!window.naver?.maps?.Service) {
+    alert("네이버 지도 API가 아직 로드되지 않았습니다.");
+    return;
+  }
+
+  naver.maps.Service.geocode({ query: address }, function (status, response) {
+    if (status !== naver.maps.Service.Status.OK) {
+      alert("주소를 좌표로 변환하는 데 실패했습니다.");
+      return;
+    }
+
+    const result = response.v2;
+    if (result.meta.totalCount === 0) {
+      alert("DB에 해당하는 주소 데이터가 없습니다.");
+      return;
+    }
+
+    const { x, y } = result.addresses[0];
+    const latVal = parseFloat(y);
+    const lngVal = parseFloat(x);
+
+    console.log("✅ 위도:", latVal, "경도:", lngVal);
 
     store.updateFormData({
-      lat: result.latlng.lat(),
-      lng: result.latlng.lng(),
+      lat: latVal,
+      lng: lngVal,
     });
-  } catch (error) {
-    console.error("주소를 좌표로 변환하는 데 실패했습니다:", error);
-    alert("주소를 좌표로 변환하는 데 실패했습니다.");
-  }
+  });
 }
 
 function next() {
@@ -155,7 +173,6 @@ function handleAddressSelected(addressData: {
   longitude: number | undefined;
   jibunAddr: string | undefined;
 }) {
-  console.log("🏢 SelectAddressPage에서 선택된 건물 데이터:", addressData);
 
   // 선택된 건물명 설정
   buildingName.value = addressData.buildingName || addressData.fullAddress;
@@ -173,15 +190,6 @@ function handleAddressSelected(addressData: {
     dongName: addressData.dong || '',
     lat: addressData.latitude, // 서버에서 받은 위도
     lng: addressData.longitude  // 서버에서 받은 경도
-  });
-
-  console.log("🎯 Store에 저장된 데이터:", {
-    buildingName: store.formData.buildingName,
-    roadAddress: store.formData.roadAddress,
-    jibunAddress: store.formData.jibunAddress,
-    dongName: store.formData.dongName,
-    lat: store.formData.lat,
-    lng: store.formData.lng
   });
 
   showBuildingNotFoundPage.value = false;
