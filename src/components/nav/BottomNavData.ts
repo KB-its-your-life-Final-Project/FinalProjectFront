@@ -19,7 +19,7 @@ const bottomNavList: BottomNavList = {
   navBarMenus: [
     { title: "홈", url: "/home", icon: ["fas", "house"] },
     { title: "지도", url: "/mapSearch", icon: ["far", "map"] },
-    { title: "내 찜 목록", url: "/myLike", icon: ["far", "star"] },
+    { title: "관심 목록", url: "/wishlist", icon: ["far", "star"] },
     { title: "전체 메뉴", url: "/mainMenu", icon: ["fas", "bars"] },
   ],
   withoutBottomNavPages: [
