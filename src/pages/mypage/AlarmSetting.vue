@@ -7,18 +7,13 @@ import TermsAndConditions from "./_component/TermsAndConditions.vue";
 import { myPageRouteName } from "@/router/mypageRoutes";
 import { useAlarmStore } from "@/stores/alarmStore";
 
-// 스토어 사용
 const alarmStore = useAlarmStore();
 
-// 알림 설정 변경 핸들러
 const handleAlarmSettingChange = async (type: number, value: boolean) => {
   await alarmStore.updateAlarmSetting(type, value);
 };
 
-// 컴포넌트 마운트 시 알림 설정 조회
 onMounted(() => {
-  // 스토어에서 알림 설정 초기화 (실제로는 백엔드에서 조회)
-  // 현재는 기본값으로 설정
 });
 
 // 약관 내용
@@ -41,8 +36,14 @@ const content2 =
   <!-- 알림 설정 목록 -->
   <div v-else class="mx-4 mt-10">
     <AlarmSettingItem
+      :main="'계약 단계별 알림'"
+      :sub="'계약 진행 단계별 상태 알림'"
+      :setting="alarmStore.alarmSettings.contractStage"
+      @update:setting="(value) => handleAlarmSettingChange(1, value)"
+    />
+    <AlarmSettingItem
       :main="'시세변화 알림'"
-      :sub="'주변 시세 변동, 권리관계 변동 알림'"
+      :sub="'관심 건물 거래 가격 변동 알림'"
       :setting="alarmStore.alarmSettings.marketChange"
       @update:setting="(value) => handleAlarmSettingChange(2, value)"
     />

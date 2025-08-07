@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
+import { computed } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import { useAlarmStore } from "@/stores/alarmStore";
 import type { AlarmResponseDto } from "@/api/autoLoad/data-contracts";
 import CardItem from './CardItem.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Header from "@/components/layout/header/Header.vue";
+import { useAlarmPolling } from "@/composables/useAlarmPolling";
 
 // 스토어 사용
 const alarmStore = useAlarmStore();
@@ -25,6 +26,8 @@ const filteredAlarms = computed(() => {
 // 알림 타입에 따른 텍스트 반환
 const getAlarmTypeText = (type: number): string => {
   switch (type) {
+    case 1:
+      return '계약 단계별 알림';
     case 2:
       return '시세변화 알림';
     case 3:
@@ -34,31 +37,32 @@ const getAlarmTypeText = (type: number): string => {
   }
 };
 
-// 알림 타입에 따른 FontAwesome 아이콘 반환
-const getAlarmIcon = (type: number): string => {
+const getAlarmIcon = (type: number): string[] => {
   switch (type) {
+    case 1:
+      return ['fas', 'clipboard'];
     case 2:
-      return 'fa-solid fa-chart-line';
+      return ['fas', 'chart-bar'];
     case 3:
-      return 'fa-solid fa-house';
+      return ['fas', 'house'];
     default:
-      return 'fa-solid fa-bell';
+      return ['fas', 'bell'];
   }
 };
 
-// 알림 타입에 따른 아이콘 색상 반환
 const getAlarmIconColor = (type: number): string => {
   switch (type) {
+    case 1:
+      return 'bg-yellow-200'; // 계약 단계별
     case 2:
-      return 'bg-blue-400'; // 파란색 (시세변화)
+      return 'bg-blue-200'; // 시세변화
     case 3:
-      return 'bg-orange-400'; // 주황색 (계약만료)
+      return 'bg-green-200'; // 계약만료
     default:
-      return 'bg-gray-300'; // 회색
+      return 'bg-gray-200';
   }
 };
 
-// 날짜 포맷팅 (이미지와 동일한 형식)
 const formatDate = (dateString: string): string => {
   if (!dateString) {
     return '방금 전';
@@ -102,17 +106,15 @@ const markAsRead = async (alarm: AlarmResponseDto) => {
   }
 };
 
-// 알림 삭제 (X 버튼 클릭 시)
-const deleteAlarm = async (alarm: AlarmResponseDto) => {
+const handleDeleteAlarm = async (alarm: AlarmResponseDto) => {
   if (alarm.id) {
+    await alarmStore.markAlarmAsRead(alarm.id);
     await alarmStore.deleteAlarm(alarm.id);
   }
 };
 
-// 컴포넌트 마운트 시 알림 목록 조회
-onMounted(async () => {
-  await alarmStore.fetchAlarms();
-});
+// 주기적 알림 목록 조회 (5초마다)
+useAlarmPolling(5000);
 </script>
 
 <template>
@@ -136,7 +138,7 @@ onMounted(async () => {
         :timeAgo="formatDate(alarm.regDate || '')"
         :iconColor="getAlarmIconColor(alarm.type || 0)"
         @click="markAsRead(alarm)"
-        @delete="deleteAlarm(alarm)"
+        @delete="handleDeleteAlarm(alarm)"
       />
 
       <!-- 알림이 없을 때 -->
@@ -151,5 +153,4 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-/* 추가 스타일이 필요한 경우 여기에 작성 */
 </style>
