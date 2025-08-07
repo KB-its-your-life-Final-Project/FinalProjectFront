@@ -1,128 +1,46 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { Api } from "@/api/autoLoad/Api.ts";
-import axios from "axios";
+import { watch, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
+import ModalForm from "@/components/common/ModalForm.vue";
+import { useBudgetInput } from "./composables/useBudgetInput";
+import { useBudgetValidation } from "./composables/useBudgetValidation";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
 
-const rawInput = ref(""); // 사용자가 입력한 숫자 문자열
-const budget = ref<number | null>(store.formData.budget);
-const displayValue = ref(""); // 변환된 한글 금액
-const showError = ref(false);
+// 예산 입력 관리
+const {
+  rawInput,
+  budget,
+  displayValue,
+  inputRef,
+  handleInput,
+  focusInput,
+} = useBudgetInput(store.formData.budget);
 
-// 숫자 입력 처리
-function handleKeydown(e: KeyboardEvent) {
-  const key = e.key;
+// 예산 검증 관리
+const {
+  showValidationModal,
+  validationMessage,
+  validateBudget,
+  showValidationError,
+  handleValidationConfirm,
+} = useBudgetValidation();
 
-  if (!/[0-9]/.test(key)) {
-    // 숫자가 아니면 입력 막기
-    if (key !== "Backspace") e.preventDefault();
-    return;
-  }
-
-  // 숫자 누르면 rawInput 업데이트
-  rawInput.value += key;
-  e.preventDefault(); // 기본 입력 막고 아래서 표시
-
-  updateDisplay();
-}
-
-function handleBackspace(e: KeyboardEvent) {
-  if (e.key === "Backspace") {
-    rawInput.value = rawInput.value.slice(0, -1);
-    updateDisplay();
-    e.preventDefault();
-  }
-}
-
-function handleInput(e: Event) {
-  let val = (e.target as HTMLInputElement).value;
-  // 숫자 이외 입력 불가
-  if (/[^0-9]/.test(val)) {
-    val = val.replace(/[^0-9]/g, "");
-  }
-  if (val === "") {
-    rawInput.value = "";
-    showError.value = false;
-    updateDisplay();
-    return;
-  }
-  if (Number(val) > 999999) {
-    showError.value = true;
-    rawInput.value = "999999"; // val이 아니라 바로 999999로!
-    updateDisplay();
-    return;
-  } else {
-    showError.value = false;
-  }
-  rawInput.value = val;
-  updateDisplay();
-}
-
-function updateDisplay() {
-  if (rawInput.value === "") {
-    displayValue.value = "";
-    budget.value = null;
-    return;
-  }
-  const numeric = Number(rawInput.value);
-  displayValue.value = numberToKorean(numeric * 10000);
-  budget.value = numeric;
-}
-
+// store와 동기화
 watch(budget, (val) => {
   store.updateFormData({ budget: val });
 });
 
-// 한글 금액 변환
-function numberToKorean(num: number, removeUnit = ""): string {
-  if (num === 0) return removeUnit ? "" : "영원";
-  const unitWords = ["", "만", "억"];
-  const smallUnitWords = ["", "십", "백", "천"];
-  const numberWords = ["영", "일", "이", "삼", "사", "오", "육", "칠", "팔", "구"];
-  const result = [];
-  let unitPos = 0;
-  while (num > 0) {
-    const part = num % 10000;
-    if (part > 0) {
-      let section = "";
-      const digits = part.toString().padStart(4, "0").split("").map(Number);
-      digits.forEach((digit, idx) => {
-        if (digit !== 0) {
-          if (!(digit === 1 && idx !== 3)) {
-            section += numberWords[digit];
-          }
-          section += smallUnitWords[3 - idx];
-        }
-      });
-      const unit = unitWords[unitPos];
-      if (unit !== removeUnit) {
-        result.unshift(section + unit);
-      } else {
-        result.unshift(section);
-      }
-    }
-    unitPos++;
-    num = Math.floor(num / 10000);
-  }
-  return result.join("");
-}
+onMounted(() => {
+  focusInput();
+});
 
 async function next() {
-  const budget_val = Number(budget.value);
-  // 100만원(=100) 이하 또는 100억원(=1,000,000) 이상은 불가
-  if (budget.value == null || budget_val <= 0 || !Number.isFinite(budget_val)) {
-    alert("예산을 올바르게 입력해주세요!");
-    return;
-  }
-  if (budget_val < 10) {
-    alert("예산은 100만원(1백만원) 이상이어야 합니다!");
-    return;
-  }
-  if (budget_val >= 1000000) {
-    alert("예산은 100억원 미만이어야 합니다!");
+  const validation = validateBudget(budget.value);
+
+  if (!validation.isValid) {
+    showValidationError(validation.message);
     return;
   }
 
@@ -148,6 +66,7 @@ function prev() {
       </span>
       <div class="flex items-center w-full">
         <input
+          ref="inputRef"
           v-model="rawInput"
           @input="handleInput"
           type="text"
@@ -156,7 +75,6 @@ function prev() {
           class="w-full border border-kb-ui-06 rounded-full pl-4 pr-14 focus:outline-none bg-white cursor-text mt-1 text-base"
           style="height: 2.5rem; line-height: 2.5rem; padding-top: 0; padding-bottom: 0"
         />
-        <!-- input의 오른쪽 안에 "만원" 배치 -->
         <span
           class="absolute right-4 top-0 bottom-0 flex items-center text-kb-ui-04 pointer-events-none text-base"
           style="height: 3rem; line-height: 2.5rem"
@@ -171,12 +89,22 @@ function prev() {
       <button @click="prev" class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11">이전</button>
       <button
         @click="next"
-        :disabled="!budget || showError || budget < 100"
+        :disabled="!budget"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
       >
         레포트 보기
       </button>
     </div>
   </div>
+
+  <!-- 유효성 검사 모달 -->
+  <ModalForm
+    v-if="showValidationModal"
+    title="예산 부적합"
+    :handle-confirm="handleValidationConfirm"
+    @close="showValidationModal = false"
+  >
+    <p>{{ validationMessage }}</p>
+  </ModalForm>
 </template>
 <style scoped></style>

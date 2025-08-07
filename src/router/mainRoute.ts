@@ -1,4 +1,4 @@
-import type { RouteRecordRaw } from "vue-router";
+import { RouteRecordRaw } from "vue-router";
 
 //라우트 파일 위치
 const mainRouteMap: Record<string, () => Promise<any>> = {
@@ -9,7 +9,7 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
   mapSearch: () => import("@/pages/mapSearch/MapSearch.vue"),
 
   //찜
-  myLike: () => import("@/pages/myLike/MyLike.vue"),
+  wishlist: () => import("@/pages/wishlist/WishlistPage.vue"),
 
   //메인 메뉴
   mainMenu: () => import("@/pages/mainMenu/MainMenu.vue"),
@@ -26,13 +26,19 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
 
   //실거래가 상세페이지
   transactionDetail: () => import("@/pages/transaction/TransactionDetailPage.vue"),
+
+  //최근 본 레포트
+  recentSafeReport: () => import("@/pages/safeReport/RecentSafeReport.vue"),
+
+  //안심 진단 결과
+  safeReportResult: () => import("@/pages/safeReport/SafeReportResult.vue"),
 };
 
 //라우트 이름
 const mainRouteName = {
   homeMain: "homeMain",
   mapSearch: "mapSearch",
-  myLike: "myLike",
+  wishlist: "wishlist",
   mainMenu: "mainMenu",
   safeReport: "safeReport",
   myAlarm: "myAlarm",
@@ -41,6 +47,8 @@ const mainRouteName = {
   myPage: "myPage",
   settingAlarm: "settingAlarm",
   transactionDetail: "transactionDetail",
+  recentSafeReport: "recentSafeReport",
+  safeReportResult: "safeReportResult",
 };
 
 //라우트 설정
@@ -56,9 +64,10 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     component: mainRouteMap.mapSearch,
   },
   {
-    path: "/myLike",
-    name: mainRouteName.myLike,
-    component: mainRouteMap.myLike,
+    path: "/wishlist",
+    name: mainRouteName.wishlist,
+    component: mainRouteMap.wishlist,
+    meta: { requiresAuth: true },
   },
   {
     path: "/mainMenu",
@@ -69,6 +78,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/safeReport",
     name: mainRouteName.safeReport,
     component: () => import("@/pages/safeReport/SafeReport.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/localInfo",
@@ -94,6 +104,18 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/transactionDetail/:aptName",
     name: "transactionDetailAptName",
     component: () => import("@/pages/transaction/TransactionDetailPage.vue"),
+  },
+  {
+    path: "/recentSafeReport",
+    name: mainRouteName.recentSafeReport,
+    component: () => import("@/pages/safeReport/RecentSafeReport.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/safeReportResult",
+    name: mainRouteName.safeReportResult,
+    component: () => import("@/pages/safeReport/SafeReportResult.vue"),
+    meta: { requiresAuth: true },
   },
 ];
 
