@@ -2,20 +2,13 @@
 import Header from "@/components/layout/header/Header.vue";
 import AlarmSettingItem from "./_component/AlarmSettingItem.vue";
 import { onMounted } from "vue";
-import { useRouter } from "vue-router";
 import ToolTip from "@/components/common/ToolTip.vue";
 import TermsAndConditions from "./_component/TermsAndConditions.vue";
 import { myPageRouteName } from "@/router/mypageRoutes";
 import { useAlarmStore } from "@/stores/alarmStore";
 
-// 라우터 및 스토어 사용
-const router = useRouter();
+// 스토어 사용
 const alarmStore = useAlarmStore();
-
-// 받은 알림 페이지로 이동
-const goToMyAlarms = () => {
-  router.push('/alarm/my-alarm');
-};
 
 // 알림 설정 변경 핸들러
 const handleAlarmSettingChange = async (type: number, value: boolean) => {
@@ -47,43 +40,17 @@ const content2 =
 
   <!-- 알림 설정 목록 -->
   <div v-else class="mx-4 mt-10">
-    <!-- 페이지 헤더 -->
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">알림 설정</h1>
-      <button
-        @click="goToMyAlarms"
-        class="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-      >
-        받은 알림 보기
-      </button>
-    </div>
     <AlarmSettingItem
-      :main="'계약 진행 단계별 알림'"
-      :sub="'전입신고, 보증보험 가입 알림'"
-      :setting="alarmStore.alarmSettings.contractProgress"
-      @update:setting="(value) => handleAlarmSettingChange(1, value)"
-    />
-    <AlarmSettingItem
-      :main="'주택 위험도 변동 알림'"
+      :main="'시세변화 알림'"
       :sub="'주변 시세 변동, 권리관계 변동 알림'"
-      :setting="alarmStore.alarmSettings.riskChange"
+      :setting="alarmStore.alarmSettings.marketChange"
       @update:setting="(value) => handleAlarmSettingChange(2, value)"
     />
     <AlarmSettingItem
-      :main="'계약 만료 및 갱신 알림'"
+      :main="'계약만료 알림'"
+      :sub="'계약 만료 및 갱신 알림'"
       :setting="alarmStore.alarmSettings.contractExpiry"
       @update:setting="(value) => handleAlarmSettingChange(3, value)"
-    />
-    <AlarmSettingItem
-      :main="'관심 지역 변동 알림'"
-      :setting="alarmStore.alarmSettings.regionChange"
-      @update:setting="(value) => handleAlarmSettingChange(4, value)"
-    />
-    <AlarmSettingItem
-      :main="'시세 변동 알림'"
-      :sub="'관심 매물의 시세 변동 알림'"
-      :setting="alarmStore.alarmSettings.marketChange"
-      @update:setting="(value) => handleAlarmSettingChange(5, value)"
     />
 
     <!-- 저장 중 표시 -->

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import alarmService from "@/services/alarmService";
-import { authStore } from "@/stores/authStore";
 import AlarmList from "@/pages/mypage/_component/AlarmList.vue";
 
 const props = defineProps<{
@@ -20,10 +19,7 @@ const isLoading = ref(false);
 const fetchUnreadCount = async () => {
   try {
     isLoading.value = true;
-    const token = authStore.token;
-    if (!token) return;
-
-    const count = await alarmService.getUnreadAlarmCount(token);
+    const count = await alarmService.getUnreadAlarmCount();
     unreadCount.value = count;
   } catch (error) {
     console.error('미확인 알림 개수 조회 실패:', error);
