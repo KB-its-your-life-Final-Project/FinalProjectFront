@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { LoginRequestDTO, MemberResponseDTO } from "@/api/autoLoad/data-contracts";
 import { useToast } from "@/utils/useToast";
@@ -33,7 +33,11 @@ const getDefaultMember = (): Member => ({
 export const authStore = defineStore("auth", () => {
   // 상태
   const member = reactive<Member>(getDefaultMember());
-
+  const isLoggedIn = computed(() => {
+    return (member.id !== 0 &&
+      (member.email || member.kakaoId || member.googleId)
+    )
+  });
   // 이메일 중복 확인
   const checkDuplicateEmail = async (email: string): Promise<boolean> => {
     try {
@@ -132,6 +136,7 @@ export const authStore = defineStore("auth", () => {
 
   return {
     member,
+    isLoggedIn,
     checkDuplicateEmail,
     checkLoginStatus,
     login,

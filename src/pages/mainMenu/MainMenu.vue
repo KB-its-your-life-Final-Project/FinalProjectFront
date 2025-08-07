@@ -27,11 +27,6 @@ const logout = async () => {
   }
 };
 
-function withdraw() {
-  alert("요청 중...");
-  // 회원탈퇴의 로직을 추가해주세요
-}
-
 function openInquiry() {
   alert("lighthouse@gmail.com 로 문의 주세요!");
 }
@@ -79,8 +74,7 @@ function openInquiry() {
     </MenuSection>
   </div>
 
-  <div class="mt-8 flex justify-center gap-40 text-sm text-kb-ui-05 pb-6">
-    <!-- <button class="underline cursor-pointer" @click="withdraw">회원탈퇴</button> -->
+  <div v-if="auth.isLoggedIn" class="mt-8 flex justify-center gap-40 text-sm text-kb-ui-05 pb-6">
     <button class="underline cursor-pointer" @click="logout">로그아웃</button>
   </div>
   <Footer />
