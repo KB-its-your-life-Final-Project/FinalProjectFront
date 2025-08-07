@@ -56,13 +56,7 @@ class AlarmService {
       console.log('알림 설정 변경 요청 데이터:', requestData);
       console.log('현재 쿠키:', document.cookie);
 
-      // Api.ts의 파라미터 순서 문제를 우회하기 위해 직접 axios 사용
-      const response = await axios.post('/api/alarm/settings', requestData, {
-        withCredentials: true, // 쿠키 포함
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await this.api.updateAlarmSettingUsingPost(requestData);
 
       console.log('알림 설정 변경 응답:', response);
       return response.data.success || false;
@@ -84,13 +78,7 @@ class AlarmService {
    */
   async markAlarmAsRead(alarmId: number): Promise<boolean> {
     try {
-      // Api.ts의 파라미터 순서 문제를 우회하기 위해 직접 axios 사용
-      const response = await axios.put(`/api/alarm/${alarmId}/read`, {}, {
-        withCredentials: true, // 쿠키 포함
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await this.api.markAlarmReadUsingPut(alarmId, "");
       return response.data.success || false;
     } catch (error) {
       console.error('알림 읽음 처리 실패:', error);

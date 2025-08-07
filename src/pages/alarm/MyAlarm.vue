@@ -40,7 +40,7 @@ const getAlarmIcon = (type: number): string => {
     case 2:
       return 'fa-solid fa-chart-line';
     case 3:
-      return 'fa-solid fa-calendar-exclamation';
+      return 'fa-solid fa-house';
     default:
       return 'fa-solid fa-bell';
   }
