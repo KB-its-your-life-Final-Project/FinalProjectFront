@@ -1,24 +1,25 @@
 <script lang="ts" setup>
-import { Api } from "@/api/autoLoad/Api"; // 실제 경로에 맞게 수정
+import { Api } from "@/api/autoLoad/Api";
 import type {
   RegionWishlistRequestDTO,
   EstateWishlistRequestDTO,
 } from "@/api/autoLoad/data-contracts";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useToast } from "@/utils/useToast";
+
 const props = defineProps<{
-  liked: boolean;
+  name?: string;
+  liked?: boolean;
   targetType: "region" | "building";
   regionCd?: string;
-  buildingId?: number;
-}>();
-
-const emit = defineEmits<{
-  (e: "toggle", payload: { success: boolean; liked: boolean }): void;
+  jibunAddr?: string;
+  estateId?: number;
 }>();
 
 const api = new Api();
 const isLoading = ref(false);
-
+const liked = ref<boolean | undefined>(props.liked);
+const toast = useToast();
 const handleClick = async () => {
   if (isLoading.value) return;
   isLoading.value = true;
@@ -26,29 +27,59 @@ const handleClick = async () => {
   try {
     if (props.targetType === "region" && props.regionCd) {
       const payload: RegionWishlistRequestDTO = { regionCd: props.regionCd };
-      if (!props.liked) {
+      if (!liked.value) {
         await api.addWishlistUsingPost1(payload); // 지역 추가
+        toast.addToast(toast.createToast(`${props.name || "지역"}: 관심 목록 등록`, "success"));
       } else {
         await api.removeWishlistUsingDelete1(props.regionCd); // 지역 제거
+        toast.addToast(toast.createToast(`${props.name || "지역"} : 관심 목록 해제`, "success"));
       }
-    } else if (props.targetType === "building" && props.buildingId != null) {
-      const payload: EstateWishlistRequestDTO = { estateId: props.buildingId };
-      if (!props.liked) {
-        // await api.addWishlistUsingPost(payload); // 건물 추가
+      liked.value = !liked.value;
+    } else if (props.targetType === "building" && props.jibunAddr != null) {
+      const payload: EstateWishlistRequestDTO = {
+        estateId: props.estateId,
+        jibunAddr: props.jibunAddr,
+      };
+      if (!liked.value) {
+        await api.addWishlistUsingPost(payload); // 건물 추가
+        toast.addToast(toast.createToast(`${props.name || "매물"}: 관심 목록 등록`, "success"));
       } else {
-        // await api.removeWishlistUsingDelete(props.buildingId); // 건물 제거
+        await api.removeWishlistUsingDelete({ jibunAddr: props.jibunAddr }); // 건물 제거
+        toast.addToast(toast.createToast(`${props.name || "매물"}: 관심 목록 해제`, "success"));
       }
+      liked.value = !liked.value;
     } else {
-      throw new Error("잘못된 요청입니다. 필수 데이터가 없습니다.");
+      console.error("잘못된 요청입니다. 필수 데이터가 없습니다.");
     }
-    emit("toggle", { success: true, liked: !props.liked });
   } catch (e) {
     console.error("API 요청 실패:", e);
-    emit("toggle", { success: false, liked: props.liked });
   } finally {
     isLoading.value = false;
   }
 };
+
+onMounted(async () => {
+  // props로 liked가 넘어오지 않았을 때만 API 호출
+  if (liked.value === undefined) {
+    try {
+      if (props.targetType === "region" && props.regionCd) {
+        const response = await api.existWishlistByRegionCdUsingGet(props.regionCd);
+        const data = response.data.data;
+        liked.value = data;
+      } else if (props.targetType === "building" && props.jibunAddr) {
+        const response = await api.existWishlistByJibunAddrUsingGet({
+          jibunAddr: props.jibunAddr,
+          estateId: props.estateId,
+        });
+        const data = response.data.data;
+        liked.value = data;
+      }
+    } catch (e) {
+      console.error("초기 liked 상태를 가져오는 데 실패:", e);
+      liked.value = false;
+    }
+  }
+});
 </script>
 
 <template>
