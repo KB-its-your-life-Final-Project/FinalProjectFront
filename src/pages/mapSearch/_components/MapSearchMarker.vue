@@ -5,13 +5,15 @@ import { EstateDTO, EstateSalesDTO } from "@/api/autoLoad/data-contracts";
 
 const props = defineProps<{
   markerData: MarkerDataType;
-  estateData: EstateDTO;
-  estateSalesData: EstateSalesDTO[];
+  estateData?: EstateDTO;
+  estateSalesData?: EstateSalesDTO[];
 }>();
 
 //표기
 const address = computed(() => {
-  if (props.estateData?.buildingName) {
+  if (props.markerData.buildingName) {
+    return props.markerData.buildingName;
+  } else if (props.estateData?.buildingName) {
     return props.estateData.buildingName;
   } else if (props.markerData?.jibunAddress) {
     return props.markerData.jibunAddress;
@@ -23,7 +25,7 @@ const address = computed(() => {
 //금액
 const dealAmount = computed(() => {
   // 배열의 첫 번째 요소에서 dealAmount 가져오기
-  const amount = props.estateSalesData[0]?.dealAmount;
+  const amount = props.estateSalesData?.[0]?.dealAmount;
 
   if (amount == null) return "거래정보 없음";
   return `${amount}만원`;
