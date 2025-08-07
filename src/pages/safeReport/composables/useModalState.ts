@@ -4,12 +4,14 @@ export function useModalState() {
   const showModal_financial = ref(false);
   const showModal_building = ref(false);
   const showNoDataModal = ref(false);
+  const showNoBuildingDataModal = ref(false);
   const showHighRatioModal = ref(false);
 
   const resetModals = () => {
     showModal_financial.value = false;
     showModal_building.value = false;
     showNoDataModal.value = false;
+    showNoBuildingDataModal.value = false;
     showHighRatioModal.value = false;
   };
 
@@ -37,6 +39,14 @@ export function useModalState() {
     showNoDataModal.value = false;
   };
 
+  const openNoBuildingDataModal = () => {
+    showNoBuildingDataModal.value = true;
+  };
+
+  const closeNoBuildingDataModal = () => {
+    showNoBuildingDataModal.value = false;
+  };
+
   const openHighRatioModal = () => {
     showHighRatioModal.value = true;
   };
@@ -50,6 +60,7 @@ export function useModalState() {
     showModal_financial,
     showModal_building,
     showNoDataModal,
+    showNoBuildingDataModal,
     showHighRatioModal,
 
     // 메서드
@@ -60,6 +71,8 @@ export function useModalState() {
     closeBuildingModal,
     openNoDataModal,
     closeNoDataModal,
+    openNoBuildingDataModal,
+    closeNoBuildingDataModal,
     openHighRatioModal,
     closeHighRatioModal,
   };
