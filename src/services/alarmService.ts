@@ -84,7 +84,13 @@ class AlarmService {
    */
   async markAlarmAsRead(alarmId: number): Promise<boolean> {
     try {
-      const response = await this.api.markAlarmReadUsingPut(alarmId, "");
+      // Api.ts의 파라미터 순서 문제를 우회하기 위해 직접 axios 사용
+      const response = await axios.put(`/api/alarm/${alarmId}/read`, {}, {
+        withCredentials: true, // 쿠키 포함
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       return response.data.success || false;
     } catch (error) {
       console.error('알림 읽음 처리 실패:', error);

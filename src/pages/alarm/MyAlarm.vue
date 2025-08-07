@@ -60,7 +60,17 @@ const getAlarmIconColor = (type: number): string => {
 
 // 날짜 포맷팅 (이미지와 동일한 형식)
 const formatDate = (dateString: string): string => {
+  if (!dateString) {
+    return '방금 전';
+  }
+
   const date = new Date(dateString);
+
+  // 유효하지 않은 날짜인지 확인
+  if (isNaN(date.getTime())) {
+    return '방금 전';
+  }
+
   const now = new Date();
   const diffTime = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -92,6 +102,13 @@ const markAsRead = async (alarm: AlarmResponseDto) => {
   }
 };
 
+// 알림 삭제 (X 버튼 클릭 시)
+const deleteAlarm = async (alarm: AlarmResponseDto) => {
+  if (alarm.id) {
+    await alarmStore.deleteAlarm(alarm.id);
+  }
+};
+
 // 컴포넌트 마운트 시 알림 목록 조회
 onMounted(async () => {
   await alarmStore.fetchAlarms();
@@ -119,6 +136,7 @@ onMounted(async () => {
         :timeAgo="formatDate(alarm.regDate || '')"
         :iconColor="getAlarmIconColor(alarm.type || 0)"
         @click="markAsRead(alarm)"
+        @delete="deleteAlarm(alarm)"
       />
 
       <!-- 알림이 없을 때 -->
