@@ -6,7 +6,7 @@ import type {
 } from "@/api/autoLoad/data-contracts";
 import { ref, onMounted } from "vue";
 import { useToast } from "@/utils/useToast";
-
+import { authStore } from "@/stores/authStore";
 const props = defineProps<{
   name?: string;
   liked?: boolean;
@@ -20,11 +20,18 @@ const api = new Api();
 const isLoading = ref(false);
 const liked = ref<boolean | undefined>(props.liked);
 const toast = useToast();
+const auth = authStore();
 const handleClick = async () => {
   if (isLoading.value) return;
   isLoading.value = true;
 
   try {
+    try {
+      await auth.checkLoginStatus();
+    } catch {
+      toast.addToast(toast.createToast("로그인 시에만 사용할 수 있습니다", "info"));
+      return;
+    }
     if (props.targetType === "region" && props.regionCd) {
       const payload: RegionWishlistRequestDTO = { regionCd: props.regionCd };
       if (!liked.value) {
