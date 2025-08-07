@@ -9,14 +9,14 @@ const { addToast, createToast } = useToast();
 
 // 사용자 인터페이스
 interface Member {
-  id?: number;
-  email?: string;
-  kakaoId?: string;
-  googleId?: string;
-  name?: string;
-  phone?: string;
-  profileImg?: string;
-  createdType?: number;
+  id: number;
+  email: string;
+  kakaoId: string;
+  googleId: string;
+  name: string;
+  phone: string;
+  profileImg: string;
+  createdType: number;
 }
 
 const getDefaultMember = (): Member => ({

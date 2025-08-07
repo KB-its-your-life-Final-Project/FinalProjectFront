@@ -7,7 +7,6 @@ import {
   isEmpty,
   isValidEmailFormat,
   isValidPasswordChk,
-  isValidPasswordFormat,
   isValidName,
 } from "@/utils/validate";
 import GoBackBtn from "@/components/common/GoBackBtn.vue";

@@ -12,8 +12,6 @@ import ChangeProfileModal from "./_component/ChangeProfileModal.vue";
 import ChangeHouseModal from "./_component/ChangeHouseModal.vue";
 import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
-import ToastList from "@/components/common/ToastList.vue";
-
 import { markRaw, ref, computed, onMounted } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
@@ -79,7 +77,6 @@ const profileImgUrl = computed(() => {
   if (!path) return defaultProfile;
   return `${fileBaseUrl}${path}`;
 });
-console.log("profileImgUrl: ", profileImgUrl);
 
 const isLoading = ref(false);
 const homeData = ref<HomeRegisterResponseDTO | null>(null);
@@ -131,10 +128,9 @@ onMounted(async () => {
           <ProfileImage :src="profileImgUrl" />
         </div>
         <button
-          class="absolute bottom-0 right-0 cursor-pointer p-1 bg-gray-300 rounded-full"
-          @click="openModal('profile', { profile: user.imagePath, name: user.name })"
-        >
-          <font-awesome-icon :icon="['fas', 'camera']"></font-awesome-icon>
+          class="absolute bottom-0 right-0 cursor-pointer py-1 px-2 bg-kb-ui-08 rounded-full"
+          @click="openModal('profile', { profile: profileImgUrl, name: user.name })"
+        ><font-awesome-icon :icon="['fas', 'camera']"></font-awesome-icon>
         </button>
       </div>
       <ProfileInfo :name="user.name" :email="user.email" />
@@ -261,8 +257,6 @@ onMounted(async () => {
       알림 설정
     </button>
   </div>
-
-  <ToastList />
   <Section />
 
   <component

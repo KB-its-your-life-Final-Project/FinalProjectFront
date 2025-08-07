@@ -6,17 +6,25 @@ import MenuSection from "@/pages/mainMenu/_component/MenuSection.vue";
 import Footer from "@/components/layout/Footer.vue";
 import { authStore } from "@/stores/authStore";
 import defaultProfile from "@/assets/imgs/profile.jpg";
-import logo from "@/assets/imgs/logo_border.svg";
+import logo from "@/assets/imgs/logo.svg";
 
-import ToastList from "@/components/common/ToastList.vue";
-
-/*임의로 로그아웃, 회원탈퇴 부분 넣겠습니다.*/
-
+import { computed } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import ProfileInfo from "@/components/common/ProfileInfo.vue";
 import ProfileImage from "@/components/common/ProfileImage.vue";
+import movePage from "@/utils/movePage";
 
 const auth = authStore();
+
+const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+const profileImgUrl = computed(() => {
+  const path = auth.member.profileImg;
+  if (!path) return logo;
+  return `${fileBaseUrl}${path}`;
+});
+console.log("profileImgUrl: ", profileImgUrl);
+
+
 
 // 로그아웃
 const logout = async () => {
@@ -40,7 +48,7 @@ function openInquiry() {
       <div class="mt-[1.5rem] flex items-center justify-center text-center">
         <div class="flex-[1]">
           <ProfileImage
-            :src="auth.member.createdType === 0 ? logo : auth.member.profileImg || defaultProfile"
+            :src="profileImgUrl || defaultProfile"
           />
         </div>
         <div class="flex-[3]">
@@ -60,7 +68,6 @@ function openInquiry() {
       <MenuItem :icon="['fas', 'shield-alt']" label="안심 정보" to="/safereport" />
       <MenuItem :icon="['far', 'heart']" label="관심 목록" to="/wishlist" />
       <MenuItem :icon="['far', 'file-lines']" label="최근 본 리포트" to="/recentSafeReport" />
-      <!--      -->
     </MenuSection>
 
     <MenuSection title="설정">
@@ -74,10 +81,14 @@ function openInquiry() {
     </MenuSection>
   </div>
 
-  <div v-if="auth.isLoggedIn" class="mt-8 flex justify-center gap-40 text-sm text-kb-ui-05 pb-6">
-    <button class="underline cursor-pointer" @click="logout">로그아웃</button>
+  <div class="mt-8 flex justify-center gap-40 text-kb-gray-dark underline pb-6">
+    <button
+    class="underline cursor-pointer"
+    @click="auth.isLoggedIn ? logout() : movePage.login()"
+  >
+    {{ auth.isLoggedIn ? '로그아웃' : '로그인' }}
+  </button>
   </div>
   <Footer />
   <div class="h-15"></div>
-  <ToastList />
 </template>

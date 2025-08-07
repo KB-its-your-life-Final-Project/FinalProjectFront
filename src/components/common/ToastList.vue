@@ -47,8 +47,16 @@ const { toasts } = useToast();
   opacity: 0;
   transform: translateY(20px);
 }
+.toast-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
 .toast-enter-active {
   transition: all 0.3s ease;
+}
+.toast-leave-from {
+  opacity: 1;
+  transform: translateY(0)
 }
 .toast-leave-to {
   opacity: 0;

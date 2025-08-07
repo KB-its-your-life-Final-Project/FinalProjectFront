@@ -2,8 +2,6 @@
 import { ref } from "vue";
 import ModalForm from "@/components/common/ModalForm.vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
-import { useToast } from "@/utils/useToast";
 import { authStore } from "@/stores/authStore";
 
 // 상태
@@ -60,13 +58,23 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
     hasConfirmBtn
   >
     <div class="flex flex-col items-center gap-2">
-      <img class="rounded-full max-w-1/2 aspect-1/1" :src="previewUrl || profile" />
-      <p v-if="selectedFile" class="text-sm text-gray-600">선택한 파일: {{ selectedFile?.name }}</p>
-      <label for="profileFile" class="cursor-pointer px-3 py-1 border rounded-xl"
+      <img class="rounded-full max-w-1/2 aspect-1/1 mt-4" :src="previewUrl || profile" />
+      <p v-show="selectedFile" class="text-sm text-kb-ui-06">선택한 파일: {{ selectedFile?.name }}</p>
+      <label for="newProfile" class="upload-btn mt-5"
         >이미지 가져오기</label
       >
       <input
-        id="profileFile"
+        id="newProfile"
+        class="hidden"
+        type="file"
+        accept="image/*"
+        @change="handleFileChange"
+      />
+      <label for="defaultProfile" class="default-btn"
+        >기본 이미지로 변경</label
+      >
+      <input
+        id="defaultProfile"
         class="hidden"
         type="file"
         accept="image/*"
@@ -75,3 +83,13 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
     </div>
   </ModalForm>
 </template>
+<style scoped>
+@reference "@/assets/styles/main.css";
+
+.upload-btn {
+  @apply cursor-pointer px-3 py-1 bg-kb-ui-09 rounded-lg w-40 text-center font-pretendard-light;
+}
+.default-btn {
+  @apply cursor-pointer px-3 py-1 bg-kb-ui-09 rounded-lg w-40 text-center font-pretendard-light;
+}
+</style>
