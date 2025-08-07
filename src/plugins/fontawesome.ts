@@ -29,6 +29,8 @@ import {
   faCross,
   faLocationDot,
   faBuilding,
+  faClipboard,
+  faChartBar,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faMap,
@@ -76,6 +78,8 @@ library.add(
   faCross,
   faLocationDot,
   faBuilding,
+  faClipboard,
+  faChartBar,
 );
 
 export { FontAwesomeIcon };

@@ -1,12 +1,5 @@
 import { Api } from "@/api/autoLoad/Api";
-import type {
-  AlarmSettingRequestDto,
-  AlarmResponseDto,
-  ApiResponseListAlarmResponseDto,
-  ApiResponseInt,
-  ApiResponseVoid,
-} from "@/api/autoLoad/data-contracts";
-import axios from "axios";
+import type { AlarmSettingRequestDto, AlarmResponseDto } from "@/api/autoLoad/data-contracts";
 
 class AlarmService {
   private api: Api;
@@ -52,23 +45,12 @@ class AlarmService {
    */
   async updateAlarmSetting(requestData: AlarmSettingRequestDto): Promise<boolean> {
     try {
-      // 디버깅: 요청 데이터 로그
-      console.log("알림 설정 변경 요청 데이터:", requestData);
-      console.log("현재 쿠키:", document.cookie);
-
       const response = await this.api.updateAlarmSettingUsingPost(requestData);
 
       console.log("알림 설정 변경 응답:", response);
       return response.data.success || false;
     } catch (error) {
       console.error("알림 설정 변경 실패:", error);
-      console.error("에러 상세 정보:", {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-      });
       return false;
     }
   }
@@ -99,14 +81,10 @@ class AlarmService {
   }
 
   /**
-   * 알림 삭제 (백엔드 API가 구현되면 실제 호출)
+   * 알림 삭제제
    */
   async deleteAlarm(alarmId: number): Promise<boolean> {
     try {
-      // TODO: 백엔드에 삭제 API가 구현되면 실제 호출
-      // const response = await this.api.deleteAlarmUsingDelete(alarmId, "");
-      // return response.data.success || false;
-
       console.log("알림 삭제 요청:", alarmId);
       return true; // 임시로 성공 반환
     } catch (error) {

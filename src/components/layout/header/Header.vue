@@ -1,13 +1,15 @@
 <!-- Header -->
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import movePage from "@/utils/movePage";
 import { headerTitleList, headerShowList } from "./header";
 import type { headerShowtype } from "./header";
 import { useRoute } from "vue-router";
+import { useAlarmStore } from "@/stores/alarmStore";
 
 const route = useRoute();
+const alarmStore = useAlarmStore();
 
 const emit = defineEmits(["back-click"]);
 
@@ -16,6 +18,11 @@ const props = defineProps<{
   headerShowtype: headerShowtype;
   title?: string; // 아파트명을 받아오고 싶음
 }>();
+
+// 알림 개수 초기화
+onMounted(() => {
+  alarmStore.fetchUnreadCount();
+});
 
 //제목 설정
 const title = ref(props.title ?? headerTitleList[props.headerShowtype]);
@@ -68,11 +75,20 @@ function handleBackClick() {
       v-if="showItems.showAlarm"
       class="absolute top-4 right-4 flex items-center space-x-[1rem] text-kb-ui-01 text-xl"
     >
-      <font-awesome-icon
-        :icon="['fas', 'bell']"
-        class="cursor-pointer"
-        @click="movePage.myAlarm()"
-      />
+      <div class="relative">
+        <font-awesome-icon
+          :icon="['fas', 'bell']"
+          class="cursor-pointer"
+          @click="movePage.myAlarm()"
+        />
+        <!-- 미확인 알림 개수 표시 -->
+        <div
+          v-if="alarmStore.unreadCount > 0"
+          class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+        >
+          {{ alarmStore.unreadCount > 99 ? '99+' : alarmStore.unreadCount }}
+        </div>
+      </div>
     </div>
     <slot />
   </header>
