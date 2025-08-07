@@ -36,7 +36,6 @@ const showItems = reactive(
 );
 
 function handleBackClick() {
-
   if (route.name === "safeReport") {
     emit("back-click");
   } else {
