@@ -1,40 +1,24 @@
 <template>
   <div class="pb-24">
     <!-- 동적 헤더: 아파트명 -->
-    <Header :headerShowtype="mainRouteName.transactionDetail" :title="selectedAptName">
+    <Header :headerShowtype="mainRouteName.transactionDetail" :title="'임시값'">
       <div class="pl-3 pr-8 pt-8 pb-8"></div>
     </Header>
 
-    <div class="w-[85%] mx-auto mt-4">
-      <div class="absolute top-27 right-3">
-        <font-awesome-icon
-          :icon="isFavorite ? ['fas', 'star'] : ['far', 'star']"
-          :class="isFavorite ? 'text-kb-yellow' : 'text-kb-ui-05'"
-          class="text-xl cursor-pointer"
-          @click="toggleFavorite"
-        />
+    <div class="relative w-[85%] mx-auto mt-4">
+      <div class="absolute right-0 w-7 h-7">
+        <WishButton target-type="building" :jibun-addr="jibunAddress" />
       </div>
 
       <p class="text-base mb-1 text-kb-ui-04">거래 형식</p>
 
       <!-- 필터: 매매/전월세 -->
-
-      <div class="grid grid-cols-3">
-        <button
-          v-for="type in ['전체', '매매', '전월세']"
-          :key="type"
-          :class="[
-            'text-sm py-2 border text-center rounded-none',
-            'w-full h-[30px] rounded-none',
-            selectedType === type
-              ? 'bg-kb-yellow text-white border border-kb-yellow'
-              : 'bg-white text-kb-ui-03 border-kb-ui-05',
-          ]"
-          @click="setType(type)"
-        >
-          {{ type }}
-        </button>
-      </div>
+      <RadioListButton
+        class="mt-4"
+        v-model="selectedType"
+        :options="typeOptions"
+        @change="changeType"
+      />
     </div>
 
     <!-- 날짜 범위 필터 -->
@@ -42,25 +26,16 @@
       <h1 class="text-base mb-1 text-kb-ui-04">기간 설정</h1>
 
       <!-- 기간 설정 필터 -->
-      <div class="grid grid-cols-4 mb-2">
-        <button
-          v-for="year in ['전체', 1, 3, 5]"
-          :key="year"
-          @click="setYear(year)"
-          :class="[
-            'text-sm py-2 border text-center rounded-none w-full h-[30px]',
-            selectedYear === year
-              ? 'bg-kb-yellow text-white border-kb-yellow'
-              : 'bg-white text-kb-ui-03 border-kb-ui-05',
-          ]"
-        >
-          {{ typeof year === "number" ? `${year}년` : year }}
-        </button>
-      </div>
+      <RadioListButton
+        class="mt-4"
+        v-model="selectedPeriod"
+        :options="periodOptions"
+        @change="changePeriod"
+      />
 
       <div class="flex items-center justify-center gap-[16px] mt-5">
         <DatePicker
-          label="시작일"
+          placeholder="시작일"
           v-model="startDate"
           :input-class="'text-sm py-2 px-2 border border-gray-400 text-center rounded-none h-[30px] w-[150px]'"
           @update:modelValue="handleDateChange"
@@ -69,7 +44,7 @@
         <div class="flex text-sm justify-center mx-[8px]">~</div>
 
         <DatePicker
-          label="종료일"
+          placeholder="종료일"
           v-model="endDate"
           :input-class="'text-sm py-2 px-2 border border-gray-400 text-center rounded-none h-[30px] w-[150px]'"
           @update:modelValue="handleDateChange"
@@ -84,41 +59,65 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
+import { useRoute, useRouter, LocationQueryValueRaw } from "vue-router";
 import Header from "@/components/layout/header/Header.vue";
 import TransactionGraph from "@/pages/transaction/TransactionGraph.vue";
-import { onMounted, ref, watch } from "vue";
-import axios from "axios";
+import { watchEffect, ref, watch, computed } from "vue";
+import { Api } from "@/api/autoLoad/Api";
 import { mainRouteName } from "@/router/mainRoute.ts";
-
 import DatePicker from "@/components/common/DatePicker.vue";
+import WishButton from "@/components/common/WishButton.vue";
+import RadioListButton from "@/components/common/RadioListButton.vue";
+import { TransactionRequestDTO } from "@/api/autoLoad/data-contracts";
+//import mapUtil from "@/utils/naverMap/naverMap";
 
 const route = useRoute();
-const selectedAptName = ref<string>((route.params.aptName as string) || "");
+const router = useRouter();
+
+const jibunAddress = computed(() => {
+  const addr = getQueryString(route.query.jibunAddress);
+  console.log("jibunAddress computed:", addr); // 디버깅용
+  return addr || "";
+});
+
+const buildingName = computed(() => {
+  const name = getQueryString(route.query.buildingName);
+  console.log("buildingName computed:", name); // 디버깅용
+  return name || "";
+});
+
+const latlng = computed<{ lat: number; lng: number }>(() => {
+  const lat = Number(getQueryString(route.query.lat));
+  const lng = Number(getQueryString(route.query.lng));
+
+  // NaN 방지: 좌표 값이 없으면 0 반환
+  return {
+    lat: isNaN(lat) ? 0 : lat,
+    lng: isNaN(lng) ? 0 : lng,
+  };
+});
+
+const input = computed(() => ({
+  jibunAddress: jibunAddress.value,
+  roadAddress: getQueryString(route.query.roadAddress) || "",
+  lat: latlng.value.lat,
+  lng: latlng.value.lng,
+}));
+
+const api = new Api();
 
 const selectedType = ref("전체");
-const selectedYear = ref<number | "전체">(1);
+const selectedPeriod = ref("1");
 
 //날짜의 기본값- 아무것도 없는 값
-const startDate = ref<Date | null>(null);
-const endDate = ref<Date | null>(null);
+const now = new Date();
+const startDate = ref<Date | null>(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
+const endDate = ref<Date | null>(new Date());
 const graphData = ref<{ date: string; price: number; type: string }[]>([]);
-
-const isFavorite = ref(false);
-
-const toggleFavorite = () => {
-  isFavorite.value = !isFavorite.value;
-
-  if (isFavorite.value) {
-    // 찜 추가해주세요
-  } else {
-    // 찜 해제
-  }
-};
 
 //전체 거래 데이터 및 그래프들 데이터
 
-//const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([]);
+//const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([])
 
 //날짜 달력
 const formatDateLocal = (date: Date): string => {
@@ -135,73 +134,140 @@ const getTradeTypeCode = (label: string | null): number | null => {
   return null; // "전체" 혹은 그 외
 };
 
-const filteredData = async (aptName: string) => {
-  console.log("실제 axios 요청 발생!", selectedAptName.value, startDate.value, endDate.value);
+// API 호출
+const filteredData = async (markerData: {
+  jibunAddress?: string;
+  roadAddress?: string;
+  lat?: number;
+  lng?: number;
+}) => {
+  if (
+    !markerData.jibunAddress &&
+    !markerData.roadAddress &&
+    (markerData.lat === undefined || markerData.lng === undefined)
+  ) {
+    console.error("markerData가 불완전합니다:", markerData);
+    return;
+  }
 
-  const body = {
-    buildingName: selectedAptName.value,
-    tradeType: getTradeTypeCode(selectedType.value),
-    startDate: startDate.value ? formatDateLocal(startDate.value) : null,
-    endDate: endDate.value ? formatDateLocal(endDate.value) : null,
+  const request: TransactionRequestDTO = {
+    jibunAddress: markerData.jibunAddress ?? undefined,
+    lat: markerData.lat ?? undefined,
+    lng: markerData.lng ?? undefined,
+    buildingName: buildingName.value,
+    tradeType: getTradeTypeCode(selectedType.value) || undefined,
+    startDate: startDate.value ? formatDateLocal(startDate.value) : undefined,
+    endDate: endDate.value ? formatDateLocal(endDate.value) : undefined,
   };
 
+  console.log("API 요청 데이터:", request);
+
   try {
-    const res = await axios.post("/api/transactions/detail", body);
-    console.log("백엔드 응답 받음:", res.data);
-    graphData.value = res.data;
+    const res = await api.getFilteredDataUsingPost(request);
+    console.log("응답 데이터:", res);
+    graphData.value = res.data as { date: string; price: number; type: string }[];
   } catch (error) {
-    console.error("데이터 가져오기 실패", error);
+    console.error("데이터 요청 실패:", error);
+    graphData.value = [];
   }
 };
 
-//연도 버튼 클릭으로 필터링 기능
-const setYear = (year) => {
-  selectedYear.value = year;
+const periodOptions = [
+  { label: "전체", value: "전체" },
+  { label: "1년", value: "1" },
+  { label: "3년", value: "3" },
+  { label: "5년", value: "5" },
+];
 
-  if (year === "전체") {
+//연도 버튼 클릭으로 필터링 기능
+const changePeriod = () => {
+  console.log("변경된 기간: ", selectedPeriod.value);
+  if (selectedPeriod.value === "전체") {
     startDate.value = null;
     endDate.value = null;
   } else {
     const now = new Date();
     const past = new Date();
-    past.setFullYear(now.getFullYear() - Number(year));
+    past.setFullYear(now.getFullYear() - Number(selectedPeriod.value));
 
+    // 날짜 입력란 자동 설정
     startDate.value = past;
     endDate.value = now;
   }
-  filteredData(selectedAptName.value);
-  //filteredData();
+
+  updateURLQuery();
+  filteredData(input.value);
 };
 
-const setType = (type: string) => {
-  console.log("거래 형식 선택됨:", type);
-  selectedType.value = type;
-  filteredData(selectedAptName.value);
+const typeOptions = [
+  { label: "전체", value: "전체" },
+  { label: "매매", value: "매매" },
+  { label: "전월세", value: "전월세" },
+];
+
+const changeType = () => {
+  console.log("거래 형식 선택됨:", selectedType.value);
+  updateURLQuery();
+  filteredData(input.value);
 };
 //수동으로 버튼 누르면... 해제
 const handleDateChange = () => {
-  selectedYear.value = "전체";
+  selectedPeriod.value = "전체";
   //startDate.value = null
   // endDate.value = null
-  filteredData(selectedAptName.value);
+  updateURLQuery();
+  filteredData(input.value);
+};
+// URL Query 업데이트
+const updateURLQuery = () => {
+  router.push({
+    query: {
+      jibunAddress: input.value.jibunAddress || "",
+      type: selectedType.value !== "전체" ? selectedType.value : undefined,
+      year: selectedPeriod.value !== "전체" ? selectedPeriod.value : undefined,
+      startDate: startDate.value ? formatDateLocal(startDate.value) : undefined,
+      endDate: endDate.value ? formatDateLocal(endDate.value) : undefined,
+    },
+  });
 };
 
 //url은 변경되어있지만, 컴포넌트는 남아있는 경우를 방지
 watch(
-  () => route.params.aptName,
-  (newName) => {
-    if (newName) {
-      selectedAptName.value = newName as string;
-      filteredData(newName as string);
+  () => route.query,
+  (newQuery) => {
+    if (newQuery.type !== undefined) {
+      selectedType.value = newQuery.type as string;
+    }
+    if (newQuery.year !== undefined) {
+      selectedPeriod.value = String(newQuery.year);
+    }
+    // 날짜 필터도 URL에서 읽어올 수 있음
+    if (newQuery.startDate) {
+      startDate.value = new Date(newQuery.startDate as string);
+    }
+    if (newQuery.endDate) {
+      endDate.value = new Date(newQuery.endDate as string);
     }
   },
+  { deep: true },
 );
 
-onMounted(() => {
-  const aptName = route.params.aptName as string;
-  if (aptName) {
-    selectedAptName.value = aptName;
-    filteredData(aptName);
+watchEffect(() => {
+  if (jibunAddress.value || input.value.roadAddress) {
+    filteredData({
+      jibunAddress: jibunAddress.value,
+      roadAddress: input.value.roadAddress,
+      lat: latlng.value.lat,
+      lng: latlng.value.lng,
+    });
   }
 });
+
+function getQueryString(
+  queryValue: LocationQueryValueRaw | LocationQueryValueRaw[] | undefined,
+): string | undefined {
+  if (!queryValue) return undefined;
+  if (Array.isArray(queryValue)) return queryValue[0]?.toString();
+  return queryValue.toString();
+}
 </script>
