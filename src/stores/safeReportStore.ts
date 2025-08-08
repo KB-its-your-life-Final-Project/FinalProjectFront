@@ -1,114 +1,79 @@
 import { defineStore } from "pinia";
-import { ref, reactive } from "vue";
-
-// 서버로 전송할 데이터터
-interface FormData {
-  buildingName: string;
-  roadAddress: string; // 도로명주소
-  jibunAddress: string; // 지번주소
-  dongName: string; // 법정동주소
-  lat: number; // 위도
-  lng: number; // 경도
-  budget: number | null;
-}
-
-interface ResultData {
-  // 결과 데이터  (건축년도, 역전세율)
-  [key: string]: unknown;
-}
-
-// 새로운 타입 정의 추가
-interface FloorAndPurpose {
-  resFloor: string;
-  resUseType: string;
-  resStructure: string;
-  resArea: string;
-}
-
-interface ViolationStatusVO {
-  violationStatus: string;
-}
-
-const initFormData: FormData = {
-  buildingName: "",
-  roadAddress: "",
-  jibunAddress: "",
-  dongName: "",
-  lat: 0,
-  lng: 0,
-  budget: null,
-};
+import { useStepManagement } from "@/pages/safeReport/composables/useStepManagement";
+import { useDataManagement } from "@/pages/safeReport/composables/useDataManagement";
 
 export const safeReportStore = defineStore("safeReport", () => {
-  const currentStep = ref(0);
-  const formData = reactive<FormData>({ ...initFormData });
-  const resultData = ref<ResultData | null>(null);
-  const violationStatus = ref<string | null>(null);
-  const floorAndPurposeList = ref<FloorAndPurpose[] | null>(null);
-
-  const updateFormData = (updated: Partial<FormData>) => {
-    Object.assign(formData, updated);
-  };
-
-  const nextStep = (payload?: { resultData?: unknown; buildingInfo?: unknown }) => {
-    if (payload?.resultData) {
-      resultData.value = payload.resultData as ResultData;
-    }
-    currentStep.value++;
-  };
-
-  const prevStep = () => {
-    const from = currentStep.value;
-    currentStep.value--;
-
-    if (from === 1) {
-      // 1→0: 건물 정보 초기화
-      formData.buildingName = "";
-    } else if (from === 2) {
-      // 2→1: 예산 정보 초기화
-      formData.budget = null;
-      console.log("초기화된 budget 값:", formData.budget);
-    }
-  };
-
-  const resetStore = () => {
-    currentStep.value = 0;
-    Object.assign(formData, initFormData);
-    resultData.value = null;
-    violationStatus.value = null;
-    floorAndPurposeList.value = null;
-  };
-
-  const updateResultData = (data: ResultData | null) => {
-    resultData.value = data;
-  };
-
-  const updateViolationStatus = (status: string | null) => {
-    violationStatus.value = status;
-  };
-
-  const updateFloorAndPurposeList = (data: FloorAndPurpose[] | null) => {
-    floorAndPurposeList.value = data;
-  };
-
-  const updateViolationStatusVO = (data: ViolationStatusVO | null) => {
-    violationStatus.value = data?.violationStatus ?? null;
-  };
-
-  return {
+  // 스텝 관리
+  const {
     currentStep,
-    formData,
-    resultData,
-    violationStatus,
-    floorAndPurposeList,
-
-    updateFormData,
     nextStep,
     prevStep,
-    resetStore,
+    goToStep,
+    isCurrentStep,
+    resetStep,
+  } = useStepManagement();
+
+  // 데이터 관리
+  const {
+    formData,
+    resultData,
+    safeReportData,
+    violationStatus,
+    floorAndPurposeList,
+    updateFormData,
+    createRequestDto,
     updateResultData,
+    updateSafeReportData,
     updateViolationStatus,
     updateFloorAndPurposeList,
     updateViolationStatusVO,
+    resetAllData,
+    resetFormData,
+  } = useDataManagement();
+
+  /**
+   * 스텝 이동 시 데이터 초기화를 포함한 prevStep
+   */
+  const prevStepWithReset = () => {
+    prevStep(formData);
+  };
+
+  /**
+   * 스토어 전체 초기화
+   */
+  const resetStore = () => {
+    resetStep();
+    resetAllData();
+  };
+
+  return {
+    // 스텝 관련
+    currentStep,
+    nextStep,
+    prevStep: prevStepWithReset,
+    goToStep,
+    isCurrentStep,
+    resetStep,
+
+    // 데이터 관련
+    formData,
+    resultData,
+    safeReportData,
+    violationStatus,
+    floorAndPurposeList,
+
+    // 데이터 업데이트
+    updateFormData,
+    createRequestDto,
+    updateResultData,
+    updateSafeReportData,
+    updateViolationStatus,
+    updateFloorAndPurposeList,
+    updateViolationStatusVO,
+
+    // 초기화
+    resetStore,
+    resetAllData,
+    resetFormData,
   };
 });

@@ -9,10 +9,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
+  (e: "change", value: string): void;
 }>();
 
 function select(value: string) {
   emit("update:modelValue", value);
+  emit("change", value);
 }
 
 const isFirst = (idx: number) => idx === 0;

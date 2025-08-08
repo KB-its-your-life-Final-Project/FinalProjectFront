@@ -30,7 +30,7 @@ const movePage = {
   // mainRouteName start
   homeMain: makeRoute(mainRouteName.homeMain),
   mapSearch: makeRoute(mainRouteName.mapSearch),
-  myLike: makeRoute(mainRouteName.myLike),
+  wishlist: makeRoute(mainRouteName.wishlist),
   safeReport: makeRoute(mainRouteName.safeReport),
   myAlarm: makeRoute(mainRouteName.myAlarm),
   localInfo: makeRoute(mainRouteName.localInfo),
