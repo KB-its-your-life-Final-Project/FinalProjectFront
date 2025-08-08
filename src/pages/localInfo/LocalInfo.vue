@@ -14,7 +14,6 @@ import { InfoCardList } from "@/pages/localInfo/_component/InfoCard.ts";
 import Footer from "@/components/layout/Footer.vue";
 import WishButton from "@/components/common/WishButton.vue";
 import { useToast } from "@/utils/useToast";
-import ToastList from "@/components/common/ToastList.vue";
 
 const route = useRoute();
 const { createToast, addToast } = useToast();
@@ -169,5 +168,4 @@ onMounted(() => {
   </div>
 
   <div class="h-15"><Footer /></div>
-  <ToastList />
 </template>

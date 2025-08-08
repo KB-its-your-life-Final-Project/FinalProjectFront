@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Api } from '@/api/autoLoad/Api';
-import type {
-  SidoDto,
-  SigugunDto,
-  DongDto,
-  BuildingInfoDto
-} from '@/api/autoLoad/data-contracts';
+import { ref, onMounted } from "vue";
+import { Api } from "@/api/autoLoad/Api";
+import type { SidoDto, SigugunDto, DongDto, BuildingInfoDto } from "@/api/autoLoad/data-contracts";
 
 interface AddressData {
   sido: string | undefined;
@@ -26,33 +21,33 @@ interface Props {
   // 건물 선택 후 처리 방식 ('safereport' | 'map'
   // safereport: 안심 레포트에서 처리
   // map: 지도에서 사용하실 경우 사용
-  handleBuildingSelection?: 'safereport' | 'map';
+  handleBuildingSelection?: "safereport" | "map";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  handleBuildingSelection: 'safereport'
+  handleBuildingSelection: "safereport",
 });
 
-const emit = defineEmits(['go-back', 'address-selected', 'building-selected']);
+const emit = defineEmits(["go-back", "address-selected", "building-selected"]);
 
 const STEPS = {
   SIDO: 1,
   SIGUGUN: 2,
   DONG: 3,
-  BUILDING: 4
+  BUILDING: 4,
 } as const;
 
 // 필터링이 필요한 시/도 코드
 const SIDO_CODES = {
-  GYEONGGI: '41',
-  JEONBUK: '52',
-  GYEONGNAM: '48',
-  GYEONGBUK: '47',
-  JEONNAM: '46',
-  CHUNGBUK: '43',
-  CHUNGNAM: '44',
-  JEJU: '50',
-  SEJONG: '36'
+  GYEONGGI: "41",
+  JEONBUK: "52",
+  GYEONGNAM: "48",
+  GYEONGBUK: "47",
+  JEONNAM: "46",
+  CHUNGBUK: "43",
+  CHUNGNAM: "44",
+  JEJU: "50",
+  SEJONG: "36",
 } as const;
 
 const api = new Api();
@@ -61,36 +56,36 @@ const createAddressData = (): AddressData => ({
   sido: selectedSido.value?.sidoNm,
   sigugun: selectedSigugun.value?.sggNm,
   dong: selectedDong.value?.dongNm,
-  buildingName: '',
-  fullAddress: '',
+  buildingName: "",
+  fullAddress: "",
   sidoCd: selectedSido.value?.sidoCd,
   sggCd: selectedSigugun.value?.sggCd,
   umdCd: selectedDong.value?.umdCd,
   latitude: undefined,
   longitude: undefined,
-  jibunAddr: undefined
+  jibunAddr: undefined,
 });
 
 const buildFullAddress = (): string => {
   // 세종시의 경우 읍/면/동 없이 주소 생성
   if (selectedSido.value?.sidoCd === SIDO_CODES.SEJONG) {
-    return `${selectedSido.value?.sidoNm || ''} ${selectedSigugun.value?.sggNm || ''}`.trim();
+    return `${selectedSido.value?.sidoNm || ""} ${selectedSigugun.value?.sggNm || ""}`.trim();
   }
-  return `${selectedSido.value?.sidoNm || ''} ${selectedSigugun.value?.sggNm || ''} ${selectedDong.value?.dongNm || ''}`.trim();
+  return `${selectedSido.value?.sidoNm || ""} ${selectedSigugun.value?.sggNm || ""} ${selectedDong.value?.dongNm || ""}`.trim();
 };
 
 const shouldFilterSigugun = (sggNm: string, sidoCd: string, allData?: SigugunDto[]): boolean => {
   // 광역시/특별시/특별자치도 이름 제거
   const metropolitanCityNames = [
-    '광주광역시',
-    '대구광역시',
-    '대전광역시',
-    '부산광역시',
-    '서울특별시',
-    '세종특별자치시',
-    '울산광역시',
-    '인천광역시',
-    '제주특별자치도'
+    "광주광역시",
+    "대구광역시",
+    "대전광역시",
+    "부산광역시",
+    "서울특별시",
+    "세종특별자치시",
+    "울산광역시",
+    "인천광역시",
+    "제주특별자치도",
   ];
 
   if (metropolitanCityNames.includes(sggNm)) {
@@ -98,31 +93,35 @@ const shouldFilterSigugun = (sggNm: string, sidoCd: string, allData?: SigugunDto
   }
 
   // 특정 지역들에 대한 추가 필터링 로직
-  const filteringCodes = ['41', '52', '48', '47', '46', '43', '44', '50'];
+  const filteringCodes = ["41", "52", "48", "47", "46", "43", "44", "50"];
   const needsFiltering = filteringCodes.includes(sidoCd);
 
   if (needsFiltering) {
     // 기본적으로 시/군/구가 포함되지 않은 경우 제외
-    const hasCityCountyGu = sggNm.includes('시') || sggNm.includes('군') || sggNm.includes('구');
+    const hasCityCountyGu = sggNm.includes("시") || sggNm.includes("군") || sggNm.includes("구");
     if (!hasCityCountyGu) {
       return true;
     }
 
     // 시/군/구 뒤에 읍/면/동이 붙은 경우 제외 (예: "거제시 남부면" → 제외)
-    if ((sggNm.includes('시') || sggNm.includes('군') || sggNm.includes('구')) &&
-        (sggNm.includes('읍') || sggNm.includes('면') || sggNm.includes('동'))) {
+    if (
+      (sggNm.includes("시") || sggNm.includes("군") || sggNm.includes("구")) &&
+      (sggNm.includes("읍") || sggNm.includes("면") || sggNm.includes("동"))
+    ) {
       return true;
     }
 
     // 경기도, 경남, 경북의 경우 추가 로직: "시"만 있는데 같은 시에 "구"가 있으면 제외
-    if (sidoCd === SIDO_CODES.GYEONGGI || sidoCd === SIDO_CODES.GYEONGNAM || sidoCd === SIDO_CODES.GYEONGBUK) {
+    if (
+      sidoCd === SIDO_CODES.GYEONGGI ||
+      sidoCd === SIDO_CODES.GYEONGNAM ||
+      sidoCd === SIDO_CODES.GYEONGBUK
+    ) {
       // "시"로 끝나는 경우, 같은 시에 구가 있는지 확인
-      if (sggNm.endsWith('시')) {
+      if (sggNm.endsWith("시")) {
         if (allData) {
-          const hasGu = allData.some(item =>
-            item.sggNm &&
-            item.sggNm.includes(sggNm) &&
-            item.sggNm.includes('구')
+          const hasGu = allData.some(
+            (item) => item.sggNm && item.sggNm.includes(sggNm) && item.sggNm.includes("구"),
           );
           // 같은 시에 구가 있으면 시만 있는 항목 제외
           if (hasGu) {
@@ -135,7 +134,7 @@ const shouldFilterSigugun = (sggNm: string, sidoCd: string, allData?: SigugunDto
     // 제주도의 경우 추가 로직: "시 + 읍/면" 형태 제외
     if (sidoCd === SIDO_CODES.JEJU) {
       // "제주시 구좌읍", "서귀포시 대정읍" 같은 형태 제외, "제주시", "서귀포시"만 남김
-      if (sggNm.includes('시') && (sggNm.includes('읍') || sggNm.includes('면'))) {
+      if (sggNm.includes("시") && (sggNm.includes("읍") || sggNm.includes("면"))) {
         return true;
       }
     }
@@ -146,7 +145,7 @@ const shouldFilterSigugun = (sggNm: string, sidoCd: string, allData?: SigugunDto
 
 const shouldFilterBuilding = (buildingName: string): boolean => {
   // 건물명이 없거나 빈 문자열인 경우 제외
-  if (!buildingName || buildingName.trim() === '') {
+  if (!buildingName || buildingName.trim() === "") {
     return true;
   }
 
@@ -186,14 +185,14 @@ async function loadSidoList() {
 
     if (response.data.success && response.data.data) {
       // "기타" 제외하고 가나다순 정렬
-      sidoList.value = response.data.data.filter(sido =>
-        sido.sidoNm && sido.sidoNm !== '기타'
-      ).sort((a, b) => (a.sidoNm || '').localeCompare(b.sidoNm || '', 'ko'));
+      sidoList.value = response.data.data
+        .filter((sido) => sido.sidoNm && sido.sidoNm !== "기타")
+        .sort((a, b) => (a.sidoNm || "").localeCompare(b.sidoNm || "", "ko"));
     } else {
-      console.error('시/도 목록 로드 실패:', response.data.message);
+      console.error("시/도 목록 로드 실패:", response.data.message);
     }
   } catch (error) {
-    console.error('시/도 목록 로드 중 오류:', error);
+    console.error("시/도 목록 로드 중 오류:", error);
   } finally {
     isLoading.value = false;
   }
@@ -205,31 +204,32 @@ async function loadSigugunList(sidoCd: string) {
     isLoading.value = true;
     const response = await api.getSigugunListUsingGet(sidoCd);
 
-          if (response.data.success && response.data.data) {
-        // 모든 데이터 사용 (첫 번째 요소 제거하지 않음)
-        const allData = response.data.data;
-        const filteredData = allData.filter(sigugun => {
-          const sggNm = sigugun.sggNm?.trim() || '';
+    if (response.data.success && response.data.data) {
+      // 모든 데이터 사용 (첫 번째 요소 제거하지 않음)
+      const allData = response.data.data;
+      const filteredData = allData.filter((sigugun) => {
+        const sggNm = sigugun.sggNm?.trim() || "";
 
-          // 빈 값 제외
-          if (!sggNm) return false;
+        // 빈 값 제외
+        if (!sggNm) return false;
 
-          // 필터링 조건 확인
-          return !shouldFilterSigugun(sggNm, sidoCd, allData);
-        });
+        // 필터링 조건 확인
+        return !shouldFilterSigugun(sggNm, sidoCd, allData);
+      });
       // 중복 제거 (sggNm 기준)
-      const uniqueData = filteredData.filter((sigugun, index, self) =>
-        index === self.findIndex(s => s.sggNm === sigugun.sggNm)
+      const uniqueData = filteredData.filter(
+        (sigugun, index, self) => index === self.findIndex((s) => s.sggNm === sigugun.sggNm),
       );
       // 가나다순 정렬
-      sigugunList.value = uniqueData.sort((a, b) => (a.sggNm || '').localeCompare(b.sggNm || '', 'ko'));
-
+      sigugunList.value = uniqueData.sort((a, b) =>
+        (a.sggNm || "").localeCompare(b.sggNm || "", "ko"),
+      );
     } else {
-      console.error('시/군/구 목록 로드 실패:', response.data.message);
+      console.error("시/군/구 목록 로드 실패:", response.data.message);
       sigugunList.value = [];
     }
   } catch (error) {
-    console.error('시/군/구 목록 로드 중 오류:', error);
+    console.error("시/군/구 목록 로드 중 오류:", error);
     sigugunList.value = [];
   } finally {
     isLoading.value = false;
@@ -240,17 +240,19 @@ async function loadSigugunList(sidoCd: string) {
 async function loadDongList(sidoCd: string, sggCd: string) {
   try {
     isLoading.value = true;
-    const response = await api.getDongListUsingGet(sggCd,sidoCd);
+    const response = await api.getDongListUsingGet(sggCd, sidoCd);
 
     if (response.data.success && response.data.data) {
       // 첫 번째 원소 제외하고 가나다순 정렬
-      dongList.value = response.data.data.slice(1).sort((a, b) => (a.dongNm || '').localeCompare(b.dongNm || '', 'ko'));
+      dongList.value = response.data.data
+        .slice(1)
+        .sort((a, b) => (a.dongNm || "").localeCompare(b.dongNm || "", "ko"));
     } else {
-      console.error('읍/면/동 목록 로드 실패:', response.data.message);
+      console.error("읍/면/동 목록 로드 실패:", response.data.message);
       dongList.value = [];
     }
   } catch (error) {
-    console.error('읍/면/동 목록 로드 중 오류:', error);
+    console.error("읍/면/동 목록 로드 중 오류:", error);
     dongList.value = [];
   } finally {
     isLoading.value = false;
@@ -263,23 +265,22 @@ async function loadBuildingList(dongName: string, regionCode: string) {
     isLoading.value = true;
     const response = await api.getBuildingListUsingGet({
       dongName: dongName,
-      regionCode: regionCode
+      regionCode: regionCode,
     });
 
     if (response.data.success && response.data.data?.buildingInfos) {
-
       // 건물명 필터링
-      const filteredBuildings: BuildingInfoDto[] = response.data.data.buildingInfos.filter((building: BuildingInfoDto) =>
-        !shouldFilterBuilding(building.buildingName || '')
+      const filteredBuildings: BuildingInfoDto[] = response.data.data.buildingInfos.filter(
+        (building: BuildingInfoDto) => !shouldFilterBuilding(building.buildingName || ""),
       );
 
       buildingList.value = filteredBuildings;
     } else {
-      console.error('❌ 건물 목록 로드 실패:', response.data.message);
+      console.error("❌ 건물 목록 로드 실패:", response.data.message);
       buildingList.value = [];
     }
   } catch (error) {
-    console.error('건물 목록 로드 중 오류:', error);
+    console.error("건물 목록 로드 중 오류:", error);
     buildingList.value = [];
   } finally {
     isLoading.value = false;
@@ -291,7 +292,7 @@ async function selectSido(sido: SidoDto) {
   selectedSido.value = sido;
 
   // 선택된 시/도에 따른 시/군/구 목록 로드
-  await loadSigugunList(sido.sidoCd || '');
+  await loadSigugunList(sido.sidoCd || "");
 
   currentStep.value = STEPS.SIGUGUN;
 }
@@ -304,11 +305,11 @@ async function selectSigugun(sigugun: SigugunDto) {
   if (selectedSido.value?.sidoCd === SIDO_CODES.SEJONG) {
     // 세종시는 읍/면/동 단계를 건너뛰고 바로 건물 목록 로드
     const regionCode = `${selectedSido.value?.sidoCd}${sigugun.sggCd}`;
-    await loadBuildingList('', regionCode); // 동 이름 없이 지역 코드만으로 검색
+    await loadBuildingList("", regionCode); // 동 이름 없이 지역 코드만으로 검색
     currentStep.value = STEPS.BUILDING;
   } else {
     // 다른 지역은 기존처럼 읍/면/동 목록 로드
-    await loadDongList(selectedSido.value?.sidoCd || '', sigugun.sggCd || '');
+    await loadDongList(selectedSido.value?.sidoCd || "", sigugun.sggCd || "");
     currentStep.value = STEPS.DONG;
   }
 }
@@ -319,7 +320,7 @@ async function selectDong(dong: DongDto) {
 
   // 선택된 읍/면/동에 따른 건물 목록 로드
   const regionCode = `${selectedSido.value?.sidoCd}${selectedSigugun.value?.sggCd}`;
-  await loadBuildingList(dong.dongNm || '', regionCode);
+  await loadBuildingList(dong.dongNm || "", regionCode);
 
   currentStep.value = STEPS.BUILDING;
 }
@@ -333,15 +334,15 @@ function selectBuilding(building: BuildingInfoDto) {
     fullAddress: buildFullAddress(),
     latitude: building.latitude,
     longitude: building.longitude,
-    jibunAddr: building.jibunAddr
+    jibunAddr: building.jibunAddr,
   };
 
-  if (props.handleBuildingSelection === 'map') {
+  if (props.handleBuildingSelection === "map") {
     // 수동 처리: 부모 컴포넌트에서 처리하도록 이벤트만 발생
-    emit('building-selected', addressData);
+    emit("building-selected", addressData);
   } else {
     // 안심 레포트 처리: 안심 레포트에서 사용
-    emit('address-selected', addressData);
+    emit("address-selected", addressData);
   }
 }
 
@@ -362,23 +363,23 @@ async function goToStep(step: number) {
     dongList.value = [];
     buildingList.value = [];
     // 시/군/구 목록 다시 로드
-    await loadSigugunList(selectedSido.value.sidoCd || '');
+    await loadSigugunList(selectedSido.value.sidoCd || "");
   } else if (step === 3 && selectedSigugun.value) {
     currentStep.value = 3;
     selectedDong.value = null;
     buildingList.value = [];
     // 읍/면/동 목록 다시 로드
-    await loadDongList(selectedSido.value?.sidoCd || '', selectedSigugun.value.sggCd || '');
+    await loadDongList(selectedSido.value?.sidoCd || "", selectedSigugun.value.sggCd || "");
   } else if (step === 4 && selectedDong.value) {
     currentStep.value = 4;
     // 건물 목록 다시 로드
     const regionCode = `${selectedSido.value?.sidoCd}${selectedSigugun.value?.sggCd}`;
-    await loadBuildingList(selectedDong.value.dongNm || '', regionCode);
+    await loadBuildingList(selectedDong.value.dongNm || "", regionCode);
   }
 }
 
 function goBack() {
-  emit('go-back');
+  emit("go-back");
 }
 </script>
 
@@ -386,29 +387,29 @@ function goBack() {
   <div class="select-address-page">
     <!-- 헤더-->
     <div class="bg-kb-yellow px-4 py-3 flex items-center justify-between flex-shrink-0">
-      <button
-        @click="goBack"
-        class="text-black hover:bg-black/10 p-1 rounded transition-colors"
-      >
+      <button @click="goBack" class="text-black hover:bg-black/10 p-1 rounded transition-colors">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </button>
       <h1 class="text-lg font-semibold text-black">주소 선택</h1>
       <div class="w-6"></div>
     </div>
 
-
     <div class="flex flex-col bg-white flex-1 overflow-hidden">
-
-              <div class="px-4 py-3 border-b border-gray-200 flex-shrink-0">
-          <div class="flex items-center text-base text-gray-600">
+      <div class="px-4 py-3 border-b border-gray-200 flex-shrink-0">
+        <div class="flex items-center text-base text-gray-600">
           <span class="mr-2 text-gray-600">📍</span>
           <span
             class="cursor-pointer hover:text-gray-800 font-semibold text-gray-800"
             @click="goToStep(1)"
           >
-            {{ selectedSido?.sidoNm || '시/도' }}
+            {{ selectedSido?.sidoNm || "시/도" }}
           </span>
           <span class="mx-2 text-gray-800"> > </span>
           <span
@@ -416,23 +417,36 @@ function goBack() {
             :class="selectedSigugun ? 'font-semibold text-gray-800' : 'text-gray-400'"
             @click="goToStep(2)"
           >
-            {{ selectedSigugun?.sggNm || '시/군/구' }}
+            {{ selectedSigugun?.sggNm || "시/군/구" }}
           </span>
           <!-- 세종시가 아닌 경우에만 읍/면/동 표시 -->
           <template v-if="selectedSido?.sidoCd !== '36'">
-            <span class="mx-2" :class="selectedSigugun ? 'text-gray-800' : 'text-gray-400'"> > </span>
+            <span class="mx-2" :class="selectedSigugun ? 'text-gray-800' : 'text-gray-400'">
+              >
+            </span>
             <span
               class="cursor-pointer hover:text-gray-800"
               :class="selectedDong ? 'font-semibold text-gray-800' : 'text-gray-400'"
               @click="goToStep(3)"
             >
-              {{ selectedDong?.dongNm || '읍/면/동' }}
+              {{ selectedDong?.dongNm || "읍/면/동" }}
             </span>
           </template>
           <!-- 세종시의 경우 시/군/구 선택 후 바로 건물 선택, 다른 지역은 읍/면/동 선택 후 건물 선택 -->
-          <span v-if="buildingList.length > 0 && (selectedSido?.sidoCd === '36' ? selectedSigugun : selectedDong)" class="mx-2 text-gray-400"> > </span>
           <span
-            v-if="buildingList.length > 0 && (selectedSido?.sidoCd === '36' ? selectedSigugun : selectedDong)"
+            v-if="
+              buildingList.length > 0 &&
+              (selectedSido?.sidoCd === '36' ? selectedSigugun : selectedDong)
+            "
+            class="mx-2 text-gray-400"
+          >
+            >
+          </span>
+          <span
+            v-if="
+              buildingList.length > 0 &&
+              (selectedSido?.sidoCd === '36' ? selectedSigugun : selectedDong)
+            "
             class="cursor-pointer hover:text-gray-800 text-gray-400"
             @click="goToStep(4)"
           >
@@ -459,7 +473,7 @@ function goBack() {
                 'py-3 px-4 border rounded-lg text-center transition-colors',
                 selectedSido?.sidoCd === sido.sidoCd
                   ? 'bg-kb-yellow border-kb-yellow text-white'
-                  : 'border-gray-300 text-gray-700 hover:border-kb-yellow hover:bg-kb-yellow/10'
+                  : 'border-gray-300 text-gray-700 hover:border-kb-yellow hover:bg-kb-yellow/10',
               ]"
             >
               {{ sido.sidoNm }}
@@ -478,7 +492,7 @@ function goBack() {
                 'py-3 px-4 border rounded-lg text-center transition-colors',
                 selectedSigugun?.sggCd === sigugun.sggCd
                   ? 'bg-kb-yellow border-kb-yellow text-white'
-                  : 'border-gray-300 text-gray-700 hover:border-kb-yellow hover:bg-kb-yellow/10'
+                  : 'border-gray-300 text-gray-700 hover:border-kb-yellow hover:bg-kb-yellow/10',
               ]"
             >
               {{ sigugun.sggNm }}
@@ -497,7 +511,7 @@ function goBack() {
                 'py-3 px-4 border rounded-lg text-center transition-colors',
                 selectedDong?.umdCd === dong.umdCd
                   ? 'bg-kb-yellow border-kb-yellow text-white'
-                  : 'border-gray-300 text-gray-700 hover:border-kb-yellow hover:bg-kb-yellow/10'
+                  : 'border-gray-300 text-gray-700 hover:border-kb-yellow hover:bg-kb-yellow/10',
               ]"
             >
               {{ dong.dongNm }}
@@ -515,7 +529,7 @@ function goBack() {
               @click="selectBuilding(building)"
               :class="[
                 'py-3 px-4 border rounded-lg text-left transition-colors',
-                'border-gray-300 text-gray-700 hover:border-kb-yellow hover:bg-kb-yellow/10'
+                'border-gray-300 text-gray-700 hover:border-kb-yellow hover:bg-kb-yellow/10',
               ]"
             >
               {{ building.buildingName }}
@@ -550,6 +564,3 @@ function goBack() {
   overflow: hidden;
 }
 </style>
-
-
-

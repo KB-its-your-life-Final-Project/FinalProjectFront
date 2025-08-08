@@ -1,5 +1,5 @@
-import { ref } from 'vue';
-import { numberToKorean, sanitizeNumberInput, validateBudgetInput } from '@/utils/numberUtils';
+import { ref } from "vue";
+import { numberToKorean, sanitizeNumberInput, validateBudgetInput } from "@/utils/numberUtils";
 
 export function useBudgetInput(initialBudget?: number) {
   const rawInput = ref(""); // 사용자가 입력한 숫자 문자열

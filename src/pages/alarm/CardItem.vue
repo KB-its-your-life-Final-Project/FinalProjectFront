@@ -1,5 +1,7 @@
 <template>
-  <div class="flex items-start bg-white rounded-xl shadow-md p-6 mb-6 hover:shadow-lg transition-shadow relative">
+  <div
+    class="flex items-start bg-white rounded-xl shadow-md p-6 mb-6 hover:shadow-lg transition-shadow relative"
+  >
     <!-- X 버튼 -->
     <button
       @click.stop="$emit('delete')"
@@ -26,10 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 defineProps<{
-  icon: string;  // e.g., ['fas', 'bell']
+  icon: string; // e.g., ['fas', 'bell']
   title: string;
   content: string;
   timeAgo: string;
@@ -37,7 +39,7 @@ defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'click'): void;
-  (e: 'delete'): void;
+  (e: "click"): void;
+  (e: "delete"): void;
 }>();
 </script>

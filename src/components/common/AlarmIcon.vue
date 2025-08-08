@@ -22,7 +22,7 @@ const fetchUnreadCount = async () => {
     const count = await alarmService.getUnreadAlarmCount();
     unreadCount.value = count;
   } catch (error) {
-    console.error('미확인 알림 개수 조회 실패:', error);
+    console.error("미확인 알림 개수 조회 실패:", error);
   } finally {
     isLoading.value = false;
   }
@@ -48,9 +48,12 @@ onMounted(() => {
   fetchUnreadCount();
 
   // 5분마다 미확인 알림 개수 업데이트
-  intervalId = setInterval(() => {
-    fetchUnreadCount();
-  }, 5 * 60 * 1000);
+  intervalId = setInterval(
+    () => {
+      fetchUnreadCount();
+    },
+    5 * 60 * 1000,
+  );
 });
 
 onUnmounted(() => {
@@ -82,15 +85,12 @@ onUnmounted(() => {
         v-if="props.showBadge && unreadCount > 0"
         class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]"
       >
-        {{ unreadCount > 99 ? '99+' : unreadCount }}
+        {{ unreadCount > 99 ? "99+" : unreadCount }}
       </div>
     </button>
 
     <!-- 알림 목록 모달 -->
-    <AlarmList
-      :visible="showAlarmList"
-      @close="closeAlarmList"
-    />
+    <AlarmList :visible="showAlarmList" @close="closeAlarmList" />
   </div>
 </template>
 

@@ -48,12 +48,12 @@ watch(
 
           const filteredPayload = props.returnFields
             ? props.returnFields.reduce(
-              (acc, key) => {
-                acc[key] = fullAddressPayload[key];
-                return acc;
-              },
-              {} as Record<string, string>,
-            )
+                (acc, key) => {
+                  acc[key] = fullAddressPayload[key];
+                  return acc;
+                },
+                {} as Record<string, string>,
+              )
             : fullAddressPayload;
 
           emit("complete", filteredPayload);
@@ -67,7 +67,7 @@ watch(
 
       // iframe 내부 스타일 주입 (글자 크기 조정)
       setTimeout(() => {
-        const iframe = layerContent.value?.querySelector('iframe');
+        const iframe = layerContent.value?.querySelector("iframe");
         if (iframe) {
           try {
             // iframe 로드 완료 후 스타일 주입
@@ -75,7 +75,7 @@ watch(
               try {
                 const doc = iframe.contentDocument || iframe.contentWindow?.document;
                 if (doc) {
-                  const style = doc.createElement('style');
+                  const style = doc.createElement("style");
                   style.textContent = `
                     * { font-size: 16px !important; }
                     body { font-size: 16px !important; }
@@ -91,11 +91,11 @@ watch(
                   doc.head.appendChild(style);
                 }
               } catch (e) {
-                console.log('iframe 스타일 주입 실패:', e);
+                console.log("iframe 스타일 주입 실패:", e);
               }
             };
           } catch (e) {
-            console.log('iframe 접근 실패:', e);
+            console.log("iframe 접근 실패:", e);
           }
         }
       }, 200);
@@ -115,7 +115,7 @@ function closeLayer() {
     :class="[
       props.fullscreen
         ? 'fixed inset-0 z-[9999] bg-white'
-        : 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white w-full h-full rounded-md'
+        : 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white w-full h-full rounded-md',
     ]"
   >
     <div class="bg-kb-yellow h-12 flex items-center">
@@ -123,11 +123,7 @@ function closeLayer() {
     </div>
     <div
       ref="layerContent"
-      :class="[
-        props.fullscreen
-          ? 'h-[calc(100vh-48px)]'
-          : 'h-[calc(100%-48px)]'
-      ]"
+      :class="[props.fullscreen ? 'h-[calc(100vh-48px)]' : 'h-[calc(100%-48px)]']"
     >
       <!-- 여기에 postcode iframe이 embed 됩니다 -->
     </div>

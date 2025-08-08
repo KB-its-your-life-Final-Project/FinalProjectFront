@@ -20,7 +20,6 @@ import {
   RegionWishlistResponseDTO,
   SearchHistoryDTO,
 } from "@/api/autoLoad/data-contracts";
-import ToastList from "@/components/common/ToastList.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const api = new Api();
@@ -151,5 +150,4 @@ onMounted(async () => {
     </SubjectSection>
     <Section />
   </div>
-  <ToastList></ToastList>
 </template>
