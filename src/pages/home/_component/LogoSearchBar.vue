@@ -5,9 +5,12 @@ import lighthouseIcon from "@/assets/imgs/lighthouse.png";
 import movePage from "@/utils/movePage";
 import { Api } from "@/api/autoLoad/Api";
 import { SearchHistoryDTO } from "@/api/autoLoad/data-contracts";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 //검색input
-const searchInput = ref("");
+const searchInput = ref(route.query.searchInput ? route.query.searchInput : "");
 
 //검색 input  클리어
 const clearSearch = () => {
@@ -42,19 +45,23 @@ const saveSearchHistory = async (keyword: string) => {
 
 //검색 실행
 const handleSearch = async () => {
-  if (searchInput.value.trim()) {
+  const searchValue =
+    typeof searchInput.value === "string" ? searchInput.value : searchInput.value[0] || "";
+
+  if (searchValue.trim()) {
     try {
-      await saveSearchHistory(searchInput.value);
-      movePage.mapSearch({ searchInput: searchInput.value });
+      await saveSearchHistory(searchValue);
+      movePage.mapSearch({ searchInput: searchValue });
     } catch (error) {
-      // 검색 기록 저장에 실패해도 페이지 이동은 진행
-      movePage.mapSearch({ searchInput: searchInput.value });
+      movePage.mapSearch({ searchInput: searchValue });
     }
+  } else {
+    movePage.mapSearch({ searchInput: searchValue });
   }
 };
 
 defineProps<{
-  placeholder: string;
+  placeholder?: string;
 }>();
 </script>
 
@@ -66,7 +73,6 @@ defineProps<{
       :src="lighthouseIcon"
       alt="검색 아이콘"
       class="h-full w-auto max-h-[2rem] mr-[0.5rem] object-contain"
-      @click="handleSearch"
     />
     <input
       v-model="searchInput"

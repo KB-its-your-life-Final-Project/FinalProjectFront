@@ -199,11 +199,11 @@ const mapUtil = {
       // 클릭시 이벤트
       naver.maps.Event.addListener(marker, "click", () => {
         movePage.transactionDetail({
-          jibunAddress: encodeURIComponent(MarkerData.jibunAddress),
-          roadAddress: encodeURIComponent(MarkerData.roadAddress),
+          jibunAddress: MarkerData.jibunAddress,
+          roadAddress: MarkerData.roadAddress,
           lat: MarkerData.latlng.lat().toString(),
           lng: MarkerData.latlng.lng().toString(),
-          buildingName: encodeURIComponent(MarkerData.buildingName || ""),
+          buildingName: MarkerData.buildingName || "",
         });
       });
 
