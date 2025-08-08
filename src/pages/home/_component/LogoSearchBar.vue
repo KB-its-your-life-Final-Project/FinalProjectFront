@@ -3,6 +3,8 @@
 import { ref, watch } from "vue";
 import lighthouseIcon from "@/assets/imgs/lighthouse.png";
 import movePage from "@/utils/movePage";
+import { Api } from "@/api/autoLoad/Api";
+import { SearchHistoryDTO } from "@/api/autoLoad/data-contracts";
 
 //검색input
 const searchInput = ref("");
@@ -22,6 +24,35 @@ watch(searchInput, () => {
   }
 });
 
+//검색 기록 저장
+const saveSearchHistory = async (keyword: string) => {
+  if (!keyword.trim()) return;
+
+  try {
+    const searchHistoryData: SearchHistoryDTO = {
+      keyword: keyword.trim(),
+      type: 1, // 검색 타입 (1: 일반 검색)
+    };
+
+    await new Api().saveSearchHistoryUsingPost(searchHistoryData);
+  } catch (error) {
+    console.error("검색 기록 저장 실패:", error);
+  }
+};
+
+//검색 실행
+const handleSearch = async () => {
+  if (searchInput.value.trim()) {
+    try {
+      await saveSearchHistory(searchInput.value);
+      movePage.mapSearch({ searchInput: searchInput.value });
+    } catch (error) {
+      // 검색 기록 저장에 실패해도 페이지 이동은 진행
+      movePage.mapSearch({ searchInput: searchInput.value });
+    }
+  }
+};
+
 defineProps<{
   placeholder: string;
 }>();
@@ -35,13 +66,14 @@ defineProps<{
       :src="lighthouseIcon"
       alt="검색 아이콘"
       class="h-full w-auto max-h-[2rem] mr-[0.5rem] object-contain"
-      @click="movePage.mapSearch({ searchInput: searchInput })"
+      @click="handleSearch"
     />
     <input
       v-model="searchInput"
       :placeholder="placeholder || '어떤 주소가 궁금하세요?'"
       class="w-full font-italic focus:outline-none placeholder-kb-ui-07 text-sm"
       type="text"
+      @keyup.enter="handleSearch"
     />
     <font-awesome-icon
       v-if="xiconShow"
