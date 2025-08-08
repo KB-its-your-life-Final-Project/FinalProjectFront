@@ -24,7 +24,7 @@ export const HomeCardTypes: HomeCardType[] = [
     title: "AI 홈 매칭",
     info: "모르는 정보를 쉽게 설명해 줄게요",
     imgSrc: imgMatch,
-    name: "",
+    name: mainRouteName.aiRecommend,
   },
   {
     title: "동네.zip",

@@ -3,12 +3,7 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { authStore } from "@/stores/authStore.ts";
 import { Api } from "@/api/autoLoad/Api";
-import {
-  isEmpty,
-  isValidEmailFormat,
-  isValidPasswordChk,
-  isValidPasswordFormat,
-} from "@/utils/validate";
+import { isEmpty, isValidEmailFormat, isValidPasswordChk, isValidName } from "@/utils/validate";
 import GoBackBtn from "@/components/common/GoBackBtn.vue";
 
 const router = useRouter();
@@ -91,6 +86,10 @@ const registerUser = async () => {
   // }
   if (isEmpty(member.name)) {
     checkSubmitMsg.value = "이름을 입력하세요";
+    return;
+  }
+  if (!isValidName(member.name)) {
+    checkSubmitMsg.value = "올바른 형식의 이름을 입력하세요";
     return;
   }
   if (isEmpty(member.password1) || isEmpty(member.password2)) {
@@ -206,7 +205,6 @@ const registerUser = async () => {
 }
 .input-email {
   @apply p-[0.7rem] border-[1px] border-solid border-kb-ui-07 flex-grow rounded-l-md h-11 min-w-0;
-  border-right: transparent;
 }
 .guide-msg {
   @apply ml-2 h-2 text-kb-ui-06 text-[0.7rem];

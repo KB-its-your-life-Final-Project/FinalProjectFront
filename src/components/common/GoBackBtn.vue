@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-
-const router = useRouter();
+import movePage from "@/utils/movePage";
 
 const goBack = async () => {
-  router.back();
+  movePage.back();
 };
 </script>
 

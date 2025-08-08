@@ -1,34 +1,70 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import ModalForm from "@/components/common/ModalForm.vue";
+import { Api } from "@/api/autoLoad/Api";
+import { authStore } from "@/stores/authStore";
+import defaultProfile from "@/assets/imgs/profile.jpg";
+
+// 상태
+const selectedFile = ref<File | null>(null);
+const previewUrl = ref<string>("");
+const isDefaultProfileImg = ref<boolean>(false);
+
+// Props & Emit
 const props = defineProps<{
   profile: string;
   name: string;
 }>();
 const emit = defineEmits(["close"]);
 
-const selectedFile = ref<File | null>(null);
-const previewUrl = ref<string>("");
-function handleFileChange(event: Event) {
+// API
+const api = new Api();
+
+const auth = authStore();
+
+function handleNewProfileChange(event: Event) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
     selectedFile.value = file;
     previewUrl.value = URL.createObjectURL(file);
+    isDefaultProfileImg.value = false;
   }
 }
-function handleConfirm(): { success: boolean; message: string } {
-  if (!selectedFile.value) {
-    return { success: false, message: "이미지를 선택해주세요." };
+
+function handleDefaultProfileChange() {
+  selectedFile.value = null;
+  previewUrl.value = defaultProfile;
+  isDefaultProfileImg.value = true;
+}
+
+async function handleConfirm(): Promise<{ success: boolean; message: string }> {
+  try {
+    if (isDefaultProfileImg.value) {
+      const { data } = await api.deleteProfileImageUsingDelete();
+      console.log("프로필사진 삭제: ", data);
+      auth.member.profileImg = "";
+      console.log("auth.member: ", auth.member);
+      return { success: true, message: "기본 이미지로 변경되었습니다" };
+    } else if (selectedFile.value) {
+      const formData = new FormData();
+      formData.append("file", selectedFile.value);
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+      const { data } = await api.uploadProfileImageUsingPost(formData);
+      console.log("프로필사진 변경: ", data);
+      auth.member.profileImg = data.data?.profileImg;
+      console.log("auth.member: ", auth.member);
+      return { success: true, message: "프로필이 변경되었습니다" };
+    } else {
+      return { success: false, message: "이미지를 선택하거나 기본 이미지를 선택하세요" };
+    }
+  } catch (error: unknown) {
+    console.error("프로필사진 변경 실패, error");
+    const errorMsg = isDefaultProfileImg.value ? "기본 이미지 변경 중 오류가 발생했습니다" : "업로드 중 오류가 발생했습니다"
+    return { success: false, message: errorMsg };
   }
-  /** todo: 실제 프로필 화면 변경 로직이 구성되어야 함. */
-  const tmpRepository = "/Users/cheonkio/upload/avatar";
-  const newFileName = `${props.name}_profile.jpg`;
-  const renamedFile = new File([selectedFile.value], newFileName, {
-    type: selectedFile.value.type,
-  });
-  console.log(renamedFile.name, "이 ", tmpRepository, "에 저장되었습니다");
-  return { success: true, message: "프로필이 변경되었습니다" };
 }
 </script>
 <template>
@@ -39,18 +75,34 @@ function handleConfirm(): { success: boolean; message: string } {
     hasConfirmBtn
   >
     <div class="flex flex-col items-center gap-2">
-      <img class="rounded-full max-w-1/2 aspect-1/1" :src="previewUrl || profile" />
-      <p v-if="selectedFile" class="text-sm text-gray-600">선택한 파일: {{ selectedFile?.name }}</p>
-      <label for="profileFile" class="cursor-pointer px-3 py-1 border rounded-xl"
-        >이미지 가져오기</label
-      >
+      <img class="rounded-full max-w-1/2 aspect-1/1 mt-4" :src="previewUrl || profile" />
+      <p v-show="selectedFile" class="text-sm text-kb-ui-06">
+        선택한 파일: {{ selectedFile?.name }}
+      </p>
+      <label for="newProfile" class="upload-btn mt-5">이미지 가져오기</label>
       <input
-        id="profileFile"
+        id="newProfile"
         class="hidden"
         type="file"
         accept="image/*"
-        @change="handleFileChange"
+        @change="handleNewProfileChange"
+      />
+      <label for="defaultProfile" class="default-btn">기본 이미지로 변경</label>
+      <input
+        id="defaultProfile"
+        class="hidden"
+        @click="handleDefaultProfileChange"
       />
     </div>
   </ModalForm>
 </template>
+<style scoped>
+@reference "@/assets/styles/main.css";
+
+.upload-btn {
+  @apply cursor-pointer px-3 py-1 bg-kb-ui-09 rounded-lg w-40 text-center font-pretendard-light;
+}
+.default-btn {
+  @apply cursor-pointer px-3 py-1 bg-kb-ui-09 rounded-lg w-40 text-center font-pretendard-light;
+}
+</style>

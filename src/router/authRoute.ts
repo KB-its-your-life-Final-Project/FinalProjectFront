@@ -1,7 +1,8 @@
 import type { RouteRecordRaw } from "vue-router";
+import type { Component } from "vue";
 
 //라우트 파일 위치
-const authRouteMap: Record<string, () => Promise<any>> = {
+const authRouteMap: Record<string, () => Promise<Component>> = {
   // 로그인 안내
   login: () => import("@/pages/auth/LoginIntroPage.vue"),
 

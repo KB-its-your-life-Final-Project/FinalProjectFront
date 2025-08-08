@@ -87,10 +87,10 @@ export function formatAmount(amount?: number): string {
   const million = amount % 10000;
 
   if (billion > 0 && million > 0) {
-    return `${billion}억 ${million.toLocaleString()}만원`;
+    return `${billion}억 ${million.toLocaleString()} 만원`;
   } else if (billion > 0) {
     return `${billion}억`;
   } else {
-    return `${million.toLocaleString()}만원`;
+    return `${million.toLocaleString()} 만원`;
   }
 }

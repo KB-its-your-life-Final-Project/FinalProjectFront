@@ -3,6 +3,7 @@ import { authRouteRecordRaw } from "@/router/authRoute";
 import { myPageRouteRecordRaw } from "@/router/mypageRoutes";
 import { mainRouteRecordRaw } from "@/router/mainRoute";
 import { authStore } from "@/stores/authStore";
+import { useToast } from "@/utils/useToast";
 
 const routes: RouteRecordRaw[] = [
   //메인 라우트
@@ -51,16 +52,23 @@ router.beforeEach(async (to, from, next) => {
     return next(); // 통과
   }
   const auth = authStore();
+  const { createToast, addToast } = useToast();
   try {
     // access token 유효성 확인
     await auth.checkLoginStatus();
     next();
-  } catch (error) {
+  } catch (error: unknown) {
     // refresh token 만료 시 로그인 화면으로 이동
-    next({
-      path: "/auth/login",
-      query: { redirect: to.fullPath }, // 로그인 후 리다이렉트를 위해 현재 경로 저장
-    });
+    console.log("refreshToken 없음: ", error);
+    addToast(createToast("로그인이 필요한 서비스입니다.", "info", 2000));
+    if (to.path !== "/auth/login") {
+      next({
+        path: "/auth/login",
+        query: { redirect: to.fullPath },
+      });
+    } else {
+      next(); // 자기 자신이면 그냥 통과
+    }
   }
 });
 

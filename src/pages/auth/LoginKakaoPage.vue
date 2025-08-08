@@ -2,14 +2,14 @@
 import { onMounted, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { authStore } from "@/stores/authStore";
-import { LoginDTO } from "@/api/autoLoad";
+import type { LoginRequestDTO } from "@/api/autoLoad/data-contracts";
 
 const route = useRoute();
 
 const router = useRouter();
 const auth = authStore();
 
-const member = reactive<LoginDTO>({
+const member = reactive<LoginRequestDTO>({
   email: "",
   password: "",
   code: "",
