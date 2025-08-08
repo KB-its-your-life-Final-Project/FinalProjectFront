@@ -13,8 +13,7 @@ const handleAlarmSettingChange = async (type: number, value: boolean) => {
   await alarmStore.updateAlarmSetting(type, value);
 };
 
-onMounted(() => {
-});
+onMounted(() => {});
 
 // 약관 내용
 const title1 = "제1조 (정보의 목적 및 한계)";

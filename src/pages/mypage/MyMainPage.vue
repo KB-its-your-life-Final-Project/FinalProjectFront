@@ -103,16 +103,75 @@ function handleNameChanged(newName: string) {
   auth.member.name = newName;
 }
 
-onMounted(async () => {
+const fetchHomeData = async () => {
   try {
-    const { data } = await api.checkLoginStatusUsingGet();
-    if (data.success && data.data) {
-      console.log("member: ", data);
-      auth.setMember(data.data);
+    isLoading.value = true;
+    const response = await api.getHomeInfoUsingGet();
+
+    if (response.data?.data) {
+      homeData.value = response.data.data;
+      user.isRegistered = true;
+    } else {
+      homeData.value = null;
+      user.isRegistered = false;
     }
   } catch (error: unknown) {
     console.error("로그인 여부 확인 중 오류: ", error);
   }
+};
+// 기존 함수들 아래에 추가
+const calculateRemainingDays = (contractEnd?: string) => {
+  if (!contractEnd) return "종료일 정보 없음";
+
+  const today = new Date();
+  const endDate = new Date(contractEnd);
+  const diffTime = endDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays > 0) {
+    return `${diffDays}일 남음`;
+  } else if (diffDays === 0) {
+    return "오늘 만료";
+  } else {
+    return `${Math.abs(diffDays)}일 지남`;
+  }
+};
+
+const getRentTypeText = (rentType?: number) => {
+  switch (rentType) {
+    case 1:
+      return "전세";
+    case 2:
+      return "월세";
+    case 3:
+      return "반전세";
+    default:
+      return "임대 유형";
+  }
+};
+
+const formatRentAmount = (homeData: HomeRegisterResponseDTO) => {
+  if (homeData.rentType === 1) {
+    return `${homeData.jeonseAmount || 0}만원`;
+  } else if (homeData.rentType === 2) {
+    return `${homeData.monthlyRent || 0}만원`;
+  } else {
+    return "금액 정보 없음";
+  }
+};
+
+const getRentSubContent = (homeData: HomeRegisterResponseDTO) => {
+  if (homeData.rentType === 1) {
+    return "전세 계약";
+  } else if (homeData.rentType === 2) {
+    return `보증금: ${homeData.monthlyDeposit || 0}만원`;
+  } else {
+    return "계약 정보 없음";
+  }
+};
+
+onMounted(() => {
+  fetchHomeData();
 });
 </script>
 
