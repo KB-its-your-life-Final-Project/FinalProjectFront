@@ -225,17 +225,6 @@ onMounted(() => {
                 @click="openModal('password', {})"
               />
               <EditItem
-                :title="'나의 집 정보 수정'"
-                :icon="['fas', 'house']"
-                @click="
-                  openModal('editHouse', {
-                    type: 'edit',
-                    address: '테스트용 주소',
-                    contractDate: '2025-01-01',
-                  })
-                "
-              />
-              <EditItem
                 :title="'회원 탈퇴'"
                 :icon="['fas', 'delete-left']"
                 @click="openModal('delete', {})"
