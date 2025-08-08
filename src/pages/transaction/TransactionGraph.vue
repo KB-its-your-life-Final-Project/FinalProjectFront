@@ -14,7 +14,7 @@ import {
 import zoomPlugin from "chartjs-plugin-zoom";
 import { computed } from "vue";
 import type { TooltipItem } from "chart.js";
-import TransactionNotFound from "./_components/TransactionNotFound.vue";
+import TransactionNotFound from "./_component/TransactionNotFound.vue";
 
 ChartJS.register(
   Title,
