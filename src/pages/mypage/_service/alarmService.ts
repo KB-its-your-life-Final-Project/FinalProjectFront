@@ -12,9 +12,11 @@ class AlarmService {
   }
 
   /**
-   * 미확인 알림 개수 조회
+   * 미확인 알림 개수 조회 (재시도 로직 포함)
    */
-  async getUnreadAlarmCount(): Promise<number> {
+  async getUnreadAlarmCount(retryCount = 0): Promise<number> {
+    const maxRetries = 2;
+
     try {
       const response = await this.api.getUnreadAlarmCountUsingGet("");
       if (response.data.success) {
@@ -22,7 +24,28 @@ class AlarmService {
       }
       return 0;
     } catch (error) {
-      console.error('미확인 알림 개수 조회 실패:', error);
+      console.error(`미확인 알림 개수 조회 실패 (시도 ${retryCount + 1}):`, error);
+
+      // 에러 타입에 따른 상세 로깅
+      if (error instanceof Error) {
+        console.error('에러 메시지:', error.message);
+        console.error('에러 스택:', error.stack);
+      }
+
+      // 재시도 로직: 네트워크 에러나 타임아웃 에러인 경우에만 재시도
+      if (retryCount < maxRetries) {
+        const isNetworkError = error instanceof Error &&
+          (error.message.includes('Network Error') ||
+           error.message.includes('timeout') ||
+           error.message.includes('ECONNABORTED'));
+
+        if (isNetworkError) {
+          console.log(`${1000 * (retryCount + 1)}ms 후 재시도...`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return this.getUnreadAlarmCount(retryCount + 1);
+        }
+      }
+
       return 0;
     }
   }
