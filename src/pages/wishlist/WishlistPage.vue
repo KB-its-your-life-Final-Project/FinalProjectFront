@@ -94,7 +94,7 @@ onMounted(async () => {
       <ul v-if="favoriteRegions.length > 0">
         <ListItem
           class="cursor-pointer"
-          @click="movePage.localInfo({ regionCd: region.regionCd })"
+          @click="movePage.localInfo({ regionCd: region.regionCd, regionNm: region.name })"
           v-for="(region, index) in favoriteRegions"
           :key="index"
           :name="region.name"
