@@ -42,13 +42,13 @@ const content2 =
       @update:setting="(value) => handleAlarmSettingChange(1, value)"
     />
     <AlarmSettingItem
-      :main="'시세변화 알림'"
+      :main="'시세 변화 알림'"
       :sub="'관심 건물 거래 가격 변동 알림'"
       :setting="alarmStore.alarmSettings.marketChange"
       @update:setting="(value) => handleAlarmSettingChange(2, value)"
     />
     <AlarmSettingItem
-      :main="'계약만료 알림'"
+      :main="'계약 만료 알림'"
       :sub="'계약 만료 및 갱신 알림'"
       :setting="alarmStore.alarmSettings.contractExpiry"
       @update:setting="(value) => handleAlarmSettingChange(3, value)"
