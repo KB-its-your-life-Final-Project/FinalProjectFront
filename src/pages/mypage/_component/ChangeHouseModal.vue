@@ -20,15 +20,15 @@ const emit = defineEmits(["close"]);
 const api = new Api();
 
 const formData = ref<HomeRegisterRequestDTO>({
-  buildingNumber: '',
-  contractStart: '',
-  contractEnd: '',
+  buildingNumber: "",
+  contractStart: "",
+  contractEnd: "",
   rentType: 1, // 1: 전세, 2: 월세
   jeonseAmount: 0,
   monthlyRent: 0,
   monthlyDeposit: 0,
   lat: 0,
-  lng: 0
+  lng: 0,
 });
 
 const startDate = ref<string | null>(null);
@@ -41,9 +41,9 @@ const title = props.type === "regist" ? "나의 집 등록" : "나의 집 수정
 
 // 컴포넌트 초기화
 onMounted(async () => {
-  if (props.type === 'edit') {
+  if (props.type === "edit") {
     // 수정 모드: 기존 데이터로 폼 초기화
-    formData.value.contractStart = props.contractDate || '';
+    formData.value.contractStart = props.contractDate || "";
     startDate.value = props.contractDate || null;
   }
 
@@ -51,7 +51,7 @@ onMounted(async () => {
   try {
     await mapUtil.loadNaverMapScript();
   } catch (error) {
-    console.error('네이버 지도 API 로드 실패:', error);
+    console.error("네이버 지도 API 로드 실패:", error);
   }
 });
 
@@ -62,15 +62,15 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
       buildingNumber: formData.value.buildingNumber,
       contractStart: startDate.value || undefined,
       contractEnd: endDate.value || undefined,
-      rentType: contractType.value === 'jeonse' ? 1 : 2,
-      jeonseAmount: contractType.value === 'jeonse' ? parseInt(jeonseAmount.value) || 0 : 0,
-      monthlyRent: contractType.value === 'monthlyRent' ? parseInt(monthlyRent.value) || 0 : 0,
-      monthlyDeposit: contractType.value === 'monthlyRent' ? parseInt(deposit.value) || 0 : 0,
+      rentType: contractType.value === "jeonse" ? 1 : 2,
+      jeonseAmount: contractType.value === "jeonse" ? parseInt(jeonseAmount.value) || 0 : 0,
+      monthlyRent: contractType.value === "monthlyRent" ? parseInt(monthlyRent.value) || 0 : 0,
+      monthlyDeposit: contractType.value === "monthlyRent" ? parseInt(deposit.value) || 0 : 0,
       lat: formData.value.lat,
-      lng: formData.value.lng
+      lng: formData.value.lng,
     };
 
-    if (props.type === 'regist') {
+    if (props.type === "regist") {
       // 집 등록
       await api.registerHomeUsingPost(requestData);
       return { success: true, message: "나의 집 정보가 등록되었습니다." };
@@ -80,7 +80,7 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
       return { success: true, message: "나의 집 정보가 수정되었습니다." };
     }
   } catch (error) {
-    console.error('집 정보 저장 실패:', error);
+    console.error("집 정보 저장 실패:", error);
     return { success: false, message: "집 정보 저장에 실패했습니다." };
   }
 };
@@ -114,15 +114,15 @@ function handleBuildingNumberChanged(buildingNumber: string) {
 // 계약 유형 변경 시 호출
 function handleContractTypeChanged() {
   // 계약 유형이 변경되면 모든 입력값 초기화
-  if (contractType.value === 'jeonse') {
+  if (contractType.value === "jeonse") {
     // 전세로 변경 시 월세 관련 입력값 초기화
-    monthlyRent.value = '';
-    deposit.value = '';
-    jeonseAmount.value = '';
+    monthlyRent.value = "";
+    deposit.value = "";
+    jeonseAmount.value = "";
   } else {
     // 월세로 변경 시 전세 관련 입력값 초기화
-    jeonseAmount.value = '';
-    deposit.value = '';
+    jeonseAmount.value = "";
+    deposit.value = "";
   }
 }
 
@@ -150,14 +150,16 @@ const options = [
         <DatePicker
           :label="'계약 시작일'"
           :model-value="startDate ? new Date(startDate) : null"
-          @update:model-value="(date) => startDate = date ? date.toISOString().split('T')[0] : null"
+          @update:model-value="
+            (date) => (startDate = date ? date.toISOString().split('T')[0] : null)
+          "
           placeholder="계약 시작일"
         ></DatePicker>
         <div class="text-lg font-pretendard-bold">~</div>
         <DatePicker
           :label="'계약 종료일'"
           :model-value="endDate ? new Date(endDate) : null"
-          @update:model-value="(date) => endDate = date ? date.toISOString().split('T')[0] : null"
+          @update:model-value="(date) => (endDate = date ? date.toISOString().split('T')[0] : null)"
           placeholder="계약 종료일"
         ></DatePicker>
       </div>
@@ -165,7 +167,13 @@ const options = [
 
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">계약 금액</div>
-      <RadioListButton class="mt-4" v-model="contractType" :options="options" rounded @change="handleContractTypeChanged" />
+      <RadioListButton
+        class="mt-4"
+        v-model="contractType"
+        :options="options"
+        rounded
+        @change="handleContractTypeChanged"
+      />
     </div>
     <div class="mt-5" v-if="contractType === 'jeonse'">
       <DefaultInput label="전세금" type="money" v-model="jeonseAmount"></DefaultInput>

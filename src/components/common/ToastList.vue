@@ -56,7 +56,7 @@ const { toasts } = useToast();
 }
 .toast-leave-from {
   opacity: 1;
-  transform: translateY(0)
+  transform: translateY(0);
 }
 .toast-leave-to {
   opacity: 0;

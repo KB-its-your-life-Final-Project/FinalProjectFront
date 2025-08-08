@@ -3,10 +3,10 @@ import type {
   SafeReportRequestDto,
   RentalRatioAndBuildyear,
   FloorAndPurpose,
-  ViolationStatus
-} from '../types';
-import type { SafeReportResponseDto } from '@/api/autoLoad/data-contracts';
-import { INIT_FORM_DATA } from '../types';
+  ViolationStatus,
+} from "../types";
+import type { SafeReportResponseDto } from "@/api/autoLoad/data-contracts";
+import { INIT_FORM_DATA } from "../types";
 
 export function useDataManagement() {
   const formData = reactive<SafeReportRequestDto>({ ...INIT_FORM_DATA });

@@ -3,10 +3,12 @@ import { ref } from "vue";
 import ModalForm from "@/components/common/ModalForm.vue";
 import { Api } from "@/api/autoLoad/Api";
 import { authStore } from "@/stores/authStore";
+import defaultProfile from "@/assets/imgs/profile.jpg";
 
 // 상태
 const selectedFile = ref<File | null>(null);
 const previewUrl = ref<string>("");
+const isDefaultProfileImg = ref<boolean>(false);
 
 // Props & Emit
 const props = defineProps<{
@@ -20,33 +22,48 @@ const api = new Api();
 
 const auth = authStore();
 
-function handleFileChange(event: Event) {
+function handleNewProfileChange(event: Event) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
     selectedFile.value = file;
     previewUrl.value = URL.createObjectURL(file);
+    isDefaultProfileImg.value = false;
   }
 }
 
+function handleDefaultProfileChange() {
+  selectedFile.value = null;
+  previewUrl.value = defaultProfile;
+  isDefaultProfileImg.value = true;
+}
+
 async function handleConfirm(): Promise<{ success: boolean; message: string }> {
-  if (!selectedFile.value) {
-    return { success: false, message: "이미지를 선택하세요" };
-  }
-  const formData = new FormData();
-  formData.append("file", selectedFile.value);
-  for (const [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
   try {
-    const { data } = await api.uploadProfileImageUsingPost(formData);
-    console.log("data: ", data);
-    auth.member.profileImg = data.data?.profileImg;
-    console.log("auth.member: ", auth.member);
-    return { success: true, message: "프로필이 변경되었습니다" };
+    if (isDefaultProfileImg.value) {
+      const { data } = await api.deleteProfileImageUsingDelete();
+      console.log("프로필사진 삭제: ", data);
+      auth.member.profileImg = "";
+      console.log("auth.member: ", auth.member);
+      return { success: true, message: "기본 이미지로 변경되었습니다" };
+    } else if (selectedFile.value) {
+      const formData = new FormData();
+      formData.append("file", selectedFile.value);
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+      const { data } = await api.uploadProfileImageUsingPost(formData);
+      console.log("프로필사진 변경: ", data);
+      auth.member.profileImg = data.data?.profileImg;
+      console.log("auth.member: ", auth.member);
+      return { success: true, message: "프로필이 변경되었습니다" };
+    } else {
+      return { success: false, message: "이미지를 선택하거나 기본 이미지를 선택하세요" };
+    }
   } catch (error: unknown) {
-    console.error("업로드 실패", error);
-    return { success: false, message: "업로드 중 오류가 발생했습니다" };
+    console.error("프로필사진 변경 실패, error");
+    const errorMsg = isDefaultProfileImg.value ? "기본 이미지 변경 중 오류가 발생했습니다" : "업로드 중 오류가 발생했습니다"
+    return { success: false, message: errorMsg };
   }
 }
 </script>
@@ -59,26 +76,22 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
   >
     <div class="flex flex-col items-center gap-2">
       <img class="rounded-full max-w-1/2 aspect-1/1 mt-4" :src="previewUrl || profile" />
-      <p v-show="selectedFile" class="text-sm text-kb-ui-06">선택한 파일: {{ selectedFile?.name }}</p>
-      <label for="newProfile" class="upload-btn mt-5"
-        >이미지 가져오기</label
-      >
+      <p v-show="selectedFile" class="text-sm text-kb-ui-06">
+        선택한 파일: {{ selectedFile?.name }}
+      </p>
+      <label for="newProfile" class="upload-btn mt-5">이미지 가져오기</label>
       <input
         id="newProfile"
         class="hidden"
         type="file"
         accept="image/*"
-        @change="handleFileChange"
+        @change="handleNewProfileChange"
       />
-      <label for="defaultProfile" class="default-btn"
-        >기본 이미지로 변경</label
-      >
+      <label for="defaultProfile" class="default-btn">기본 이미지로 변경</label>
       <input
         id="defaultProfile"
         class="hidden"
-        type="file"
-        accept="image/*"
-        @change="handleFileChange"
+        @click="handleDefaultProfileChange"
       />
     </div>
   </ModalForm>

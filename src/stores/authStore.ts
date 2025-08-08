@@ -34,9 +34,7 @@ export const authStore = defineStore("auth", () => {
   // 상태
   const member = reactive<Member>(getDefaultMember());
   const isLoggedIn = computed(() => {
-    return (member.id !== 0 &&
-      (member.email || member.kakaoId || member.googleId)
-    )
+    return member.id !== 0 && (member.email || member.kakaoId || member.googleId);
   });
   // 이메일 중복 확인
   const checkDuplicateEmail = async (email: string): Promise<boolean> => {

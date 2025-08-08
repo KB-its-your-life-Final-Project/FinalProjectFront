@@ -24,8 +24,6 @@ const profileImgUrl = computed(() => {
 });
 console.log("profileImgUrl: ", profileImgUrl);
 
-
-
 // 로그아웃
 const logout = async () => {
   if (auth.logout) {
@@ -47,9 +45,7 @@ function openInquiry() {
     <div class="pl-3 pr-8 pt-8 pb-8">
       <div class="mt-[1.5rem] flex items-center justify-center text-center">
         <div class="flex-[1]">
-          <ProfileImage
-            :src="profileImgUrl || defaultProfile"
-          />
+          <ProfileImage :src="profileImgUrl || defaultProfile" />
         </div>
         <div class="flex-[3]">
           <ProfileInfo
@@ -82,12 +78,9 @@ function openInquiry() {
   </div>
 
   <div class="mt-8 flex justify-center gap-40 text-kb-gray-dark underline pb-6">
-    <button
-    class="underline cursor-pointer"
-    @click="auth.isLoggedIn ? logout() : movePage.login()"
-  >
-    {{ auth.isLoggedIn ? '로그아웃' : '로그인' }}
-  </button>
+    <button class="underline cursor-pointer" @click="auth.isLoggedIn ? logout() : movePage.login()">
+      {{ auth.isLoggedIn ? "로그아웃" : "로그인" }}
+    </button>
   </div>
   <Footer />
   <div class="h-15"></div>

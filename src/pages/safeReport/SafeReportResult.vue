@@ -111,7 +111,7 @@ async function loadSavedReportData() {
       openHighRatioModal();
     }
 
-        // 건축물 정보가 없는 경우 모달 표시
+    // 건축물 정보가 없는 경우 모달 표시
     if (!savedData.floorAndPurposeList || savedData.floorAndPurposeList.length === 0) {
       openNoBuildingDataModal();
     }
@@ -160,7 +160,7 @@ async function loadReportFromAPI() {
       openHighRatioModal();
     }
 
-        // 건축물 정보가 없는 경우 모달 표시
+    // 건축물 정보가 없는 경우 모달 표시
     if (!reportData.floorAndPurposeList || reportData.floorAndPurposeList.length === 0) {
       openNoBuildingDataModal();
     }
@@ -198,8 +198,6 @@ function goToSelectBudget() {
 function goToKB() {
   window.open("https://m.naver.com/");
 }
-
-
 </script>
 
 <template>
@@ -252,7 +250,9 @@ function goToKB() {
           :class="totalGradeColor.bg"
           style="margin-top: -1.5rem"
         >
-          <span class="text-base font-semibold" :class="totalGradeColor.text">{{ totalGradeText }}</span>
+          <span class="text-base font-semibold" :class="totalGradeColor.text">{{
+            totalGradeText
+          }}</span>
         </div>
       </section>
 
@@ -359,15 +359,12 @@ function goToKB() {
     >
       <div v-if="store.resultData?.dealAmount === 0">
         <p class="text-center text-kb-ui-02">
-          해당 건물은 매매 거래 내역이 존재하지 않아<br>
+          해당 건물은 매매 거래 내역이 존재하지 않아<br />
           재정적 안전성 분석 정보를 제공할 수 없습니다.
         </p>
       </div>
       <div v-else>
-        <p>
-          예산 금액 {{ store.formData.budget }}만원에 기반하여 분석한 결과는 다음과
-          같습니다.
-        </p>
+        <p>예산 금액 {{ store.formData.budget }}만원에 기반하여 분석한 결과는 다음과 같습니다.</p>
         <p class="mt-4">
           {{ store.formData.buildingName }}의 최근 거래 가격은
           {{ store.resultData?.dealAmount }}만원 입니다. 이에 따라 역전세율은
@@ -448,7 +445,10 @@ function goToKB() {
               <div class="ml-2 relative">
                 <ToolTip>
                   <div class="max-w-[180px] text-xs">
-                    주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다. <span class="text-error font-semibold">주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span>
+                    주거용이 아닌 층의 경우 전입 신고를 못 하거나 확정일자를 받을 수 없습니다.
+                    <span class="text-error font-semibold"
+                      >주택임대차보호법 적용에서도 제외될 가능성이 높으니 거래에 조심하세요!</span
+                    >
                   </div>
                 </ToolTip>
               </div>
@@ -460,7 +460,9 @@ function goToKB() {
                 class="mb-2 text-sm"
               >
                 <span class="font-medium">{{ getFloorLabel(info.resFloor) }}:</span>
-                <span class="text-kb-ui-02">{{ info.resUseType?.endsWith('(') ? info.resUseType.slice(0, -1) : info.resUseType }}</span>
+                <span class="text-kb-ui-02">{{
+                  info.resUseType?.endsWith("(") ? info.resUseType.slice(0, -1) : info.resUseType
+                }}</span>
               </div>
             </div>
             <div v-else class="text-center text-kb-ui-02 text-sm">층별 용도 정보가 없습니다.</div>
@@ -479,13 +481,23 @@ function goToKB() {
     >
       <div class="text-center">
         <div class="mb-4">
-          <svg class="mx-auto h-12 w-12 text-kb-ui-05" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
+          <svg
+            class="mx-auto h-12 w-12 text-kb-ui-05"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"
+            />
           </svg>
         </div>
         <p class="text-medium text-kb-ui-02">
-          해당 건물은 매매 거래 내역이 존재하지 않습니다.<br>
-          건축물 정보만을 기반으로 산출한 안심 점수입니다.<br>
+          해당 건물은 매매 거래 내역이 존재하지 않습니다.<br />
+          건축물 정보만을 기반으로 산출한 안심 점수입니다.<br />
           참고 바랍니다.
         </p>
       </div>
@@ -500,19 +512,27 @@ function goToKB() {
     >
       <div class="text-center">
         <div class="mb-4">
-          <svg class="mx-auto h-12 w-12 text-kb-ui-05" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
+          <svg
+            class="mx-auto h-12 w-12 text-kb-ui-05"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"
+            />
           </svg>
         </div>
         <p class="text-medium text-kb-ui-02">
-          해당 건물은 건축물 대장 정보가 없습니다.<br>
-          거래 내역 정보만을 기반으로 산출한 안심 점수입니다.<br>
+          해당 건물은 건축물 대장 정보가 없습니다.<br />
+          거래 내역 정보만을 기반으로 산출한 안심 점수입니다.<br />
           참고 바랍니다.
         </p>
       </div>
     </ModalForm>
-
-
 
     <!-- 전세가율 높음 모달 -->
     <ModalForm
@@ -524,12 +544,22 @@ function goToKB() {
     >
       <div class="text-center">
         <div class="mb-4">
-          <svg class="mx-auto h-12 w-12 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          <svg
+            class="mx-auto h-12 w-12 text-orange-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
           </svg>
         </div>
         <p class="text-sm text-kb-ui-04 mb-6">
-          전세가율이 100%를 초과했습니다.<br>
+          전세가율이 100%를 초과했습니다.<br />
           입력하신 예산 금액이 현실적인지 다시 확인해 주세요.
         </p>
         <button

@@ -3,12 +3,7 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { authStore } from "@/stores/authStore.ts";
 import { Api } from "@/api/autoLoad/Api";
-import {
-  isEmpty,
-  isValidEmailFormat,
-  isValidPasswordChk,
-  isValidName,
-} from "@/utils/validate";
+import { isEmpty, isValidEmailFormat, isValidPasswordChk, isValidName } from "@/utils/validate";
 import GoBackBtn from "@/components/common/GoBackBtn.vue";
 
 const router = useRouter();
