@@ -187,7 +187,7 @@ watch(
 </script>
 
 <template>
-  <MapFilter />
+  <!-- <MapFilter /> -->
   <!--  지도 표시-->
   <div id="map" ref="mapEl" class="relative w-full h-full">
     <div v-if="mapDetailShow" class="absolute bottom-0 z-10 w-full h-65 border-1">

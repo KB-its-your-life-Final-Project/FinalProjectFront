@@ -21,6 +21,4 @@ import Footer from "@/components/layout/Footer.vue";
     <!-- 지도 API   -->
     <MapPage />
   </div>
-
-  <div class="h-15"></div>
 </template>
