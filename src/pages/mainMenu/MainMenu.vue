@@ -17,12 +17,15 @@ import movePage from "@/utils/movePage";
 const auth = authStore();
 
 const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-const profileImgUrl = computed(() => {
+const profileImgPath = computed(() => {
+  if (auth.member.createdType === 0) {
+    return logo
+  }
   const path = auth.member.profileImg;
-  if (!path) return logo;
+  if (!path) return defaultProfile;
   return `${fileBaseUrl}${path}`;
 });
-console.log("profileImgUrl: ", profileImgUrl);
+console.log("profileImgPath: ", profileImgPath);
 
 // 로그아웃
 const logout = async () => {
@@ -45,7 +48,7 @@ function openInquiry() {
     <div class="pl-3 pr-8 pt-8 pb-8">
       <div class="mt-[1.5rem] flex items-center justify-center text-center">
         <div class="flex-[1]">
-          <ProfileImage :src="profileImgUrl || defaultProfile" />
+          <ProfileImage :src="profileImgPath" />
         </div>
         <div class="flex-[3]">
           <ProfileInfo

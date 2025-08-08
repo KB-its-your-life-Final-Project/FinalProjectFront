@@ -70,13 +70,8 @@ const user = computed(() => ({
   name: auth.member.name ?? "사용자",
   email: auth.member.email ?? "이메일 없음",
   isRegistered: false,
-  imagePath: auth.member.profileImg || defaultProfile,
+  imagePath: auth.member.profileImg ? `${fileBaseUrl}${auth.member.profileImg}` : defaultProfile,
 }));
-const profileImgUrl = computed(() => {
-  const path = auth.member.profileImg;
-  if (!path) return defaultProfile;
-  return `${fileBaseUrl}${path}`;
-});
 
 const isLoading = ref(false);
 const homeData = ref<HomeRegisterResponseDTO | null>(null);
@@ -125,11 +120,11 @@ onMounted(async () => {
     >
       <div class="relative">
         <div class="w-25">
-          <ProfileImage :src="profileImgUrl" />
+          <ProfileImage :src="user.imagePath" />
         </div>
         <button
           class="absolute bottom-0 right-0 cursor-pointer py-1 px-2 bg-kb-ui-08 rounded-full"
-          @click="openModal('profile', { profile: profileImgUrl, name: user.name })"
+          @click="openModal('profile', { profile: user.imagePath, name: user.name })"
         >
           <font-awesome-icon :icon="['fas', 'camera']"></font-awesome-icon>
         </button>
