@@ -1,13 +1,13 @@
 <template>
   <div class="pb-24">
-    <!-- 동적 헤더: 아파트명 -->
-    <Header :headerShowtype="mainRouteName.transactionDetail" :title="'임시값'">
+    <!-- 동적 헤더: 건물 명이 없다면 주소 표기 -->
+    <Header :headerShowtype="mainRouteName.transactionDetail" :title="buildingName || jibunAddress">
       <div class="pl-3 pr-8 pt-8 pb-8"></div>
     </Header>
 
     <div class="relative w-[85%] mx-auto mt-4">
       <div class="absolute right-0 w-7 h-7">
-        <WishButton target-type="building" :jibun-addr="jibunAddress" />
+        <WishButton target-type="building" :jibun-addr="jibunAddress" :estate-id="estateId" />
       </div>
 
       <p class="text-base mb-1 text-kb-ui-04">거래 형식</p>
@@ -54,7 +54,14 @@
 
     <!-- 그래프 -->
 
-    <TransactionGraph :graphData="graphData" :selectedType="selectedType" />
+    <TransactionGraph
+      v-if="graphData.length > 0"
+      :graphData="graphData"
+      :selectedType="selectedType"
+    />
+    <div v-else>
+      <NoData></NoData>
+    </div>
   </div>
 </template>
 
@@ -69,6 +76,7 @@ import DatePicker from "@/components/common/DatePicker.vue";
 import WishButton from "@/components/common/WishButton.vue";
 import RadioListButton from "@/components/common/RadioListButton.vue";
 import { TransactionRequestDTO } from "@/api/autoLoad/data-contracts";
+import NoData from "./_component/NoData.vue";
 //import mapUtil from "@/utils/naverMap/naverMap";
 
 const route = useRoute();
@@ -80,11 +88,8 @@ const jibunAddress = computed(() => {
   return addr || "";
 });
 
-const buildingName = computed(() => {
-  const name = getQueryString(route.query.buildingName);
-  console.log("buildingName computed:", name); // 디버깅용
-  return name || "";
-});
+const buildingName = ref("");
+const estateId = ref<number | undefined>();
 
 const latlng = computed<{ lat: number; lng: number }>(() => {
   const lat = Number(getQueryString(route.query.lat));
@@ -154,7 +159,6 @@ const filteredData = async (markerData: {
     jibunAddress: markerData.jibunAddress ?? undefined,
     lat: markerData.lat ?? undefined,
     lng: markerData.lng ?? undefined,
-    buildingName: buildingName.value,
     tradeType: getTradeTypeCode(selectedType.value) || undefined,
     startDate: startDate.value ? formatDateLocal(startDate.value) : undefined,
     endDate: endDate.value ? formatDateLocal(endDate.value) : undefined,
@@ -165,6 +169,7 @@ const filteredData = async (markerData: {
   try {
     const res = await api.getFilteredDataUsingPost(request);
     console.log("응답 데이터:", res);
+    buildingName.value = res.data[0].buildingName || "";
     graphData.value = res.data as { date: string; price: number; type: string }[];
   } catch (error) {
     console.error("데이터 요청 실패:", error);
@@ -223,8 +228,6 @@ const updateURLQuery = () => {
   router.push({
     query: {
       jibunAddress: input.value.jibunAddress || "",
-      type: selectedType.value !== "전체" ? selectedType.value : undefined,
-      year: selectedPeriod.value !== "전체" ? selectedPeriod.value : undefined,
       startDate: startDate.value ? formatDateLocal(startDate.value) : undefined,
       endDate: endDate.value ? formatDateLocal(endDate.value) : undefined,
     },
