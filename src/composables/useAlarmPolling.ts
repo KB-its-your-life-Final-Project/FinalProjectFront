@@ -52,3 +52,4 @@ export function useAlarmPolling(intervalMs: number = 30000) { // 기본 30초마
     restartPolling
   };
 }
+

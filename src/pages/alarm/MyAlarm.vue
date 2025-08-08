@@ -29,9 +29,9 @@ const getAlarmTypeText = (type: number): string => {
     case 1:
       return '계약 단계별 알림';
     case 2:
-      return '시세변화 알림';
+      return '시세 변화 알림';
     case 3:
-      return '계약만료 알림';
+      return '계약 만료 알림';
     default:
       return '기타';
   }
