@@ -2,14 +2,25 @@
 import { computed } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import { useAlarmStore } from "@/stores/alarmStore";
+import { authStore } from "@/stores/authStore";
 import type { AlarmResponseDto } from "@/api/autoLoad/data-contracts";
 import CardItem from "./CardItem.vue";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Header from "@/components/layout/header/Header.vue";
 import { useAlarmPolling } from "@/composables/useAlarmPolling";
+import ProfileImage from "@/components/common/ProfileImage.vue";
+import defaultProfile from "@/assets/imgs/profile.jpg";
+import ProfileInfo from "@/components/common/ProfileInfo.vue";
 
 // 스토어 사용
 const alarmStore = useAlarmStore();
+const auth = authStore();
+const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+const user = computed(() => ({
+  name: auth.member.name ?? "사용자",
+  email: auth.member.email ?? "이메일 없음",
+  isRegistered: false,
+  imagePath: auth.member.profileImg ? `${fileBaseUrl}${auth.member.profileImg}` : defaultProfile,
+}));
 
 // 필터링된 알림 목록
 const filteredAlarms = computed(() => {
@@ -119,15 +130,15 @@ useAlarmPolling(5000);
 
 <template>
   <div class="pb-24">
-    <Header :headerShowtype="mainRouteName.myAlarm">
-      <div class="flex flex-col items-center">
-        <img src="@/assets/imgs/profile.jpg" class="w-16 h-16 rounded-full mb-2" />
-        <div class="text-center">
-          <p class="font-bold">홍길동</p>
-          <p class="text-sm text-gray-500">
-            HONGG@MAIL.COM
-            <font-awesome-icon icon="fa-solid fa-circle-check" class="text-green-500" />
-          </p>
+    <Header class="" :headerShowtype="mainRouteName.myAlarm">
+      <div class="pl-3 pr-8 pt-8 pb-8">
+        <div class="mt-[1.5rem] flex items-center justify-center text-center">
+          <div class="flex-[1]">
+            <ProfileImage :src="user.imagePath" />
+          </div>
+          <div class="flex-[3]">
+            <ProfileInfo :name="user.name" :email="user.email"></ProfileInfo>
+          </div>
         </div>
       </div>
     </Header>
