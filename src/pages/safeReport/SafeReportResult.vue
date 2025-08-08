@@ -35,7 +35,6 @@ const {
   openNoBuildingDataModal,
   closeNoBuildingDataModal,
   openHighRatioModal,
-  closeHighRatioModal,
 } = useModalState();
 
 const isLoading = ref(true); // 로딩 상태
@@ -535,41 +534,40 @@ function goToKB() {
     </ModalForm>
 
     <!-- 전세가율 높음 모달 -->
-    <ModalForm
-      v-if="showHighRatioModal"
-      title="전세가율 초과"
-      :has-confirm-btn="false"
-      :handle-confirm="() => ({ success: true, message: '' })"
-      @close="closeHighRatioModal"
-    >
-      <div class="text-center">
-        <div class="mb-4">
-          <svg
-            class="mx-auto h-12 w-12 text-orange-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+    <div v-if="showHighRatioModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-10">
+      <!-- 배경 흑백 처리 -->
+      <div class="absolute inset-0 bg-gray-900/30 backdrop-blur-sm"></div>
+      <div class="bg-white rounded-xl shadow-lg w-full p-8 max-w-md mx-4 relative z-20">
+        <h2 class="text-xl font-pretendard-bold mb-4 text-center">전세가율 초과</h2>
+        <div class="text-center">
+          <div class="mb-4">
+            <svg
+              class="mx-auto h-12 w-12 text-orange-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+          <p class="text-sm text-kb-ui-04 mb-6">
+            전세가율이 100%를 초과했습니다.<br />
+            입력하신 예산 금액이 현실적인지 다시 확인해 주세요.
+          </p>
+          <button
+            @click="goToSelectBudget"
+            class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-lg font-semibold"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
+            예산 재입력
+          </button>
         </div>
-        <p class="text-sm text-kb-ui-04 mb-6">
-          전세가율이 100%를 초과했습니다.<br />
-          입력하신 예산 금액이 현실적인지 다시 확인해 주세요.
-        </p>
-        <button
-          @click="goToSelectBudget"
-          class="w-full bg-kb-yellow text-kb-ui-01 py-3 rounded-lg text-lg font-semibold"
-        >
-          예산 재입력
-        </button>
       </div>
-    </ModalForm>
+    </div>
   </div>
 </template>
 <style scoped></style>
