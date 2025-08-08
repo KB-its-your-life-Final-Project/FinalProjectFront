@@ -151,7 +151,9 @@ const options = [
           :label="'계약 시작일'"
           :model-value="startDate ? new Date(startDate) : null"
           @update:model-value="
-            (date) => (startDate = date ? date.toISOString().split('T')[0] : null)
+            (date) => {
+              startDate = date ? date.toLocaleDateString('sv-SE') : null;
+            }
           "
           placeholder="계약 시작일"
         ></DatePicker>
@@ -159,7 +161,11 @@ const options = [
         <DatePicker
           :label="'계약 종료일'"
           :model-value="endDate ? new Date(endDate) : null"
-          @update:model-value="(date) => (endDate = date ? date.toISOString().split('T')[0] : null)"
+          @update:model-value="
+            (date) => {
+              endDate = date ? date.toLocaleDateString('sv-SE') : null;
+            }
+          "
           placeholder="계약 종료일"
         ></DatePicker>
       </div>
