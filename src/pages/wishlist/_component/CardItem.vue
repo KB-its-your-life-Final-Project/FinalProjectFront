@@ -34,7 +34,7 @@ const isEmpty = computed(() => {
 
 const handleClick = () => {
   if (props.building.jibunAddr) {
-    movePage.transactionDetail({ jibunAddr: props.building.jibunAddr });
+    movePage.transactionDetail({ jibunAddress: props.building.jibunAddr });
   } else {
     console.warn("확인할 주소값이 비어있습니다");
   }
