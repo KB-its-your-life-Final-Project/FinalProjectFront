@@ -1,5 +1,5 @@
-import { computed } from 'vue';
-import type { RentalRatioAndBuildyear } from '@/api/autoLoad/data-contracts';
+import { computed } from "vue";
+import type { RentalRatioAndBuildyear } from "@/api/autoLoad/data-contracts";
 
 export interface GradeInfo {
   text: string;

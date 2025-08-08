@@ -81,7 +81,7 @@ function openModal<T extends ModalNames>(type: T, props: ModalPropsMap[T]) {
 const handleModalClose = () => {
   const modalType = currentModalName.value;
   closeModal();
-  if(modalType === 'newHouse' || modalType === 'editHouse'){
+  if (modalType === "newHouse" || modalType === "editHouse") {
     fetchHomeData();
   }
 };
@@ -91,14 +91,14 @@ function closeModal() {
 }
 
 const fetchHomeData = async () => {
-  try{
+  try {
     isLoading.value = true;
     const response = await api.getHomeInfoUsingGet();
 
-    if(response.data?.data){
+    if (response.data?.data) {
       homeData.value = response.data.data;
       user.isRegistered = true;
-    }else{
+    } else {
       homeData.value = null;
       user.isRegistered = false;
     }
@@ -110,7 +110,7 @@ const fetchHomeData = async () => {
 };
 // 기존 함수들 아래에 추가
 const calculateRemainingDays = (contractEnd?: string) => {
-  if (!contractEnd) return '종료일 정보 없음';
+  if (!contractEnd) return "종료일 정보 없음";
 
   const today = new Date();
   const endDate = new Date(contractEnd);
@@ -120,7 +120,7 @@ const calculateRemainingDays = (contractEnd?: string) => {
   if (diffDays > 0) {
     return `${diffDays}일 남음`;
   } else if (diffDays === 0) {
-    return '오늘 만료';
+    return "오늘 만료";
   } else {
     return `${Math.abs(diffDays)}일 지남`;
   }
@@ -128,10 +128,14 @@ const calculateRemainingDays = (contractEnd?: string) => {
 
 const getRentTypeText = (rentType?: number) => {
   switch (rentType) {
-    case 1: return '전세';
-    case 2: return '월세';
-    case 3: return '반전세';
-    default: return '임대 유형';
+    case 1:
+      return "전세";
+    case 2:
+      return "월세";
+    case 3:
+      return "반전세";
+    default:
+      return "임대 유형";
   }
 };
 
@@ -141,17 +145,17 @@ const formatRentAmount = (homeData: HomeRegisterResponseDTO) => {
   } else if (homeData.rentType === 2) {
     return `${homeData.monthlyRent || 0}만원`;
   } else {
-    return '금액 정보 없음';
+    return "금액 정보 없음";
   }
 };
 
 const getRentSubContent = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
-    return '전세 계약';
+    return "전세 계약";
   } else if (homeData.rentType === 2) {
     return `보증금: ${homeData.monthlyDeposit || 0}만원`;
   } else {
-    return '계약 정보 없음';
+    return "계약 정보 없음";
   }
 };
 
@@ -236,56 +240,62 @@ const email = userStore.email*/
   </div>
 
   <div v-if="isLoading" class="h-100 flex items-center justify-center">
-  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-</div>
-<div v-else-if="homeData" class="overflow-y-auto pb-20">
-  <!-- 등록된 집 정보 -->
-  <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
-  <div class="mx-4 text-xs text-gray-400">{{ homeData.buildingName || '등록된 아파트' }}</div>
-  <InfoCard :title="'등록된 아파트'" :content="homeData.buildingName || '정보 없음'" :sub-content="homeData.buildingNumber ? `${homeData.buildingNumber}` : '동 정보 없음'" />
-
-  <!-- 계약 정보 -->
-  <h2 class="text-lg mx-4 mt-4">계약 정보</h2>
-  <div class="mx-4 text-xs text-gray-400">계약 기간</div>
-  <InfoCard
-    :title="'계약 기간'"
-    :content="`${homeData.contractStart || '시작일 없음'} ~ ${homeData.contractEnd || '종료일 없음'}`"
-    :sub-content="calculateRemainingDays(homeData.contractEnd)"
-  />
-
-  <!-- 임대료 정보 -->
-  <h2 class="text-lg mx-4 mt-4">임대료 정보</h2>
-  <div class="mx-4 text-xs text-gray-400">계약 조건</div>
-  <InfoCard
-    :title="getRentTypeText(homeData.rentType)"
-    :content="formatRentAmount(homeData)"
-    :sub-content="getRentSubContent(homeData)"
-  />
-
-  <!-- 나의 집 정보 수정하기 버튼 -->
-  <div class="mx-4 mt-4">
-    <button
-      class="w-full py-3 bg-kb-yellow-positive text-white text-sm rounded-md shadow-inner cursor-pointer"
-      @click="openModal('editHouse', {
-        type: 'edit',
-        address: homeData.buildingName || '',
-        contractDate: homeData.contractStart || '',
-      })"
-    >
-      나의 집 정보 수정하기
-    </button>
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
   </div>
+  <div v-else-if="homeData" class="overflow-y-auto pb-20">
+    <!-- 등록된 집 정보 -->
+    <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
+    <div class="mx-4 text-xs text-gray-400">{{ homeData.buildingName || "등록된 아파트" }}</div>
+    <InfoCard
+      :title="'등록된 아파트'"
+      :content="homeData.buildingName || '정보 없음'"
+      :sub-content="homeData.buildingNumber ? `${homeData.buildingNumber}` : '동 정보 없음'"
+    />
 
-  <!-- 알림 설정 버튼 -->
-  <div class="mx-4 mt-4">
-    <button
-      class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
-      @click="movePage.mypageStetting()"
-    >
-      알림 설정
-    </button>
+    <!-- 계약 정보 -->
+    <h2 class="text-lg mx-4 mt-4">계약 정보</h2>
+    <div class="mx-4 text-xs text-gray-400">계약 기간</div>
+    <InfoCard
+      :title="'계약 기간'"
+      :content="`${homeData.contractStart || '시작일 없음'} ~ ${homeData.contractEnd || '종료일 없음'}`"
+      :sub-content="calculateRemainingDays(homeData.contractEnd)"
+    />
+
+    <!-- 임대료 정보 -->
+    <h2 class="text-lg mx-4 mt-4">임대료 정보</h2>
+    <div class="mx-4 text-xs text-gray-400">계약 조건</div>
+    <InfoCard
+      :title="getRentTypeText(homeData.rentType)"
+      :content="formatRentAmount(homeData)"
+      :sub-content="getRentSubContent(homeData)"
+    />
+
+    <!-- 나의 집 정보 수정하기 버튼 -->
+    <div class="mx-4 mt-4">
+      <button
+        class="w-full py-3 bg-kb-yellow-positive text-white text-sm rounded-md shadow-inner cursor-pointer"
+        @click="
+          openModal('editHouse', {
+            type: 'edit',
+            address: homeData.buildingName || '',
+            contractDate: homeData.contractStart || '',
+          })
+        "
+      >
+        나의 집 정보 수정하기
+      </button>
+    </div>
+
+    <!-- 알림 설정 버튼 -->
+    <div class="mx-4 mt-4">
+      <button
+        class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
+        @click="movePage.mypageStetting()"
+      >
+        알림 설정
+      </button>
+    </div>
   </div>
-</div>
   <div v-else class="h-100 flex flex-col items-center justify-center">
     <div class="font-pretendard-bold text-xl">나의 집을 등록하고 정보를 받아보세요!</div>
     <button

@@ -1,5 +1,5 @@
-import { computed } from 'vue';
-import type { SafeReportResponseDto } from '@/api/autoLoad/data-contracts';
+import { computed } from "vue";
+import type { SafeReportResponseDto } from "@/api/autoLoad/data-contracts";
 
 export interface TotalGradeInfo {
   text: string;
