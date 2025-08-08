@@ -75,6 +75,7 @@ const user = computed(() => ({
 
 const isLoading = ref(false);
 const homeData = ref<HomeRegisterResponseDTO | null>(null);
+const isRegistered = ref(false);
 
 function openDrawer() {
   isOpenDrawer.value = !isOpenDrawer.value;
@@ -101,17 +102,21 @@ function handleNameChanged(newName: string) {
 const fetchHomeData = async () => {
   try {
     isLoading.value = true;
-    const response = await api.getHomeInfoUsingGet();
+    const response = await api.getHomeInfoUsingGet("");
 
     if (response.data?.data) {
       homeData.value = response.data.data;
-      user.isRegistered = true;
+      isRegistered.value = true;
     } else {
       homeData.value = null;
-      user.isRegistered = false;
+      isRegistered.value = false;
     }
   } catch (error: unknown) {
     console.error("로그인 여부 확인 중 오류: ", error);
+    homeData.value = null;
+    isRegistered.value = false;
+  } finally {
+    isLoading.value = false;
   }
 };
 // 기존 함수들 아래에 추가
