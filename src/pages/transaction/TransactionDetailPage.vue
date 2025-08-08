@@ -1,65 +1,5 @@
-<template>
-  <div class="pb-24">
-    <!-- 동적 헤더: 아파트명 -->
-    <Header :headerShowtype="mainRouteName.transactionDetail" :title="'임시값'">
-      <div class="pl-3 pr-8 pt-8 pb-8"></div>
-    </Header>
-
-    <div class="relative w-[85%] mx-auto mt-4">
-      <div class="absolute right-0 w-7 h-7">
-        <WishButton target-type="building" :jibun-addr="jibunAddress" />
-      </div>
-
-      <p class="text-base mb-1 text-kb-ui-04">거래 형식</p>
-
-      <!-- 필터: 매매/전월세 -->
-      <RadioListButton
-        class="mt-4"
-        v-model="selectedType"
-        :options="typeOptions"
-        @change="changeType"
-      />
-    </div>
-
-    <!-- 날짜 범위 필터 -->
-    <div class="w-[85%] mx-auto gap-2 mt-6">
-      <h1 class="text-base mb-1 text-kb-ui-04">기간 설정</h1>
-
-      <!-- 기간 설정 필터 -->
-      <RadioListButton
-        class="mt-4"
-        v-model="selectedPeriod"
-        :options="periodOptions"
-        @change="changePeriod"
-      />
-
-      <div class="flex items-center justify-center gap-[16px] mt-5">
-        <DatePicker
-          placeholder="시작일"
-          v-model="startDate"
-          :input-class="'text-sm py-2 px-2 border border-gray-400 text-center rounded-none h-[30px] w-[150px]'"
-          @update:modelValue="handleDateChange"
-        />
-
-        <div class="flex text-sm justify-center mx-[8px]">~</div>
-
-        <DatePicker
-          placeholder="종료일"
-          v-model="endDate"
-          :input-class="'text-sm py-2 px-2 border border-gray-400 text-center rounded-none h-[30px] w-[150px]'"
-          @update:modelValue="handleDateChange"
-        />
-      </div>
-    </div>
-
-    <!-- 그래프 -->
-
-    <TransactionGraph :graphData="graphData" :selectedType="selectedType" />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { useRoute, useRouter, LocationQueryValueRaw } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Header from "@/components/layout/header/Header.vue";
 import TransactionGraph from "@/pages/transaction/TransactionGraph.vue";
 import { watchEffect, ref, watch, computed } from "vue";
@@ -69,26 +9,29 @@ import DatePicker from "@/components/common/DatePicker.vue";
 import WishButton from "@/components/common/WishButton.vue";
 import RadioListButton from "@/components/common/RadioListButton.vue";
 import { TransactionRequestDTO } from "@/api/autoLoad/data-contracts";
+import queryUtil from "@/utils/queryUtils";
+import { transactionPeriodOptions } from "@/types/tansactionType";
+import { estateTradeOptions } from "@/types/estateType";
 //import mapUtil from "@/utils/naverMap/naverMap";
 
 const route = useRoute();
 const router = useRouter();
+const api = new Api();
 
+//다른곳에 넘겨줘야해서 computed
 const jibunAddress = computed(() => {
-  const addr = getQueryString(route.query.jibunAddress);
-  console.log("jibunAddress computed:", addr); // 디버깅용
+  const addr = queryUtil.getQueryString(route.query.jibunAddress);
   return addr || "";
 });
 
 const buildingName = computed(() => {
-  const name = getQueryString(route.query.buildingName);
-  console.log("buildingName computed:", name); // 디버깅용
+  const name = queryUtil.getQueryString(route.query.buildingName);
   return name || "";
 });
 
 const latlng = computed<{ lat: number; lng: number }>(() => {
-  const lat = Number(getQueryString(route.query.lat));
-  const lng = Number(getQueryString(route.query.lng));
+  const lat = Number(queryUtil.getQueryString(route.query.lat));
+  const lng = Number(queryUtil.getQueryString(route.query.lng));
 
   // NaN 방지: 좌표 값이 없으면 0 반환
   return {
@@ -99,12 +42,10 @@ const latlng = computed<{ lat: number; lng: number }>(() => {
 
 const input = computed(() => ({
   jibunAddress: jibunAddress.value,
-  roadAddress: getQueryString(route.query.roadAddress) || "",
+  roadAddress: queryUtil.getQueryString(route.query.roadAddress) || "",
   lat: latlng.value.lat,
   lng: latlng.value.lng,
 }));
-
-const api = new Api();
 
 const selectedType = ref("전체");
 const selectedPeriod = ref("1");
@@ -128,7 +69,6 @@ const formatDateLocal = (date: Date): string => {
 };
 
 const getTradeTypeCode = (label: string | null): number | null => {
-  console.log("getTradeTypeCode 호출:", label);
   if (label === "매매") return 1;
   if (label === "전월세") return 2;
   return null; // "전체" 혹은 그 외
@@ -172,13 +112,6 @@ const filteredData = async (markerData: {
   }
 };
 
-const periodOptions = [
-  { label: "전체", value: "전체" },
-  { label: "1년", value: "1" },
-  { label: "3년", value: "3" },
-  { label: "5년", value: "5" },
-];
-
 //연도 버튼 클릭으로 필터링 기능
 const changePeriod = () => {
   console.log("변경된 기간: ", selectedPeriod.value);
@@ -199,17 +132,11 @@ const changePeriod = () => {
   filteredData(input.value);
 };
 
-const typeOptions = [
-  { label: "전체", value: "전체" },
-  { label: "매매", value: "매매" },
-  { label: "전월세", value: "전월세" },
-];
-
 const changeType = () => {
-  console.log("거래 형식 선택됨:", selectedType.value);
   updateURLQuery();
   filteredData(input.value);
 };
+
 //수동으로 버튼 누르면... 해제
 const handleDateChange = () => {
   selectedPeriod.value = "전체";
@@ -218,6 +145,7 @@ const handleDateChange = () => {
   updateURLQuery();
   filteredData(input.value);
 };
+
 // URL Query 업데이트
 const updateURLQuery = () => {
   router.push({
@@ -262,12 +190,68 @@ watchEffect(() => {
     });
   }
 });
-
-function getQueryString(
-  queryValue: LocationQueryValueRaw | LocationQueryValueRaw[] | undefined,
-): string | undefined {
-  if (!queryValue) return undefined;
-  if (Array.isArray(queryValue)) return queryValue[0]?.toString();
-  return queryValue.toString();
-}
 </script>
+
+<template>
+  <div class="pb-24">
+    <!-- 동적 헤더: 아파트명 -->
+    <Header :headerShowtype="mainRouteName.transactionDetail">
+      <div class="relatvie h-25 flex flex-col justify-center p-2">
+        <div class="flex justify-center text-2xl text-bold">
+          {{ buildingName ? buildingName : jibunAddress }}
+        </div>
+      </div>
+    </Header>
+
+    <div class="relative w-[85%] mx-auto mt-4">
+      <div class="absolute right-0 w-7 h-7">
+        <WishButton target-type="building" :jibun-addr="jibunAddress" />
+      </div>
+
+      <p class="text-base mb-1 text-kb-ui-04">거래 형식</p>
+
+      <!-- 필터: 매매/전월세 -->
+      <RadioListButton
+        class="mt-4"
+        v-model="selectedType"
+        :options="estateTradeOptions"
+        @change="changeType"
+      />
+    </div>
+
+    <!-- 날짜 범위 필터 -->
+    <div class="w-[85%] mx-auto gap-2 mt-6">
+      <h1 class="text-base mb-1 text-kb-ui-04">기간 설정</h1>
+
+      <!-- 기간 설정 필터 -->
+      <RadioListButton
+        class="mt-4"
+        v-model="selectedPeriod"
+        :options="transactionPeriodOptions"
+        @change="changePeriod"
+      />
+
+      <div class="flex items-center justify-center gap-[16px] mt-5">
+        <DatePicker
+          placeholder="시작일"
+          v-model="startDate"
+          :input-class="'text-sm py-2 px-2 border border-gray-400 text-center rounded-none h-[30px] w-[150px]'"
+          @update:modelValue="handleDateChange"
+        />
+
+        <div class="flex text-sm justify-center mx-[8px]">~</div>
+
+        <DatePicker
+          placeholder="종료일"
+          v-model="endDate"
+          :input-class="'text-sm py-2 px-2 border border-gray-400 text-center rounded-none h-[30px] w-[150px]'"
+          @update:modelValue="handleDateChange"
+        />
+      </div>
+    </div>
+
+    <!-- 그래프 -->
+
+    <TransactionGraph :graphData="graphData" :selectedType="selectedType" />
+  </div>
+</template>

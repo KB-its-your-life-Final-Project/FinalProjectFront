@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { defineEmits } from "vue";
+import { TransactionPeriodType } from "@/types/tansactionType";
 
 const props = defineProps<{
   modelValue: string;
-  options: { label: string; value: string }[];
+  options: TransactionPeriodType[];
   rounded?: boolean;
 }>();
 

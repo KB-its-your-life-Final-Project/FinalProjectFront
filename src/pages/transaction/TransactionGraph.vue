@@ -1,9 +1,3 @@
-<template>
-  <div class="mt-8 h-[400px]">
-    <Line :data="chartData" :options="chartOptions" />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { Line } from "vue-chartjs";
 import {
@@ -20,6 +14,7 @@ import {
 import zoomPlugin from "chartjs-plugin-zoom";
 import { computed } from "vue";
 import type { TooltipItem } from "chart.js";
+import TransactionNotFound from "./_components/TransactionNotFound.vue";
 
 ChartJS.register(
   Title,
@@ -37,6 +32,10 @@ const props = defineProps<{
   graphData: { date: string; price: number; type: string }[];
   selectedType: string;
 }>();
+
+const hasData = computed(() => {
+  return props.graphData && props.graphData.length > 0;
+});
 
 const chartData = computed(() => {
   console.log(" [그래프 데이터 확인]", props.graphData);
@@ -91,8 +90,8 @@ const chartOptions = computed(() => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "bottom",
-        align: "center",
+        position: "bottom" as const,
+        align: "center" as const,
         labels: {
           boxWidth: 12,
           padding: 20,
@@ -100,7 +99,7 @@ const chartOptions = computed(() => {
         onClick: () => {},
       },
       tooltip: {
-        mode: "index",
+        mode: "index" as const,
         intersect: false,
         callbacks: {
           label: (tooltipItem: TooltipItem<"line">) =>
@@ -110,7 +109,7 @@ const chartOptions = computed(() => {
       zoom: {
         pan: {
           enabled: true,
-          mode: "x",
+          mode: "x" as const,
         },
         zoom: {
           wheel: {
@@ -119,25 +118,25 @@ const chartOptions = computed(() => {
           pinch: {
             enabled: true,
           },
-          mode: "x",
+          mode: "x" as const,
         },
       },
     },
     interaction: {
       //타입충돌예방
-      mode: "index",
+      mode: "index" as const,
       intersect: false,
     },
     scales: {
-    
       y: {
         beginAtZero: true,
         min: minY,
         max: maxY,
         ticks: {
           stepSize: Math.ceil((maxY - minY) / 5),
-          callback: function (value: number) {
-            return (value / 10000).toFixed(1) + "억"; // 여기에 '억' 추가
+          callback: function (value: string | number) {
+            const numValue = typeof value === "string" ? parseFloat(value) : value;
+            return (numValue / 10000).toFixed(1) + "억";
           },
         },
       },
@@ -145,3 +144,10 @@ const chartOptions = computed(() => {
   };
 });
 </script>
+
+<template>
+  <div class="mt-8 h-[400px]">
+    <TransactionNotFound v-if="!hasData" />
+    <Line v-else :data="chartData" :options="chartOptions" />
+  </div>
+</template>

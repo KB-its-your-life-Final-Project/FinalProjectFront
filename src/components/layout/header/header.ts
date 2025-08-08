@@ -19,7 +19,7 @@ const headerTitleList = {
   [mainRouteName.myAlarm]: "알람",
   [mainRouteName.wishlist]: "관심 목록",
   [mainRouteName.mainMenu]: "전체 메뉴",
-  [mainRouteName.transactionDetail]: "",
+  [mainRouteName.transactionDetail]: "건축물 실거래가",
   [mainRouteName.myPage]: "마이 페이지",
   [mainRouteName.aiRecommend]: "AI 추천 서비스",
   [myPageRouteName.alarmSetting]: "알림 설정",
