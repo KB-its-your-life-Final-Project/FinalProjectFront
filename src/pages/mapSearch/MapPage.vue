@@ -16,6 +16,9 @@ let mapMoveTimer: any;
 const route = useRoute();
 const mapDetailShow = ref(false);
 
+// 이전 검색값 저장
+const previousSearchInput = ref("");
+
 //주소 검색시
 const searchInput = route.query.searchInput
   ? ref(decodeURIComponent(route.query.searchInput as string))
@@ -80,7 +83,11 @@ const loadMarkers = async () => {
       },
     ];
 
-    map.setCenter(atcResult.latlng);
+    // 검색값이 변경되었을 때만 center 설정
+    if (previousSearchInput.value !== searchInput.value) {
+      map.setCenter(atcResult.latlng);
+      previousSearchInput.value = searchInput.value;
+    }
   }
   //아무것도 못받으면 그냥 현재 주변 건물 표시
   else if (
