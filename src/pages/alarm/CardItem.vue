@@ -1,3 +1,20 @@
+<script setup lang="ts">
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+defineProps<{
+  icon: string[]; // e.g., ['fas', 'bell']
+  title: string;
+  content: string;
+  timeAgo: string;
+  iconColor: string;
+}>();
+
+defineEmits<{
+  (e: "click"): void;
+  (e: "delete"): void;
+}>();
+</script>
+
 <template>
   <div
     class="flex items-start bg-white rounded-xl shadow-md p-6 mb-6 hover:shadow-lg transition-shadow relative"
@@ -26,20 +43,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
-defineProps<{
-  icon: string; // e.g., ['fas', 'bell']
-  title: string;
-  content: string;
-  timeAgo: string;
-  iconColor: string; // 배경색 클래스
-}>();
-
-defineEmits<{
-  (e: "click"): void;
-  (e: "delete"): void;
-}>();
-</script>

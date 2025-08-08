@@ -30,7 +30,7 @@ const headerShowList = {
   [mainRouteName.homeMain]: ["showAlarm"],
   [mainRouteName.mapSearch]: ["showAlarm", "showBack"],
   [mainRouteName.localInfo]: ["showAlarm", "showBack"],
-  [mainRouteName.safeReport]: ["showAlarm", "showBack"],
+  [mainRouteName.safeReport]: ["showBack"],
   [mainRouteName.safeReportResult]: ["showBack"],
   [mainRouteName.recentSafeReport]: ["showBack"],
   [mainRouteName.localInfoSearch]: ["showAlarm", "showBack"],

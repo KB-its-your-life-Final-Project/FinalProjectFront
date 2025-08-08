@@ -99,6 +99,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/myAlarm",
     name: mainRouteName.myAlarm,
     component: () => import("@/pages/alarm/MyAlarm.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/transactionDetail",

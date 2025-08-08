@@ -26,6 +26,7 @@ const myPageRouteRecordRaw: RouteRecordRaw[] = [
     path: "/mypage/setting",
     name: myPageRouteName.alarmSetting,
     component: myPageRouteMap.myPageSetting,
+    meta: { requiresAuth: true },
   },
 ];
 export { myPageRouteMap, myPageRouteName, myPageRouteRecordRaw };
