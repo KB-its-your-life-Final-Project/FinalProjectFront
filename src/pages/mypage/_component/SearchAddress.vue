@@ -17,8 +17,8 @@ function openPostcode() {
 }
 
 const emit = defineEmits<{
-  'address-selected': [address: string]
-  'building-number-changed': [buildingNumber: string]
+  "address-selected": [address: string];
+  "building-number-changed": [buildingNumber: string];
 }>();
 
 function onAddressSelected(
@@ -37,7 +37,7 @@ function onAddressSelected(
 
   // 부모 컴포넌트로 지번주소 전달
   if (jibunAddress.value) {
-    emit('address-selected', jibunAddress.value);
+    emit("address-selected", jibunAddress.value);
   }
 }
 </script>

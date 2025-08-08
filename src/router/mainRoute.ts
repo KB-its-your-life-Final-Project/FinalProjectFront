@@ -1,7 +1,8 @@
-import { RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
+import type { Component } from "vue";
 
 //라우트 파일 위치
-const mainRouteMap: Record<string, () => Promise<any>> = {
+const mainRouteMap: Record<string, () => Promise<Component>> = {
   //홈
   homeMain: () => import("@/pages/home/HomeMain.vue"),
 
@@ -32,6 +33,9 @@ const mainRouteMap: Record<string, () => Promise<any>> = {
 
   //안심 진단 결과
   safeReportResult: () => import("@/pages/safeReport/SafeReportResult.vue"),
+
+  //안심 진단 결과
+  aiRecommend: () => import("@/pages/aiRecommend/aiRecommend.vue"),
 };
 
 //라우트 이름
@@ -49,6 +53,7 @@ const mainRouteName = {
   transactionDetail: "transactionDetail",
   recentSafeReport: "recentSafeReport",
   safeReportResult: "safeReportResult",
+  aiRecommend: "aiRecommend",
 };
 
 //라우트 설정
@@ -94,6 +99,7 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/myAlarm",
     name: mainRouteName.myAlarm,
     component: () => import("@/pages/alarm/MyAlarm.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/transactionDetail",
@@ -115,6 +121,12 @@ const mainRouteRecordRaw: RouteRecordRaw[] = [
     path: "/safeReportResult",
     name: mainRouteName.safeReportResult,
     component: () => import("@/pages/safeReport/SafeReportResult.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/aiRecommend",
+    name: mainRouteName.aiRecommend,
+    component: () => import("@/pages/aiRecommend/aiRecommend.vue"),
     meta: { requiresAuth: true },
   },
 ];

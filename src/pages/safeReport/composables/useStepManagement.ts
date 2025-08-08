@@ -1,6 +1,6 @@
-import { ref } from 'vue';
-import type { SafeReportRequestDto } from '../types';
-import { SafeReportStep, STEP_RESET_CONFIG } from '../types';
+import { ref } from "vue";
+import type { SafeReportRequestDto } from "../types";
+import { SafeReportStep, STEP_RESET_CONFIG } from "../types";
 
 export function useStepManagement(initialStep = 0) {
   const currentStep = ref(initialStep);
@@ -25,9 +25,9 @@ export function useStepManagement(initialStep = 0) {
       // 1→0: 건물 정보 초기화
       const resetFields = STEP_RESET_CONFIG[SafeReportStep.SEARCH_BUILDING].resetFields;
       resetFields.forEach((field: keyof SafeReportRequestDto) => {
-        if (field === 'lat' || field === 'lng') {
+        if (field === "lat" || field === "lng") {
           (formData as Record<string, number>)[field] = 0;
-        } else if (field === 'budget') {
+        } else if (field === "budget") {
           (formData as Record<string, undefined>)[field] = undefined;
         } else {
           (formData as Record<string, string>)[field] = "";

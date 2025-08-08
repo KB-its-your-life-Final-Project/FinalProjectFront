@@ -12,17 +12,18 @@ import ChangeProfileModal from "./_component/ChangeProfileModal.vue";
 import ChangeHouseModal from "./_component/ChangeHouseModal.vue";
 import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
-import ToastList from "@/components/common/ToastList.vue";
-
-import { markRaw, ref, reactive, onMounted } from "vue";
+import { markRaw, ref, computed, onMounted } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
+import { authStore } from "@/stores/authStore";
+
 import defaultProfile from "@/assets/imgs/profile.jpg";
 import ProfileImage from "@/components/common/ProfileImage.vue";
 import ProfileInfo from "@/components/common/ProfileInfo.vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
 
+const api = new Api();
 const modalMap = {
   name: markRaw(ChangeNameModal),
   editHouse: markRaw(ChangeHouseModal),
@@ -56,17 +57,21 @@ type ModalPropsMap = {
     contractDate?: never;
   };
 };
+
+const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
 const isOpenDrawer = ref(false);
 const currentModalName = ref<null | ModalNames>(null);
 const modalProps = ref<ModalPropsMap[ModalNames] | null>(null);
-const api = new Api();
+const isPwdChangeable = computed(() => auth.member.createdType === 1); // 1: 이메일 계정
 
-const user = reactive({
-  name: "홍길동",
-  email: "HONG@GMAIL.COM",
+const auth = authStore();
+const user = computed(() => ({
+  name: auth.member.name ?? "사용자",
+  email: auth.member.email ?? "이메일 없음",
   isRegistered: false,
-  imagePath: defaultProfile,
-});
+  imagePath: auth.member.profileImg ? `${fileBaseUrl}${auth.member.profileImg}` : defaultProfile,
+}));
 
 const isLoading = ref(false);
 const homeData = ref<HomeRegisterResponseDTO | null>(null);
@@ -81,7 +86,7 @@ function openModal<T extends ModalNames>(type: T, props: ModalPropsMap[T]) {
 const handleModalClose = () => {
   const modalType = currentModalName.value;
   closeModal();
-  if(modalType === 'newHouse' || modalType === 'editHouse'){
+  if (modalType === "newHouse" || modalType === "editHouse") {
     fetchHomeData();
   }
 };
@@ -89,28 +94,29 @@ function closeModal() {
   currentModalName.value = null;
   modalProps.value = null;
 }
+function handleNameChanged(newName: string) {
+  auth.member.name = newName;
+}
 
 const fetchHomeData = async () => {
-  try{
+  try {
     isLoading.value = true;
     const response = await api.getHomeInfoUsingGet();
 
-    if(response.data?.data){
+    if (response.data?.data) {
       homeData.value = response.data.data;
       user.isRegistered = true;
-    }else{
+    } else {
       homeData.value = null;
       user.isRegistered = false;
     }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    isLoading.value = false;
+  } catch (error: unknown) {
+    console.error("로그인 여부 확인 중 오류: ", error);
   }
 };
 // 기존 함수들 아래에 추가
 const calculateRemainingDays = (contractEnd?: string) => {
-  if (!contractEnd) return '종료일 정보 없음';
+  if (!contractEnd) return "종료일 정보 없음";
 
   const today = new Date();
   const endDate = new Date(contractEnd);
@@ -120,7 +126,7 @@ const calculateRemainingDays = (contractEnd?: string) => {
   if (diffDays > 0) {
     return `${diffDays}일 남음`;
   } else if (diffDays === 0) {
-    return '오늘 만료';
+    return "오늘 만료";
   } else {
     return `${Math.abs(diffDays)}일 지남`;
   }
@@ -128,10 +134,14 @@ const calculateRemainingDays = (contractEnd?: string) => {
 
 const getRentTypeText = (rentType?: number) => {
   switch (rentType) {
-    case 1: return '전세';
-    case 2: return '월세';
-    case 3: return '반전세';
-    default: return '임대 유형';
+    case 1:
+      return "전세";
+    case 2:
+      return "월세";
+    case 3:
+      return "반전세";
+    default:
+      return "임대 유형";
   }
 };
 
@@ -141,27 +151,23 @@ const formatRentAmount = (homeData: HomeRegisterResponseDTO) => {
   } else if (homeData.rentType === 2) {
     return `${homeData.monthlyRent || 0}만원`;
   } else {
-    return '금액 정보 없음';
+    return "금액 정보 없음";
   }
 };
 
 const getRentSubContent = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
-    return '전세 계약';
+    return "전세 계약";
   } else if (homeData.rentType === 2) {
     return `보증금: ${homeData.monthlyDeposit || 0}만원`;
   } else {
-    return '계약 정보 없음';
+    return "계약 정보 없음";
   }
 };
 
 onMounted(() => {
   fetchHomeData();
 });
-/*회원가입한 데이터를 받아오기!*/
-/* (예시) const userStore = useUserStore()
-const name = userStore.name
-const email = userStore.email*/
 </script>
 
 <template>
@@ -176,7 +182,7 @@ const email = userStore.email*/
           <ProfileImage :src="user.imagePath" />
         </div>
         <button
-          class="absolute bottom-0 right-0 cursor-pointer p-1 bg-gray-300 rounded-full"
+          class="absolute bottom-0 right-0 cursor-pointer py-1 px-2 bg-kb-ui-08 rounded-full"
           @click="openModal('profile', { profile: user.imagePath, name: user.name })"
         >
           <font-awesome-icon :icon="['fas', 'camera']"></font-awesome-icon>
@@ -184,10 +190,10 @@ const email = userStore.email*/
       </div>
       <ProfileInfo :name="user.name" :email="user.email" />
 
-      <div class="w-4/5 relative h-10">
-        <div class="absolute w-full border border-kb-gray-light rounded-md">
+      <div class="w-4/5 relative h-10 mt-3">
+        <div class="absolute w-full border border-kb-ui-07 rounded-lg">
           <button
-            class="text-lg py-2 w-full font-bold cursor-pointer text-kb-gray-light flex justify-center items-center gap-2"
+            class="text-md font-pretendard-medium py-2 w-full font-bold cursor-pointer text-kb-ui-04 flex justify-center items-center gap-2"
             @click="openDrawer"
           >
             회원정보 수정
@@ -208,6 +214,7 @@ const email = userStore.email*/
                 @click="openModal('name', { oldName: user.name })"
               />
               <EditItem
+                v-if="isPwdChangeable"
                 :title="'비밀번호 변경'"
                 :icon="['fas', 'key']"
                 @click="openModal('password', {})"
@@ -236,60 +243,66 @@ const email = userStore.email*/
   </div>
 
   <div v-if="isLoading" class="h-100 flex items-center justify-center">
-  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-</div>
-<div v-else-if="homeData" class="overflow-y-auto pb-20">
-  <!-- 등록된 집 정보 -->
-  <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
-  <div class="mx-4 text-xs text-gray-400">{{ homeData.buildingName || '등록된 아파트' }}</div>
-  <InfoCard :title="'등록된 아파트'" :content="homeData.buildingName || '정보 없음'" :sub-content="homeData.buildingNumber ? `${homeData.buildingNumber}` : '동 정보 없음'" />
-
-  <!-- 계약 정보 -->
-  <h2 class="text-lg mx-4 mt-4">계약 정보</h2>
-  <div class="mx-4 text-xs text-gray-400">계약 기간</div>
-  <InfoCard
-    :title="'계약 기간'"
-    :content="`${homeData.contractStart || '시작일 없음'} ~ ${homeData.contractEnd || '종료일 없음'}`"
-    :sub-content="calculateRemainingDays(homeData.contractEnd)"
-  />
-
-  <!-- 임대료 정보 -->
-  <h2 class="text-lg mx-4 mt-4">임대료 정보</h2>
-  <div class="mx-4 text-xs text-gray-400">계약 조건</div>
-  <InfoCard
-    :title="getRentTypeText(homeData.rentType)"
-    :content="formatRentAmount(homeData)"
-    :sub-content="getRentSubContent(homeData)"
-  />
-
-  <!-- 나의 집 정보 수정하기 버튼 -->
-  <div class="mx-4 mt-4">
-    <button
-      class="w-full py-3 bg-kb-yellow-positive text-white text-sm rounded-md shadow-inner cursor-pointer"
-      @click="openModal('editHouse', {
-        type: 'edit',
-        address: homeData.buildingName || '',
-        contractDate: homeData.contractStart || '',
-      })"
-    >
-      나의 집 정보 수정하기
-    </button>
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
   </div>
+  <div v-else-if="homeData" class="overflow-y-auto pb-20">
+    <!-- 등록된 집 정보 -->
+    <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
+    <div class="mx-4 text-xs text-gray-400">{{ homeData.buildingName || "등록된 아파트" }}</div>
+    <InfoCard
+      :title="'등록된 아파트'"
+      :content="homeData.buildingName || '정보 없음'"
+      :sub-content="homeData.buildingNumber ? `${homeData.buildingNumber}` : '동 정보 없음'"
+    />
 
-  <!-- 알림 설정 버튼 -->
-  <div class="mx-4 mt-4">
-    <button
-      class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
-      @click="movePage.mypageStetting()"
-    >
-      알림 설정
-    </button>
+    <!-- 계약 정보 -->
+    <h2 class="text-lg mx-4 mt-4">계약 정보</h2>
+    <div class="mx-4 text-xs text-gray-400">계약 기간</div>
+    <InfoCard
+      :title="'계약 기간'"
+      :content="`${homeData.contractStart || '시작일 없음'} ~ ${homeData.contractEnd || '종료일 없음'}`"
+      :sub-content="calculateRemainingDays(homeData.contractEnd)"
+    />
+
+    <!-- 임대료 정보 -->
+    <h2 class="text-lg mx-4 mt-4">임대료 정보</h2>
+    <div class="mx-4 text-xs text-gray-400">계약 조건</div>
+    <InfoCard
+      :title="getRentTypeText(homeData.rentType)"
+      :content="formatRentAmount(homeData)"
+      :sub-content="getRentSubContent(homeData)"
+    />
+
+    <!-- 나의 집 정보 수정하기 버튼 -->
+    <div class="mx-4 mt-4">
+      <button
+        class="w-full py-3 bg-kb-yellow-positive text-white text-sm rounded-md shadow-inner cursor-pointer"
+        @click="
+          openModal('editHouse', {
+            type: 'edit',
+            address: homeData.buildingName || '',
+            contractDate: homeData.contractStart || '',
+          })
+        "
+      >
+        나의 집 정보 수정하기
+      </button>
+    </div>
+
+    <!-- 알림 설정 버튼 -->
+    <div class="mx-4 mt-4">
+      <button
+        class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
+        @click="movePage.mypageStetting()"
+      >
+        알림 설정
+      </button>
+    </div>
   </div>
-</div>
   <div v-else class="h-100 flex flex-col items-center justify-center">
     <div class="font-pretendard-bold text-xl">나의 집을 등록하고 정보를 받아보세요!</div>
     <button
-      class="mt-10 cursor-pointer bg-kb-yellow-positive text-white px-10 py-3 rounded-md"
+      class="mt-10 text-md cursor-pointer bg-kb-yellow-positive text-white px-10 py-3 rounded-md"
       @click="openModal('newHouse', { type: 'regist' })"
     >
       나의 집 등록하기
@@ -299,19 +312,18 @@ const email = userStore.email*/
   <!-- 알림 설정 버튼 (하단 고정) - 집 정보가 없을 때만 표시 -->
   <div v-if="!homeData" class="fixed bottom-20 left-4 right-4 z-10">
     <button
-      class="w-full py-3 bg-gray-200 text-sm rounded-md shadow-inner cursor-pointer"
+      class="w-full py-3 bg-kb-ui-09 text-md rounded-md shadow-inner cursor-pointer"
       @click="movePage.mypageStetting()"
     >
       알림 설정
     </button>
   </div>
-
-  <ToastList />
   <Section />
 
   <component
     :is="currentModalName ? modalMap[currentModalName] : null"
     v-bind="modalProps"
+    @nameChanged="handleNameChanged"
     @close="handleModalClose"
   ></component>
 </template>

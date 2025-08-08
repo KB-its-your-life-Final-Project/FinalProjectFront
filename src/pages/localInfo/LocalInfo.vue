@@ -99,5 +99,4 @@ onMounted(() => {
   </div>
 
   <div class="h-15"><Footer /></div>
-  <ToastList />
 </template>

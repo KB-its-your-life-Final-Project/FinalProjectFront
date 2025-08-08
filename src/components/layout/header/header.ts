@@ -21,6 +21,7 @@ const headerTitleList = {
   [mainRouteName.mainMenu]: "전체 메뉴",
   [mainRouteName.transactionDetail]: "",
   [mainRouteName.myPage]: "마이 페이지",
+  [mainRouteName.aiRecommend]: "AI 추천 서비스",
   [myPageRouteName.alarmSetting]: "알림 설정",
 };
 
@@ -29,7 +30,7 @@ const headerShowList = {
   [mainRouteName.homeMain]: ["showAlarm"],
   [mainRouteName.mapSearch]: ["showAlarm", "showBack"],
   [mainRouteName.localInfo]: ["showAlarm", "showBack"],
-  [mainRouteName.safeReport]: ["showAlarm", "showBack"],
+  [mainRouteName.safeReport]: ["showBack"],
   [mainRouteName.safeReportResult]: ["showBack"],
   [mainRouteName.recentSafeReport]: ["showBack"],
   [mainRouteName.localInfoSearch]: ["showAlarm", "showBack"],
@@ -38,6 +39,7 @@ const headerShowList = {
   [mainRouteName.mainMenu]: ["showAlarm"],
   [mainRouteName.transactionDetail]: ["showAlarm", "showBack"],
   [mainRouteName.myPage]: ["showAlarm", "showBack"],
+  [mainRouteName.aiRecommend]: ["showAlarm", "showBack"],
   [myPageRouteName.alarmSetting]: ["showAlarm", "showBack"],
 };
 type headerShowtype = keyof typeof headerShowList;

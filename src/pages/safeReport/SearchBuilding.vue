@@ -26,7 +26,6 @@ const isButtonEnabled = computed(() => {
   const hasRoadAddress = roadAddress.value?.trim();
   const hasJibunAddress = jibunAddress.value?.trim();
 
-
   // 모든 필수 주소 정보가 있어야 활성화
   return hasBuildingName && hasRoadAddress && hasJibunAddress;
 });
@@ -58,7 +57,7 @@ onMounted(async () => {
     await mapUtil.loadNaverMapScript();
     naverReady.value = true;
   } catch (error) {
-    console.error('네이버 지도 API 로드 실패:', error);
+    console.error("네이버 지도 API 로드 실패:", error);
   }
 });
 
@@ -100,8 +99,6 @@ function handleAddressComplete(payload: {
     searchAddressToCoordinate(jibunAddress.value);
   }
 }
-
-
 
 // 주소 레이어 닫기 핸들러
 function handleAddressLayerClose() {
@@ -174,7 +171,6 @@ function handleAddressSelected(addressData: {
   longitude: number | undefined;
   jibunAddr: string | undefined;
 }) {
-
   // 선택된 건물명 설정
   buildingName.value = addressData.buildingName || addressData.fullAddress;
 
@@ -188,9 +184,9 @@ function handleAddressSelected(addressData: {
     buildingName: buildingName.value,
     roadAddress: roadAddress.value,
     jibunAddress: jibunAddress.value,
-    dongName: addressData.dong || '',
+    dongName: addressData.dong || "",
     lat: addressData.latitude, // 서버에서 받은 위도
-    lng: addressData.longitude  // 서버에서 받은 경도
+    lng: addressData.longitude, // 서버에서 받은 경도
   });
 
   showBuildingNotFoundPage.value = false;
@@ -198,8 +194,6 @@ function handleAddressSelected(addressData: {
   // 다음 화면으로 이동
   next();
 }
-
-
 </script>
 
 <template>
@@ -273,21 +267,19 @@ function handleAddressSelected(addressData: {
     >
       <div class="text-center">
         <p class="text-medium text-kb-ui-02">
-          검색하신 주소에 해당하는 건물 정보가 없습니다.<br>
+          검색하신 주소에 해당하는 건물 정보가 없습니다.<br />
           다시 검색해주세요.
         </p>
       </div>
       <div class="mt-8 p-4 bg-gray-50 rounded-lg">
-          <h3 class="text-sm font-medium text-gray-800 mb-2">💡 도움말</h3>
-          <ul class="text-sm text-gray-600 space-y-1 text-left">
-            <li>• 정확한 도로명 주소를 입력해보세요</li>
-            <li>• 건물명 대신 동/호수로 검색해보세요</li>
-            <li>• 새로 지어진 건물은 등록이 지연될 수 있습니다</li>
-          </ul>
-        </div>
+        <h3 class="text-sm font-medium text-gray-800 mb-2">💡 도움말</h3>
+        <ul class="text-sm text-gray-600 space-y-1 text-left">
+          <li>• 정확한 도로명 주소를 입력해보세요</li>
+          <li>• 건물명 대신 동/호수로 검색해보세요</li>
+          <li>• 새로 지어진 건물은 등록이 지연될 수 있습니다</li>
+        </ul>
+      </div>
     </ModalForm>
-
-
   </div>
 </template>
 

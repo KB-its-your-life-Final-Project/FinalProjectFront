@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import HomeCard from "@/components/home/HomeCard.vue";
-import HomeHeader from "@/components/home/HomeHeader.vue";
 import Footer from "@/components/layouts/Footer.vue";
 import NavBar from "@/components/layouts/NavBar.vue";
 

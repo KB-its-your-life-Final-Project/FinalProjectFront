@@ -2,11 +2,10 @@
 import { watch, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
-import { useBudgetInput } from "./composables/useBudgetInput";
-import { useBudgetValidation } from "./composables/useBudgetValidation";
+import { useBudgetInput } from "../safeReport/composables/useBudgetInput";
+import { useBudgetValidation } from "../safeReport/composables/useBudgetValidation";
 
 const store = safeReportStore();
-const emit = defineEmits(["update", "next", "prev"]);
 
 // 예산 입력 관리
 const { rawInput, budget, displayValue, inputRef, handleInput, focusInput } = useBudgetInput(
@@ -31,27 +30,23 @@ onMounted(() => {
   focusInput();
 });
 
-async function next() {
-  const validation = validateBudget(budget.value);
+// AI 추천 확인 버튼 클릭 시 부모 컴포넌트에 이벤트 emit
+const emit = defineEmits<{
+  next: [];
+}>();
 
-  if (!validation.isValid) {
-    showValidationError(validation.message);
-    return;
+const next = () => {
+  if (budget.value) {
+    emit("next");
   }
-
-  emit("next");
-}
-
-function prev() {
-  emit("prev");
-}
+};
 </script>
 
 <template>
-  <div class="relative flex flex-col flex-1 min-h-screen px-6 gap-6">
+  <div class="relative flex flex-col flex-1 min-h-screen px-6 gap-6 mt-6">
     <div>
       <h1 class="text-2xl font-pretendard-bold mb-1">예산은 얼마인가요?</h1>
-      <h1 class="text-2xl font-pretendard-bold mb-1">더 상세한 리포트를 제공해드릴게요!</h1>
+      <h1 class="text-2xl font-pretendard-bold mb-1">더 상세한 정보를 제공해드릴게요!</h1>
     </div>
 
     <div class="relative w-full max-w-lg mx-auto">
@@ -80,14 +75,13 @@ function prev() {
 
       <div class="text-xs text-kb-ui-04 mt-2 text-right">예산은 100억원 미만이어야 합니다</div>
     </div>
-    <div class="fixed z-auto inset-x-0 bottom-6 flex justify-between px-6 pb-24">
-      <button @click="prev" class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11">이전</button>
+    <div class="fixed z-auto inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
         :disabled="!budget"
-        class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
+        class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 terst disabled:opacity-50"
       >
-        레포트 보기
+        AI 추천 확인
       </button>
     </div>
   </div>
@@ -102,4 +96,3 @@ function prev() {
     <p>{{ validationMessage }}</p>
   </ModalForm>
 </template>
-<style scoped></style>

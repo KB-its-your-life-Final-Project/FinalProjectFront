@@ -2,7 +2,7 @@ import type {
   SafeReportRequestDto,
   RentalRatioAndBuildyear,
   FloorAndPurpose,
-  ViolationStatus
+  ViolationStatus,
 } from "@/api/autoLoad/data-contracts";
 
 // 초기 폼 데이터
@@ -38,10 +38,10 @@ export interface StepResetConfig {
 
 export const STEP_RESET_CONFIG: StepResetConfig = {
   [SafeReportStep.SEARCH_BUILDING]: {
-    resetFields: ['buildingName', 'roadAddress', 'jibunAddress', 'dongName', 'lat', 'lng'],
+    resetFields: ["buildingName", "roadAddress", "jibunAddress", "dongName", "lat", "lng"],
   },
   [SafeReportStep.SELECT_BUDGET]: {
-    resetFields: ['budget'],
+    resetFields: ["budget"],
   },
   [SafeReportStep.RESULT]: {
     resetFields: [],
@@ -58,9 +58,4 @@ export interface SafeReportState {
 }
 
 // Export 타입들
-export type {
-  SafeReportRequestDto,
-  RentalRatioAndBuildyear,
-  FloorAndPurpose,
-  ViolationStatus,
-};
+export type { SafeReportRequestDto, RentalRatioAndBuildyear, FloorAndPurpose, ViolationStatus };
