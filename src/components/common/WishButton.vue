@@ -7,14 +7,19 @@ import type {
 import { ref, onMounted } from "vue";
 import { useToast } from "@/utils/useToast";
 import { authStore } from "@/stores/authStore";
-const props = defineProps<{
-  name?: string;
-  liked?: boolean;
-  targetType: "region" | "building";
-  regionCd?: string;
-  jibunAddr?: string;
-  estateId?: number;
-}>();
+const props = withDefaults(
+  defineProps<{
+    name?: string;
+    liked?: boolean;
+    targetType: "region" | "building";
+    regionCd?: string;
+    jibunAddr?: string;
+    estateId?: number;
+  }>(),
+  {
+    liked: undefined, // 기본값을 undefined로 설정
+  },
+);
 
 const api = new Api();
 const isLoading = ref(false);
@@ -76,7 +81,6 @@ onMounted(async () => {
       } else if (props.targetType === "building" && props.jibunAddr) {
         const response = await api.existWishlistByJibunAddrUsingGet({
           jibunAddr: props.jibunAddr,
-          estateId: props.estateId,
         });
         const data = response.data.data;
         liked.value = data;
