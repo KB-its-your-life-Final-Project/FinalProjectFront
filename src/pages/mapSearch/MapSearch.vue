@@ -16,7 +16,7 @@ import Footer from "@/components/layout/Footer.vue";
     <LogoSearchBar />
   </Header>
   <!-- 지도부분 넣어주세요!!!! -->
-  <div class="w-full h-[calc(100vh-15rem)] mt-[3rem] rounded-xl">
+  <div class="w-full h-[calc(100vh-15.5rem)] mt-[2rem] rounded-xl">
     <!-- 지도 API   -->
     <MapPage />
   </div>
