@@ -1,7 +1,8 @@
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useAlarmStore } from '@/stores/alarmStore';
+import { ref, onMounted, onUnmounted } from "vue";
+import { useAlarmStore } from "@/stores/alarmStore";
 
-export function useAlarmPolling(intervalMs: number = 30000) { // 기본 30초마다 조회
+export function useAlarmPolling(intervalMs: number = 30000) {
+  // 기본 30초마다 조회
   const isPolling = ref(false);
   let pollInterval: NodeJS.Timeout | null = null;
   const alarmStore = useAlarmStore();
@@ -49,7 +50,6 @@ export function useAlarmPolling(intervalMs: number = 30000) { // 기본 30초마
     isPolling,
     startPolling,
     stopPolling,
-    restartPolling
+    restartPolling,
   };
 }
-

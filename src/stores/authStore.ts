@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, reactive } from "vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { LoginRequestDTO, MemberResponseDTO } from "@/api/autoLoad/data-contracts";
+import type { LoginRequestDTO, MemberResponseDTO, ApiResponseMemberResponseDTO } from "@/api/autoLoad/data-contracts";
 import { useToast } from "@/utils/useToast";
 
 const api = new Api();
@@ -40,7 +40,6 @@ export const authStore = defineStore("auth", () => {
   const checkDuplicateEmail = async (email: string): Promise<boolean> => {
     try {
       const { data } = await api.checkDuplicateEmailUsingGet(email);
-      console.log("이메일 중복 확인 결과: ", data);
       return data.data ?? false;
     } catch (error: unknown) {
       console.error("이메일 중복 확인 오류:", error);
@@ -67,10 +66,14 @@ export const authStore = defineStore("auth", () => {
   };
 
   // 로그인 (토큰은 쿠키에 있으므로 응답에서 사용자 정보만 받아서 상태에 저장)
-  const login = async (loginInfo: LoginRequestDTO): Promise<MemberResponseDTO> => {
+  const login = async (loginInfo: LoginRequestDTO): Promise<ApiResponseMemberResponseDTO> => {
     try {
       const { data } = await api.loginUsingPost(loginInfo);
       console.log("data: ", data);
+      if (data.success === false && data.code === 1013) {
+        console.log("error message: ", data.message)
+        return data;
+      }
       if (data.success === true && data.data) {
         // 상태 업데이트
         Object.assign(member, data.data);
