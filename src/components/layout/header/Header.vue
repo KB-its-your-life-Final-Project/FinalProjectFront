@@ -1,13 +1,15 @@
 <!-- Header -->
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import movePage from "@/utils/movePage";
 import { headerTitleList, headerShowList } from "./header";
 import type { headerShowtype } from "./header";
 import { useRoute } from "vue-router";
+import { useAlarmStore } from "@/stores/alarmStore";
 
 const route = useRoute();
+const alarmStore = useAlarmStore();
 
 const emit = defineEmits(["back-click"]);
 
@@ -16,6 +18,11 @@ const props = defineProps<{
   headerShowtype: headerShowtype;
   title?: string; // 아파트명을 받아오고 싶음
 }>();
+
+// 알림 개수 초기화
+onMounted(() => {
+  alarmStore.fetchUnreadCount();
+});
 
 //제목 설정
 const title = ref(props.title ?? headerTitleList[props.headerShowtype]);
@@ -36,48 +43,50 @@ const showItems = reactive(
 );
 
 function handleBackClick() {
-  console.log("뒤로가기 버튼 클릭됨!");
-  console.log("현재 route.name:", route.name);
-
   if (route.name === "safeReport") {
-    console.log("SafeReport 페이지 - emit 실행");
     emit("back-click");
   } else {
-    console.log("다른 페이지 - movePage.back() 실행");
     movePage.back();
   }
 }
 </script>
 
 <template>
-  <header class="bg-kb-yellow w-full p-[1rem] relative">
-    <!-- 왼쪽: 뒤로가기 아이콘 or 타이틀 -->
-    <div
-      class="absolute top-4 left-4 flex items-center space-x-[1rem] text-kb-ui-01 text-[1.25rem]"
-    >
-      <font-awesome-icon
-        v-if="showItems.showBack"
-        :icon="['fas', 'arrow-left']"
-        class="text-[1.125rem] cursor-pointer"
-        @click="handleBackClick"
-      />
-      <span
-        v-if="title"
-        :class="['text-base font-semibold text-kb-ui-01', showItems.showBack ? 'ml-4' : '']"
-      >
-        {{ props.title || title }}
-      </span>
-    </div>
+  <header class="bg-kb-yellow w-full p-3 relative">
+    <!-- 헤더 상단 -->
+    <div class="flex justify-between text-kb-ui-01 h-7">
+      <!-- 왼쪽 아이콘 리스트-->
+      <div class="flex gap-2 text-md items-center">
+        <font-awesome-icon
+          v-if="showItems.showBack"
+          :icon="['fas', 'arrow-left']"
+          class="text-[1.125rem] cursor-pointer"
+          @click="handleBackClick"
+        />
+        <span v-if="title" class="text-base font-semibold text-kb-ui-01">
+          {{ props.title || title }}
+        </span>
+      </div>
 
-    <div
-      v-if="showItems.showAlarm"
-      class="absolute top-4 right-4 flex items-center space-x-[1rem] text-kb-ui-01 text-xl"
-    >
-      <font-awesome-icon
-        :icon="['fas', 'bell']"
-        class="cursor-pointer"
-        @click="movePage.myAlarm()"
-      />
+      <!-- 오른쪽 아이콘 리스트 -->
+      <div class="flex flex-row-reverse gap-2 text-md items-center">
+        <div v-if="showItems.showAlarm" class="text-xl">
+          <div class="relative">
+            <font-awesome-icon
+              :icon="['fas', 'bell']"
+              class="cursor-pointer"
+              @click="movePage.myAlarm()"
+            />
+            <!-- 미확인 알림 개수 표시 -->
+            <div
+              v-if="alarmStore.unreadCount > 0"
+              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+            >
+              {{ alarmStore.unreadCount > 99 ? "99+" : alarmStore.unreadCount }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <slot />
   </header>

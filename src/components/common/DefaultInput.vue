@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { numberToKorean } from "@/utils/numberUtils";
 const props = defineProps<{
   label: string;
   modelValue?: string;
@@ -17,10 +18,10 @@ const emit = defineEmits<{
 // 내부 값 관리
 const rawValue = ref(String(props.modelValue ?? ""));
 
-// 실제 숫자 값만 저장
+// 실제 숫자 값만 저장 (만원 단위)
 const formatted = computed(() => {
-  const n = rawValue.value.replace(/\D/g, "");
-  return n ? Number(n).toLocaleString() + "원" : "";
+  const n = String(props.modelValue ?? "").replace(/\D/g, "");
+  return n ? numberToKorean(Number(n) * 10000) + "원" : "";
 });
 
 function onInput(e: Event) {
@@ -37,7 +38,7 @@ function onBlur(event: FocusEvent) {
   if (props.type !== "money") return;
   const target = event.target as HTMLInputElement;
   const rawValue = target.value.replace(/[^\d]/g, "");
-  target.value = Number(rawValue).toLocaleString() + "원";
+  target.value = numberToKorean(Number(rawValue) * 10000) + "원";
 }
 watch(
   () => props.modelValue,
@@ -68,7 +69,7 @@ const displayValue = computed(() => {
       />
       <span
         v-if="type === 'money' && rawValue"
-        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 text-sm pointer-events-none"
       >
         {{ formatted }}
       </span>

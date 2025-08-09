@@ -6,14 +6,26 @@ import MenuSection from "@/pages/mainMenu/_component/MenuSection.vue";
 import Footer from "@/components/layout/Footer.vue";
 import { authStore } from "@/stores/authStore";
 import defaultProfile from "@/assets/imgs/profile.jpg";
+import logo from "@/assets/imgs/logo.svg";
 
-/*임의로 로그아웃, 회원탈퇴 부분 넣겠습니다.*/
-
+import { computed } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import ProfileInfo from "@/components/common/ProfileInfo.vue";
 import ProfileImage from "@/components/common/ProfileImage.vue";
+import movePage from "@/utils/movePage";
 
 const auth = authStore();
+
+const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+const profileImgPath = computed(() => {
+  if (auth.member.createdType === 0) {
+    return logo
+  }
+  const path = auth.member.profileImg;
+  if (!path) return defaultProfile;
+  return `${fileBaseUrl}${path}`;
+});
+console.log("profileImgPath: ", profileImgPath);
 
 // 로그아웃
 const logout = async () => {
@@ -23,11 +35,6 @@ const logout = async () => {
     console.error("logoutUser is undefined");
   }
 };
-
-function withdraw() {
-  alert("요청 중...");
-  // 회원탈퇴의 로직을 추가해주세요
-}
 
 function openInquiry() {
   alert("lighthouse@gmail.com 로 문의 주세요!");
@@ -40,13 +47,14 @@ function openInquiry() {
     <!--Header 부분에 회원 정보가 크게 띄게 수정-->
     <div class="pl-3 pr-8 pt-8 pb-8">
       <div class="mt-[1.5rem] flex items-center justify-center text-center">
-        <!-- 프로필 사진 넣어주세요! 회원부분이랑 연동해서      -->
         <div class="flex-[1]">
-          <ProfileImage :src="defaultProfile" />
+          <ProfileImage :src="profileImgPath" />
         </div>
-        <!--어떤 식으로 회원 정보를 받아올 것인지 - 홍길동은 예시임 + 업로드 기능 (사진 추가해야 함)   -->
         <div class="flex-[3]">
-          <ProfileInfo name="홍길동" email="GILDONG@GMAIL.COM"></ProfileInfo>
+          <ProfileInfo
+            :name="auth.member.name || '안전한 거래의 시작,'"
+            :email="auth.member.createdType === 0 ? 'Light House' : auth.member.email || ''"
+          ></ProfileInfo>
         </div>
       </div>
     </div>
@@ -57,9 +65,8 @@ function openInquiry() {
       <MenuItem :icon="['far', 'user']" label="마이페이지" to="/mypage" />
       <MenuItem :icon="['fas', 'house']" label="실거래가 조회" to="/mapSearch" />
       <MenuItem :icon="['fas', 'shield-alt']" label="안심 정보" to="/safereport" />
-      <MenuItem :icon="['far', 'heart']" label="찜한 매물" to="/myLike" />
-      <MenuItem :icon="['far', 'file-lines']" label="최근 본 리포트" to="/" />
-      <!--      -->
+      <MenuItem :icon="['far', 'heart']" label="관심 목록" to="/wishlist" />
+      <MenuItem :icon="['far', 'file-lines']" label="최근 본 리포트" to="/recentSafeReport" />
     </MenuSection>
 
     <MenuSection title="설정">
@@ -73,9 +80,10 @@ function openInquiry() {
     </MenuSection>
   </div>
 
-  <div class="mt-8 flex justify-center gap-40 text-sm text-kb-ui-05 pb-6">
-    <button class="underline cursor-pointer" @click="withdraw">회원탈퇴</button>
-    <button class="underline cursor-pointer" @click="logout">로그아웃</button>
+  <div class="mt-8 flex justify-center gap-40 text-kb-gray-dark underline pb-6">
+    <button class="underline cursor-pointer" @click="auth.isLoggedIn ? logout() : movePage.login()">
+      {{ auth.isLoggedIn ? "로그아웃" : "로그인" }}
+    </button>
   </div>
   <Footer />
   <div class="h-15"></div>

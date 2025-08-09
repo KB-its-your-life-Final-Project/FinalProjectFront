@@ -16,6 +16,11 @@ function openPostcode() {
   showPostcode.value = true;
 }
 
+const emit = defineEmits<{
+  "address-selected": [address: string];
+  "building-number-changed": [buildingNumber: string];
+}>();
+
 function onAddressSelected(
   payload: Partial<{
     roadAddress: string;
@@ -24,10 +29,16 @@ function onAddressSelected(
     dongName: string;
   }>,
 ) {
-  if (payload.roadAddress) roadAddress.value = payload.roadAddress;
-  if (payload.jibunAddress) jibunAddress.value = payload.jibunAddress;
-  if (payload.buildingName) buildingName.value = payload.buildingName;
-  if (payload.dongName) dongName.value = payload.dongName;
+  // 자동 주소 처리 (SearchAddressLayer.vue와 동일한 로직)
+  roadAddress.value = payload.roadAddress || "";
+  jibunAddress.value = payload.jibunAddress || "";
+  buildingName.value = payload.buildingName || "";
+  dongName.value = payload.dongName || "";
+
+  // 부모 컴포넌트로 지번주소 전달
+  if (jibunAddress.value) {
+    emit("address-selected", jibunAddress.value);
+  }
 }
 </script>
 
@@ -56,6 +67,7 @@ function onAddressSelected(
         v-model="dongNo"
         placeholder="동 입력(예: 204동)"
         class="p-2 w-full border-t border-gray-300"
+        @input="emit('building-number-changed', dongNo)"
       />
       <button
         @click="openPostcode"

@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import ModalForm from "@/components/common/ModalForm.vue";
+import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
+import SelectAddressPage from "@/components/common/SelectAddressPage.vue";
+import mapUtil from "@/utils/naverMap/naverMap";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -10,76 +13,100 @@ const buildingName = ref(store.formData.buildingName);
 const roadAddress = ref(store.formData.roadAddress);
 const jibunAddress = ref(store.formData.jibunAddress);
 const dongName = ref(store.formData.dongName);
-const lat = ref<number>(store.formData.lat);
-const lng = ref<number>(store.formData.lng);
+const lat = ref<number>(store.formData.lat || 0);
+const lng = ref<number>(store.formData.lng || 0);
 const naverReady = ref(false);
-const showPostcode = ref(false);
-const showBuildingNotFoundModal = ref(false);
+const showAddressLayer = ref(false);
+const showBuildingNameInputModal = ref(false);
+const showBuildingNotFoundPage = ref(false);
 
-// DAUM 우편 번호 API + Naver Maps API 호출
-onMounted(() => {
-  if (!window.daum) {
-    const script = document.createElement("script");
-    script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-    document.head.appendChild(script);
+// 버튼 활성화 상태 디버깅
+const isButtonEnabled = computed(() => {
+  const hasBuildingName = buildingName.value?.trim();
+  const hasRoadAddress = roadAddress.value?.trim();
+  const hasJibunAddress = jibunAddress.value?.trim();
+
+  // 모든 필수 주소 정보가 있어야 활성화
+  return hasBuildingName && hasRoadAddress && hasJibunAddress;
+});
+
+// Naver Maps API 호출
+onMounted(async () => {
+  // 검색바 초기화 (store에 값이 있으면 유지)
+  if (!store.formData.buildingName) {
+    buildingName.value = "";
   }
-  if (!window.naver?.maps) {
-    const naverScript = document.createElement("script");
-    naverScript.src =
-      "https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=55s76chbvh&submodules=geocoder";
-    naverScript.async = true;
-    naverScript.onload = () => {
-      naverReady.value = true;
-    };
-    document.head.appendChild(naverScript);
-  } else {
+  if (!store.formData.roadAddress) {
+    roadAddress.value = "";
+  }
+  if (!store.formData.jibunAddress) {
+    jibunAddress.value = "";
+  }
+  if (!store.formData.dongName) {
+    dongName.value = "";
+  }
+  if (!store.formData.lat) {
+    lat.value = 0;
+  }
+  if (!store.formData.lng) {
+    lng.value = 0;
+  }
+
+  // Naver Maps API 로드
+  try {
+    await mapUtil.loadNaverMapScript();
     naverReady.value = true;
+  } catch (error) {
+    console.error("네이버 지도 API 로드 실패:", error);
   }
 });
 
 function search() {
-  showPostcode.value = true;
+  showAddressLayer.value = true;
+}
 
-  nextTick(() => {
-    const container = document.getElementById("postcodeContainer");
-    if (!container || !(window as any).daum?.Postcode) return;
+// 주소 선택 완료 핸들러
+function handleAddressComplete(payload: {
+  roadAddress?: string;
+  jibunAddress?: string;
+  buildingName?: string;
+  dongName?: string;
+}) {
+  console.log("전체 주소 데이터:", payload);
 
-    const postcode = new (window as any).daum.Postcode({
-      oncomplete(data: any) {
-        console.log("전체 주소 데이터:", data);
-        if (!data.buildingName || data.buildingName.trim() == "") {
-          showBuildingNotFoundModal.value = true;
-          return;
-        }
-        roadAddress.value = data.roadAddress || data.autoRoadAddress || "";
-        jibunAddress.value = data.jibunAddress || data.autoJibunAddress || "";
-        buildingName.value = data.buildingName || "";
-        dongName.value = /[동|로|가]$/.test(data.bname) ? data.bname : "";
+  // 건물명이 없으면 건물명 입력 모달 표시
+  if (!payload.buildingName || payload.buildingName.trim() === "") {
+    showBuildingNameInputModal.value = true;
+    return;
+  }
 
-        store.updateFormData({
-          roadAddress: roadAddress.value,
-          jibunAddress: jibunAddress.value,
-          buildingName: buildingName.value,
-          dongName: dongName.value,
-        });
+  // 주소 정보 업데이트 (SearchAddressLayer에서 이미 auto 주소 처리됨)
+  roadAddress.value = payload.roadAddress || "";
+  jibunAddress.value = payload.jibunAddress || "";
+  buildingName.value = payload.buildingName || "";
+  dongName.value = payload.dongName || "";
 
-        if (roadAddress.value && naverReady.value) {
-          searchAddressToCoordinate(jibunAddress.value);
-        }
-      },
-      onclose: () => {
-        showPostcode.value = false;
-        // 주소 선택 없이 닫으면 초기화
-        if (!buildingName.value.trim()) {
-          resetFormData();
-        }
-      },
-      width: "100%",
-      height: "100%",
-    });
-
-    postcode.embed(container);
+  // store 업데이트
+  store.updateFormData({
+    roadAddress: roadAddress.value,
+    jibunAddress: jibunAddress.value,
+    buildingName: buildingName.value,
+    dongName: dongName.value,
   });
+
+  // 좌표 변환
+  if (roadAddress.value && naverReady.value && jibunAddress.value) {
+    searchAddressToCoordinate(jibunAddress.value);
+  }
+}
+
+// 주소 레이어 닫기 핸들러
+function handleAddressLayerClose() {
+  showAddressLayer.value = false;
+  // 주소 선택 없이 닫으면 초기화
+  if (!buildingName.value?.trim()) {
+    resetFormData();
+  }
 }
 
 function searchAddressToCoordinate(address: string) {
@@ -110,7 +137,6 @@ function searchAddressToCoordinate(address: string) {
       lat: latVal,
       lng: lngVal,
     });
-    console.log("store 업데이트 후 formData:", store.formData);
   });
 }
 
@@ -131,10 +157,42 @@ function resetFormData() {
   lng.value = 0;
 }
 
-// 닫기 버튼 클릭 시 초기화
-function handleClose() {
-  showPostcode.value = false;
-  resetFormData();
+// 주소 선택 페이지 이벤트 핸들러
+function handleAddressSelected(addressData: {
+  sido: string | undefined;
+  sigugun: string | undefined;
+  dong: string | undefined;
+  buildingName: string | undefined;
+  fullAddress: string;
+  sidoCd: string | undefined;
+  sggCd: string | undefined;
+  umdCd: string | undefined;
+  latitude: number | undefined;
+  longitude: number | undefined;
+  jibunAddr: string | undefined;
+}) {
+  // 선택된 건물명 설정
+  buildingName.value = addressData.buildingName || addressData.fullAddress;
+
+  // 주소 정보 설정 (jibunAddr 우선, 없으면 fullAddress 사용)
+  const addressToUse = addressData.jibunAddr || addressData.fullAddress;
+  roadAddress.value = addressToUse;
+  jibunAddress.value = addressToUse;
+
+  // store 업데이트 (위도/경도 포함)
+  store.updateFormData({
+    buildingName: buildingName.value,
+    roadAddress: roadAddress.value,
+    jibunAddress: jibunAddress.value,
+    dongName: addressData.dong || "",
+    lat: addressData.latitude, // 서버에서 받은 위도
+    lng: addressData.longitude, // 서버에서 받은 경도
+  });
+
+  showBuildingNotFoundPage.value = false;
+
+  // 다음 화면으로 이동
+  next();
 }
 </script>
 
@@ -162,26 +220,38 @@ function handleClose() {
       </button>
     </div>
 
-    <!--    주소 검색 창 -->
-    <teleport to="body">
-      <div
-        v-if="showPostcode"
-        class="fixed left-0 top-0 w-screen h-screen z-[9999] bg-white flex items-center justify-center"
+    <!-- 원하는 단지가 안나온다면 링크 -->
+    <div class="w-full max-w-lg mx-auto flex justify-end">
+      <button
+        @click="showBuildingNotFoundPage = true"
+        class="text-sm text-kb-ui-05 hover:text-kb-ui-03 transition-colors cursor-pointer"
       >
-        <div id="postcodeContainer" class="w-full h-full" style="min-height: 400px"></div>
-        <button
-          class="absolute top-2 right-2 z-[10000] bg-white text-sm border px-2 py-1 rounded"
-          @click="handleClose"
-        >
-          닫기
-        </button>
-      </div>
+        원하는 단지가 안나온다면? >
+      </button>
+    </div>
+
+    <!-- 주소 검색 레이어 -->
+    <teleport to="body">
+      <SearchAddressLayer
+        :visible="showAddressLayer"
+        :return-fields="['roadAddress', 'jibunAddress', 'buildingName', 'dongName']"
+        :fullscreen="true"
+        @complete="handleAddressComplete"
+        @close="handleAddressLayerClose"
+      />
     </teleport>
+
+    <!-- 주소 선택 페이지 -->
+    <SelectAddressPage
+      v-if="showBuildingNotFoundPage"
+      @go-back="showBuildingNotFoundPage = false"
+      @address-selected="handleAddressSelected"
+    />
 
     <div class="fixed z-0 inset-x-0 bottom-6 flex justify-end px-6 pb-24">
       <button
         @click="next"
-        :disabled="!buildingName.trim() || !roadAddress.trim() || !jibunAddress.trim()"
+        :disabled="!isButtonEnabled"
         class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 disabled:opacity-50"
       >
         다음
@@ -190,16 +260,24 @@ function handleClose() {
 
     <!-- 건물 없음 모달 -->
     <ModalForm
-      v-if="showBuildingNotFoundModal"
-      title="건물 정보 없음"
-      :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
-      @close="showBuildingNotFoundModal = false"
+      v-if="showBuildingNameInputModal"
+      title="건물을 찾을 수 없습니다."
+      :handle-confirm="() => ({ success: true, message: '' })"
+      @close="showBuildingNameInputModal = false"
     >
       <div class="text-center">
-        <p class="text-gray-600">
-          해당 주소에 건물이 없습니다.<br />
-          다른 주소를 선택해주세요.
+        <p class="text-medium text-kb-ui-02">
+          검색하신 주소에 해당하는 건물 정보가 없습니다.<br />
+          다시 검색해주세요.
         </p>
+      </div>
+      <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-800 mb-2">💡 도움말</h3>
+        <ul class="text-sm text-gray-600 space-y-1 text-left">
+          <li>• 정확한 도로명 주소를 입력해보세요</li>
+          <li>• 건물명 대신 동/호수로 검색해보세요</li>
+          <li>• 새로 지어진 건물은 등록이 지연될 수 있습니다</li>
+        </ul>
       </div>
     </ModalForm>
   </div>

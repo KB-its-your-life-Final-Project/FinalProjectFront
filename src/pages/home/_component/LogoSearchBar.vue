@@ -3,18 +3,14 @@
 import { ref, watch } from "vue";
 import lighthouseIcon from "@/assets/imgs/lighthouse.png";
 import movePage from "@/utils/movePage";
+import { Api } from "@/api/autoLoad/Api";
+import { SearchHistoryDTO } from "@/api/autoLoad/data-contracts";
 import { useRoute } from "vue-router";
 
-defineProps<{
-  placeholder?: string;
-}>();
+const route = useRoute();
 
 //검색input
-const route = useRoute();
-const searchInput = (route.query.searchInput as string)
-  ? // ? ref(decodeURIComponent(route.query.searchInput as string))
-    ref(route.query.searchInput as string)
-  : ref("");
+const searchInput = ref(route.query.searchInput ? route.query.searchInput : "");
 
 //검색 input  클리어
 const clearSearch = () => {
@@ -22,7 +18,6 @@ const clearSearch = () => {
 };
 
 const xiconShow = ref(false);
-
 //x표시 보여주기
 watch(searchInput, () => {
   if (searchInput.value.length > 0) {
@@ -31,6 +26,43 @@ watch(searchInput, () => {
     xiconShow.value = false;
   }
 });
+
+//검색 기록 저장
+const saveSearchHistory = async (keyword: string) => {
+  if (!keyword.trim()) return;
+
+  try {
+    const searchHistoryData: SearchHistoryDTO = {
+      keyword: keyword.trim(),
+      type: 1, // 검색 타입 (1: 일반 검색)
+    };
+
+    await new Api().saveSearchHistoryUsingPost(searchHistoryData);
+  } catch (error) {
+    console.error("검색 기록 저장 실패:", error);
+  }
+};
+
+//검색 실행
+const handleSearch = async () => {
+  const searchValue =
+    typeof searchInput.value === "string" ? searchInput.value : searchInput.value[0] || "";
+
+  if (searchValue.trim()) {
+    try {
+      await saveSearchHistory(searchValue);
+      movePage.mapSearch({ searchInput: searchValue });
+    } catch (error) {
+      movePage.mapSearch({ searchInput: searchValue });
+    }
+  } else {
+    movePage.mapSearch({ searchInput: searchValue });
+  }
+};
+
+defineProps<{
+  placeholder?: string;
+}>();
 </script>
 
 <template>
@@ -47,7 +79,7 @@ watch(searchInput, () => {
       :placeholder="placeholder || '어떤 주소가 궁금하세요?'"
       class="w-full font-italic focus:outline-none placeholder-kb-ui-07 text-sm"
       type="text"
-      @keyup.enter="movePage.mapSearch({ searchInput: searchInput })"
+      @keyup.enter="handleSearch"
     />
     <font-awesome-icon
       v-if="xiconShow"

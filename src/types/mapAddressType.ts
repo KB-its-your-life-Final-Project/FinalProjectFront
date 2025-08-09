@@ -1,7 +1,7 @@
 interface MapAddressType {
-  umdNm: String;
-  jibun: Number;
-  aptNm: String;
+  umdNm: string;
+  jibun: number;
+  aptNm: string;
 }
 
 export type { MapAddressType };

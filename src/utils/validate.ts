@@ -1,6 +1,6 @@
 // 공백 여부
 export const isEmpty = (input: string | null | undefined): boolean => {
-  return !input || input.trimEnd() === "";
+  return !input || input.trim() === "";
 };
 
 // 이메일 유효성 검사
@@ -18,4 +18,10 @@ export const isValidPasswordFormat = (password: string): boolean => {
 // 비밀번호 일치 여부 확인
 export const isValidPasswordChk = (password1: string, password2: string): boolean => {
   return password1 === password2;
+};
+
+// 이름 유효성 검사
+export const isValidName = (name: string): boolean => {
+  const regex = /^[가-힣a-zA-Z]{2,20}$/;
+  return regex.test(name.trim());
 };
