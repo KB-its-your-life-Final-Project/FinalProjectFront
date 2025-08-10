@@ -39,6 +39,10 @@ const jeonseAmount = ref(""); // 전세금
 const contractType = ref<"jeonse" | "monthlyRent">("jeonse");
 const title = props.type === "regist" ? "나의 집 등록" : "나의 집 수정";
 
+// 로딩 상태 관리
+const isLoading = ref(true);
+const isDataReady = ref(false);
+
 // 컴포넌트 초기화
 onMounted(async () => {
   console.log("ChangeHouseModal onMounted - props:", props);
@@ -78,6 +82,36 @@ onMounted(async () => {
 
     // PostcodeSearch에서 사용할 수 있도록 formData 업데이트
     formData.value.buildingNumber = homeData.buildingNumber || "";
+
+    // 백엔드에서 받아온 도로명주소를 homeStore에 저장
+    if (homeData.roadAddress) {
+      console.log("🏠 백엔드에서 받아온 도로명주소:", homeData.roadAddress);
+
+      // 모든 주소 정보를 homeStore에 업데이트
+      homeStore.updateAddressInfo({
+        roadAddress: homeData.roadAddress,
+        jibunAddress: homeData.jibunAddr || "",
+        buildingName: homeData.buildingName || "",
+        dongName: homeData.umdNm || "",
+        buildingNumber: homeData.buildingNumber || "",
+        umdNm: homeData.umdNm || "",
+        jibunAddr: homeData.jibunAddr || ""
+      });
+
+      console.log("✅ 백엔드 도로명주소를 homeStore에 저장 완료");
+    } else {
+      console.log("⚠️ 백엔드에 도로명주소 정보 없음");
+    }
+
+    // 백엔드 데이터 로딩 완료 후 모달 표시
+    console.log("✅ 백엔드 데이터 로딩 완료, 모달 준비됨");
+    isDataReady.value = true;
+    isLoading.value = false;
+  } else {
+    // 등록 모드인 경우 바로 모달 표시
+    console.log("✅ 등록 모드, 바로 모달 표시");
+    isDataReady.value = true;
+    isLoading.value = false;
   }
 
   try {
@@ -89,23 +123,22 @@ onMounted(async () => {
 
 const submitForm = async (): Promise<{ success: boolean; message: string }> => {
   try {
-    const requestData: HomeRegisterRequestDTO = {
-      buildingNumber: formData.value.buildingNumber,
-      contractStart: startDate.value || undefined,
-      contractEnd: endDate.value || undefined,
-      rentType: contractType.value === "jeonse" ? 1 : 2,
-      jeonseAmount: contractType.value === "jeonse" ? parseInt(jeonseAmount.value) || 0 : 0,
-      monthlyRent: contractType.value === "monthlyRent" ? parseInt(monthlyRent.value) || 0 : 0,
-      monthlyDeposit: contractType.value === "monthlyRent" ? parseInt(deposit.value) || 0 : 0,
-      lat: formData.value.lat,
-      lng: formData.value.lng,
-    };
+          const requestData: HomeRegisterRequestDTO = {
+        buildingNumber: formData.value.buildingNumber,
+        contractStart: startDate.value || undefined,
+        contractEnd: endDate.value || undefined,
+        rentType: contractType.value === "jeonse" ? 1 : 2,
+        jeonseAmount: contractType.value === "jeonse" ? parseInt(jeonseAmount.value) || 0 : 0,
+        monthlyRent: contractType.value === "monthlyRent" ? parseInt(monthlyRent.value) || 0 : 0,
+        monthlyDeposit: contractType.value === "monthlyRent" ? parseInt(deposit.value) || 0 : 0,
+        lat: formData.value.lat,
+        lng: formData.value.lng,
+      };
 
     if (props.type === "regist") {
       // 집 등록
       const response = await api.registerHomeUsingPost(requestData);
       if (response.data.success && response.data.data) {
-        // store에 응답 데이터 업데이트
         homeStore.updateHomeInfoFromResponse(response.data.data);
       }
       return { success: true, message: "나의 집 정보가 등록되었습니다." };
@@ -113,7 +146,6 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
       // 집 정보 수정
       const response = await api.registerHomeUsingPost(requestData);
       if (response.data.success && response.data.data) {
-        // store에 응답 데이터 업데이트
         homeStore.updateHomeInfoFromResponse(response.data.data);
       }
       return { success: true, message: "나의 집 정보가 수정되었습니다." };
@@ -124,13 +156,10 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
   }
 };
 
-// 주소를 좌표로 변환 (mapUtil 사용)
+// 주소를 좌표로 변환
 async function searchAddressToCoordinate(address: string) {
   try {
     const result = await mapUtil.searchAddressToCoordinate(address);
-    console.log("✅ 위도:", result.latlng.lat(), "경도:", result.latlng.lng());
-
-    // formData에 좌표 저장
     formData.value.lat = result.latlng.lat();
     formData.value.lng = result.latlng.lng();
   } catch (error) {
@@ -138,14 +167,14 @@ async function searchAddressToCoordinate(address: string) {
   }
 }
 
-// PostcodeSearch에서 주소 선택 완료 시 호출
+// PostcodeSearch에서 주소 선택 완료 시
 async function handleAddressSelected(address: string) {
   if (address) {
     await searchAddressToCoordinate(address);
   }
 }
 
-// PostcodeSearch에서 주소 정보가 업데이트될 때 호출
+// PostcodeSearch에서 주소 정보가 업데이트될 때
 function handleAddressInfoUpdated(addressData: {
   roadAddress: string;
   jibunAddress: string;
@@ -155,29 +184,19 @@ function handleAddressInfoUpdated(addressData: {
   umdNm?: string;
   jibunAddr?: string;
 }) {
-  // 디버깅: 받은 주소 정보 확인
-  console.log("ChangeHouseModal - 주소 정보 업데이트:", addressData);
-
-  // 새로운 주소를 선택했으므로 formData의 buildingNumber도 초기화
   formData.value.buildingNumber = "";
-
-  // 주소 정보를 store에 업데이트
   homeStore.updateAddressInfo(addressData);
-
-  // 새로운 주소를 선택했으므로 store의 집 정보 초기화
   homeStore.resetHomeInfo();
-
-  console.log("store에 주소 정보 업데이트 완료:", homeStore.homeInfo);
 }
 
 
 
-// 동 정보 변경 시 호출
+// 동 정보 변경 시
 function handleBuildingNumberChanged(buildingNumber: string) {
   formData.value.buildingNumber = buildingNumber;
 }
 
-// 계약 유형 변경 시 호출
+// 계약 유형 변경 시
 function handleContractTypeChanged() {
   // 계약 유형이 변경되면 모든 입력값 초기화
   if (contractType.value === "jeonse") {
@@ -202,7 +221,16 @@ const options = [
 ];
 </script>
 <template>
-  <ModalForm :title="title" :handle-confirm="handleConfirm" @close="emit('close')" hasConfirmBtn>
+  <!-- 로딩 중일 때는 로딩 화면 표시 -->
+  <div v-if="isLoading" class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-kb-yellow mx-auto mb-4"></div>
+      <div class="text-lg font-pretendard-bold text-gray-600">주소 정보를 불러오는 중...</div>
+    </div>
+  </div>
+
+  <!-- 데이터가 준비된 후에 모달 표시 -->
+  <ModalForm v-else-if="isDataReady" :title="title" :handle-confirm="handleConfirm" @close="emit('close')" hasConfirmBtn>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">집 주소</div>
       <PostcodeSearch
@@ -214,10 +242,10 @@ const options = [
             }
             // 저장된 주소 정보가 없다면 기본값 반환
             return {
-              roadAddress: '',
+              roadAddress: homeStore.homeInfo.addressInfo.roadAddress || '',
               jibunAddress: props.homeData.jibunAddr || '',
               buildingName: props.homeData.buildingName || '',
-              dongName: '',
+              dongName: props.homeData.umdNm || '',
               buildingNumber: props.homeData.buildingNumber || '',
               umdNm: props.homeData.umdNm || ''
             };

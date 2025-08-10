@@ -61,8 +61,32 @@ export const useHomeStore = defineStore("home", () => {
 
   // 주소 정보 업데이트
   const updateAddressInfo = (addressData: Partial<AddressInfo>) => {
-    Object.assign(homeInfo.addressInfo, addressData);
-    console.log("주소 정보 업데이트:", homeInfo.addressInfo);
+    console.log("🔄 updateAddressInfo 호출됨:", addressData);
+
+    // 반응성을 보장하기 위해 각 필드를 개별적으로 업데이트
+    if (addressData.roadAddress !== undefined) {
+      homeInfo.addressInfo.roadAddress = addressData.roadAddress;
+    }
+    if (addressData.jibunAddress !== undefined) {
+      homeInfo.addressInfo.jibunAddress = addressData.jibunAddress;
+    }
+    if (addressData.buildingName !== undefined) {
+      homeInfo.addressInfo.buildingName = addressData.buildingName;
+    }
+    if (addressData.dongName !== undefined) {
+      homeInfo.addressInfo.dongName = addressData.dongName;
+    }
+    if (addressData.buildingNumber !== undefined) {
+      homeInfo.addressInfo.buildingNumber = addressData.buildingNumber;
+    }
+    if (addressData.umdNm !== undefined) {
+      homeInfo.addressInfo.umdNm = addressData.umdNm;
+    }
+    if (addressData.jibunAddr !== undefined) {
+      homeInfo.addressInfo.jibunAddr = addressData.jibunAddr;
+    }
+
+    console.log("✅ 주소 정보 업데이트 완료:", homeInfo.addressInfo);
   };
 
   // 건물동 번호 업데이트
@@ -133,7 +157,7 @@ export const useHomeStore = defineStore("home", () => {
     homeInfo.monthlyDeposit = responseData.monthlyDeposit;
     homeInfo.regDate = responseData.regDate;
 
-    // 주소 정보는 기존에 저장된 것을 유지 (사용자가 주소 찾기로 설정한 정보)
+    // 주소 정보 업데이트
     if (responseData.buildingName) {
       homeInfo.addressInfo.buildingName = responseData.buildingName;
     }
@@ -145,6 +169,24 @@ export const useHomeStore = defineStore("home", () => {
     }
     if (responseData.jibunAddr) {
       homeInfo.addressInfo.jibunAddr = responseData.jibunAddr;
+    }
+
+    // jibunAddr을 jibunAddress로도 설정 (호환성을 위해)
+    if (responseData.jibunAddr && !homeInfo.addressInfo.jibunAddress) {
+      homeInfo.addressInfo.jibunAddress = responseData.jibunAddr;
+    }
+
+    // umdNm을 dongName으로도 설정 (호환성을 위해)
+    if (responseData.umdNm && !homeInfo.addressInfo.dongName) {
+      homeInfo.addressInfo.dongName = responseData.umdNm;
+    }
+
+    // 백엔드에서 받은 위도/경도 정보 업데이트
+    if (responseData.latitude) {
+      homeInfo.lat = responseData.latitude;
+    }
+    if (responseData.longitude) {
+      homeInfo.lng = responseData.longitude;
     }
   };
 
@@ -180,6 +222,24 @@ export const useHomeStore = defineStore("home", () => {
     homeInfo.addressInfo.buildingNumber = existingData.buildingNumber || "";
     homeInfo.addressInfo.umdNm = existingData.umdNm || "";
     homeInfo.addressInfo.jibunAddr = existingData.jibunAddr || "";
+
+    // jibunAddr을 jibunAddress로도 설정 (호환성을 위해)
+    if (existingData.jibunAddr && !homeInfo.addressInfo.jibunAddress) {
+      homeInfo.addressInfo.jibunAddress = existingData.jibunAddr;
+    }
+
+    // umdNm을 dongName으로도 설정 (호환성을 위해)
+    if (existingData.umdNm && !homeInfo.addressInfo.dongName) {
+      homeInfo.addressInfo.dongName = existingData.umdNm;
+    }
+
+    // 백엔드에서 받은 위도/경도 정보 설정
+    if (existingData.latitude) {
+      homeInfo.lat = existingData.latitude;
+    }
+    if (existingData.longitude) {
+      homeInfo.lng = existingData.longitude;
+    }
 
     console.log("기존 집 정보 로드 완료:", homeInfo);
   };

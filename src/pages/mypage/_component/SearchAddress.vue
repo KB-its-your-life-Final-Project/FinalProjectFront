@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 import { useHomeStore } from "@/stores/homeStore";
-import PostcodeLayer from "@/components/common/SearchAddressLayer.vue";
+import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
 
 // store 초기화
 const homeStore = useHomeStore();
+console.log("🏪 homeStore 초기화됨:", homeStore);
+console.log("🏪 homeStore.homeInfo:", homeStore.homeInfo);
+console.log("🏪 homeStore.homeInfo.addressInfo:", homeStore.homeInfo.addressInfo);
 
 const props = withDefaults(defineProps<{
   initialAddress?: {
@@ -20,8 +23,14 @@ const props = withDefaults(defineProps<{
   initialAddress: undefined
 });
 
-// 주소 데이터
-const roadAddress = ref("");
+// 주소 데이터 - ref로 변경하고 watch로 homeStore 변경 감지
+const roadAddress = ref(homeStore.homeInfo.addressInfo.roadAddress);
+
+// homeStore의 roadAddress 변경을 감지하여 ref 업데이트
+watch(() => homeStore.homeInfo.addressInfo.roadAddress, (newValue: string) => {
+  console.log("🔄 homeStore roadAddress 변경 감지:", newValue);
+  roadAddress.value = newValue;
+}, { immediate: true });
 const jibunAddress = ref("");
 const buildingName = ref("");
 const dongName = ref("");
@@ -31,12 +40,18 @@ const jibunAddr = ref("");
 
 // 기존 주소 정보로 초기화 (기존 기능에 영향 없음)
 onMounted(() => {
+  console.log("🚀 SearchAddress.vue onMounted 호출됨");
 
   if (props.initialAddress) {
     console.log("초기 주소 정보:", props.initialAddress);
 
+    // homeStore에 이미 저장된 도로명주소가 있으면 사용
+    const savedRoadAddress = homeStore.homeInfo.addressInfo.roadAddress;
+    if (savedRoadAddress) {
+      console.log("🏠 homeStore에서 저장된 도로명주소 사용:", savedRoadAddress);
+    }
+
     // 모든 주소 정보 설정
-    roadAddress.value = props.initialAddress.roadAddress || "";
     jibunAddress.value = props.initialAddress.jibunAddr || "";
     buildingName.value = props.initialAddress.buildingName || "";
     dongName.value = props.initialAddress.umdNm || "";
@@ -44,22 +59,10 @@ onMounted(() => {
     umdNm.value = props.initialAddress.umdNm || "";
     jibunAddr.value = props.initialAddress.jibunAddr || "";
 
-    console.log("설정된 값들:", {
-      roadAddress: roadAddress.value,
-      jibunAddress: jibunAddress.value,
-      buildingName: buildingName.value,
-      dongName: dongName.value,
-      dongNo: dongNo.value,
-      umdNm: umdNm.value,
-      jibunAddr: jibunAddr.value
-    });
-
     // buildingNumber가 있으면 building-number-changed 이벤트 발생
     if (props.initialAddress.buildingNumber) {
       emit('building-number-changed', props.initialAddress.buildingNumber);
     }
-  } else {
-    console.log("initialAddress가 없습니다");
   }
 });
 // 주소 찾기 레이어 표시 여부
@@ -84,7 +87,7 @@ const emit = defineEmits<{
   }];
 }>();
 
-function onAddressSelected(
+async function onAddressSelected(
   payload: Partial<{
     roadAddress: string;
     jibunAddress: string;
@@ -94,8 +97,12 @@ function onAddressSelected(
     jibunAddr?: string;
   }>,
 ) {
+  console.log("🚀 onAddressSelected 호출됨, payload:", payload);
+  console.log("🔍 payload.roadAddress 값:", payload.roadAddress);
+  console.log("🔍 payload.roadAddress 타입:", typeof payload.roadAddress);
+  console.log("🔍 payload.roadAddress 길이:", payload.roadAddress?.length);
+
   // 새로운 주소를 선택했으므로 기존 건물 정보 초기화
-  roadAddress.value = payload.roadAddress || "";
   jibunAddress.value = payload.jibunAddr || "";
   buildingName.value = payload.buildingName || "";
   dongName.value = payload.umdNm || "";
@@ -110,18 +117,34 @@ function onAddressSelected(
     emit("address-selected", jibunAddress.value);
   }
 
-  homeStore.updateAddressInfo({
-    roadAddress: roadAddress.value,
+  // homeStore에 모든 주소 정보 업데이트 (도로명주소 포함)
+  const updateData = {
+    roadAddress: payload.roadAddress || "",
     jibunAddress: jibunAddress.value,
     buildingName: buildingName.value,
     dongName: dongName.value,
-    buildingNumber: "",
+    buildingNumber: "", // 새로운 주소 선택 시 건물동 번호 초기화
     umdNm: umdNm.value,
     jibunAddr: jibunAddr.value
+  };
+
+  console.log("📝 homeStore에 업데이트할 데이터:", updateData);
+  console.log("📝 roadAddress 값 확인:", updateData.roadAddress);
+
+  homeStore.updateAddressInfo(updateData);
+
+  // UI 업데이트를 보장하기 위해 nextTick 사용
+  await nextTick();
+
+  console.log("✅ 주소 정보 업데이트 완료:", {
+    roadAddress: payload.roadAddress,
+    jibunAddress: jibunAddress.value,
+    buildingName: buildingName.value,
+    dongName: dongName.value
   });
 
   emit("address-info-updated", {
-    roadAddress: roadAddress.value,
+    roadAddress: payload.roadAddress || "",
     jibunAddress: jibunAddress.value,
     buildingName: buildingName.value,
     dongName: dongName.value,
@@ -134,7 +157,7 @@ function onAddressSelected(
 
 <template>
   <div class="border border-gray-300 mt-4 rounded-md space-y-2">
-    <input v-model="roadAddress" placeholder="도로명주소" class="p-2 w-full" readonly />
+    <input :value="roadAddress" placeholder="도로명주소" class="p-2 w-full" readonly />
     <input
       v-model="jibunAddress"
       placeholder="지번주소"
@@ -169,7 +192,7 @@ function onAddressSelected(
   </div>
 
   <!-- 주소 검색 레이어 컴포넌트 -->
-  <PostcodeLayer
+  <SearchAddressLayer
     :visible="showPostcode"
     @close="showPostcode = false"
     @complete="onAddressSelected"
