@@ -22,6 +22,7 @@ import ProfileImage from "@/components/common/ProfileImage.vue";
 import ProfileInfo from "@/components/common/ProfileInfo.vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
+import { formatAmount } from "@/utils/numberUtils";
 
 const api = new Api();
 const modalMap = {
@@ -153,9 +154,9 @@ const getRentTypeText = (rentType?: number) => {
 
 const formatRentAmount = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
-    return `${homeData.jeonseAmount || 0}만원`;
+    return `${formatAmount((homeData.jeonseAmount || 0) / 10000) || "0만원"}`;
   } else if (homeData.rentType === 2) {
-    return `${homeData.monthlyRent || 0}만원`;
+    return `${formatAmount((homeData.monthlyRent || 0) / 10000) || "0만원"}`;
   } else {
     return "금액 정보 없음";
   }
@@ -165,7 +166,7 @@ const getRentSubContent = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
     return "전세 계약";
   } else if (homeData.rentType === 2) {
-    return `보증금: ${homeData.monthlyDeposit || 0}만원`;
+    return `보증금: ${formatAmount((homeData.monthlyDeposit || 0) / 10000) || "0만원"}`;
   } else {
     return "계약 정보 없음";
   }
