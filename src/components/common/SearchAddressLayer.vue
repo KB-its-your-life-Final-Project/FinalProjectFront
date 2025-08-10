@@ -44,6 +44,8 @@ watch(
             jibunAddress: data.jibunAddress || data.autoJibunAddress || "",
             buildingName: data.buildingName || "",
             dongName: data.bname && /[동|로|가]$/g.test(data.bname) ? data.bname : "",
+            umdNm: data.bname || "",
+            jibunAddr: data.jibunAddress || data.autoJibunAddress || "",
           };
 
           const filteredPayload = props.returnFields

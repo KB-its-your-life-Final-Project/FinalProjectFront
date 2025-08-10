@@ -43,6 +43,7 @@ type ModalPropsMap = {
     type: "edit";
     address: string;
     contractDate: string;
+    homeData: HomeRegisterResponseDTO;
   };
   profile: {
     profile: string;
@@ -276,6 +277,7 @@ onMounted(() => {
             type: 'edit',
             address: homeData.buildingName || '',
             contractDate: homeData.contractStart || '',
+            homeData: homeData
           })
         "
       >

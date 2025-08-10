@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-
+import { useHomeStore } from "@/stores/homeStore";
 import ModalForm from "@/components/common/ModalForm.vue";
 import DatePicker from "@/components/common/DatePicker.vue";
 import RadioListButton from "@/components/common/RadioListButton.vue";
-
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import PostcodeSearch from "./SearchAddress.vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { HomeRegisterRequestDTO } from "@/api/autoLoad/data-contracts";
+import type { HomeRegisterRequestDTO, HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
 import mapUtil from "@/utils/naverMap/naverMap";
 const props = defineProps<
   | { type: "regist"; address?: never; contractDate?: never }
-  | { type: "edit"; address: string; contractDate: string }
+  | { type: "edit"; address: string; contractDate: string; homeData: HomeRegisterResponseDTO }
 >();
 
 const emit = defineEmits(["close"]);
 
 const api = new Api();
+const homeStore = useHomeStore();
 
 const formData = ref<HomeRegisterRequestDTO>({
   buildingNumber: "",
@@ -41,13 +41,45 @@ const title = props.type === "regist" ? "나의 집 등록" : "나의 집 수정
 
 // 컴포넌트 초기화
 onMounted(async () => {
-  if (props.type === "edit") {
+  console.log("ChangeHouseModal onMounted - props:", props);
+
+  if (props.type === "edit" && props.homeData) {
     // 수정 모드: 기존 데이터로 폼 초기화
-    formData.value.contractStart = props.contractDate || "";
-    startDate.value = props.contractDate || null;
+    const homeData = props.homeData;
+    console.log("기존 집 정보:", homeData);
+
+    // 계약 기간 설정
+    startDate.value = homeData.contractStart || null;
+    endDate.value = homeData.contractEnd || null;
+    console.log("계약 기간 설정:", { startDate: startDate.value, endDate: endDate.value });
+
+    // 계약 유형 설정
+    contractType.value = homeData.rentType === 1 ? "jeonse" : "monthlyRent";
+    console.log("계약 유형 설정:", contractType.value);
+
+    // 금액 정보 설정
+    if (homeData.rentType === 1) {
+      // 전세
+      jeonseAmount.value = homeData.jeonseAmount?.toString() || "";
+      console.log("전세 금액 설정:", jeonseAmount.value);
+    } else {
+      // 월세
+      deposit.value = homeData.monthlyDeposit?.toString() || "";
+      monthlyRent.value = homeData.monthlyRent?.toString() || "";
+      console.log("월세 금액 설정:", { deposit: deposit.value, monthlyRent: monthlyRent.value });
+    }
+
+    // 주소 정보 설정 (PostcodeSearch 컴포넌트에서 사용할 수 있도록)
+    formData.value.buildingNumber = homeData.buildingNumber || "";
+    console.log("건물 번호 설정:", formData.value.buildingNumber);
+
+    // 기존 집 정보를 store에 로드
+    homeStore.loadHomeInfo(homeData);
+
+    // PostcodeSearch에서 사용할 수 있도록 formData 업데이트
+    formData.value.buildingNumber = homeData.buildingNumber || "";
   }
 
-  // Naver Maps API 로드
   try {
     await mapUtil.loadNaverMapScript();
   } catch (error) {
@@ -57,7 +89,6 @@ onMounted(async () => {
 
 const submitForm = async (): Promise<{ success: boolean; message: string }> => {
   try {
-    // 폼 데이터를 HomeRegisterRequestDTO 형식으로 변환
     const requestData: HomeRegisterRequestDTO = {
       buildingNumber: formData.value.buildingNumber,
       contractStart: startDate.value || undefined,
@@ -72,11 +103,19 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
 
     if (props.type === "regist") {
       // 집 등록
-      await api.registerHomeUsingPost(requestData);
+      const response = await api.registerHomeUsingPost(requestData);
+      if (response.data.success && response.data.data) {
+        // store에 응답 데이터 업데이트
+        homeStore.updateHomeInfoFromResponse(response.data.data);
+      }
       return { success: true, message: "나의 집 정보가 등록되었습니다." };
     } else {
       // 집 정보 수정
-      await api.registerHomeUsingPost(requestData);
+      const response = await api.registerHomeUsingPost(requestData);
+      if (response.data.success && response.data.data) {
+        // store에 응답 데이터 업데이트
+        homeStore.updateHomeInfoFromResponse(response.data.data);
+      }
       return { success: true, message: "나의 집 정보가 수정되었습니다." };
     }
   } catch (error) {
@@ -105,6 +144,33 @@ async function handleAddressSelected(address: string) {
     await searchAddressToCoordinate(address);
   }
 }
+
+// PostcodeSearch에서 주소 정보가 업데이트될 때 호출
+function handleAddressInfoUpdated(addressData: {
+  roadAddress: string;
+  jibunAddress: string;
+  buildingName: string;
+  dongName: string;
+  buildingNumber: string;
+  umdNm?: string;
+  jibunAddr?: string;
+}) {
+  // 디버깅: 받은 주소 정보 확인
+  console.log("ChangeHouseModal - 주소 정보 업데이트:", addressData);
+
+  // 새로운 주소를 선택했으므로 formData의 buildingNumber도 초기화
+  formData.value.buildingNumber = "";
+
+  // 주소 정보를 store에 업데이트
+  homeStore.updateAddressInfo(addressData);
+
+  // 새로운 주소를 선택했으므로 store의 집 정보 초기화
+  homeStore.resetHomeInfo();
+
+  console.log("store에 주소 정보 업데이트 완료:", homeStore.homeInfo);
+}
+
+
 
 // 동 정보 변경 시 호출
 function handleBuildingNumberChanged(buildingNumber: string) {
@@ -140,9 +206,28 @@ const options = [
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">집 주소</div>
       <PostcodeSearch
+        :initial-address="props.type === 'edit' && props.homeData ?
+          (() => {
+            const savedAddressInfo = homeStore.homeInfo.addressInfo;
+            if (savedAddressInfo.buildingName || savedAddressInfo.buildingNumber) {
+              return savedAddressInfo;
+            }
+            // 저장된 주소 정보가 없다면 기본값 반환
+            return {
+              roadAddress: '',
+              jibunAddress: props.homeData.jibunAddr || '',
+              buildingName: props.homeData.buildingName || '',
+              dongName: '',
+              buildingNumber: props.homeData.buildingNumber || '',
+              umdNm: props.homeData.umdNm || ''
+            };
+          })()
+        : undefined"
         @address-selected="handleAddressSelected"
         @building-number-changed="handleBuildingNumberChanged"
+        @address-info-updated="handleAddressInfoUpdated"
       />
+
     </div>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">계약 기간</div>
