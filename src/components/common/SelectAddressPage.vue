@@ -146,11 +146,15 @@ const shouldFilterSigugun = (sggNm: string, sidoCd: string, allData?: SigugunDto
 const shouldFilterBuilding = (buildingName: string): boolean => {
   // 건물명이 없거나 빈 문자열인 경우 제외
   if (!buildingName || buildingName.trim() === "") {
+    console.log(`🚫 건물명 필터링: "${buildingName}" - 빈 문자열`);
     return true;
   }
 
   // 숫자와 특수문자만으로 구성된 경우 제외 (예: "640-2", "123", "A-1" 등)
   const numericOnly = /^[\d\-\s()]+$/.test(buildingName.trim());
+  if (numericOnly) {
+    console.log(`🚫 건물명 필터링: "${buildingName}" - 숫자/특수문자만`);
+  }
   return numericOnly;
 };
 
@@ -263,16 +267,29 @@ async function loadDongList(sidoCd: string, sggCd: string) {
 async function loadBuildingList(dongName: string, regionCode: string) {
   try {
     isLoading.value = true;
-    const response = await api.getBuildingListUsingGet({
+
+    // 서버로 보내는 데이터 로그
+    const requestData = {
       dongName: dongName,
       regionCode: regionCode,
-    });
+    };
+    console.log("🔍 건물 목록 요청 데이터:", requestData);
+
+    const response = await api.getBuildingListUsingGet(requestData);
+
+    // 서버 응답 데이터 로그
+    console.log("📊 건물 목록 응답 데이터:", response.data);
 
     if (response.data.success && response.data.data?.buildingInfos) {
+      console.log("🏢 필터링 전 건물 목록:", response.data.data.buildingInfos);
+
       // 건물명 필터링
       const filteredBuildings: BuildingInfoDto[] = response.data.data.buildingInfos.filter(
         (building: BuildingInfoDto) => !shouldFilterBuilding(building.buildingName || ""),
       );
+
+      console.log("✅ 필터링 후 건물 목록:", filteredBuildings);
+      console.log("🔍 필터링된 건물 수:", filteredBuildings.length);
 
       buildingList.value = filteredBuildings;
     } else {
@@ -301,14 +318,22 @@ async function selectSido(sido: SidoDto) {
 async function selectSigugun(sigugun: SigugunDto) {
   selectedSigugun.value = sigugun;
 
+  console.log("🏘️ 선택된 시/군/구 정보:", {
+    sigugunName: sigugun.sggNm,
+    sigugunCd: sigugun.sggCd,
+    sidoCd: selectedSido.value?.sidoCd
+  });
+
   // 세종시의 경우 바로 건물 목록으로 이동
   if (selectedSido.value?.sidoCd === SIDO_CODES.SEJONG) {
     // 세종시는 읍/면/동 단계를 건너뛰고 바로 건물 목록 로드
     const regionCode = `${selectedSido.value?.sidoCd}${sigugun.sggCd}`;
+    console.log("🏛️ 세종시 - 동 이름 없이 건물 목록 로드:", { regionCode });
     await loadBuildingList("", regionCode); // 동 이름 없이 지역 코드만으로 검색
     currentStep.value = STEPS.BUILDING;
   } else {
     // 다른 지역은 기존처럼 읍/면/동 목록 로드
+    console.log("🏘️ 일반 지역 - 읍/면/동 목록 로드");
     await loadDongList(selectedSido.value?.sidoCd || "", sigugun.sggCd || "");
     currentStep.value = STEPS.DONG;
   }
@@ -320,6 +345,13 @@ async function selectDong(dong: DongDto) {
 
   // 선택된 읍/면/동에 따른 건물 목록 로드
   const regionCode = `${selectedSido.value?.sidoCd}${selectedSigugun.value?.sggCd}`;
+  console.log("📍 선택된 동 정보:", {
+    dongName: dong.dongNm,
+    sidoCd: selectedSido.value?.sidoCd,
+    sggCd: selectedSigugun.value?.sggCd,
+    regionCode: regionCode
+  });
+
   await loadBuildingList(dong.dongNm || "", regionCode);
 
   currentStep.value = STEPS.BUILDING;

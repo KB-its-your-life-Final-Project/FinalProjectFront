@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { useHomeStore } from "@/stores/homeStore";
 import ModalForm from "@/components/common/ModalForm.vue";
 import DatePicker from "@/components/common/DatePicker.vue";
@@ -122,6 +122,9 @@ onMounted(async () => {
     } else {
       console.log("⚠️ 백엔드에 도로명주소 정보 없음");
     }
+
+    // homeStore 업데이트 완료 후 다음 틱에서 모달 표시
+    await nextTick();
 
   } else {
     console.log("✅ 등록 모드, 바로 모달 표시");
