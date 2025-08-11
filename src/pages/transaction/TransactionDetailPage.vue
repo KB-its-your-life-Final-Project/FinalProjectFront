@@ -2,7 +2,7 @@
 import { useRoute, useRouter } from "vue-router";
 import Header from "@/components/layout/header/Header.vue";
 import TransactionGraph from "@/pages/transaction/TransactionGraph.vue";
-import { watchEffect, ref, watch, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import { mainRouteName } from "@/router/mainRoute.ts";
 import DatePicker from "@/components/common/DatePicker.vue";
@@ -12,28 +12,26 @@ import { TransactionRequestDTO } from "@/api/autoLoad/data-contracts";
 import queryUtil from "@/utils/queryUtils";
 import { transactionPeriodOptions } from "@/types/tansactionType";
 import { estateTradeOptions } from "@/types/estateType";
-//import mapUtil from "@/utils/naverMap/naverMap";
+import { classifyRentType, GraphItemInput, GraphItemOutput } from "@/utils/transactionUtils";
 
 const route = useRoute();
 const router = useRouter();
 const api = new Api();
 
-//다른곳에 넘겨줘야해서 computed
-const jibunAddress = computed(() => {
-  const addr = queryUtil.getQueryString(route.query.jibunAddress);
-  return addr || "";
-});
+// 모든 쿼리 데이터를 computed로 관리 (Single Source of Truth)
+const queryData = computed(() => ({
+  jibunAddress: queryUtil.getQueryString(route.query.jibunAddress) || "",
+  roadAddress: queryUtil.getQueryString(route.query.roadAddress) || "",
+  type: (route.query.type as string) || "전체",
+  startDate: route.query.startDate ? new Date(route.query.startDate as string) : null,
+  endDate: route.query.endDate ? new Date(route.query.endDate as string) : null,
+}));
 
-const buildingName = computed(() => {
-  const name = queryUtil.getQueryString(route.query.buildingName);
-  return name || "";
-});
-
+// 좌표 정보
 const latlng = computed<{ lat: number; lng: number }>(() => {
   const lat = Number(queryUtil.getQueryString(route.query.lat));
   const lng = Number(queryUtil.getQueryString(route.query.lng));
 
-  // NaN 방지: 좌표 값이 없으면 0 반환
   return {
     lat: isNaN(lat) ? 0 : lat,
     lng: isNaN(lng) ? 0 : lng,
@@ -41,26 +39,46 @@ const latlng = computed<{ lat: number; lng: number }>(() => {
 });
 
 const input = computed(() => ({
-  jibunAddress: jibunAddress.value,
-  roadAddress: queryUtil.getQueryString(route.query.roadAddress) || "",
+  jibunAddress: queryData.value.jibunAddress,
+  roadAddress: queryData.value.roadAddress,
   lat: latlng.value.lat,
   lng: latlng.value.lng,
 }));
 
-const selectedType = ref("전체");
-const selectedPeriod = ref("1");
+// UI 전용 상태들
+const buildingName = ref<string | undefined>();
+const estateId = ref<number | undefined>();
+const selectedPeriod = ref("12"); // UI에서만 사용하는 기간 선택 상태
+const graphData = ref<GraphItemOutput[]>([]);
 
-//날짜의 기본값- 아무것도 없는 값
-const now = new Date();
-const startDate = ref<Date | null>(new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()));
-const endDate = ref<Date | null>(new Date());
-const graphData = ref<{ date: string; price: number; type: string }[]>([]);
+// computed로 관리되는 상태들을 v-model에서 사용할 수 있도록 writable computed 생성
+const selectedType = computed({
+  get: () => queryData.value.type,
+  set: (value: string) => {
+    updateQuery({ type: value !== "전체" ? value : undefined });
+  },
+});
 
-//전체 거래 데이터 및 그래프들 데이터
+const startDate = computed({
+  get: () => queryData.value.startDate,
+  set: (value: Date | null) => {
+    selectedPeriod.value = "0"; // 날짜 직접 변경시 기간 리셋
+    updateQuery({
+      startDate: value ? formatDateLocal(value) : undefined,
+    });
+  },
+});
 
-//const allData = ref<{ date: string; price: number; type: string; buildingName: string }[]>([])
+const endDate = computed({
+  get: () => queryData.value.endDate,
+  set: (value: Date | null) => {
+    selectedPeriod.value = "0"; // 날짜 직접 변경시 기간 리셋
+    updateQuery({
+      endDate: value ? formatDateLocal(value) : undefined,
+    });
+  },
+});
 
-//날짜 달력
 const formatDateLocal = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -70,34 +88,43 @@ const formatDateLocal = (date: Date): string => {
 
 const getTradeTypeCode = (label: string | null): number | null => {
   if (label === "매매") return 1;
-  if (label === "전월세") return 2;
-  return null; // "전체" 혹은 그 외
+  if (label === "전세" || label === "월세") return 2;
+  return null;
 };
 
-// API 호출
-const filteredData = async (markerData: {
-  jibunAddress?: string;
-  roadAddress?: string;
-  lat?: number;
-  lng?: number;
-}) => {
+// 쿼리 업데이트 헬퍼 함수
+const updateQuery = (updates: Record<string, any>) => {
+  router
+    .replace({
+      query: {
+        ...route.query,
+        ...updates,
+      },
+    })
+    .catch(() => {});
+};
+
+// API 호출 함수
+const filteredData = async () => {
+  const data = queryData.value;
+
   if (
-    !markerData.jibunAddress &&
-    !markerData.roadAddress &&
-    (markerData.lat === undefined || markerData.lng === undefined)
+    !data.jibunAddress &&
+    !data.roadAddress &&
+    (latlng.value.lat === 0 || latlng.value.lng === 0)
   ) {
-    console.error("markerData가 불완전합니다:", markerData);
+    console.error("쿼리 데이터가 불완전합니다:", data);
     return;
   }
 
   const request: TransactionRequestDTO = {
-    jibunAddress: markerData.jibunAddress ?? undefined,
-    lat: markerData.lat ?? undefined,
-    lng: markerData.lng ?? undefined,
+    jibunAddress: data.jibunAddress || undefined,
+    lat: latlng.value.lat || undefined,
+    lng: latlng.value.lng || undefined,
     buildingName: buildingName.value,
-    tradeType: getTradeTypeCode(selectedType.value) || undefined,
-    startDate: startDate.value ? formatDateLocal(startDate.value) : undefined,
-    endDate: endDate.value ? formatDateLocal(endDate.value) : undefined,
+    tradeType: getTradeTypeCode(data.type) || undefined,
+    startDate: data.startDate ? formatDateLocal(data.startDate) : undefined,
+    endDate: data.endDate ? formatDateLocal(data.endDate) : undefined,
   };
 
   console.log("API 요청 데이터:", request);
@@ -105,91 +132,70 @@ const filteredData = async (markerData: {
   try {
     const res = await api.getFilteredDataUsingPost(request);
     console.log("응답 데이터:", res);
-    graphData.value = res.data as { date: string; price: number; type: string }[];
+
+    if (res.data && res.data.length > 0) {
+      buildingName.value = res.data[0].buildingName;
+
+      const inputData = res.data.map((item) => ({
+        ...item,
+        date: item.date ?? "",
+        deposit: item.deposit ?? 0,
+        monthlyRent: item.monthlyRent ?? 0,
+        type: item.type,
+      })) as GraphItemInput[];
+
+      const filtered = classifyRentType(inputData, data.type as "전체" | "매매" | "전세" | "월세");
+
+      graphData.value = filtered;
+    } else {
+      graphData.value = [];
+    }
   } catch (error) {
     console.error("데이터 요청 실패:", error);
     graphData.value = [];
   }
 };
 
-//연도 버튼 클릭으로 필터링 기능
-const changePeriod = () => {
-  console.log("변경된 기간: ", selectedPeriod.value);
-  if (selectedPeriod.value === "전체") {
-    startDate.value = null;
-    endDate.value = null;
-  } else {
-    const now = new Date();
-    const past = new Date();
-    past.setFullYear(now.getFullYear() - Number(selectedPeriod.value));
-
-    // 날짜 입력란 자동 설정
-    startDate.value = past;
-    endDate.value = now;
-  }
-
-  updateURLQuery();
-  filteredData(input.value);
-};
-
-const changeType = () => {
-  updateURLQuery();
-  filteredData(input.value);
-};
-
-//수동으로 버튼 누르면... 해제
-const handleDateChange = () => {
-  selectedPeriod.value = "전체";
-  //startDate.value = null
-  // endDate.value = null
-  updateURLQuery();
-  filteredData(input.value);
-};
-
-// URL Query 업데이트
-const updateURLQuery = () => {
-  router.push({
-    query: {
-      jibunAddress: input.value.jibunAddress || "",
-      type: selectedType.value !== "전체" ? selectedType.value : undefined,
-      year: selectedPeriod.value !== "전체" ? selectedPeriod.value : undefined,
-      startDate: startDate.value ? formatDateLocal(startDate.value) : undefined,
-      endDate: endDate.value ? formatDateLocal(endDate.value) : undefined,
-    },
-  });
-};
-
-//url은 변경되어있지만, 컴포넌트는 남아있는 경우를 방지
+// 단일 watcher - queryData 변경시에만 API 호출
 watch(
-  () => route.query,
-  (newQuery) => {
-    if (newQuery.type !== undefined) {
-      selectedType.value = newQuery.type as string;
-    }
-    if (newQuery.year !== undefined) {
-      selectedPeriod.value = String(newQuery.year);
-    }
-    // 날짜 필터도 URL에서 읽어올 수 있음
-    if (newQuery.startDate) {
-      startDate.value = new Date(newQuery.startDate as string);
-    }
-    if (newQuery.endDate) {
-      endDate.value = new Date(newQuery.endDate as string);
-    }
+  queryData,
+  async (newData) => {
+    console.log("queryData 변경됨:", newData);
+    await filteredData();
   },
-  { deep: true },
+  { immediate: true, deep: true },
 );
 
-watchEffect(() => {
-  if (jibunAddress.value || input.value.roadAddress) {
-    filteredData({
-      jibunAddress: jibunAddress.value,
-      roadAddress: input.value.roadAddress,
-      lat: latlng.value.lat,
-      lng: latlng.value.lng,
+// UI 이벤트 핸들러
+const changeType = (val: string) => {
+  selectedType.value = val;
+};
+
+const changePeriod = (val: string) => {
+  const numVal = val;
+  if (isNaN(Number(numVal))) {
+    selectedPeriod.value = "0";
+    return;
+  }
+
+  selectedPeriod.value = numVal;
+
+  if (numVal !== "0") {
+    const now = new Date();
+    const past = new Date();
+    past.setMonth(now.getMonth() - Number(numVal));
+
+    // 한번에 두 날짜를 모두 업데이트
+    updateQuery({
+      startDate: formatDateLocal(past),
+      endDate: formatDateLocal(now),
     });
   }
-});
+};
+
+const handleDateChange = () => {
+  selectedPeriod.value = "0";
+};
 </script>
 
 <template>
@@ -198,14 +204,18 @@ watchEffect(() => {
     <Header :headerShowtype="mainRouteName.transactionDetail">
       <div class="relatvie h-25 flex flex-col justify-center p-2">
         <div class="flex justify-center text-2xl text-bold">
-          {{ buildingName ? buildingName : jibunAddress }}
+          {{ buildingName ? buildingName : queryData.jibunAddress }}
         </div>
       </div>
     </Header>
 
     <div class="relative w-[85%] mx-auto mt-4">
       <div class="absolute right-0 w-7 h-7">
-        <WishButton target-type="building" :jibun-addr="jibunAddress" />
+        <WishButton
+          target-type="building"
+          :jibun-addr="queryData.jibunAddress"
+          :estate-id="estateId"
+        />
       </div>
 
       <p class="text-base mb-1 text-kb-ui-04">거래 형식</p>
@@ -225,7 +235,6 @@ watchEffect(() => {
 
       <!-- 기간 설정 필터 -->
       <RadioListButton
-        class="mt-4"
         v-model="selectedPeriod"
         :options="transactionPeriodOptions"
         @change="changePeriod"
@@ -251,7 +260,6 @@ watchEffect(() => {
     </div>
 
     <!-- 그래프 -->
-
-    <TransactionGraph :graphData="graphData" :selectedType="selectedType" />
+    <TransactionGraph :graphData="graphData" :selectedType="queryData.type" />
   </div>
 </template>

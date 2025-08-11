@@ -48,7 +48,12 @@ const handleClick = () => {
     <div class="relative bg-kb-ui-10 pb-1 rounded-t-lg">
       <img :src="buildingImage" class="pt-5 w-full h-35 object-contain" />
       <div class="absolute top-0 left-0 text-sm bg-kb-yellow p-1 rounded-tl-lg rounded-br-lg">
-        {{ building.name || "건물명 없음" }}
+        {{
+          building.name ||
+          (building.type === 4
+            ? `${building.jibunAddr?.split(" ").pop()} 단독/다가구`
+            : "이름 없음")
+        }}
       </div>
     </div>
     <div class="p-3">
