@@ -23,7 +23,6 @@ function restoreOriginalAddress() {
   }
 }
 
-// 모달 닫기 처리
 function handleClose() {
   restoreOriginalAddress(); // 원래 주소 정보로 복원
   emit('close'); // 모달 닫기
@@ -52,7 +51,7 @@ const jeonseAmount = ref(""); // 전세금
 const contractType = ref<"jeonse" | "monthlyRent">("jeonse");
 const title = props.type === "regist" ? "나의 집 등록" : "나의 집 수정";
 
-// 원래 주소 정보 저장용 (모달 닫기 시 복원용)
+// 원래 주소 정보 저장용
 const originalAddressInfo = ref<{
   roadAddress: string;
   jibunAddress: string;
@@ -67,7 +66,6 @@ const originalAddressInfo = ref<{
 onMounted(async () => {
 
   if (props.type === "edit" && props.homeData) {
-    // 수정 모드: 기존 데이터로 폼 초기화
     const homeData = props.homeData;
 
     // 계약 기간 설정
@@ -87,16 +85,12 @@ onMounted(async () => {
       monthlyRent.value = homeData.monthlyRent?.toString() || "";
     }
 
-    // 주소 정보 설정 (PostcodeSearch 컴포넌트에서 사용할 수 있도록)
     formData.value.buildingNumber = homeData.buildingNumber || "";
 
-    // 기존 집 정보를 store에 로드
     homeStore.loadHomeInfo(homeData);
 
-    // PostcodeSearch에서 사용할 수 있도록 formData 업데이트
     formData.value.buildingNumber = homeData.buildingNumber || "";
 
-    // 백엔드에서 받아온 도로명주소를 homeStore에 저장
     if (homeData.roadAddress) {
       // 원래 주소 정보 저장 (모달 닫기 시 복원용)
       originalAddressInfo.value = {
@@ -123,7 +117,6 @@ onMounted(async () => {
       console.log("⚠️ 백엔드에 도로명주소 정보 없음");
     }
 
-    // homeStore 업데이트 완료 후 다음 틱에서 모달 표시
     await nextTick();
 
   } else {
@@ -147,7 +140,6 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
 
     // 기존 집 정보를 유지하면서 수정된 정보만 업데이트
     const requestData: HomeRegisterRequestDTO = {
-      // 주소 정보: 새 주소가 있으면 homeStore에서, 없으면 기존 props에서 가져오기
       buildingNumber: hasNewAddress ? addressInfo.buildingNumber : (props.homeData?.buildingNumber || ""),
       buildingName: hasNewAddress ? addressInfo.buildingName : (props.homeData?.buildingName || ""),
       roadAddress: hasNewAddress ? addressInfo.roadAddress : (props.homeData?.roadAddress || ""),
