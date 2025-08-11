@@ -14,6 +14,7 @@ import Footer from "@/components/layout/Footer.vue";
 import WishButton from "@/components/common/WishButton.vue";
 
 const route = useRoute();
+
 const selectedRegionData = ref<LocalInfoResponseDTO | null>({
   regionCd: "1121510700",
   locataddNm: "서울시 광진구 화양동",

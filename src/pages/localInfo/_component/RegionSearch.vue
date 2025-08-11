@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { LocalInfoResponseDTO, SearchHistoryDTO } from "@/api/autoLoad/data-contracts";
 import lighthouseIcon from "@/assets/imgs/lighthouse.png";
@@ -10,6 +10,9 @@ const MIN_SEARCH_LENGTH = 2;
 
 // API 인스턴스
 const api = new Api();
+
+// 모든 지역 법정동 코드 리스트
+const regionList = ref<LocalInfoResponseDTO[]>([]);
 
 // 이벤트 정의
 const emit = defineEmits<{
@@ -32,25 +35,36 @@ const showNoResults = computed(
     !loading.value,
 );
 
-// 검색 API 호출 함수
-const searchRegions = async (keyword: string) => {
-  if (keyword.trim().length < MIN_SEARCH_LENGTH) {
+// 지역 검색 함수
+const searchRegions = (keyword: string) => {
+  const trimmed = keyword.trim();
+  if (trimmed.length < MIN_SEARCH_LENGTH) {
     searchResults.value = [];
     dropdownVisible.value = false;
     return;
   }
 
-  try {
-    loading.value = true;
-    dropdownVisible.value = true;
-    const response = await api.searchRegionsUsingGet({ keyword });
-    searchResults.value = response.data?.data || [];
-  } catch (error) {
-    console.error("지역 검색 API 오류:", error);
-    searchResults.value = [];
-  } finally {
-    loading.value = false;
-  }
+  loading.value = true;
+  dropdownVisible.value = true;
+
+  // 공백으로 분리해서 각 단어별로 검색
+  const searchTerms = trimmed
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((term) => term.length > 0);
+
+  searchResults.value = regionList.value
+    .filter((region) => {
+      if (!region.locataddNm) return false;
+
+      const regionName = region.locataddNm.toLowerCase();
+
+      // 모든 검색어가 지역명에 포함되어야 함 (순서 무관)
+      return searchTerms.every((term) => regionName.includes(term));
+    })
+    .slice(0, 10); // 결과 제한 (최대 10개)
+
+  loading.value = false;
 };
 
 // 검색 입력 감시 - 디바운스 없이 즉시 검색
@@ -105,6 +119,11 @@ const selectRegion = (region: LocalInfoResponseDTO) => {
     isSelecting.value = false;
   }, 300);
 };
+
+onMounted(async () => {
+  const response = await api.getAllRegionsUsingGet();
+  regionList.value = response.data.data || [];
+});
 </script>
 <template>
   <div
