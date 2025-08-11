@@ -77,7 +77,7 @@ function handleAddressComplete(payload: {
   buildingName?: string;
   dongName?: string;
 }) {
-  console.log("전체 주소 데이터:", payload);
+
 
   // 건물명이 없으면 건물명 입력 모달 표시
   if (!payload.buildingName || payload.buildingName.trim() === "") {
@@ -136,7 +136,7 @@ function searchAddressToCoordinate(address: string) {
     const latVal = parseFloat(y);
     const lngVal = parseFloat(x);
 
-    console.log("✅ 위도:", latVal, "경도:", lngVal);
+
 
     store.updateFormData({
       lat: latVal,
@@ -208,14 +208,14 @@ async function handleMyHomeSearch() {
 
     if (response.data?.success && response.data?.data) {
       const homeInfo = response.data.data;
-      console.log("🏠 백엔드에서 가져온 집 정보:", homeInfo);
+
 
       // 위도/경도로 정확한 주소 정보 검색
       if (homeInfo.latitude && homeInfo.longitude) {
         const latlng = new naver.maps.LatLng(homeInfo.latitude, homeInfo.longitude);
         const addressInfo = await mapUtil.searchCoordinateToAddress(latlng);
 
-        console.log("📍 위도/경도로 검색한 정확한 주소:", addressInfo);
+
 
         // safeReport store에 정확한 주소 정보 저장
         store.updateFormData({
@@ -240,7 +240,7 @@ async function handleMyHomeSearch() {
           });
         }
 
-        console.log("📝 safeReportStore에 저장된 데이터:", store.formData);
+
 
         // 안심레포트 결과 페이지로 이동
         store.goToStep(SafeReportStep.RESULT);
@@ -250,7 +250,7 @@ async function handleMyHomeSearch() {
         router.push({ name: "mypage" });
       }
     } else {
-      console.log("등록된 집 정보가 없습니다.");
+
       // 집 정보가 없는 경우: 마이페이지 집 등록으로 이동
       router.push({ name: "mypage" });
     }

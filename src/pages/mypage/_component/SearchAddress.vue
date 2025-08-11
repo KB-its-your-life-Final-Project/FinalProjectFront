@@ -87,7 +87,6 @@ async function onAddressSelected(
     jibunAddr?: string;
   }>,
 ) {
-  console.log("🔍 onAddressSelected payload:", payload);
 
   // 새로운 주소를 선택했으므로 기존 건물 정보 초기화 (도로명주소 포함)
   roadAddress.value = payload.roadAddress || "";
@@ -115,8 +114,6 @@ async function onAddressSelected(
     umdNm: umdNm.value,
     jibunAddr: jibunAddr.value
   };
-
-  console.log("📝 homeStore에 업데이트할 데이터:", updateData);
   homeStore.updateAddressInfo(updateData);
 
   // UI 업데이트를 보장하기 위해 nextTick 사용
@@ -135,7 +132,6 @@ async function onAddressSelected(
 
 // 동 번호 입력 시 처리
 function handleDongNoInput() {
-  console.log("🔍 동 번호 입력:", dongNo.value);
 
   // 부모 컴포넌트로 동 번호 변경 알림
   emit('building-number-changed', dongNo.value);

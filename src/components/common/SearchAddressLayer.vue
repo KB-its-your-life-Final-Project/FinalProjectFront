@@ -39,7 +39,7 @@ watch(
       await ensureScript();
       const postcodeRef = new window.daum.Postcode({
         oncomplete: (data: any) => {
-      
+
 
           const fullAddressPayload = {
             roadAddress: data.roadAddress || data.autoRoadAddress || "",
@@ -50,8 +50,8 @@ watch(
             jibunAddr: data.jibunAddress || data.autoJibunAddress || "",
           };
 
-      
-      
+
+
 
           const filteredPayload = props.returnFields
             ? props.returnFields.reduce(
@@ -63,8 +63,8 @@ watch(
               )
             : fullAddressPayload;
 
-      
-      
+
+
 
           emit("complete", filteredPayload);
           emit("close");
@@ -101,11 +101,11 @@ watch(
                   doc.head.appendChild(style);
                 }
               } catch (e) {
-                console.log("iframe 스타일 주입 실패:", e);
+
               }
             };
           } catch (e) {
-            console.log("iframe 접근 실패:", e);
+
           }
         }
       }, 200);

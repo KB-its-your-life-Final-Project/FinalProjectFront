@@ -83,6 +83,7 @@ async function loadSavedReportData() {
 
     // localStorage에서 건물 정보 로드
     const buildingInfo = SafeReportService.loadBuildingInfo();
+    console.log("🏠 localStorage에서 로드한 건물 정보:", buildingInfo);
     store.updateFormData(buildingInfo);
 
     // 전체 SafeReport 데이터 저장 (SafeReportResponseDto 형태로 변환)
@@ -92,6 +93,8 @@ async function loadSavedReportData() {
       floorAndPurposeList: savedData.floorAndPurposeList,
       totalScore: savedData.rentalRatioAndBuildyear?.score, // score를 totalScore로
     });
+
+    console.log("💾 localStorage에서 로드한 SafeReport 데이터:", savedData);
 
     // 전달받은 데이터로 store 업데이트
     store.updateResultData(savedData.rentalRatioAndBuildyear);
@@ -109,21 +112,31 @@ async function loadSavedReportData() {
     const hasNoData = validation.hasNoData;
     const hasNoBuildingData = !savedData.floorAndPurposeList || savedData.floorAndPurposeList.length === 0;
 
+    console.log("🔍 데이터 유효성 검사 결과:", {
+      hasNoData,
+      hasNoBuildingData,
+      hasHighRatio: validation.hasHighRatio
+    });
+
     // 매매거래내역과 건축물 정보가 모두 없는 경우
     if (hasNoData && hasNoBuildingData) {
       openNoDataAndBuildingModal();
+      console.log("⚠️ 매매거래내역과 건축물 정보 모두 없음 - 통합 모달 표시");
     } else {
       // 개별적으로 모달 표시
       if (hasNoData) {
         openNoDataModal();
+        console.log("⚠️ 매매거래내역 없음 - 개별 모달 표시");
       }
       if (hasNoBuildingData) {
         openNoBuildingDataModal();
+        console.log("⚠️ 건축물 정보 없음 - 개별 모달 표시");
       }
     }
 
     if (validation.hasHighRatio) {
       openHighRatioModal();
+      console.log("⚠️ 전세가율 높음 - 경고 모달 표시");
     }
 
     // localStorage 정리
@@ -140,7 +153,10 @@ async function loadSavedReportData() {
 async function loadReportFromAPI() {
   try {
     const requestDto = store.createRequestDto();
+    console.log("🔍 SafeReport API 요청 데이터:", requestDto);
+
     const reportData = await SafeReportService.generateSafeReport(requestDto);
+    console.log("📊 서버로부터 응답받은 SafeReport 데이터:", reportData);
 
     // 전체 SafeReport 데이터 저장 (SafeReportResponseDto 형태로 변환)
     store.updateSafeReportData({
@@ -166,21 +182,31 @@ async function loadReportFromAPI() {
     const hasNoData = validation.hasNoData;
     const hasNoBuildingData = !reportData.floorAndPurposeList || reportData.floorAndPurposeList.length === 0;
 
+    console.log("🔍 데이터 유효성 검사 결과:", {
+      hasNoData,
+      hasNoBuildingData,
+      hasHighRatio: validation.hasHighRatio
+    });
+
     // 매매거래내역과 건축물 정보가 모두 없는 경우
     if (hasNoData && hasNoBuildingData) {
       openNoDataAndBuildingModal();
+      console.log("⚠️ 매매거래내역과 건축물 정보 모두 없음 - 통합 모달 표시");
     } else {
       // 개별적으로 모달 표시
       if (hasNoData) {
         openNoDataModal();
+        console.log("⚠️ 매매거래내역 없음 - 개별 모달 표시");
       }
       if (hasNoBuildingData) {
         openNoBuildingDataModal();
+        console.log("⚠️ 건축물 정보 없음 - 개별 모달 표시");
       }
     }
 
     if (validation.hasHighRatio) {
       openHighRatioModal();
+      console.log("⚠️ 전세가율 높음 - 경고 모달 표시");
     }
 
     isLoading.value = false;
