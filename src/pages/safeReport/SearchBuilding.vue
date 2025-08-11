@@ -286,16 +286,6 @@ async function handleMyHomeSearch() {
       </button>
     </div>
 
-    <!-- 내가 살고 있는 집으로 조회하기 버튼 -->
-    <div class="w-full max-w-lg mx-auto">
-      <button
-        @click="handleMyHomeSearch"
-        class="w-full px-4 py-3 bg-kb-yellow-positive text-white rounded-lg font-medium hover:bg-kb-yellow transition-colors"
-      >
-        내가 살고 있는 집으로 조회하기
-      </button>
-    </div>
-
     <!-- 원하는 단지가 안나온다면 링크 -->
     <div class="w-full max-w-lg mx-auto flex justify-end">
       <button
@@ -303,6 +293,16 @@ async function handleMyHomeSearch() {
         class="text-sm text-kb-ui-05 hover:text-kb-ui-03 transition-colors cursor-pointer"
       >
         원하는 단지가 안나온다면? >
+      </button>
+    </div>
+
+    <!-- 내가 살고 있는 집 확인하기 버튼 -->
+    <div class="w-full max-w-lg mx-auto flex justify-end">
+      <button
+        @click="handleMyHomeSearch"
+        class="px-4 py-2 bg-kb-yellow-positive text-white rounded-full font-medium hover:bg-kb-yellow transition-colors shadow-sm"
+      >
+        내가 살고 있는 집 확인하기
       </button>
     </div>
 

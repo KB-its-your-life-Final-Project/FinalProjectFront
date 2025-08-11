@@ -39,7 +39,7 @@ watch(
       await ensureScript();
       const postcodeRef = new window.daum.Postcode({
         oncomplete: (data: any) => {
-          console.log("📍 Daum Postcode oncomplete 호출됨, 원본 데이터:", data);
+      
 
           const fullAddressPayload = {
             roadAddress: data.roadAddress || data.autoRoadAddress || "",
@@ -50,8 +50,8 @@ watch(
             jibunAddr: data.jibunAddress || data.autoJibunAddress || "",
           };
 
-          console.log("📍 fullAddressPayload 생성됨:", fullAddressPayload);
-          console.log("📍 roadAddress 값:", fullAddressPayload.roadAddress);
+      
+      
 
           const filteredPayload = props.returnFields
             ? props.returnFields.reduce(
@@ -63,8 +63,8 @@ watch(
               )
             : fullAddressPayload;
 
-          console.log("📍 최종 emit할 payload:", filteredPayload);
-          console.log("📍 최종 roadAddress 값:", filteredPayload.roadAddress);
+      
+      
 
           emit("complete", filteredPayload);
           emit("close");

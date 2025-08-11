@@ -5,9 +5,6 @@ import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
 
 // store 초기화
 const homeStore = useHomeStore();
-console.log("🏪 homeStore 초기화됨:", homeStore);
-console.log("🏪 homeStore.homeInfo:", homeStore.homeInfo);
-console.log("🏪 homeStore.homeInfo.addressInfo:", homeStore.homeInfo.addressInfo);
 
 const props = withDefaults(defineProps<{
   initialAddress?: {
@@ -28,7 +25,6 @@ const roadAddress = ref(homeStore.homeInfo.addressInfo.roadAddress);
 
 // homeStore의 roadAddress 변경을 감지하여 ref 업데이트
 watch(() => homeStore.homeInfo.addressInfo.roadAddress, (newValue: string) => {
-  console.log("🔄 homeStore roadAddress 변경 감지:", newValue);
   roadAddress.value = newValue;
 }, { immediate: true });
 const jibunAddress = ref("");
@@ -38,20 +34,14 @@ const dongNo = ref("");
 const umdNm = ref("");
 const jibunAddr = ref("");
 
-// 기존 주소 정보로 초기화 (기존 기능에 영향 없음)
+// 기존 주소 정보로 초기화
 onMounted(() => {
-  console.log("🚀 SearchAddress.vue onMounted 호출됨");
-
   if (props.initialAddress) {
-    console.log("초기 주소 정보:", props.initialAddress);
-
     // homeStore에 이미 저장된 도로명주소가 있으면 사용
     const savedRoadAddress = homeStore.homeInfo.addressInfo.roadAddress;
-    if (savedRoadAddress) {
-      console.log("🏠 homeStore에서 저장된 도로명주소 사용:", savedRoadAddress);
-    }
 
-    // 모든 주소 정보 설정
+    // 모든 주소 정보 설정 (도로명주소 포함)
+    roadAddress.value = props.initialAddress.roadAddress || "";
     jibunAddress.value = props.initialAddress.jibunAddr || "";
     buildingName.value = props.initialAddress.buildingName || "";
     dongName.value = props.initialAddress.umdNm || "";
@@ -97,20 +87,18 @@ async function onAddressSelected(
     jibunAddr?: string;
   }>,
 ) {
-  console.log("🚀 onAddressSelected 호출됨, payload:", payload);
-  console.log("🔍 payload.roadAddress 값:", payload.roadAddress);
-  console.log("🔍 payload.roadAddress 타입:", typeof payload.roadAddress);
-  console.log("🔍 payload.roadAddress 길이:", payload.roadAddress?.length);
+  console.log("🔍 onAddressSelected payload:", payload);
 
-  // 새로운 주소를 선택했으므로 기존 건물 정보 초기화
+  // 새로운 주소를 선택했으므로 기존 건물 정보 초기화 (도로명주소 포함)
+  roadAddress.value = payload.roadAddress || "";
   jibunAddress.value = payload.jibunAddr || "";
   buildingName.value = payload.buildingName || "";
   dongName.value = payload.umdNm || "";
   umdNm.value = payload.umdNm || "";
   jibunAddr.value = payload.jibunAddr || "";
 
-  // 새로운 주소를 선택했으므로 건물동 번호도 초기화
-  dongNo.value = "";
+  // 새로운 주소를 선택했으므로 건물동 번호는 유지 (사용자 입력값 보존)
+  // dongNo.value = ""; // 이 줄 제거 - 동 번호 초기화하지 않음
 
   // 부모 컴포넌트로 지번주소 전달
   if (jibunAddress.value) {
@@ -123,32 +111,45 @@ async function onAddressSelected(
     jibunAddress: jibunAddress.value,
     buildingName: buildingName.value,
     dongName: dongName.value,
-    buildingNumber: "", // 새로운 주소 선택 시 건물동 번호 초기화
+    buildingNumber: dongNo.value, // 현재 입력된 동 번호 사용
     umdNm: umdNm.value,
     jibunAddr: jibunAddr.value
   };
 
   console.log("📝 homeStore에 업데이트할 데이터:", updateData);
-  console.log("📝 roadAddress 값 확인:", updateData.roadAddress);
-
   homeStore.updateAddressInfo(updateData);
 
   // UI 업데이트를 보장하기 위해 nextTick 사용
   await nextTick();
-
-  console.log("✅ 주소 정보 업데이트 완료:", {
-    roadAddress: payload.roadAddress,
-    jibunAddress: jibunAddress.value,
-    buildingName: buildingName.value,
-    dongName: dongName.value
-  });
 
   emit("address-info-updated", {
     roadAddress: payload.roadAddress || "",
     jibunAddress: jibunAddress.value,
     buildingName: buildingName.value,
     dongName: dongName.value,
-    buildingNumber: "", // 새로운 주소 선택 시 건물동 번호 초기화
+    buildingNumber: dongNo.value, // 현재 입력된 동 번호 사용
+    umdNm: umdNm.value,
+    jibunAddr: jibunAddr.value
+  });
+}
+
+// 동 번호 입력 시 처리
+function handleDongNoInput() {
+  console.log("🔍 동 번호 입력:", dongNo.value);
+
+  // 부모 컴포넌트로 동 번호 변경 알림
+  emit('building-number-changed', dongNo.value);
+
+  // homeStore의 buildingNumber 업데이트
+  homeStore.updateBuildingNumber(dongNo.value);
+
+  // address-info-updated 이벤트 발생
+  emit("address-info-updated", {
+    roadAddress: roadAddress.value,
+    jibunAddress: jibunAddress.value,
+    buildingName: buildingName.value,
+    dongName: dongName.value,
+    buildingNumber: dongNo.value,
     umdNm: umdNm.value,
     jibunAddr: jibunAddr.value
   });
@@ -180,7 +181,7 @@ async function onAddressSelected(
         v-model="dongNo"
         placeholder="동 입력(예: 204동)"
         class="p-2 w-full border-t border-gray-300"
-        @input="emit('building-number-changed', dongNo)"
+        @input="handleDongNoInput"
       />
       <button
         @click="openPostcode"

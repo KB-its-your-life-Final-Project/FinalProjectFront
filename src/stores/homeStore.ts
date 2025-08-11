@@ -61,8 +61,6 @@ export const useHomeStore = defineStore("home", () => {
 
   // 주소 정보 업데이트
   const updateAddressInfo = (addressData: Partial<AddressInfo>) => {
-    console.log("🔄 updateAddressInfo 호출됨:", addressData);
-
     // 반응성을 보장하기 위해 각 필드를 개별적으로 업데이트
     if (addressData.roadAddress !== undefined) {
       homeInfo.addressInfo.roadAddress = addressData.roadAddress;
@@ -85,20 +83,16 @@ export const useHomeStore = defineStore("home", () => {
     if (addressData.jibunAddr !== undefined) {
       homeInfo.addressInfo.jibunAddr = addressData.jibunAddr;
     }
-
-    console.log("✅ 주소 정보 업데이트 완료:", homeInfo.addressInfo);
   };
 
   // 건물동 번호 업데이트
   const updateBuildingNumber = (buildingNumber: string) => {
     homeInfo.addressInfo.buildingNumber = buildingNumber;
-    console.log("건물동 번호 업데이트:", buildingNumber);
   };
 
   // 계약 정보 업데이트
   const updateContractInfo = (contractData: Partial<HomeInfo>) => {
     Object.assign(homeInfo, contractData);
-    console.log("계약 정보 업데이트:", contractData);
   };
 
   // 집 정보 등록
@@ -110,7 +104,6 @@ export const useHomeStore = defineStore("home", () => {
       if (data.success && data.data) {
         // 응답 데이터로 집 정보 업데이트
         updateHomeInfoFromResponse(data.data);
-        console.log("집 정보 등록 성공:", data.data);
         return data.data;
       }
 
@@ -132,7 +125,6 @@ export const useHomeStore = defineStore("home", () => {
       if (data.success && data.data) {
         // 응답 데이터로 집 정보 업데이트
         updateHomeInfoFromResponse(data.data);
-        console.log("집 정보 수정 성공:", data.data);
         return data.data;
       }
 
@@ -192,7 +184,9 @@ export const useHomeStore = defineStore("home", () => {
 
   // 집 정보 초기화 (새로운 주소 선택 시)
   const resetHomeInfo = () => {
-    homeInfo.addressInfo = getDefaultAddressInfo();
+    // 주소 정보는 유지하고 다른 정보만 초기화
+    // homeInfo.addressInfo = getDefaultAddressInfo(); // ❌ 주소 정보 초기화 제거
+
     homeInfo.contractStart = undefined;
     homeInfo.contractEnd = undefined;
     homeInfo.jeonseAmount = undefined;
@@ -200,9 +194,8 @@ export const useHomeStore = defineStore("home", () => {
     homeInfo.monthlyDeposit = undefined;
     homeInfo.lat = undefined;
     homeInfo.lng = undefined;
-    homeInfo.addressInfo.umdNm = undefined;
-    homeInfo.addressInfo.jibunAddr = undefined;
-    console.log("집 정보 초기화 완료");
+
+    // 주소 정보는 이미 updateAddressInfo에서 업데이트되었으므로 유지
   };
 
   // 집 정보 로드 (수정 모드에서 기존 데이터로 초기화)
@@ -241,7 +234,7 @@ export const useHomeStore = defineStore("home", () => {
       homeInfo.lng = existingData.longitude;
     }
 
-    console.log("기존 집 정보 로드 완료:", homeInfo);
+
   };
 
   // 집 정보 내보내기 (폼 데이터 생성용)

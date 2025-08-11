@@ -29,12 +29,15 @@ const {
   showNoDataModal,
   showNoBuildingDataModal,
   showHighRatioModal,
+  showNoDataAndBuildingModal,
   resetModals,
   openNoDataModal,
   closeNoDataModal,
   openNoBuildingDataModal,
   closeNoBuildingDataModal,
   openHighRatioModal,
+  openNoDataAndBuildingModal,
+  closeNoDataAndBuildingModal,
 } = useModalState();
 
 const isLoading = ref(true); // 로딩 상태
@@ -103,16 +106,24 @@ async function loadSavedReportData() {
 
     // 데이터 유효성 검사 및 모달 표시
     const validation = SafeReportService.validateReportData(savedData);
-    if (validation.hasNoData) {
-      openNoDataModal();
-    }
-    if (validation.hasHighRatio) {
-      openHighRatioModal();
+    const hasNoData = validation.hasNoData;
+    const hasNoBuildingData = !savedData.floorAndPurposeList || savedData.floorAndPurposeList.length === 0;
+
+    // 매매거래내역과 건축물 정보가 모두 없는 경우
+    if (hasNoData && hasNoBuildingData) {
+      openNoDataAndBuildingModal();
+    } else {
+      // 개별적으로 모달 표시
+      if (hasNoData) {
+        openNoDataModal();
+      }
+      if (hasNoBuildingData) {
+        openNoBuildingDataModal();
+      }
     }
 
-    // 건축물 정보가 없는 경우 모달 표시
-    if (!savedData.floorAndPurposeList || savedData.floorAndPurposeList.length === 0) {
-      openNoBuildingDataModal();
+    if (validation.hasHighRatio) {
+      openHighRatioModal();
     }
 
     // localStorage 정리
@@ -152,16 +163,24 @@ async function loadReportFromAPI() {
 
     // 데이터 유효성 검사 및 모달 표시
     const validation = SafeReportService.validateReportData(reportData);
-    if (validation.hasNoData) {
-      openNoDataModal();
-    }
-    if (validation.hasHighRatio) {
-      openHighRatioModal();
+    const hasNoData = validation.hasNoData;
+    const hasNoBuildingData = !reportData.floorAndPurposeList || reportData.floorAndPurposeList.length === 0;
+
+    // 매매거래내역과 건축물 정보가 모두 없는 경우
+    if (hasNoData && hasNoBuildingData) {
+      openNoDataAndBuildingModal();
+    } else {
+      // 개별적으로 모달 표시
+      if (hasNoData) {
+        openNoDataModal();
+      }
+      if (hasNoBuildingData) {
+        openNoBuildingDataModal();
+      }
     }
 
-    // 건축물 정보가 없는 경우 모달 표시
-    if (!reportData.floorAndPurposeList || reportData.floorAndPurposeList.length === 0) {
-      openNoBuildingDataModal();
+    if (validation.hasHighRatio) {
+      openHighRatioModal();
     }
 
     isLoading.value = false;
@@ -471,7 +490,7 @@ function goToKB() {
       <div v-else class="text-center text-kb-ui-02">건축물 정보가 없습니다.</div>
     </ModalForm>
 
-    <!-- 매매 거래 내역역 없음 모달 -->
+    <!-- 매매 거래 내역 없음 모달 -->
     <ModalForm
       v-if="showNoDataModal"
       title="매매 거래 내역 없음"
@@ -529,6 +548,36 @@ function goToKB() {
           해당 건물은 건축물 대장 정보가 없습니다.<br />
           거래 내역 정보만을 기반으로 산출한 안심 점수입니다.<br />
           참고 바랍니다.
+        </p>
+      </div>
+    </ModalForm>
+
+    <!-- 매매 거래 내역과 건축물 정보 모두 없음 모달 -->
+    <ModalForm
+      v-if="showNoDataAndBuildingModal"
+      title="레포트 제공 불가"
+      :handle-confirm="() => ({ success: true, message: '' })"
+      @close="closeNoDataAndBuildingModal"
+    >
+      <div class="text-center">
+        <div class="mb-4">
+          <svg
+            class="mx-auto h-12 w-12 text-kb-ui-05"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"
+            />
+          </svg>
+        </div>
+        <p class="text-medium text-kb-ui-02">
+          해당 건물은 매매 거래 내역과 건축물 정보가 없어<br />
+          레포트를 제공할 수 없습니다.
         </p>
       </div>
     </ModalForm>
