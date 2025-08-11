@@ -35,8 +35,38 @@ const props = defineProps<{
   selectedType: string;
 }>();
 
-const hasData = computed(() => {
-  return props.graphData && props.graphData.length > 0;
+const hasData = computed(() => props.graphData && props.graphData.length > 0);
+
+// 1. groupedData : 날짜+타입별 { max, all[] } 형태로 그룹핑
+const groupedData = computed(() => {
+  const filtered =
+    props.selectedType === "전체"
+      ? props.graphData
+      : props.graphData.filter((item) => item.type === props.selectedType);
+
+  filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  return filtered.reduce(
+    (acc, cur) => {
+      if (!acc[cur.type]) acc[cur.type] = {};
+
+      const price =
+        cur.type === "매매"
+          ? (cur.dealAmount ?? 0)
+          : cur.type === "전세"
+            ? (cur.deposit ?? 0)
+            : (cur.monthlyRent ?? 0);
+
+      if (!acc[cur.type][cur.date]) {
+        acc[cur.type][cur.date] = { max: price, all: [cur] };
+      } else {
+        acc[cur.type][cur.date].max = Math.max(acc[cur.type][cur.date].max, price);
+        acc[cur.type][cur.date].all.push(cur);
+      }
+      return acc;
+    },
+    {} as Record<string, Record<string, { max: number; all: GraphItemOutput[] }>>,
+  );
 });
 
 const formatDateShort = (dateStr: string): string => {
@@ -47,8 +77,8 @@ const formatDateShort = (dateStr: string): string => {
   const dd = String(d.getDate()).padStart(2, "0");
   return `${yy}.${mm}.${dd}`;
 };
+
 const chartData = computed(() => {
-  console.log(" [그래프 데이터 확인]", props.graphData);
   const filtered =
     props.selectedType === "전체"
       ? props.graphData
@@ -56,23 +86,6 @@ const chartData = computed(() => {
 
   filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const allDates = [...new Set(filtered.map((item) => item.date))].sort();
-
-  const grouped = filtered.reduce(
-    (acc, cur) => {
-      if (!acc[cur.type]) acc[cur.type] = {};
-      let price = 0;
-      if (cur.type === "매매") {
-        price = cur.dealAmount ?? 0;
-      } else if (cur.type === "전세") {
-        price = cur.deposit ?? 0; // 전세는 보증금 중심
-      } else if (cur.type === "월세") {
-        price = cur.monthlyRent ?? 0; // 월세는 월세금액 중심
-      }
-      acc[cur.type][cur.date] = price;
-      return acc;
-    },
-    {} as Record<string, Record<string, number>>,
-  );
 
   const colorMap: Record<OutputDealType, string> = {
     매매: "#4caf50",
@@ -86,12 +99,12 @@ const chartData = computed(() => {
     월세: "rgba(63, 81, 181, 0.1)",
   };
 
-  const datasets = Object.entries(grouped).map(([type, dateMap]) => {
+  const datasets = Object.entries(groupedData.value).map(([type, dateMap]) => {
     const borderColor = colorMap[type as OutputDealType] ?? "#000000";
     const backgroundColor = bgColorMap[type as OutputDealType] ?? "rgba(0,0,0,0.1)";
     return {
       label: type,
-      data: allDates.map((date) => dateMap[date] ?? null),
+      data: allDates.map((date) => dateMap[date]?.max ?? null),
       borderColor,
       backgroundColor,
       fill: true,
@@ -109,7 +122,6 @@ const chartData = computed(() => {
   };
 });
 
-// tooltip 콜백에 보증금 같이 표기
 const chartOptions = computed(() => {
   const prices = props.graphData.map((item) => {
     if (item.type === "매매") return item.dealAmount ?? 0;
@@ -125,15 +137,12 @@ const chartOptions = computed(() => {
   let unitLabel = "만";
 
   if (maxPrice >= 10000) {
-    // 1억 이상 (10000만원)
     unit = 10000;
     unitLabel = "억";
   } else if (maxPrice >= 1000) {
-    // 1천만원 이상 (1000만원)
     unit = 1000;
     unitLabel = "천만";
   } else if (maxPrice >= 100) {
-    // 100만원 이상
     unit = 100;
     unitLabel = "백만";
   }
@@ -159,25 +168,27 @@ const chartOptions = computed(() => {
         intersect: false,
         callbacks: {
           label: (tooltipItem: TooltipItem<"line">) => {
-            const item = props.graphData[tooltipItem.dataIndex];
-            const rawValue = tooltipItem.raw as number | null;
+            const type = tooltipItem.dataset.label as OutputDealType;
+            const allDates = chartData.value.labels.map((label) => {
+              // labels 는 yy.mm.dd 포맷이라 실제 날짜와 다름,
+              // props.graphData에서 date 기준으로 찾자
+              return (
+                props.graphData.find((item) => formatDateShort(item.date) === label)?.date ?? ""
+              );
+            });
+            const dateStr = allDates[tooltipItem.dataIndex];
+            const allDeals = groupedData.value[type]?.[dateStr]?.all ?? [];
 
-            if (rawValue === null || rawValue === undefined)
-              return `${tooltipItem.dataset.label}: 데이터 없음`;
-
-            let priceLabel = "";
-            const price = formatAmount(rawValue);
-
-            if (item.type === "매매") {
-              priceLabel = `${price}`;
-            } else if (item.type === "전세") {
-              priceLabel = ` ${price}`;
-            } else if (item.type === "월세") {
-              const deposit = item.deposit !== undefined ? formatAmount(item.deposit) : "-";
-              priceLabel = `${price}, 보증금: ${deposit}`;
-            }
-
-            return `${tooltipItem.dataset.label} ${priceLabel}`;
+            // 모든 거래 내역을 줄바꿈으로 리턴 (tooltip은 문자열 배열도 지원)
+            return allDeals.map((deal) => {
+              if (deal.type === "매매") {
+                return `${type} ${formatAmount(deal.dealAmount ?? 0)}`;
+              } else if (deal.type === "전세") {
+                return `${type} ${formatAmount(deal.deposit ?? 0)}`;
+              } else {
+                return `${type} ${formatAmount(deal.monthlyRent ?? 0)}, 보증금: ${formatAmount(deal.deposit ?? 0)}`;
+              }
+            });
           },
         },
       },
