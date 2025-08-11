@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { MarkerDataType } from "@/types/markerDataType";
 import { EstateDTO, EstateSalesDTO } from "@/api/autoLoad/data-contracts";
 import { formatAmount } from "@/utils/numberUtils";
-import { estateTradeOptionsFinal } from "@/types/estateType";
+import estateUtils from "@/utils/estateUtils";
 
 const props = defineProps<{
   markerData: MarkerDataType;
@@ -29,20 +29,19 @@ const dealAmount = computed(() => {
   const saleData = props.estateSalesData?.[0];
   if (!saleData) return "거래정보 없음";
 
+  const tradeOption = estateUtils.checkFinaltype(saleData);
+  if (!tradeOption) return "거래정보 없음";
+
   const { dealAmount, deposit, monthlyRent, tradeType } = saleData;
 
-  if (tradeType === 1 && dealAmount && dealAmount > 0) {
-    return `${estateTradeOptionsFinal[1].label}: ${formatAmount(dealAmount)}`;
-  }
+  const estateFinalType = estateUtils.checkFinaltype(saleData);
 
-  else if (tradeType === 2 && deposit && deposit > 0) {
-    return `전세: ${formatAmount(deposit)}`;
-  }
-
-  // 월세 (tradeType: 3)
-  if (tradeType === 3 && deposit && deposit > 0) {
-    const rentText = monthlyRent && monthlyRent > 0 ? `/${formatAmount(monthlyRent)}` : "";
-    return `월세: ${formatAmount(deposit)}${rentText}`;
+  if (estateFinalType?.value == 1) {
+    return `${estateFinalType?.label}: ${dealAmount}`;
+  } else if (estateFinalType?.value == 2) {
+    return `${estateFinalType?.label}: ${deposit}`;
+  } else if (estateFinalType?.value == 3) {
+    return `보증금: ${deposit} \n ${estateFinalType?.value}: ${monthlyRent}`;
   }
 
   return "거래정보 없음";
