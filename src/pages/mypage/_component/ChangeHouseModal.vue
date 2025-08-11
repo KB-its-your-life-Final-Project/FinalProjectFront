@@ -41,6 +41,9 @@ const homeStore = useHomeStore();
 // 저장 성공 여부 플래그
 const saveSucceeded = ref(false);
 
+// 로딩 상태
+const isLoading = ref(false);
+
 const formData = ref<HomeRegisterRequestDTO>({
   buildingNumber: "",
   contractStart: "",
@@ -158,6 +161,9 @@ onMounted(async () => {
 
 const submitForm = async (): Promise<{ success: boolean; message: string }> => {
   try {
+    // 로딩 시작
+    isLoading.value = true;
+
     // 주소 정보 결정: 사용자가 새 주소를 선택했거나 buildingNumber를 변경했으면 homeStore의 정보, 아니면 기존 props의 정보
     const addressInfo = homeStore.homeInfo.addressInfo;
     const hasNewAddress = (addressInfo.buildingName && addressInfo.roadAddress &&
@@ -236,6 +242,9 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
   } catch (error) {
     console.error("집 정보 저장 실패:", error);
     return { success: false, message: "집 정보 저장에 실패했습니다." };
+  } finally {
+    // 로딩 종료
+    isLoading.value = false;
   }
 };
 
@@ -329,7 +338,7 @@ const options = [
 ];
 </script>
 <template>
-  <ModalForm :title="title" :handle-confirm="handleConfirm" @close="handleClose" hasConfirmBtn>
+  <ModalForm :title="title" :handle-confirm="handleConfirm" :is-loading="isLoading" @close="handleClose" hasConfirmBtn>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">집 주소</div>
       <PostcodeSearch
