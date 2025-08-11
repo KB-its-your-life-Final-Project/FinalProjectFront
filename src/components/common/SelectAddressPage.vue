@@ -151,6 +151,9 @@ const shouldFilterBuilding = (buildingName: string): boolean => {
 
   // 숫자와 특수문자만으로 구성된 경우 제외 (예: "640-2", "123", "A-1" 등)
   const numericOnly = /^[\d\-\s()]+$/.test(buildingName.trim());
+  if (numericOnly) {
+    console.log(`🚫 건물명 필터링: "${buildingName}" - 숫자/특수문자만`);
+  }
   return numericOnly;
 };
 
@@ -263,16 +266,22 @@ async function loadDongList(sidoCd: string, sggCd: string) {
 async function loadBuildingList(dongName: string, regionCode: string) {
   try {
     isLoading.value = true;
-    const response = await api.getBuildingListUsingGet({
+
+    // 서버로 보내는 데이터 로그
+    const requestData = {
       dongName: dongName,
       regionCode: regionCode,
-    });
+    };
+
+    const response = await api.getBuildingListUsingGet(requestData);
 
     if (response.data.success && response.data.data?.buildingInfos) {
+
       // 건물명 필터링
       const filteredBuildings: BuildingInfoDto[] = response.data.data.buildingInfos.filter(
         (building: BuildingInfoDto) => !shouldFilterBuilding(building.buildingName || ""),
       );
+
 
       buildingList.value = filteredBuildings;
     } else {
@@ -301,6 +310,7 @@ async function selectSido(sido: SidoDto) {
 async function selectSigugun(sigugun: SigugunDto) {
   selectedSigugun.value = sigugun;
 
+
   // 세종시의 경우 바로 건물 목록으로 이동
   if (selectedSido.value?.sidoCd === SIDO_CODES.SEJONG) {
     // 세종시는 읍/면/동 단계를 건너뛰고 바로 건물 목록 로드
@@ -320,6 +330,7 @@ async function selectDong(dong: DongDto) {
 
   // 선택된 읍/면/동에 따른 건물 목록 로드
   const regionCode = `${selectedSido.value?.sidoCd}${selectedSigugun.value?.sggCd}`;
+
   await loadBuildingList(dong.dongNm || "", regionCode);
 
   currentStep.value = STEPS.BUILDING;

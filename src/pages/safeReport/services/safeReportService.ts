@@ -20,9 +20,7 @@ export class SafeReportService {
    */
   static async generateSafeReport(requestDto: SafeReportRequestDto): Promise<SafeReportData> {
     try {
-      console.log("보낼 데이터", { ...requestDto });
       const { data } = await api.generateSafeReportUsingPost(requestDto);
-      console.log("서버 응답:", data);
 
       return {
         rentalRatioAndBuildyear: data.data?.rentalRatioAndBuildyear ?? null,

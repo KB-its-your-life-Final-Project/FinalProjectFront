@@ -28,7 +28,7 @@ const mapUtil = {
       script.onload = () => {
         setTimeout(() => {
           resolve();
-          console.log("Resolving NaverMap API Successful");
+
         }, 300);
       };
       script.onerror = () => reject(new Error("네이버 지도 API 로드 실패"));
@@ -54,7 +54,7 @@ const mapUtil = {
       },
     });
 
-    console.log("NaverMap initialized");
+
     return map;
   },
 

@@ -44,6 +44,7 @@ type ModalPropsMap = {
     type: "edit";
     address: string;
     contractDate: string;
+    homeData: HomeRegisterResponseDTO;
   };
   profile: {
     profile: string;
@@ -153,9 +154,11 @@ const getRentTypeText = (rentType?: number) => {
 
 const formatRentAmount = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
-    return `${formatAmount((homeData.jeonseAmount || 0) / 10000) || "0만원"}`;
+    // jeonseAmount가 만원 단위로 저장되어 있다면 그대로 사용
+    return `${formatAmount(homeData.jeonseAmount || 0) || "0만원"}`;
   } else if (homeData.rentType === 2) {
-    return `${formatAmount((homeData.monthlyRent || 0) / 10000) || "0만원"}`;
+    // monthlyRent가 만원 단위로 저장되어 있다면 그대로 사용
+    return `${formatAmount(homeData.monthlyRent || 0) || "0만원"}`;
   } else {
     return "금액 정보 없음";
   }
@@ -165,7 +168,8 @@ const getRentSubContent = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
     return "전세 계약";
   } else if (homeData.rentType === 2) {
-    return `보증금: ${formatAmount((homeData.monthlyDeposit || 0) / 10000) || "0만원"}`;
+    // monthlyDeposit이 만원 단위로 저장되어 있다면 그대로 사용
+    return `보증금: ${formatAmount(homeData.monthlyDeposit || 0) || "0만원"}`;
   } else {
     return "계약 정보 없음";
   }
@@ -277,6 +281,7 @@ onMounted(() => {
             type: 'edit',
             address: homeData.buildingName || '',
             contractDate: homeData.contractStart || '',
+            homeData: homeData
           })
         "
       >

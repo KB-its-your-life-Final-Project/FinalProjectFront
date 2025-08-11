@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
+import { useRouter } from "vue-router";
 import ModalForm from "@/components/common/ModalForm.vue";
 import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
 import SelectAddressPage from "@/components/common/SelectAddressPage.vue";
 import mapUtil from "@/utils/naverMap/naverMap";
+import { SafeReportStep } from "./types";
+import { Api } from "@/api/autoLoad/Api";
 
 const store = safeReportStore();
+const router = useRouter();
+const api = new Api();
 const emit = defineEmits(["update", "next", "prev"]);
 
 const buildingName = ref(store.formData.buildingName);
@@ -72,7 +77,7 @@ function handleAddressComplete(payload: {
   buildingName?: string;
   dongName?: string;
 }) {
-  console.log("전체 주소 데이터:", payload);
+
 
   // 건물명이 없으면 건물명 입력 모달 표시
   if (!payload.buildingName || payload.buildingName.trim() === "") {
@@ -131,7 +136,7 @@ function searchAddressToCoordinate(address: string) {
     const latVal = parseFloat(y);
     const lngVal = parseFloat(x);
 
-    console.log("✅ 위도:", latVal, "경도:", lngVal);
+
 
     store.updateFormData({
       lat: latVal,
@@ -183,7 +188,7 @@ function handleAddressSelected(addressData: {
   store.updateFormData({
     buildingName: buildingName.value,
     roadAddress: roadAddress.value,
-    jibunAddress: jibunAddress.value,
+    jibunAddress: addressToUse,
     dongName: addressData.dong || "",
     lat: addressData.latitude, // 서버에서 받은 위도
     lng: addressData.longitude, // 서버에서 받은 경도
@@ -193,6 +198,67 @@ function handleAddressSelected(addressData: {
 
   // 다음 화면으로 이동
   next();
+}
+
+// 내가 살고 있는 집으로 조회하기
+async function handleMyHomeSearch() {
+  try {
+    // 백엔드에서 직접 사용자의 등록된 집 정보 가져오기
+    const response = await api.getHomeInfoUsingGet("");
+
+    if (response.data?.success && response.data?.data) {
+      const homeInfo = response.data.data;
+
+
+      // 위도/경도로 정확한 주소 정보 검색
+      if (homeInfo.latitude && homeInfo.longitude) {
+        const latlng = new naver.maps.LatLng(homeInfo.latitude, homeInfo.longitude);
+        const addressInfo = await mapUtil.searchCoordinateToAddress(latlng);
+
+
+
+        // safeReport store에 정확한 주소 정보 저장
+        store.updateFormData({
+          buildingName: homeInfo.buildingName || "",
+          roadAddress: addressInfo.roadAddress || "",
+          jibunAddress: addressInfo.jibunAddress || "",
+          dongName: homeInfo.umdNm || "",
+          lat: homeInfo.latitude,
+          lng: homeInfo.longitude,
+        });
+
+        // 예산 정보도 저장 (보증금 또는 전세금)
+        if (homeInfo.rentType === 1) {
+          // 전세
+          store.updateFormData({
+            budget: homeInfo.jeonseAmount || 0
+          });
+        } else {
+          // 월세 (보증금만)
+          store.updateFormData({
+            budget: homeInfo.monthlyDeposit || 0
+          });
+        }
+
+
+
+        // 안심레포트 결과 페이지로 이동
+        store.goToStep(SafeReportStep.RESULT);
+      } else {
+        console.warn("위도/경도 정보가 없습니다.");
+        // 위도/경도가 없는 경우 마이페이지로 이동
+        router.push({ name: "mypage" });
+      }
+    } else {
+
+      // 집 정보가 없는 경우: 마이페이지 집 등록으로 이동
+      router.push({ name: "mypage" });
+    }
+  } catch (error) {
+    console.error("집 정보 조회 실패:", error);
+    // 에러 발생 시 마이페이지로 이동
+    router.push({ name: "mypage" });
+  }
 }
 </script>
 
@@ -227,6 +293,16 @@ function handleAddressSelected(addressData: {
         class="text-sm text-kb-ui-05 hover:text-kb-ui-03 transition-colors cursor-pointer"
       >
         원하는 단지가 안나온다면? >
+      </button>
+    </div>
+
+    <!-- 내가 살고 있는 집 확인하기 버튼 -->
+    <div class="w-full max-w-lg mx-auto flex justify-end">
+      <button
+        @click="handleMyHomeSearch"
+        class="px-4 py-2 bg-kb-yellow-positive text-white rounded-full font-medium hover:bg-kb-yellow transition-colors shadow-sm"
+      >
+        내가 살고 있는 집 확인하기
       </button>
     </div>
 

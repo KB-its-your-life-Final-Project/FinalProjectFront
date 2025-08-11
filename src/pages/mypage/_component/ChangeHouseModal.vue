@@ -1,23 +1,35 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-
+import { ref, onMounted, nextTick } from "vue";
+import { useHomeStore } from "@/stores/homeStore";
 import ModalForm from "@/components/common/ModalForm.vue";
 import DatePicker from "@/components/common/DatePicker.vue";
 import RadioListButton from "@/components/common/RadioListButton.vue";
-
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import PostcodeSearch from "./SearchAddress.vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { HomeRegisterRequestDTO } from "@/api/autoLoad/data-contracts";
+import type { HomeRegisterRequestDTO, HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
 import mapUtil from "@/utils/naverMap/naverMap";
 const props = defineProps<
   | { type: "regist"; address?: never; contractDate?: never }
-  | { type: "edit"; address: string; contractDate: string }
+  | { type: "edit"; address: string; contractDate: string; homeData: HomeRegisterResponseDTO }
 >();
 
 const emit = defineEmits(["close"]);
 
+// 모달 닫기 시 원래 주소 정보로 복원
+function restoreOriginalAddress() {
+  if (originalAddressInfo.value && props.type === "edit") {
+    homeStore.updateAddressInfo(originalAddressInfo.value);
+  }
+}
+
+function handleClose() {
+  restoreOriginalAddress(); // 원래 주소 정보로 복원
+  emit('close'); // 모달 닫기
+}
+
 const api = new Api();
+const homeStore = useHomeStore();
 
 const formData = ref<HomeRegisterRequestDTO>({
   buildingNumber: "",
@@ -39,15 +51,78 @@ const jeonseAmount = ref(""); // 전세금
 const contractType = ref<"jeonse" | "monthlyRent">("jeonse");
 const title = props.type === "regist" ? "나의 집 등록" : "나의 집 수정";
 
+// 원래 주소 정보 저장용
+const originalAddressInfo = ref<{
+  roadAddress: string;
+  jibunAddress: string;
+  buildingName: string;
+  dongName: string;
+  buildingNumber: string;
+  umdNm?: string;
+  jibunAddr?: string;
+} | null>(null);
+
 // 컴포넌트 초기화
 onMounted(async () => {
-  if (props.type === "edit") {
-    // 수정 모드: 기존 데이터로 폼 초기화
-    formData.value.contractStart = props.contractDate || "";
-    startDate.value = props.contractDate || null;
+
+  if (props.type === "edit" && props.homeData) {
+    const homeData = props.homeData;
+
+    // 계약 기간 설정
+    startDate.value = homeData.contractStart || null;
+    endDate.value = homeData.contractEnd || null;
+
+    // 계약 유형 설정
+    contractType.value = homeData.rentType === 1 ? "jeonse" : "monthlyRent";
+
+    // 금액 정보 설정
+    if (homeData.rentType === 1) {
+      // 전세
+      jeonseAmount.value = homeData.jeonseAmount?.toString() || "";
+    } else {
+      // 월세
+      deposit.value = homeData.monthlyDeposit?.toString() || "";
+      monthlyRent.value = homeData.monthlyRent?.toString() || "";
+    }
+
+    formData.value.buildingNumber = homeData.buildingNumber || "";
+
+    homeStore.loadHomeInfo(homeData);
+
+    formData.value.buildingNumber = homeData.buildingNumber || "";
+
+    if (homeData.roadAddress) {
+      // 원래 주소 정보 저장 (모달 닫기 시 복원용)
+      originalAddressInfo.value = {
+        roadAddress: homeData.roadAddress,
+        jibunAddress: homeData.jibunAddr || "",
+        buildingName: homeData.buildingName || "",
+        dongName: homeData.umdNm || "",
+        buildingNumber: homeData.buildingNumber || "",
+        umdNm: homeData.umdNm || "",
+        jibunAddr: homeData.jibunAddr || ""
+      };
+
+      // 모든 주소 정보 homeStore에 업데이트
+      homeStore.updateAddressInfo({
+        roadAddress: homeData.roadAddress,
+        jibunAddress: homeData.jibunAddr || "",
+        buildingName: homeData.buildingName || "",
+        dongName: homeData.umdNm || "",
+        buildingNumber: homeData.buildingNumber || "",
+        umdNm: homeData.umdNm || "",
+        jibunAddr: homeData.jibunAddr || ""
+      });
+    } else {
+      console.log("⚠️ 백엔드에 도로명주소 정보 없음");
+    }
+
+    await nextTick();
+
+  } else {
+    console.log("✅ 등록 모드, 바로 모달 표시");
   }
 
-  // Naver Maps API 로드
   try {
     await mapUtil.loadNaverMapScript();
   } catch (error) {
@@ -57,26 +132,46 @@ onMounted(async () => {
 
 const submitForm = async (): Promise<{ success: boolean; message: string }> => {
   try {
-    // 폼 데이터를 HomeRegisterRequestDTO 형식으로 변환
+    // 주소 정보 결정: 사용자가 새 주소를 선택했으면 homeStore의 정보, 아니면 기존 props의 정보
+    const addressInfo = homeStore.homeInfo.addressInfo;
+    const hasNewAddress = addressInfo.buildingName && addressInfo.roadAddress &&
+                          (addressInfo.buildingName !== props.homeData?.buildingName ||
+                           addressInfo.roadAddress !== props.homeData?.roadAddress);
+
+    // 기존 집 정보를 유지하면서 수정된 정보만 업데이트
     const requestData: HomeRegisterRequestDTO = {
-      buildingNumber: formData.value.buildingNumber,
+      buildingNumber: hasNewAddress ? addressInfo.buildingNumber : (props.homeData?.buildingNumber || ""),
+      buildingName: hasNewAddress ? addressInfo.buildingName : (props.homeData?.buildingName || ""),
+      roadAddress: hasNewAddress ? addressInfo.roadAddress : (props.homeData?.roadAddress || ""),
+      jibunAddress: hasNewAddress ? addressInfo.jibunAddress : (props.homeData?.jibunAddr || ""),
+      dongName: hasNewAddress ? addressInfo.dongName : (props.homeData?.umdNm || ""),
+      // 계약 정보
       contractStart: startDate.value || undefined,
       contractEnd: endDate.value || undefined,
       rentType: contractType.value === "jeonse" ? 1 : 2,
+      // 금액 정보 (수정된 값만)
       jeonseAmount: contractType.value === "jeonse" ? parseInt(jeonseAmount.value) || 0 : 0,
       monthlyRent: contractType.value === "monthlyRent" ? parseInt(monthlyRent.value) || 0 : 0,
       monthlyDeposit: contractType.value === "monthlyRent" ? parseInt(deposit.value) || 0 : 0,
-      lat: formData.value.lat,
-      lng: formData.value.lng,
+      // 좌표 정보: 새 주소가 있으면 homeStore에서, 없으면 기존 props에서 가져오기
+      lat: hasNewAddress ? (homeStore.homeInfo.lat || 0) : (props.homeData?.latitude || 0),
+      lng: hasNewAddress ? (homeStore.homeInfo.lng || 0) : (props.homeData?.longitude || 0),
     };
+
 
     if (props.type === "regist") {
       // 집 등록
-      await api.registerHomeUsingPost(requestData);
+      const response = await api.registerHomeUsingPost(requestData);
+      if (response.data.success && response.data.data) {
+        homeStore.updateHomeInfoFromResponse(response.data.data);
+      }
       return { success: true, message: "나의 집 정보가 등록되었습니다." };
     } else {
       // 집 정보 수정
-      await api.registerHomeUsingPost(requestData);
+      const response = await api.registerHomeUsingPost(requestData);
+      if (response.data.success && response.data.data) {
+        homeStore.updateHomeInfoFromResponse(response.data.data);
+      }
       return { success: true, message: "나의 집 정보가 수정되었습니다." };
     }
   } catch (error) {
@@ -85,33 +180,64 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
   }
 };
 
-// 주소를 좌표로 변환 (mapUtil 사용)
+// 주소를 좌표로 변환
 async function searchAddressToCoordinate(address: string) {
   try {
     const result = await mapUtil.searchAddressToCoordinate(address);
-    console.log("✅ 위도:", result.latlng.lat(), "경도:", result.latlng.lng());
+    const lat = result.latlng.lat();
+    const lng = result.latlng.lng();
 
-    // formData에 좌표 저장
-    formData.value.lat = result.latlng.lat();
-    formData.value.lng = result.latlng.lng();
+    // formData와 homeStore 모두에 좌표 저장
+    formData.value.lat = lat;
+    formData.value.lng = lng;
+
+    // homeStore에도 좌표 정보 업데이트
+    homeStore.homeInfo.lat = lat;
+    homeStore.homeInfo.lng = lng;
+
+
   } catch (error) {
     console.error("주소를 좌표로 변환하는 데 실패했습니다:", error);
   }
 }
 
-// PostcodeSearch에서 주소 선택 완료 시 호출
+// PostcodeSearch에서 주소 선택 완료 시
 async function handleAddressSelected(address: string) {
   if (address) {
     await searchAddressToCoordinate(address);
   }
 }
 
-// 동 정보 변경 시 호출
-function handleBuildingNumberChanged(buildingNumber: string) {
-  formData.value.buildingNumber = buildingNumber;
+// PostcodeSearch에서 주소 정보가 업데이트될 때
+function handleAddressInfoUpdated(addressData: {
+  roadAddress: string;
+  jibunAddress: string;
+  buildingName: string;
+  dongName: string;
+  buildingNumber: string;
+  umdNm?: string;
+  jibunAddr?: string;
+}) {
+  // homeStore에 주소 정보 업데이트
+  homeStore.updateAddressInfo(addressData);
+
+  // formData도 함께 업데이트하여 UI 동기화
+  formData.value.buildingNumber = addressData.buildingNumber;
+  // resetHomeInfo() 호출하지 않음 - 좌표 정보 유지
 }
 
-// 계약 유형 변경 시 호출
+
+
+// 동 정보 변경 시
+function handleBuildingNumberChanged(buildingNumber: string) {
+  // formData 업데이트
+  formData.value.buildingNumber = buildingNumber;
+
+  // homeStore도 함께 업데이트
+  homeStore.updateBuildingNumber(buildingNumber);
+}
+
+// 계약 유형 변경 시
 function handleContractTypeChanged() {
   // 계약 유형이 변경되면 모든 입력값 초기화
   if (contractType.value === "jeonse") {
@@ -136,13 +262,32 @@ const options = [
 ];
 </script>
 <template>
-  <ModalForm :title="title" :handle-confirm="handleConfirm" @close="emit('close')" hasConfirmBtn>
+  <ModalForm :title="title" :handle-confirm="handleConfirm" @close="handleClose" hasConfirmBtn>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">집 주소</div>
       <PostcodeSearch
+        :initial-address="props.type === 'edit' && props.homeData ?
+          (() => {
+            const savedAddressInfo = homeStore.homeInfo.addressInfo;
+            if (savedAddressInfo.buildingName || savedAddressInfo.buildingNumber) {
+              return savedAddressInfo;
+            }
+            // 저장된 주소 정보가 없다면 기본값 반환
+            return {
+              roadAddress: homeStore.homeInfo.addressInfo.roadAddress || '',
+              jibunAddress: props.homeData.jibunAddr || '',
+              buildingName: props.homeData.buildingName || '',
+              dongName: props.homeData.umdNm || '',
+              buildingNumber: props.homeData.buildingNumber || '',
+              umdNm: props.homeData.umdNm || ''
+            };
+          })()
+        : undefined"
         @address-selected="handleAddressSelected"
         @building-number-changed="handleBuildingNumberChanged"
+        @address-info-updated="handleAddressInfoUpdated"
       />
+
     </div>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">계약 기간</div>
