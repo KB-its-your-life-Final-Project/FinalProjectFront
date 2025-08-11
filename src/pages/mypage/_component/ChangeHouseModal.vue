@@ -158,12 +158,14 @@ onMounted(async () => {
 
 const submitForm = async (): Promise<{ success: boolean; message: string }> => {
   try {
-    // 주소 정보 결정: 사용자가 새 주소를 선택했으면 homeStore의 정보, 아니면 기존 props의 정보
+    // 주소 정보 결정: 사용자가 새 주소를 선택했거나 buildingNumber를 변경했으면 homeStore의 정보, 아니면 기존 props의 정보
     const addressInfo = homeStore.homeInfo.addressInfo;
-    const hasNewAddress = addressInfo.buildingName && addressInfo.roadAddress &&
+    const hasNewAddress = (addressInfo.buildingName && addressInfo.roadAddress &&
                           (props.type === "edit" && props.homeData ?
                            (addressInfo.buildingName !== props.homeData.buildingName ||
-                            addressInfo.roadAddress !== props.homeData.roadAddress) : true);
+                            addressInfo.roadAddress !== props.homeData.roadAddress) : true)) ||
+                         (addressInfo.buildingNumber && props.type === "edit" && props.homeData &&
+                          addressInfo.buildingNumber !== props.homeData.buildingNumber);
 
     // 기존 집 정보를 유지하면서 수정된 정보만 업데이트
     const requestData: HomeRegisterRequestDTO = {
