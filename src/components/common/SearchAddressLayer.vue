@@ -48,7 +48,6 @@ watch(
       await ensureScript();
       const postcodeRef = new window.daum.Postcode({
         oncomplete: (data: any) => {
-          console.log("🏠 주소 검색 결과:", data);
 
           // buildingName을 더 정확하게 파싱
           let buildingName = "";
@@ -68,8 +67,6 @@ watch(
             umdNm: data.bname || "",
             jibunAddr: data.jibunAddress || data.autoJibunAddress || "",
           };
-
-          console.log("📝 파싱된 주소 정보:", fullAddressPayload);
 
           const filteredPayload = props.returnFields
             ? props.returnFields.reduce(
