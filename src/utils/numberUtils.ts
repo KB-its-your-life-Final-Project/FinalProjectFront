@@ -89,7 +89,7 @@ export function formatAmount(amount?: number): string {
   if (billion > 0 && million > 0) {
     return `${billion}억 ${million.toLocaleString()} 만원`;
   } else if (billion > 0) {
-    return `${billion}억`;
+    return `${billion}억원`;
   } else {
     return `${million.toLocaleString()} 만원`;
   }
