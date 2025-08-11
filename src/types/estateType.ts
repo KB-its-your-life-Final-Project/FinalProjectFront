@@ -6,6 +6,13 @@ const estateTradeOptions = [
 ];
 type estateTradeType = typeof estateTradeOptions;
 
+const estateTradeOptionsFinal = [
+  { value: 1, label: "매매", parent: 1 },
+  { value: 2, label: "전세", parent: 2 },
+  { value: 3, label: "월세", parent: 2 },
+];
+type estateTradeFinalType = typeof estateTradeOptionsFinal;
+
 const estateMhouseOptions = [
   { value: 1, label: "연립" },
   { value: 2, label: "다세대" },
@@ -26,5 +33,5 @@ const estateBuildingOptions = [
 ];
 type estateBuildingType = typeof estateBuildingOptions;
 
-export { estateTradeOptions, estateMhouseOptions, estateShouseOptions, estateBuildingOptions };
-export type { estateTradeType, estateMhouseType, estateShouseType, estateBuildingType };
+export { estateTradeOptions, estateMhouseOptions, estateShouseOptions, estateBuildingOptions, estateTradeOptionsFinal };
+export type { estateTradeType, estateMhouseType, estateShouseType, estateBuildingType, estateTradeFinalType };

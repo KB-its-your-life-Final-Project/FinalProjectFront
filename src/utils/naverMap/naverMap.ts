@@ -28,7 +28,6 @@ const mapUtil = {
       script.onload = () => {
         setTimeout(() => {
           resolve();
-
         }, 300);
       };
       script.onerror = () => reject(new Error("네이버 지도 API 로드 실패"));
@@ -53,7 +52,6 @@ const mapUtil = {
         position: defaultOptions.zoomControlPosition,
       },
     });
-
 
     return map;
   },
@@ -282,172 +280,172 @@ const mapUtil = {
 
   // 지도 영역 내 건물 정보 검색
   // DB에서 불러오기 주석처리됨 일단 보류
-  searchBuildingsInBounds: async (map: naver.maps.Map): Promise<Array<MarkerDataType>> => {
-    const buildings: Array<{
-      jibunAddress: string;
-      roadAddress: string;
-      latlng: naver.maps.LatLng;
-      buildingName?: string;
-    }> = [];
-
-    // 줌 레벨에 따른 격자 크기 조정
-    const currentZoom = map.getZoom();
-    let gridSize;
-
-    if (currentZoom >= 20) {
-      gridSize = 0.0001; // 약 10m 간격 (줌 레벨 20 이상)
-    } else if (currentZoom >= 19) {
-      gridSize = 0.0003; // 약 50m 간격 (줌 레벨 19)
-    } else if (currentZoom >= 17) {
-      gridSize = 0.0006; // 약 100m 간격 (줌 레벨 17-18)
-    } else if (currentZoom >= 15) {
-      gridSize = 0.001; // 약 200m 간격 (줌 레벨 15-16)
-    } else {
-      gridSize = 0.0025; // 약 500m 간격 (줌 레벨 15 미만)
-    }
-
-    const mapBoundary = mapUtil.getBoundary(map);
-    const minLat = mapBoundary.bottomLeft.lat;
-    const maxLat = mapBoundary.topRight.lat;
-    const minLng = mapBoundary.bottomLeft.lng;
-    const maxLng = mapBoundary.topRight.lng;
-
-    // DB에서 해당 영역의 건물 정보 미리 조회
-    // const api = new Api();
-    // let dbBuildings: any[] = [];
-    // try {
-    //   const response = await api.getEstateBySquareUsingGet({
-    //     minLat: minLat,
-    //     maxLat: maxLat,
-    //     minLng: minLng,
-    //     maxLng: maxLng,
-    //   });
-    //   if (response.data && response.data.data) {
-    //     dbBuildings = response.data.data;
-    //   }
-    // } catch (error) {
-    //   console.error("DB 건물 정보 조회 실패:", error);
-    // }
-
-    // 격자 기반으로 더 많은 지점 검색
-    const searchPoints: naver.maps.LatLng[] = [];
-    for (let lat = minLat; lat <= maxLat; lat += gridSize) {
-      for (let lng = minLng; lng <= maxLng; lng += gridSize) {
-        searchPoints.push(new naver.maps.LatLng(lat + gridSize / 2, lng + gridSize / 2));
-      }
-    }
-
-    // 각 지점에서 주소 검색
-    for (let i = 0; i < searchPoints.length; i++) {
-      const point = searchPoints[i];
-      const buildingInfo = await mapUtil.searchCoordinateToAddress(point);
-
-      // 주소가 유효한지 확인
-      if (
-        buildingInfo.jibunAddress &&
-        buildingInfo.jibunAddress.trim() !== "" &&
-        !buildingInfo.jibunAddress.includes("undefined")
-      ) {
-        const accurateInfo = await mapUtil.searchAddressToCoordinate(buildingInfo.jibunAddress);
-
-        // 중복 제거
-        const isAlreadyAdded = buildings.some((building) => {
-          const latMatch = building.latlng.lat() === accurateInfo.latlng.lat();
-          const lngMatch = building.latlng.lng() === accurateInfo.latlng.lng();
-          return latMatch && lngMatch;
-        });
-        // DB에 존재하는지 확인
-        // const existsInDB = dbBuildings.some((dbBuilding) => {
-        //   // 좌표 비교
-        //   const latMatch = Math.abs(dbBuilding.latitude - buildingInfo.latlng.lat()) < 0.0001;
-        //   const lngMatch = Math.abs(dbBuilding.longitude - buildingInfo.latlng.lng()) < 0.0001;
-
-        //   return latMatch && lngMatch;
-        // });
-
-        // if (existsInDB) {
-
-        // 정확한 좌표로 주소 검색하여 정확한 위치 가져오기
-        if (!isAlreadyAdded) {
-          buildings.push({
-            jibunAddress: accurateInfo.jibunAddress,
-            roadAddress: accurateInfo.roadAddress,
-            latlng: accurateInfo.latlng, // 정확한 좌표 사용
-            buildingName: accurateInfo.buildingName,
-          });
-        }
-        // }
-      }
-    }
-
-    return buildings;
-  },
-
-  // 지도 영역 내 건물 정보 검색
   // searchBuildingsInBounds: async (map: naver.maps.Map): Promise<Array<MarkerDataType>> => {
+  //   const buildings: Array<{
+  //     jibunAddress: string;
+  //     roadAddress: string;
+  //     latlng: naver.maps.LatLng;
+  //     buildingName?: string;
+  //   }> = [];
+
+  //   // 줌 레벨에 따른 격자 크기 조정
+  //   const currentZoom = map.getZoom();
+  //   let gridSize;
+
+  //   if (currentZoom >= 20) {
+  //     gridSize = 0.0001; // 약 10m 간격 (줌 레벨 20 이상)
+  //   } else if (currentZoom >= 19) {
+  //     gridSize = 0.0003; // 약 50m 간격 (줌 레벨 19)
+  //   } else if (currentZoom >= 17) {
+  //     gridSize = 0.0006; // 약 100m 간격 (줌 레벨 17-18)
+  //   } else if (currentZoom >= 15) {
+  //     gridSize = 0.001; // 약 200m 간격 (줌 레벨 15-16)
+  //   } else {
+  //     gridSize = 0.0025; // 약 500m 간격 (줌 레벨 15 미만)
+  //   }
+
   //   const mapBoundary = mapUtil.getBoundary(map);
   //   const minLat = mapBoundary.bottomLeft.lat;
   //   const maxLat = mapBoundary.topRight.lat;
   //   const minLng = mapBoundary.bottomLeft.lng;
   //   const maxLng = mapBoundary.topRight.lng;
 
-  //   // DB에서 해당 영역의 건물 정보 조회
-  //   const api = new Api();
-  //   let dbBuildings: any[] = [];
+  //   // DB에서 해당 영역의 건물 정보 미리 조회
+  //   // const api = new Api();
+  //   // let dbBuildings: any[] = [];
+  //   // try {
+  //   //   const response = await api.getEstateBySquareUsingGet({
+  //   //     minLat: minLat,
+  //   //     maxLat: maxLat,
+  //   //     minLng: minLng,
+  //   //     maxLng: maxLng,
+  //   //   });
+  //   //   if (response.data && response.data.data) {
+  //   //     dbBuildings = response.data.data;
+  //   //   }
+  //   // } catch (error) {
+  //   //   console.error("DB 건물 정보 조회 실패:", error);
+  //   // }
 
-  //   try {
-  //     const response = await api.getEstateBySquareUsingGet({
-  //       minLat: minLat,
-  //       maxLat: maxLat,
-  //       minLng: minLng,
-  //       maxLng: maxLng,
-  //     });
-
-  //     if (response.data && response.data.data) {
-  //       dbBuildings = response.data.data;
+  //   // 격자 기반으로 더 많은 지점 검색
+  //   const searchPoints: naver.maps.LatLng[] = [];
+  //   for (let lat = minLat; lat <= maxLat; lat += gridSize) {
+  //     for (let lng = minLng; lng <= maxLng; lng += gridSize) {
+  //       searchPoints.push(new naver.maps.LatLng(lat + gridSize / 2, lng + gridSize / 2));
   //     }
-  //   } catch (error) {
-  //     console.error("DB 건물 정보 조회 실패:", error);
-  //     return [];
   //   }
 
-  //   // DB 데이터에서 중복 제거 (좌표 기준)
-  //   const uniqueBuildings = dbBuildings.filter((building, index, self) => {
-  //     return (
-  //       index ===
-  //       self.findIndex(
-  //         (b) =>
-  //           Math.abs(b.latitude - building.latitude) < 0.0001 &&
-  //           Math.abs(b.longitude - building.longitude) < 0.0001,
-  //       )
-  //     );
-  //   });
+  //   // 각 지점에서 주소 검색
+  //   for (let i = 0; i < searchPoints.length; i++) {
+  //     const point = searchPoints[i];
+  //     const buildingInfo = await mapUtil.searchCoordinateToAddress(point);
 
-  //   // 중복 제거된 데이터로 네이버 API 호출
-  //   const buildings: Array<MarkerDataType> = [];
+  //     // 주소가 유효한지 확인
+  //     if (
+  //       buildingInfo.jibunAddress &&
+  //       buildingInfo.jibunAddress.trim() !== "" &&
+  //       !buildingInfo.jibunAddress.includes("undefined")
+  //     ) {
+  //       const accurateInfo = await mapUtil.searchAddressToCoordinate(buildingInfo.jibunAddress);
 
-  //   for (const building of uniqueBuildings) {
-  //     try {
-  //       const latlng = new naver.maps.LatLng(building.latitude, building.longitude);
+  //       // 중복 제거
+  //       const isAlreadyAdded = buildings.some((building) => {
+  //         const latMatch = building.latlng.lat() === accurateInfo.latlng.lat();
+  //         const lngMatch = building.latlng.lng() === accurateInfo.latlng.lng();
+  //         return latMatch && lngMatch;
+  //       });
+  //       // DB에 존재하는지 확인
+  //       // const existsInDB = dbBuildings.some((dbBuilding) => {
+  //       //   // 좌표 비교
+  //       //   const latMatch = Math.abs(dbBuilding.latitude - buildingInfo.latlng.lat()) < 0.0001;
+  //       //   const lngMatch = Math.abs(dbBuilding.longitude - buildingInfo.latlng.lng()) < 0.0001;
 
-  //       // 네이버 API로 좌표에 해당하는 정확한 주소 정보 가져오기
-  //       const addressInfo = await mapUtil.searchCoordinateToAddress(latlng);
+  //       //   return latMatch && lngMatch;
+  //       // });
 
-  //       if (addressInfo) {
+  //       // if (existsInDB) {
+
+  //       // 정확한 좌표로 주소 검색하여 정확한 위치 가져오기
+  //       if (!isAlreadyAdded) {
   //         buildings.push({
-  //           jibunAddress: addressInfo.jibunAddress,
-  //           roadAddress: addressInfo.roadAddress || "",
-  //           latlng: latlng,
-  //           buildingName: building.buildingName || building.name || undefined,
+  //           jibunAddress: accurateInfo.jibunAddress,
+  //           roadAddress: accurateInfo.roadAddress,
+  //           latlng: accurateInfo.latlng, // 정확한 좌표 사용
+  //           buildingName: accurateInfo.buildingName,
   //         });
   //       }
-  //     } catch (error) {
-  //       console.log(error);
+  //       // }
   //     }
   //   }
 
   //   return buildings;
   // },
+
+  // 지도 영역 내 건물 정보 검색
+  searchBuildingsInBounds: async (map: naver.maps.Map): Promise<Array<MarkerDataType>> => {
+    const mapBoundary = mapUtil.getBoundary(map);
+    const minLat = mapBoundary.bottomLeft.lat;
+    const maxLat = mapBoundary.topRight.lat;
+    const minLng = mapBoundary.bottomLeft.lng;
+    const maxLng = mapBoundary.topRight.lng;
+
+    // DB에서 해당 영역의 건물 정보 조회
+    const api = new Api();
+    let dbBuildings: any[] = [];
+
+    try {
+      const response = await api.getEstateBySquareUsingGet({
+        minLat: minLat,
+        maxLat: maxLat,
+        minLng: minLng,
+        maxLng: maxLng,
+      });
+
+      if (response.data && response.data.data) {
+        dbBuildings = response.data.data;
+      }
+    } catch (error) {
+      console.error("DB 건물 정보 조회 실패:", error);
+      return [];
+    }
+
+    // DB 데이터에서 중복 제거 (좌표 기준)
+    const uniqueBuildings = dbBuildings.filter((building, index, self) => {
+      return (
+        index ===
+        self.findIndex(
+          (b) =>
+            Math.abs(b.latitude - building.latitude) < 0.0001 &&
+            Math.abs(b.longitude - building.longitude) < 0.0001,
+        )
+      );
+    });
+
+    // 중복 제거된 데이터로 네이버 API 호출
+    const buildings: Array<MarkerDataType> = [];
+
+    for (const building of uniqueBuildings) {
+      try {
+        const latlng = new naver.maps.LatLng(building.latitude, building.longitude);
+
+        // 네이버 API로 좌표에 해당하는 정확한 주소 정보 가져오기
+        const addressInfo = await mapUtil.searchCoordinateToAddress(latlng);
+
+        if (addressInfo) {
+          buildings.push({
+            jibunAddress: addressInfo.jibunAddress,
+            roadAddress: addressInfo.roadAddress || "",
+            latlng: latlng,
+            buildingName: building.buildingName || building.name || undefined,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    return buildings;
+  },
 
   // 좌표 기반 주소 검색
   searchCoordinateToAddress: (latlng: naver.maps.LatLng): Promise<MarkerDataType> => {

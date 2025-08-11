@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { MarkerDataType } from "@/types/markerDataType";
 import { EstateDTO, EstateSalesDTO } from "@/api/autoLoad/data-contracts";
 import { formatAmount } from "@/utils/numberUtils";
+import { estateTradeOptionsFinal } from "@/types/estateType";
 
 const props = defineProps<{
   markerData: MarkerDataType;
@@ -30,13 +31,11 @@ const dealAmount = computed(() => {
 
   const { dealAmount, deposit, monthlyRent, tradeType } = saleData;
 
-  // 매매 (tradeType: 1)
   if (tradeType === 1 && dealAmount && dealAmount > 0) {
-    return `매매: ${formatAmount(dealAmount)}`;
+    return `${estateTradeOptionsFinal[1].label}: ${formatAmount(dealAmount)}`;
   }
 
-  // 전세 (tradeType: 2)
-  if (tradeType === 2 && deposit && deposit > 0) {
+  else if (tradeType === 2 && deposit && deposit > 0) {
     return `전세: ${formatAmount(deposit)}`;
   }
 
