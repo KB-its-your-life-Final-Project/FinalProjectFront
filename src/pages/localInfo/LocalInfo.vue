@@ -12,7 +12,6 @@ import InfoCard from "@/pages/localInfo/_component/InfoCard.vue";
 import { InfoCardList } from "@/pages/localInfo/_component/InfoCard.ts";
 import Footer from "@/components/layout/Footer.vue";
 import WishButton from "@/components/common/WishButton.vue";
-import ToastList from "@/components/common/ToastList.vue";
 
 const route = useRoute();
 const selectedRegionData = ref<LocalInfoResponseDTO | null>({
@@ -59,6 +58,10 @@ onMounted(() => {
 <template>
   <Header class="h-35 mb-12" headerShowtype="localInfo">
     <!-- 검색창 -->
+    <img
+      src="@/assets/imgs/findneighborhood.PNG"
+      class="absolute right-1 top-12/20 -translate-y-1/2 h-25"
+    />
     <div class="px-6 mt-3">
       <RegionSearch @region-selected="handleRegionSelected" />
     </div>
@@ -73,11 +76,7 @@ onMounted(() => {
       <div class="font-pretendard-bold text-2xl text-kb-ui-02">동네정보</div>
     </div>
     <div class="h-[30%] w-[20%] flex items-center">
-      <WishButton
-        :key="selectedRegionCd + String(isLiked)"
-        targetType="region"
-        :regionCd="selectedRegionCd"
-      />
+      <WishButton :key="selectedRegionCd" targetType="region" :regionCd="selectedRegionCd" />
     </div>
   </div>
 

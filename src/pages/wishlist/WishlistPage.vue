@@ -85,11 +85,7 @@ onMounted(async () => {
 
 <template>
   <div class="pb-24">
-    <Header class="h-30 mb-10" :headerShowtype="mainRouteName.wishlist">
-      <div class="px-4 mt-3">
-        <LogoSearchBar placeholder="지역 또는 매물 검색" />
-      </div>
-    </Header>
+    <Header class="h-25 mb-5" :headerShowtype="mainRouteName.wishlist"> </Header>
     <SubjectSection title="관심 지역">
       <ul v-if="favoriteRegions.length > 0">
         <ListItem
