@@ -52,13 +52,13 @@ router.beforeEach(async (to, from, next) => {
   const { createToast, addToast } = useToast();
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     // 로그인 안 했는데 접근 → 로그인 페이지로
-    addToast(createToast("로그인이 필요한 서비스입니다.", "info", 2000))
+    addToast(createToast("로그인이 필요한 서비스입니다.", "info", 2000));
     movePage.login();
   }
 
   if (to.meta.notLoggedIn && auth.isLoggedIn) {
     // 로그인 상태인데 접근 불가 페이지 → 홈으로
-    addToast(createToast("이미 로그인 된 상태입니다.", "info", 2000))
+    addToast(createToast("이미 로그인 된 상태입니다.", "info", 2000));
     movePage.homeMain();
   }
 

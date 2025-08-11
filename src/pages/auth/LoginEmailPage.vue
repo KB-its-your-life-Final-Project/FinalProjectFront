@@ -34,27 +34,36 @@ const handleLogin = async () => {
   checkEmailMsg.value = "";
   checkPwdMsg.value = "";
 
- // 이메일 검사
- if (isEmpty(member.email)) {
+  // 이메일 검사
+  if (isEmpty(member.email)) {
     checkEmailMsg.value = "이메일을 입력하세요";
   } else if (!isValidEmailFormat(member.email)) {
     checkEmailMsg.value = "올바른 형식의 이메일을 입력하세요";
-  }
-  const isDuplicateEmail: boolean = await auth.checkDuplicateEmail(member.email);
-  if (!isDuplicateEmail) {
-    checkEmailMsg.value = "등록되지 않은 이메일입니다";
+  } else {
+    const isDuplicateEmail: boolean = await auth.checkDuplicateEmail(member.email);
+    if (!isDuplicateEmail) {
+      checkEmailMsg.value = "등록되지 않은 이메일입니다";
+    }
   }
 
   // 비밀번호 검사
   if (isEmpty(member.pwd)) {
     checkPwdMsg.value = "비밀번호를 입력하세요";
+  }
+
+  // 입력값 오류 여부 확인
+  const hasError = [checkEmailMsg.value, checkPwdMsg.value].some((msg) => msg !== "");
+  if (hasError) {
+    addToast(createToast("입력값을 확인하세요.", "error", 2000));
     return;
   }
+
   try {
     const response = await auth.login(member);
     if (response.success === false && response.code === 1013) {
       console.log("로그인 결과: ", response.message);
       checkPwdMsg.value = "비밀번호가 일치하지 않습니다";
+      addToast(createToast("입력값을 확인하세요.", "error", 2000));
       return;
     }
 
@@ -69,9 +78,9 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <header class="p-[1rem] bg-kb-yellow w-full h-[6rem] flex items-center gap-2">
+  <header class="header">
     <GoBackBtn />
-    <h1 class="text-2xl font-pretendard-bold">로그인</h1>
+    <h1 class="header-text">로그인</h1>
   </header>
   <div class="content-wrapper">
     <form class="form" method="post" @submit.prevent="handleLogin" novalidate>
@@ -108,6 +117,12 @@ const handleLogin = async () => {
 <style scoped>
 @reference "@/assets/styles/main.css";
 
+.header {
+  @apply p-[1rem] bg-kb-yellow w-full h-[6rem] flex items-center gap-2;
+}
+.header-text {
+  @apply text-2xl font-pretendard-bold;
+}
 .content-wrapper {
   @apply flex flex-col items-center;
 }

@@ -1,7 +1,11 @@
 import { defineStore } from "pinia";
 import { computed, reactive } from "vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { LoginRequestDTO, MemberResponseDTO, ApiResponseMemberResponseDTO } from "@/api/autoLoad/data-contracts";
+import type {
+  LoginRequestDTO,
+  MemberResponseDTO,
+  ApiResponseMemberResponseDTO,
+} from "@/api/autoLoad/data-contracts";
 import { useToast } from "@/utils/useToast";
 
 const api = new Api();
@@ -71,7 +75,7 @@ export const authStore = defineStore("auth", () => {
       const { data } = await api.loginUsingPost(loginInfo);
       console.log("data: ", data);
       if (data.success === false && data.code === 1013) {
-        console.log("error message: ", data.message)
+        console.log("error message: ", data.message);
         return data;
       }
       if (data.success === true && data.data) {

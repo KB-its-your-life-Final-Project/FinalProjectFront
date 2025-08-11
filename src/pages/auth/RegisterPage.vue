@@ -3,7 +3,13 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { authStore } from "@/stores/authStore.ts";
 import { Api } from "@/api/autoLoad/Api";
-import { isEmpty, isValidEmailFormat, isValidPasswordFormat, isValidPasswordChk, isValidName } from "@/utils/validate";
+import {
+  isEmpty,
+  isValidEmailFormat,
+  isValidPasswordFormat,
+  isValidPasswordChk,
+  isValidName,
+} from "@/utils/validate";
 import GoBackBtn from "@/components/common/GoBackBtn.vue";
 import { useToast } from "@/utils/useToast";
 
@@ -103,7 +109,7 @@ const handleRegister = async () => {
   if (isEmpty(member.pwd)) {
     checkPwdMsg.value = "비밀번호를 입력하세요";
   } else if (!isValidPasswordFormat(member.pwd)) {
-    checkPwdMsg.value = "올바른 형식의 비밀번호를 입력하세요"
+    checkPwdMsg.value = "올바른 형식의 비밀번호를 입력하세요";
   }
 
   // 비밀번호 확인 검사
@@ -118,8 +124,8 @@ const handleRegister = async () => {
     checkEmailMsg.value,
     checkNamelMsg.value,
     checkPwdMsg.value,
-    checkPwdChkMsg.value
-  ].some(msg => msg !== "");
+    checkPwdChkMsg.value,
+  ].some((msg) => msg !== "");
   if (hasError) {
     addToast(createToast("입력값을 확인하세요.", "error", 2000));
     return;
@@ -133,16 +139,18 @@ const handleRegister = async () => {
     addToast(createToast("회원가입 완료", "success", 2000));
     router.push({ name: "loginEmail" });
   } catch (e) {
-    addToast(createToast("서버 오류: 회웝가입에 실패했습니다. 잠시 후 시도해주세요.", "error", 2000));
+    addToast(
+      createToast("서버 오류: 회웝가입에 실패했습니다. 잠시 후 시도해주세요.", "error", 2000),
+    );
     console.error(e);
   }
 };
 </script>
 
 <template>
-  <header class="header-wrapper">
+  <header class="header">
     <GoBackBtn />
-    <h1 class="text-2xl font-pretendard-bold">회원가입</h1>
+    <h1 class="header-text">회원가입</h1>
   </header>
   <div class="flex flex-col items-center">
     <form class="form" method="post" @submit.prevent="handleRegister" novalidate>
@@ -229,8 +237,11 @@ const handleRegister = async () => {
 <style scoped>
 @reference "@/assets/styles/main.css";
 
-.header-wrapper {
+.header {
   @apply p-[1rem] bg-kb-yellow w-full h-[6rem] flex items-center gap-2;
+}
+.header-text {
+  @apply text-2xl font-pretendard-bold;
 }
 .form {
   @apply mt-[3rem] w-5/6 h-auto flex flex-col gap-1;
