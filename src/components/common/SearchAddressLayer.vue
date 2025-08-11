@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 
+// daum postcode 타입 선언
+declare global {
+  interface Window {
+    daum: {
+      Postcode: new (options: any) => any;
+    };
+  }
+}
+
 const props = defineProps<{
   visible: boolean;
   returnFields?: Array<"roadAddress" | "jibunAddress" | "buildingName" | "dongName">;
@@ -40,18 +49,24 @@ watch(
       const postcodeRef = new window.daum.Postcode({
         oncomplete: (data: any) => {
 
+          // buildingName을 더 정확하게 파싱
+          let buildingName = "";
+          if (data.buildingName && data.buildingName.trim()) {
+            buildingName = data.buildingName;
+          } else if (data.apartment && data.apartment.trim()) {
+            buildingName = data.apartment;
+          } else if (data.buildingName && data.buildingName.trim()) {
+            buildingName = data.buildingName;
+          }
 
           const fullAddressPayload = {
             roadAddress: data.roadAddress || data.autoRoadAddress || "",
             jibunAddress: data.jibunAddress || data.autoJibunAddress || "",
-            buildingName: data.buildingName || "",
-            dongName: data.bname && /[동|로|가]$/g.test(data.bname) ? data.bname : "",
+            buildingName: buildingName,
+            dongName: data.bname || "",
             umdNm: data.bname || "",
             jibunAddr: data.jibunAddress || data.autoJibunAddress || "",
           };
-
-
-
 
           const filteredPayload = props.returnFields
             ? props.returnFields.reduce(
@@ -62,9 +77,6 @@ watch(
                 {} as Record<string, string>,
               )
             : fullAddressPayload;
-
-
-
 
           emit("complete", filteredPayload);
           emit("close");

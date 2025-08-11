@@ -12,6 +12,7 @@ import { useModalState } from "./composables/useModalState";
 import { useIllegalBuildingStatus } from "./composables/useIllegalBuildingStatus";
 import { SafeReportService } from "./services/safeReportService";
 import { getFloorLabel } from "./composables/floorUtils";
+import { formatAmount } from "@/utils/numberUtils";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -408,10 +409,10 @@ function goToKB() {
         </p>
       </div>
       <div v-else>
-        <p>예산 금액 {{ store.formData.budget }}만원에 기반하여 분석한 결과는 다음과 같습니다.</p>
+        <p>예산 금액 {{ formatAmount(store.formData.budget) }}에 기반하여 분석한 결과는 다음과 같습니다.</p>
         <p class="mt-4">
           {{ store.formData.buildingName }}의 최근 거래 가격은
-          {{ store.resultData?.dealAmount }}만원 입니다. 이에 따라 역전세율은
+          {{ formatAmount(store.resultData?.dealAmount) }} 입니다. 이에 따라 역전세율은
           {{
             store.resultData?.reverseRentalRatio != null &&
             !isNaN(Number(store.resultData.reverseRentalRatio))

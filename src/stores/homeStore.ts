@@ -53,7 +53,7 @@ export const useHomeStore = defineStore("home", () => {
 
   // 계산된 속성
   const hasHomeInfo = computed(() => {
-    return homeInfo.addressInfo.buildingName || homeInfo.addressInfo.buildingNumber;
+    return !!(homeInfo.addressInfo.buildingName || homeInfo.addressInfo.buildingNumber);
   });
 
   const isJeonse = computed(() => homeInfo.rentType === 1);
@@ -143,14 +143,14 @@ export const useHomeStore = defineStore("home", () => {
     homeInfo.id = responseData.estateId;
     homeInfo.contractStart = responseData.contractStart;
     homeInfo.contractEnd = responseData.contractEnd;
-    homeInfo.rentType = responseData.rentType || 1;
+    homeInfo.rentType = (responseData.rentType as 1 | 2) || 1;
     homeInfo.jeonseAmount = responseData.jeonseAmount;
     homeInfo.monthlyRent = responseData.monthlyRent;
     homeInfo.monthlyDeposit = responseData.monthlyDeposit;
     homeInfo.regDate = responseData.regDate;
 
-    // 주소 정보 업데이트
-    if (responseData.buildingName) {
+    // 주소 정보 업데이트 - 잘못된 buildingName은 업데이트하지 않음
+    if (responseData.buildingName && responseData.buildingName !== "경상남도 거제시") {
       homeInfo.addressInfo.buildingName = responseData.buildingName;
     }
     if (responseData.buildingNumber) {
@@ -204,14 +204,18 @@ export const useHomeStore = defineStore("home", () => {
     homeInfo.id = existingData.estateId;
     homeInfo.contractStart = existingData.contractStart;
     homeInfo.contractEnd = existingData.contractEnd;
-    homeInfo.rentType = existingData.rentType || 1;
+    homeInfo.rentType = (existingData.rentType as 1 | 2) || 1;
     homeInfo.jeonseAmount = existingData.jeonseAmount;
     homeInfo.monthlyRent = existingData.monthlyRent;
     homeInfo.monthlyDeposit = existingData.monthlyDeposit;
     homeInfo.regDate = existingData.regDate;
 
     // 주소 정보는 기존에 저장된 것을 사용하거나 기본값 설정
-    homeInfo.addressInfo.buildingName = existingData.buildingName || "";
+    homeInfo.addressInfo.roadAddress = existingData.roadAddress || "";
+    // 잘못된 buildingName은 설정하지 않음
+    if (existingData.buildingName && existingData.buildingName !== "경상남도 거제시") {
+      homeInfo.addressInfo.buildingName = existingData.buildingName;
+    }
     homeInfo.addressInfo.buildingNumber = existingData.buildingNumber || "";
     homeInfo.addressInfo.umdNm = existingData.umdNm || "";
     homeInfo.addressInfo.jibunAddr = existingData.jibunAddr || "";
@@ -233,8 +237,6 @@ export const useHomeStore = defineStore("home", () => {
     if (existingData.longitude) {
       homeInfo.lng = existingData.longitude;
     }
-
-
   };
 
   // 집 정보 내보내기 (폼 데이터 생성용)

@@ -4,6 +4,7 @@ import { useToast, ToastType } from "@/utils/useToast";
 const props = defineProps<{
   title: string;
   hasConfirmBtn?: boolean;
+  isLoading?: boolean;
   handleConfirm: () =>
     | Promise<{ success: boolean; message: string }>
     | { success: boolean; message: string };
@@ -50,12 +51,14 @@ async function onConfirm() {
         <template v-if="hasConfirmBtn">
           <button
             class="rounded-xl w-1/2 cursor-pointer text-white bg-kb-gray-light"
+            :disabled="props.isLoading"
             @click="$emit('close')"
           >
             닫기
           </button>
           <button
-            class="rounded-xl w-1/2 py-2 bg-kb-yellow-positive text-white cursor-pointer"
+            class="rounded-xl w-1/2 py-2 bg-kb-yellow-positive text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="props.isLoading"
             @click="onConfirm"
           >
             완료
@@ -64,11 +67,21 @@ async function onConfirm() {
         <template v-else>
           <button
             class="rounded-xl w-full py-2 bg-kb-yellow-positive text-white cursor-pointer"
+            :disabled="props.isLoading"
             @click="$emit('close')"
           >
             확인
           </button>
         </template>
+      </div>
+
+      <!-- 로딩 오버레이 -->
+      <div v-if="props.isLoading" class="absolute inset-0 bg-white/90 rounded-xl flex items-center justify-center">
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-kb-yellow-positive mx-auto mb-4"></div>
+          <p class="text-lg font-pretendard-medium text-kb-ui-02">처리중입니다...</p>
+          <p class="text-sm text-kb-ui-04 mt-2">잠시만 기다려주세요</p>
+        </div>
       </div>
     </div>
   </div>
