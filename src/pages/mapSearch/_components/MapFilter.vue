@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="flex p-2">
@@ -7,5 +6,4 @@
       <option value="">asdf</option>
     </select>
   </div>
-
 </template>
