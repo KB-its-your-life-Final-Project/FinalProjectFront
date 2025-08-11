@@ -1,8 +1,8 @@
-//estateTradeOptions 수정해야함 이건
 const estateTradeOptions = [
   { label: "전체", value: "전체" },
   { label: "매매", value: "매매" },
-  { label: "전월세", value: "전월세" },
+  { label: "전세", value: "전세" },
+  { label: "월세", value: "월세" },
 ];
 type estateTradeType = typeof estateTradeOptions;
 
