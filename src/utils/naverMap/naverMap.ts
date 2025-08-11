@@ -83,8 +83,8 @@ const mapUtil = {
     onClickCallback?: (markerData: any, marker: naver.maps.Marker) => void,
   ) => {
     // return;
-    let currentMarkers: naver.maps.Marker[] = [];
-    let currentClusters: any[] = [];
+    const currentMarkers: naver.maps.Marker[] = [];
+    const currentClusters: any[] = [];
 
     // 줌 레벨에 따른 마커/클러스터 전환 함수
     const updateMarkersByZoom = async () => {

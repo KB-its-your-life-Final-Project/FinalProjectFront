@@ -94,7 +94,7 @@ export const authStore = defineStore("auth", () => {
         } else {
           console.log("알 수 없는 로그인 방식");
         }
-        return data.data;
+        return data;
       }
       throw new Error(data.message || "로그인 실패");
     } catch (error: unknown) {
