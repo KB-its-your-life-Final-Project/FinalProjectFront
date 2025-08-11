@@ -4,6 +4,7 @@ import { myPageRouteRecordRaw } from "@/router/mypageRoutes";
 import { mainRouteRecordRaw } from "@/router/mainRoute";
 import { authStore } from "@/stores/authStore";
 import { useToast } from "@/utils/useToast";
+import movePage from "@/utils/movePage";
 
 const routes: RouteRecordRaw[] = [
   //메인 라우트
@@ -47,29 +48,22 @@ const router = createRouter({
 
 // 로그인 인증 가드
 router.beforeEach(async (to, from, next) => {
-  // 인증 불필요 화면
-  if (!to.meta.requiresAuth) {
-    return next(); // 통과
-  }
   const auth = authStore();
   const { createToast, addToast } = useToast();
-  try {
-    // access token 유효성 확인
-    await auth.checkLoginStatus();
-    next();
-  } catch (error: unknown) {
-    // refresh token 만료 시 로그인 화면으로 이동
-    console.log("refreshToken 없음: ", error);
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    // 로그인 안 했는데 접근 → 로그인 페이지로
     addToast(createToast("로그인이 필요한 서비스입니다.", "info", 2000));
-    if (to.path !== "/auth/login") {
-      next({
-        path: "/auth/login",
-        query: { redirect: to.fullPath },
-      });
-    } else {
-      next(); // 자기 자신이면 그냥 통과
-    }
+    movePage.login();
   }
+
+  if (to.meta.notLoggedIn && auth.isLoggedIn) {
+    // 로그인 상태인데 접근 불가 페이지 → 홈으로
+    addToast(createToast("이미 로그인 된 상태입니다.", "info", 2000));
+    movePage.homeMain();
+  }
+
+  // 그 외는 통과
+  next();
 });
 
 export default router;

@@ -62,7 +62,9 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
     }
   } catch (error: unknown) {
     console.error("프로필사진 변경 실패, error");
-    const errorMsg = isDefaultProfileImg.value ? "기본 이미지 변경 중 오류가 발생했습니다" : "업로드 중 오류가 발생했습니다"
+    const errorMsg = isDefaultProfileImg.value
+      ? "기본 이미지 변경 중 오류가 발생했습니다"
+      : "업로드 중 오류가 발생했습니다";
     return { success: false, message: errorMsg };
   }
 }
@@ -88,11 +90,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
         @change="handleNewProfileChange"
       />
       <label for="defaultProfile" class="default-btn">기본 이미지로 변경</label>
-      <input
-        id="defaultProfile"
-        class="hidden"
-        @click="handleDefaultProfileChange"
-      />
+      <input id="defaultProfile" class="hidden" @click="handleDefaultProfileChange" />
     </div>
   </ModalForm>
 </template>

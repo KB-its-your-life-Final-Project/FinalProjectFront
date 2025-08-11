@@ -19,7 +19,7 @@ const auth = authStore();
 const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 const profileImgPath = computed(() => {
   if (auth.member.createdType === 0) {
-    return logo
+    return logo;
   }
   const path = auth.member.profileImg;
   if (!path) return defaultProfile;

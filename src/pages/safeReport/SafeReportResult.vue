@@ -609,7 +609,10 @@ function goToKB() {
     </ModalForm>
 
     <!-- 전세가율 높음 모달 -->
-    <div v-if="showHighRatioModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-10">
+    <div
+      v-if="showHighRatioModal"
+      class="fixed inset-0 bg-black/70 flex items-center justify-center z-10"
+    >
       <!-- 배경 흑백 처리 -->
       <div class="absolute inset-0 bg-gray-900/30 backdrop-blur-sm"></div>
       <div class="bg-white rounded-xl shadow-lg w-full p-8 max-w-md mx-4 relative z-20">
