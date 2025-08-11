@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { LocalInfoResponseDTO } from "@/api/autoLoad/data-contracts";
+import type { LocalInfoResponseDTO, SearchHistoryDTO } from "@/api/autoLoad/data-contracts";
 import lighthouseIcon from "@/assets/imgs/lighthouse.png";
 
 // 상수 정의
@@ -67,6 +67,22 @@ watch(searchInput, (newKeyword: string) => {
   searchRegions(newKeyword);
 });
 
+//검색 기록 저장
+const saveSearchHistory = async (keyword: string) => {
+  if (!keyword.trim()) return;
+
+  try {
+    const searchHistoryData: SearchHistoryDTO = {
+      keyword: keyword.trim(),
+      type: 1,
+    };
+
+    await new Api().saveSearchHistoryUsingPost(searchHistoryData);
+  } catch (error) {
+    console.error("검색 기록 저장 실패:", error);
+  }
+};
+
 // 검색 초기화
 const clearSearch = () => {
   searchInput.value = "";
@@ -84,6 +100,7 @@ const selectRegion = (region: LocalInfoResponseDTO) => {
   emit("regionSelected", region);
   searchInput.value = region.locataddNm || "";
 
+  saveSearchHistory(region.locataddNm || "");
   setTimeout(() => {
     isSelecting.value = false;
   }, 300);
