@@ -92,7 +92,7 @@ async function loadSavedReportData() {
       rentalRatioAndBuildyear: savedData.rentalRatioAndBuildyear || undefined,
       violationStatus: savedData.violationStatus,
       floorAndPurposeList: savedData.floorAndPurposeList,
-      totalScore: savedData.rentalRatioAndBuildyear?.score, // score를 totalScore로
+      totalScore: savedData.totalScore, // totalScore 직접 사용
     });
 
     console.log("💾 localStorage에서 로드한 SafeReport 데이터:", savedData);
@@ -164,7 +164,7 @@ async function loadReportFromAPI() {
       rentalRatioAndBuildyear: reportData.rentalRatioAndBuildyear || undefined,
       violationStatus: reportData.violationStatus,
       floorAndPurposeList: reportData.floorAndPurposeList,
-      totalScore: reportData.rentalRatioAndBuildyear?.score, // score를 totalScore로 매핑
+      totalScore: reportData.totalScore, // totalScore 직접 사용
     });
 
     // 개별 데이터 업데이트
