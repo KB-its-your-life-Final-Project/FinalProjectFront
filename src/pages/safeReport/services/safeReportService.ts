@@ -12,6 +12,7 @@ export interface SafeReportData {
   rentalRatioAndBuildyear: RentalRatioAndBuildyear | null;
   violationStatus?: ViolationStatus;
   floorAndPurposeList?: FloorAndPurpose[];
+  totalScore?: number;
 }
 
 export class SafeReportService {
@@ -26,6 +27,7 @@ export class SafeReportService {
         rentalRatioAndBuildyear: data.data?.rentalRatioAndBuildyear ?? null,
         violationStatus: data.data?.violationStatus,
         floorAndPurposeList: data.data?.floorAndPurposeList,
+        totalScore: data.data?.totalScore,
       };
     } catch (error) {
       console.error("전송 실패: ", error);
@@ -46,6 +48,7 @@ export class SafeReportService {
         rentalRatioAndBuildyear: savedData.rentalRatioAndBuildyear ?? null,
         violationStatus: savedData.violationStatus,
         floorAndPurposeList: savedData.floorAndPurposeList,
+        totalScore: savedData.totalScore,
       };
     } catch (error) {
       console.error("저장된 데이터 파싱 실패:", error);

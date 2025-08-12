@@ -99,7 +99,7 @@ const getGradeColorClass = (grade: string | undefined) => {
     case "주의":
       return "bg-orange-100 text-orange-800";
     case "위험":
-      return "bg-error text-error";
+      return "bg-red-100 text-red-800";
     default:
       return "bg-gray-100 text-gray-800";
   }
