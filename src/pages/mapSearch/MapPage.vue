@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, toRaw, watch } from "vue";
+import { ref, onMounted, onUnmounted, toRaw, watch, computed } from "vue";
 import mapUtil from "@/utils/naverMap/naverMap";
 import { useRoute } from "vue-router";
 import MapFilter from "@/pages/mapSearch/_components/MapFilter.vue";
@@ -13,6 +13,17 @@ let map: any;
 let markerManager: any;
 let mapMoveTimer: any;
 
+// 클러스터 클릭 시 건물 리스트 표시
+const clusterMarkers = ref<Array<MarkerDataType>>([]);
+const showClusterList = ref(false);
+
+// 클러스터 클릭 이벤트 리스너
+const handleClusterClick = (event: CustomEvent) => {
+  const { markers } = event.detail;
+  clusterMarkers.value = markers;
+  showClusterList.value = true;
+};
+
 const route = useRoute();
 const mapDetailShow = ref(false);
 
@@ -23,16 +34,6 @@ const previousSearchInput = ref("");
 const searchInput = route.query.searchInput
   ? ref(decodeURIComponent(route.query.searchInput as string))
   : ref("");
-
-const props = defineProps<{
-  // address?: string;
-  // latlng?: naver.maps.LatLng;
-  addresssList: Array<string>;
-  latlngList?: Array<naver.maps.LatLng>;
-}>();
-
-const addresssList = ref(props.addresssList);
-const latlngList = ref(props.latlngList);
 
 // 지도 영역 상태 추적
 const mapBounds = ref<any>(null);
@@ -46,64 +47,45 @@ const loadMarkers = async () => {
     markerManager.updateMarkersByZoom();
   }
 
-  //주소 배열을 받았을 경우
-  if (addresssList.value && addresssList.value.length > 0) {
-    const newMarkers = [];
-    for (const address of addresssList.value) {
-      const atcResult = await mapUtil.searchAddressToCoordinate(address);
-      newMarkers.push({
-        jibunAddress: atcResult.jibunAddress,
-        roadAddress: atcResult.roadAddress,
-        latlng: atcResult.latlng,
-      });
-    }
-    markers.value = newMarkers;
-  }
-  //위도경도 배열을 받았을 경우
-  else if (latlngList.value && latlngList.value.length > 0) {
-    const newMarkers = [];
-    for (const latlng of latlngList.value) {
-      const ctaResult = await mapUtil.searchCoordinateToAddress(latlng);
-      newMarkers.push({
-        jibunAddress: ctaResult.jibunAddress,
-        roadAddress: ctaResult.roadAddress,
-        latlng: ctaResult.latlng,
-      });
-    }
-    markers.value = newMarkers;
-  }
-  //검색 결과가 존재할 경우
-  else if (searchInput.value) {
-    const atcResult = await mapUtil.searchAddressToCoordinate(searchInput.value);
-    markers.value = [
-      {
-        jibunAddress: atcResult.jibunAddress,
-        roadAddress: atcResult.roadAddress,
-        latlng: atcResult.latlng,
-      },
-    ];
+  try {
+    // 주변 건물들 가져오기 (지도 중심 이동 후)
+    const buildings = await mapUtil.searchBuildingsInBounds(map);
 
+    if (buildings.length > 0) {
+      markers.value = buildings;
+    }
+  } catch (error) {
+    console.error("건물 정보 로드 실패:", error);
+  }
+
+  //검색 결과가 존재할 경우
+  if (searchInput.value) {
+    const atcResult = await mapUtil.searchAddressToCoordinate(searchInput.value);
     // 검색값이 변경되었을 때만 center 설정
     if (previousSearchInput.value !== searchInput.value) {
       map.setCenter(atcResult.latlng);
       previousSearchInput.value = searchInput.value;
     }
-  }
-  //아무것도 못받으면 그냥 현재 주변 건물 표시
-  else if (
-    (!addresssList.value || addresssList.value.length === 0) &&
-    (!latlngList.value || latlngList.value.length === 0)
-  ) {
-    try {
-      // 주변 건물들 가져오기 (지도 중심 이동 후)
-      const buildings = await mapUtil.searchBuildingsInBounds(map);
-      console.log(buildings);
 
-      if (buildings.length > 0) {
-        markers.value = buildings;
-      }
-    } catch (error) {
-      console.error("건물 정보 로드 실패:", error);
+    // 검색 결과가 기존 마커에 있는지 확인
+    const existingMarker = markers.value.find(
+      (marker) =>
+        marker.jibunAddress === atcResult.jibunAddress ||
+        marker.roadAddress === atcResult.roadAddress,
+    );
+
+    // 검색 결과가 기존 마커에 없으면 네이버 검색 결과 추가
+    if (!existingMarker && atcResult) {
+      const naverMarker = {
+        jibunAddress: atcResult.jibunAddress,
+        roadAddress: atcResult.roadAddress,
+        latlng: atcResult.latlng,
+        buildingName: atcResult.buildingName || atcResult.jibunAddress,
+        // 네이버 검색 결과임을 표시하는 플래그
+        isNaverSearch: true,
+      };
+
+      markers.value.push(naverMarker);
     }
   }
 
@@ -139,25 +121,10 @@ onMounted(async () => {
 
     //초기 마커 생성
     naver.maps.Event.addListener(map, "init", async function () {
-      //아무것도 없으면 현재주소
-      if (!addresssList.value?.length && !latlngList.value?.length && !searchInput.value) {
-        const currentLatLng = await mapUtil.getCurrentLocation();
-        map.setCenter(currentLatLng);
-      }
+      const currentLatLng = await mapUtil.getCurrentLocation();
+      map.setCenter(currentLatLng);
 
       await loadMarkers();
-
-      // 지도 영역 변화 감지
-      watch(
-        //mapBounds 가 시작부터 변화해서 watch가 onMounted 안에 위치
-        mapBounds,
-        () => {
-          if (mapBounds.value !== null) {
-            updateMarkersOnMapMove();
-          }
-        },
-        { deep: true },
-      );
     });
 
     // 지도 이동 감지
@@ -167,6 +134,14 @@ onMounted(async () => {
   } catch (error) {
     console.error("Failed initializing Maps:", error);
   }
+});
+
+onMounted(() => {
+  document.addEventListener("clusterClick", handleClusterClick as EventListener);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("clusterClick", handleClusterClick as EventListener);
 });
 
 //  searchInput 변화 감지
@@ -181,15 +156,13 @@ watch(
   { immediate: false },
 );
 
-// List 변화감지
+// 지도 영역 변화 감지
 watch(
-  [addresssList, latlngList],
-  async () => {
-    if (map) {
-      await loadMarkers();
-    }
+  mapBounds,
+  () => {
+    updateMarkersOnMapMove();
   },
-  { deep: true, immediate: false },
+  { deep: true },
 );
 </script>
 
@@ -203,6 +176,28 @@ watch(
           <div @click="mapDetailShow = false">X</div>
         </template>
       </MapDetailList>
+    </div>
+    <!-- 클러스터 건물 리스트 -->
+    <div
+      v-if="showClusterList"
+      class="absolute bottom-0 left-0 right-0 z-50 p-3 pointer-events-none"
+    >
+      <div
+        class="bg-white rounded-lg w-full h-96 max-w-2xl mx-auto flex flex-col shadow-lg pointer-events-auto"
+      >
+        <div class="flex justify-between items-center p-4 bg-kb-yellow-native">
+          <h3 class="text-lg font-bold">지역 내 건물 목록 ({{ clusterMarkers.length }}개)</h3>
+          <button
+            @click="showClusterList = false"
+            class="text-gray-500 hover:text-gray-700 text-xl"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4">
+          <MapDetailList :markers="clusterMarkers" />
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -12,6 +12,7 @@ export interface SafeReportData {
   rentalRatioAndBuildyear: RentalRatioAndBuildyear | null;
   violationStatus?: ViolationStatus;
   floorAndPurposeList?: FloorAndPurpose[];
+  totalScore?: number;
 }
 
 export class SafeReportService {
@@ -20,14 +21,13 @@ export class SafeReportService {
    */
   static async generateSafeReport(requestDto: SafeReportRequestDto): Promise<SafeReportData> {
     try {
-      console.log("보낼 데이터", { ...requestDto });
       const { data } = await api.generateSafeReportUsingPost(requestDto);
-      console.log("서버 응답:", data);
 
       return {
         rentalRatioAndBuildyear: data.data?.rentalRatioAndBuildyear ?? null,
         violationStatus: data.data?.violationStatus,
         floorAndPurposeList: data.data?.floorAndPurposeList,
+        totalScore: data.data?.totalScore,
       };
     } catch (error) {
       console.error("전송 실패: ", error);
@@ -48,6 +48,7 @@ export class SafeReportService {
         rentalRatioAndBuildyear: savedData.rentalRatioAndBuildyear ?? null,
         violationStatus: savedData.violationStatus,
         floorAndPurposeList: savedData.floorAndPurposeList,
+        totalScore: savedData.totalScore,
       };
     } catch (error) {
       console.error("저장된 데이터 파싱 실패:", error);

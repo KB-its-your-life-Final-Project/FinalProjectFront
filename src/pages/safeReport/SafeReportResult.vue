@@ -12,6 +12,7 @@ import { useModalState } from "./composables/useModalState";
 import { useIllegalBuildingStatus } from "./composables/useIllegalBuildingStatus";
 import { SafeReportService } from "./services/safeReportService";
 import { getFloorLabel } from "./composables/floorUtils";
+import { formatAmount } from "@/utils/numberUtils";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -29,12 +30,15 @@ const {
   showNoDataModal,
   showNoBuildingDataModal,
   showHighRatioModal,
+  showNoDataAndBuildingModal,
   resetModals,
   openNoDataModal,
   closeNoDataModal,
   openNoBuildingDataModal,
   closeNoBuildingDataModal,
   openHighRatioModal,
+  openNoDataAndBuildingModal,
+  closeNoDataAndBuildingModal,
 } = useModalState();
 
 const isLoading = ref(true); // 로딩 상태
@@ -80,6 +84,7 @@ async function loadSavedReportData() {
 
     // localStorage에서 건물 정보 로드
     const buildingInfo = SafeReportService.loadBuildingInfo();
+    console.log("🏠 localStorage에서 로드한 건물 정보:", buildingInfo);
     store.updateFormData(buildingInfo);
 
     // 전체 SafeReport 데이터 저장 (SafeReportResponseDto 형태로 변환)
@@ -87,8 +92,10 @@ async function loadSavedReportData() {
       rentalRatioAndBuildyear: savedData.rentalRatioAndBuildyear || undefined,
       violationStatus: savedData.violationStatus,
       floorAndPurposeList: savedData.floorAndPurposeList,
-      totalScore: savedData.rentalRatioAndBuildyear?.score, // score를 totalScore로
+      totalScore: savedData.totalScore, // totalScore 직접 사용
     });
+
+    console.log("💾 localStorage에서 로드한 SafeReport 데이터:", savedData);
 
     // 전달받은 데이터로 store 업데이트
     store.updateResultData(savedData.rentalRatioAndBuildyear);
@@ -103,16 +110,34 @@ async function loadSavedReportData() {
 
     // 데이터 유효성 검사 및 모달 표시
     const validation = SafeReportService.validateReportData(savedData);
-    if (validation.hasNoData) {
-      openNoDataModal();
-    }
-    if (validation.hasHighRatio) {
-      openHighRatioModal();
+    const hasNoData = validation.hasNoData;
+    const hasNoBuildingData = !savedData.floorAndPurposeList || savedData.floorAndPurposeList.length === 0;
+
+    console.log("🔍 데이터 유효성 검사 결과:", {
+      hasNoData,
+      hasNoBuildingData,
+      hasHighRatio: validation.hasHighRatio
+    });
+
+    // 매매거래내역과 건축물 정보가 모두 없는 경우
+    if (hasNoData && hasNoBuildingData) {
+      openNoDataAndBuildingModal();
+      console.log("⚠️ 매매거래내역과 건축물 정보 모두 없음 - 통합 모달 표시");
+    } else {
+      // 개별적으로 모달 표시
+      if (hasNoData) {
+        openNoDataModal();
+        console.log("⚠️ 매매거래내역 없음 - 개별 모달 표시");
+      }
+      if (hasNoBuildingData) {
+        openNoBuildingDataModal();
+        console.log("⚠️ 건축물 정보 없음 - 개별 모달 표시");
+      }
     }
 
-    // 건축물 정보가 없는 경우 모달 표시
-    if (!savedData.floorAndPurposeList || savedData.floorAndPurposeList.length === 0) {
-      openNoBuildingDataModal();
+    if (validation.hasHighRatio) {
+      openHighRatioModal();
+      console.log("⚠️ 전세가율 높음 - 경고 모달 표시");
     }
 
     // localStorage 정리
@@ -129,14 +154,17 @@ async function loadSavedReportData() {
 async function loadReportFromAPI() {
   try {
     const requestDto = store.createRequestDto();
+    console.log("🔍 SafeReport API 요청 데이터:", requestDto);
+
     const reportData = await SafeReportService.generateSafeReport(requestDto);
+    console.log("📊 서버로부터 응답받은 SafeReport 데이터:", reportData);
 
     // 전체 SafeReport 데이터 저장 (SafeReportResponseDto 형태로 변환)
     store.updateSafeReportData({
       rentalRatioAndBuildyear: reportData.rentalRatioAndBuildyear || undefined,
       violationStatus: reportData.violationStatus,
       floorAndPurposeList: reportData.floorAndPurposeList,
-      totalScore: reportData.rentalRatioAndBuildyear?.score, // score를 totalScore로 매핑
+      totalScore: reportData.totalScore, // totalScore 직접 사용
     });
 
     // 개별 데이터 업데이트
@@ -152,16 +180,34 @@ async function loadReportFromAPI() {
 
     // 데이터 유효성 검사 및 모달 표시
     const validation = SafeReportService.validateReportData(reportData);
-    if (validation.hasNoData) {
-      openNoDataModal();
-    }
-    if (validation.hasHighRatio) {
-      openHighRatioModal();
+    const hasNoData = validation.hasNoData;
+    const hasNoBuildingData = !reportData.floorAndPurposeList || reportData.floorAndPurposeList.length === 0;
+
+    console.log("🔍 데이터 유효성 검사 결과:", {
+      hasNoData,
+      hasNoBuildingData,
+      hasHighRatio: validation.hasHighRatio
+    });
+
+    // 매매거래내역과 건축물 정보가 모두 없는 경우
+    if (hasNoData && hasNoBuildingData) {
+      openNoDataAndBuildingModal();
+      console.log("⚠️ 매매거래내역과 건축물 정보 모두 없음 - 통합 모달 표시");
+    } else {
+      // 개별적으로 모달 표시
+      if (hasNoData) {
+        openNoDataModal();
+        console.log("⚠️ 매매거래내역 없음 - 개별 모달 표시");
+      }
+      if (hasNoBuildingData) {
+        openNoBuildingDataModal();
+        console.log("⚠️ 건축물 정보 없음 - 개별 모달 표시");
+      }
     }
 
-    // 건축물 정보가 없는 경우 모달 표시
-    if (!reportData.floorAndPurposeList || reportData.floorAndPurposeList.length === 0) {
-      openNoBuildingDataModal();
+    if (validation.hasHighRatio) {
+      openHighRatioModal();
+      console.log("⚠️ 전세가율 높음 - 경고 모달 표시");
     }
 
     isLoading.value = false;
@@ -363,10 +409,10 @@ function goToKB() {
         </p>
       </div>
       <div v-else>
-        <p>예산 금액 {{ store.formData.budget }}만원에 기반하여 분석한 결과는 다음과 같습니다.</p>
+        <p>예산 금액 {{ formatAmount(store.formData.budget) }}에 기반하여 분석한 결과는 다음과 같습니다.</p>
         <p class="mt-4">
           {{ store.formData.buildingName }}의 최근 거래 가격은
-          {{ store.resultData?.dealAmount }}만원 입니다. 이에 따라 역전세율은
+          {{ formatAmount(store.resultData?.dealAmount) }} 입니다. 이에 따라 역전세율은
           {{
             store.resultData?.reverseRentalRatio != null &&
             !isNaN(Number(store.resultData.reverseRentalRatio))
@@ -471,7 +517,7 @@ function goToKB() {
       <div v-else class="text-center text-kb-ui-02">건축물 정보가 없습니다.</div>
     </ModalForm>
 
-    <!-- 매매 거래 내역역 없음 모달 -->
+    <!-- 매매 거래 내역 없음 모달 -->
     <ModalForm
       v-if="showNoDataModal"
       title="매매 거래 내역 없음"
@@ -529,6 +575,36 @@ function goToKB() {
           해당 건물은 건축물 대장 정보가 없습니다.<br />
           거래 내역 정보만을 기반으로 산출한 안심 점수입니다.<br />
           참고 바랍니다.
+        </p>
+      </div>
+    </ModalForm>
+
+    <!-- 매매 거래 내역과 건축물 정보 모두 없음 모달 -->
+    <ModalForm
+      v-if="showNoDataAndBuildingModal"
+      title="레포트 제공 불가"
+      :handle-confirm="() => ({ success: true, message: '' })"
+      @close="closeNoDataAndBuildingModal"
+    >
+      <div class="text-center">
+        <div class="mb-4">
+          <svg
+            class="mx-auto h-12 w-12 text-kb-ui-05"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"
+            />
+          </svg>
+        </div>
+        <p class="text-medium text-kb-ui-02">
+          해당 건물은 매매 거래 내역과 건축물 정보가 없어<br />
+          레포트를 제공할 수 없습니다.
         </p>
       </div>
     </ModalForm>

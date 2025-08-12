@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import AmountDesc from "./AmountDesc.vue";
 import movePage from "@/utils/movePage";
+import { estateBuildingOptions } from "@/types/estateType";
 const props = defineProps<{
   building: {
     name?: string | undefined;
@@ -14,19 +15,13 @@ const props = defineProps<{
     monthlyRent?: number;
   };
 }>();
+const getBuildingImage = (buildingType: number) => {
+  const buildingOption = estateBuildingOptions.find((option) => option.value === buildingType);
+  return buildingOption?.image;
+};
+
 const buildingImage = computed(() => {
-  switch (props.building.type) {
-    case 1:
-      return "/src/assets/imgs/apartment.png";
-    case 2:
-      return "/src/assets/imgs/officetel.png";
-    case 3:
-      return "/src/assets/imgs/multihouse.png";
-    case 4:
-      return "/src/assets/imgs/singlehouse.png";
-    default:
-      return "/src/assets/imgs/anonymous_building.png";
-  }
+  return getBuildingImage(props.building.type);
 });
 const isEmpty = computed(() => {
   return !props.building.amount && !props.building.deposit && !props.building.monthlyRent;

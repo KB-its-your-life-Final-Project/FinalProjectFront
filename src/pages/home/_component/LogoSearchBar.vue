@@ -34,7 +34,7 @@ const saveSearchHistory = async (keyword: string) => {
   try {
     const searchHistoryData: SearchHistoryDTO = {
       keyword: keyword.trim(),
-      type: 1, // 검색 타입 (1: 일반 검색)
+      type: 2, // 매물 검색
     };
 
     await new Api().saveSearchHistoryUsingPost(searchHistoryData);

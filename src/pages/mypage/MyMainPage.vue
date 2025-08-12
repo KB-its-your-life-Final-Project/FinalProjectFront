@@ -12,10 +12,11 @@ import ChangeProfileModal from "./_component/ChangeProfileModal.vue";
 import ChangeHouseModal from "./_component/ChangeHouseModal.vue";
 import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
-import { markRaw, ref, computed, onMounted } from "vue";
+import { markRaw, ref, computed, onMounted, watch } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
 import { authStore } from "@/stores/authStore";
+import { useHomeStore } from "@/stores/homeStore";
 
 import defaultProfile from "@/assets/imgs/profile.jpg";
 import ProfileImage from "@/components/common/ProfileImage.vue";
@@ -25,6 +26,7 @@ import type { HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
 import { formatAmount } from "@/utils/numberUtils";
 
 const api = new Api();
+const homeStore = useHomeStore();
 const modalMap = {
   name: markRaw(ChangeNameModal),
   editHouse: markRaw(ChangeHouseModal),
@@ -44,6 +46,7 @@ type ModalPropsMap = {
     type: "edit";
     address: string;
     contractDate: string;
+    homeData: HomeRegisterResponseDTO;
   };
   profile: {
     profile: string;
@@ -84,13 +87,43 @@ function openDrawer() {
 function openModal<T extends ModalNames>(type: T, props: ModalPropsMap[T]) {
   currentModalName.value = type;
   modalProps.value = props;
+
+  // editHouse 모달을 열 때 homeStore에 기존 집 정보 미리 설정
+  if (type === "editHouse" && "homeData" in props) {
+    const homeData = props.homeData as HomeRegisterResponseDTO;
+
+    // homeStore에 기존 집 정보 설정
+    homeStore.loadHomeInfo(homeData);
+
+    // 주소 정보도 함께 설정
+    const addressInfo = {
+      roadAddress: homeData.roadAddress || "",
+      jibunAddress: homeData.jibunAddr || "",
+      buildingName: homeData.buildingName || "",
+      dongName: homeData.umdNm || "",
+      buildingNumber: homeData.buildingNumber || "",
+      umdNm: homeData.umdNm || "",
+      jibunAddr: homeData.jibunAddr || ""
+    };
+
+    homeStore.updateAddressInfo(addressInfo);
+  }
 }
 const handleModalClose = () => {
   const modalType = currentModalName.value;
   closeModal();
-  if (modalType === "newHouse" || modalType === "editHouse") {
+  // editHouse 모달이 닫힐 때는 서버에서 데이터를 다시 가져오지 않음
+  // homeStore에 이미 업데이트된 정보가 있기 때문
+  if (modalType === "newHouse") {
     fetchHomeData();
   }
+  // editHouse의 경우 homeStore의 정보를 사용하므로 fetchHomeData 호출하지 않음
+};
+
+// 집 정보가 업데이트되었을 때 처리
+const handleHomeUpdated = (updatedHomeData: HomeRegisterResponseDTO) => {
+  // homeData를 새 객체로 교체하여 반응성 보장
+  homeData.value = { ...updatedHomeData };
 };
 function closeModal() {
   currentModalName.value = null;
@@ -153,9 +186,11 @@ const getRentTypeText = (rentType?: number) => {
 
 const formatRentAmount = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
-    return `${formatAmount((homeData.jeonseAmount || 0) / 10000) || "0만원"}`;
+    // jeonseAmount가 만원 단위로 저장되어 있다면 그대로 사용
+    return `${formatAmount(homeData.jeonseAmount || 0) || "0만원"}`;
   } else if (homeData.rentType === 2) {
-    return `${formatAmount((homeData.monthlyRent || 0) / 10000) || "0만원"}`;
+    // monthlyRent가 만원 단위로 저장되어 있다면 그대로 사용
+    return `${formatAmount(homeData.monthlyRent || 0) || "0만원"}`;
   } else {
     return "금액 정보 없음";
   }
@@ -165,11 +200,32 @@ const getRentSubContent = (homeData: HomeRegisterResponseDTO) => {
   if (homeData.rentType === 1) {
     return "전세 계약";
   } else if (homeData.rentType === 2) {
-    return `보증금: ${formatAmount((homeData.monthlyDeposit || 0) / 10000) || "0만원"}`;
+    // monthlyDeposit이 만원 단위로 저장되어 있다면 그대로 사용
+    return `보증금: ${formatAmount(homeData.monthlyDeposit || 0) || "0만원"}`;
   } else {
     return "계약 정보 없음";
   }
 };
+
+// homeStore의 정보를 사용하는 computed 속성 추가
+const displayHomeData = computed(() => {
+  // homeStore에 정보가 있으면 그것을 우선 사용, 없으면 서버 데이터 사용
+  if (homeStore.hasHomeInfo && homeData.value) {
+    return {
+      ...homeData.value,
+      buildingName: homeStore.homeInfo.addressInfo.buildingName || homeData.value.buildingName,
+      buildingNumber: homeStore.homeInfo.addressInfo.buildingNumber || homeData.value.buildingNumber,
+      umdNm: homeStore.homeInfo.addressInfo.umdNm || homeData.value.umdNm,
+      jibunAddr: homeStore.homeInfo.addressInfo.jibunAddr || homeData.value.jibunAddr,
+    };
+  }
+  return homeData.value;
+});
+
+// homeStore의 addressInfo 변경을 감지하여 UI 즉시 업데이트
+watch(() => homeStore.homeInfo.addressInfo, () => {
+  // computed 속성이 자동으로 재계산되어 UI가 업데이트됨
+}, { deep: true });
 
 onMounted(() => {
   fetchHomeData();
@@ -240,32 +296,35 @@ onMounted(() => {
   <div v-if="isLoading" class="h-100 flex items-center justify-center">
     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
   </div>
-  <div v-else-if="homeData" class="overflow-y-auto pb-20">
+  <div v-else-if="displayHomeData" class="overflow-y-auto pb-20">
     <!-- 등록된 집 정보 -->
     <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
-    <div class="mx-4 text-xs text-gray-400">{{ homeData.buildingName || "등록된 아파트" }}</div>
+    <div class="mx-4 text-xs text-gray-400">{{ displayHomeData?.buildingName || "등록된 아파트" }}</div>
     <InfoCard
+      :key="`building-${displayHomeData?.buildingName}-${displayHomeData?.buildingNumber}`"
       :title="'등록된 아파트'"
-      :content="homeData.buildingName || '정보 없음'"
-      :sub-content="homeData.buildingNumber ? `${homeData.buildingNumber}` : '동 정보 없음'"
+      :content="displayHomeData?.buildingName || '정보 없음'"
+      :sub-content="displayHomeData?.buildingNumber ? `${displayHomeData.buildingNumber}` : '동 정보 없음'"
     />
 
     <!-- 계약 정보 -->
     <h2 class="text-lg mx-4 mt-4">계약 정보</h2>
     <div class="mx-4 text-xs text-gray-400">계약 기간</div>
     <InfoCard
+      :key="`contract-${displayHomeData?.contractStart}-${displayHomeData?.contractEnd}`"
       :title="'계약 기간'"
-      :content="`${homeData.contractStart || '시작일 없음'} ~ ${homeData.contractEnd || '종료일 없음'}`"
-      :sub-content="calculateRemainingDays(homeData.contractEnd)"
+      :content="`${displayHomeData?.contractStart || '시작일 없음'} ~ ${displayHomeData?.contractEnd || '종료일 없음'}`"
+      :sub-content="calculateRemainingDays(displayHomeData?.contractEnd)"
     />
 
     <!-- 임대료 정보 -->
     <h2 class="text-lg mx-4 mt-4">임대료 정보</h2>
     <div class="mx-4 text-xs text-gray-400">계약 조건</div>
     <InfoCard
-      :title="getRentTypeText(homeData.rentType)"
-      :content="formatRentAmount(homeData)"
-      :sub-content="getRentSubContent(homeData)"
+      :key="`rent-${displayHomeData?.rentType}-${displayHomeData?.jeonseAmount}-${displayHomeData?.monthlyRent}`"
+      :title="getRentTypeText(displayHomeData?.rentType)"
+      :content="displayHomeData ? formatRentAmount(displayHomeData) : '정보 없음'"
+      :sub-content="displayHomeData ? getRentSubContent(displayHomeData) : '정보 없음'"
     />
 
     <!-- 나의 집 정보 수정하기 버튼 -->
@@ -275,8 +334,9 @@ onMounted(() => {
         @click="
           openModal('editHouse', {
             type: 'edit',
-            address: homeData.buildingName || '',
-            contractDate: homeData.contractStart || '',
+            address: displayHomeData?.buildingName || '',
+            contractDate: displayHomeData?.contractStart || '',
+            homeData: displayHomeData || homeData
           })
         "
       >
@@ -319,6 +379,7 @@ onMounted(() => {
     :is="currentModalName ? modalMap[currentModalName] : null"
     v-bind="modalProps"
     @nameChanged="handleNameChanged"
+    @home-updated="handleHomeUpdated"
     @close="handleModalClose"
   ></component>
 </template>

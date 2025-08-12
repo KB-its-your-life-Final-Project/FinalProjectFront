@@ -1,4 +1,16 @@
 <script setup lang="ts">
+/*
+  현재는 TransactionRequestDTO 로 모든걸 받아오고 있는데 이 페이지는 아래 로직처럼 작동해야함
+
+  1. TransactionRequestDTO 로 값을 보내서 해당하는 esate 와 esateSales 가 존재하는지 확인
+  2-1. 확인되면 그 값은 esatetDTO 와 estateSalesDTO 값으로 반환
+  2-2. 만약 확인되지 않으면 네이버를 통해 지도 정보를 반환
+
+  3. 2번에서 가져온 정보들 기반으로 상황에 맞춰 데이터표기
+
+  사유: TransactionRequestDTO 로 받아오면 추후 해당 건물에 대한 추가 정보 요청이 있을시 작업이 매우 번거로워짐
+  만약 이 외의 추가적인 정보가 더 필요하다면 위 작업 이후 한번 더 쿼리를 날리는게 맞음
+*/
 import { useRoute, useRouter } from "vue-router";
 import Header from "@/components/layout/header/Header.vue";
 import TransactionGraph from "@/pages/transaction/TransactionGraph.vue";
@@ -13,6 +25,8 @@ import queryUtil from "@/utils/queryUtils";
 import { transactionPeriodOptions } from "@/types/tansactionType";
 import { estateTradeOptions } from "@/types/estateType";
 import { classifyRentType, GraphItemInput, GraphItemOutput } from "@/utils/transactionUtils";
+import estateUtils from "@/utils/estateUtils";
+import { EstateDTO, EstateSalesDTO } from "@/api/autoLoad/data-contracts";
 
 const route = useRoute();
 const router = useRouter();
@@ -26,6 +40,8 @@ const queryData = computed(() => ({
   startDate: route.query.startDate ? new Date(route.query.startDate as string) : null,
   endDate: route.query.endDate ? new Date(route.query.endDate as string) : null,
 }));
+
+const estateDTO = ref<EstateDTO>();
 
 // 좌표 정보
 const latlng = computed<{ lat: number; lng: number }>(() => {
@@ -127,11 +143,11 @@ const filteredData = async () => {
     endDate: data.endDate ? formatDateLocal(data.endDate) : undefined,
   };
 
-  console.log("API 요청 데이터:", request);
+  // console.log("API 요청 데이터:", request);
 
   try {
     const res = await api.getFilteredDataUsingPost(request);
-    console.log("응답 데이터:", res);
+    // console.log("응답 데이터:", res);
 
     if (res.data && res.data.length > 0) {
       buildingName.value = res.data[0].buildingName;
@@ -154,13 +170,31 @@ const filteredData = async () => {
     console.error("데이터 요청 실패:", error);
     graphData.value = [];
   }
+
+  // 건물 정보
+  // 나중에 빼든 다른곳에 써먹든 해야함 순서 뒤에 위치하여 강제로 buildingName 변경중
+  try {
+    const estateData = await api.getEstateByElementUsingGet({
+      latitude: latlng.value.lat,
+      longitude: latlng.value.lng,
+    });
+    if (estateData.data?.data && estateData.data.success) {
+      estateDTO.value = estateData.data.data[0];
+    }
+
+    if (estateDTO.value?.buildingName) {
+      buildingName.value = estateUtils.formatBuildingName(estateDTO.value) || undefined;
+    }
+  } catch (error) {
+    console.error("부동산 정보 조회 실패:", error);
+  }
 };
 
 // 단일 watcher - queryData 변경시에만 API 호출
 watch(
   queryData,
   async (newData) => {
-    console.log("queryData 변경됨:", newData);
+    // console.log("queryData 변경됨:", newData);
     await filteredData();
   },
   { immediate: true, deep: true },
