@@ -91,7 +91,7 @@ const mapUtil = {
       mapUtil.clearCurrentMarkers(currentMarkers, currentClusters);
 
       //기준 줌
-      if (currentZoom >= 20) {
+      if (currentZoom >= 19) {
         const newMarkers = await mapUtil.createMarkers(map, markerDataList, markerType);
         currentMarkers.push(...newMarkers);
       } else {
@@ -141,8 +141,8 @@ const mapUtil = {
 
           // DB에서 부동산 정보 가져오기
           const api = new Api();
-          let estateData = null;
-          let estateSalesData = null;
+          let estateDTO = null;
+          let estateSalesDTO = null;
 
           try {
             // 좌표로 부동산 정보 조회
@@ -152,15 +152,15 @@ const mapUtil = {
             });
 
             if (response.data?.data) {
-              estateData = response.data.data;
+              estateDTO = response.data.data;
 
               // 거래 정보 조회
               const responseSales = await api.getEstateSalesByElementUsingGet({
-                estateId: estateData.id,
+                estateId: estateDTO.id,
               });
 
               if (responseSales.data?.data) {
-                estateSalesData = responseSales.data.data;
+                estateSalesDTO = responseSales.data.data;
               }
             }
           } catch (error) {
@@ -171,8 +171,8 @@ const mapUtil = {
             render() {
               return h(markerIcon, {
                 markerData: MarkerData,
-                estateData: estateData,
-                estateSalesData: estateSalesData,
+                estateDTO: estateDTO,
+                estateSalesDTO: estateSalesDTO,
               });
             },
           });
@@ -238,18 +238,46 @@ const mapUtil = {
         const centerLng =
           markers.reduce((sum: number, m: any) => sum + m.latlng.lng(), 0) / markers.length;
 
+        // 마커 개수에 따른 크기 조절
+        const getClusterSize = (count: number) => {
+          if (count >= 100) return { width: 70, height: 70, fontSize: "18px" };
+          if (count >= 50) return { width: 65, height: 65, fontSize: "17px" };
+          if (count >= 20) return { width: 60, height: 60, fontSize: "16px" };
+          if (count >= 10) return { width: 55, height: 55, fontSize: "15px" };
+          return { width: 50, height: 50, fontSize: "14px" };
+        };
+
+        const size = getClusterSize(markers.length);
+
         const clusterMarker = new naver.maps.Marker({
           position: new naver.maps.LatLng(centerLat, centerLng),
           map: map,
           icon: {
             content: `
-                <div class="bg-blue-300 opacity-70 text-white border-2 border-blue-600 rounded-full w-10 h-10 flex items-center justify-center text-md font-bold">
+                <div class="bg-blue-300 opacity-70 text-white border-2 border-blue-600 rounded-full flex items-center justify-center font-bold cursor-pointer"
+                     style="width: ${size.width}px; height: ${size.height}px; font-size: ${size.fontSize};">
                   ${markers.length}
                 </div>
               `,
-            size: new naver.maps.Size(32, 32),
-            anchor: new naver.maps.Point(16, 16),
+            size: new naver.maps.Size(size.width, size.height),
+            anchor: new naver.maps.Point(size.width / 2, size.height / 2),
           },
+        });
+
+        // 클러스터 클릭 이벤트 추가
+        naver.maps.Event.addListener(clusterMarker, "click", () => {
+          // 클러스터 내 마커들의 정보를 이벤트로 전달
+          const clusterInfo = {
+            markers: markers,
+            center: new naver.maps.LatLng(centerLat, centerLng),
+            count: markers.length,
+          };
+
+          // 커스텀 이벤트 발생
+          const event = new CustomEvent("clusterClick", {
+            detail: clusterInfo,
+          });
+          document.dispatchEvent(event);
         });
 
         clusters.push(clusterMarker);
