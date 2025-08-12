@@ -87,6 +87,7 @@ async function onAddressSelected(
     jibunAddr?: string;
   }>,
 ) {
+  console.log("🏠 SearchAddress - 주소 선택됨:", payload);
 
   // 새로운 주소를 선택했으므로 기존 건물 정보 초기화 (도로명주소 포함)
   roadAddress.value = payload.roadAddress || "";
@@ -95,6 +96,15 @@ async function onAddressSelected(
   dongName.value = payload.umdNm || "";
   umdNm.value = payload.umdNm || "";
   jibunAddr.value = payload.jibunAddr || "";
+
+  console.log("🏠 SearchAddress - 설정된 값들:", {
+    roadAddress: roadAddress.value,
+    jibunAddress: jibunAddress.value,
+    buildingName: buildingName.value,
+    dongName: dongName.value,
+    umdNm: umdNm.value,
+    jibunAddr: jibunAddr.value
+  });
 
   // 새로운 주소를 선택했으므로 건물동 번호는 유지 (사용자 입력값 보존)
   // dongNo.value = ""; // 이 줄 제거 - 동 번호 초기화하지 않음
@@ -114,6 +124,8 @@ async function onAddressSelected(
     umdNm: umdNm.value,
     jibunAddr: jibunAddr.value
   };
+
+  console.log("🏠 SearchAddress - homeStore 업데이트 데이터:", updateData);
   homeStore.updateAddressInfo(updateData);
 
   // UI 업데이트를 보장하기 위해 nextTick 사용
