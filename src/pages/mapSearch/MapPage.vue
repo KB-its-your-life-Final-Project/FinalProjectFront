@@ -186,7 +186,7 @@ watch(
         class="bg-white rounded-lg w-full h-96 max-w-2xl mx-auto flex flex-col shadow-lg pointer-events-auto"
       >
         <div class="flex justify-between items-center p-4 bg-kb-yellow-native">
-          <h3 class="text-lg font-bold">클러스터 내 건물 목록 ({{ clusterMarkers.length }}개)</h3>
+          <h3 class="text-lg font-bold">지역 내 건물 목록 ({{ clusterMarkers.length }}개)</h3>
           <button
             @click="showClusterList = false"
             class="text-gray-500 hover:text-gray-700 text-xl"
