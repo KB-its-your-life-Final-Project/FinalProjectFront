@@ -48,7 +48,6 @@ watch(
       await ensureScript();
       const postcodeRef = new window.daum.Postcode({
         oncomplete: (data: any) => {
-
           // buildingName을 더 정확하게 파싱
           let buildingName = "";
           if (data.buildingName && data.buildingName.trim()) {
@@ -112,13 +111,9 @@ watch(
                   `;
                   doc.head.appendChild(style);
                 }
-              } catch (e) {
-
-              }
+              } catch (e) {}
             };
-          } catch (e) {
-
-          }
+          } catch (e) {}
         }
       }, 200);
     }

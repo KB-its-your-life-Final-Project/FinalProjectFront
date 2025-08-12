@@ -76,9 +76,14 @@ async function onConfirm() {
       </div>
 
       <!-- 로딩 오버레이 -->
-      <div v-if="props.isLoading" class="absolute inset-0 bg-white/90 rounded-xl flex items-center justify-center">
+      <div
+        v-if="props.isLoading"
+        class="absolute inset-0 bg-white/90 rounded-xl flex items-center justify-center"
+      >
         <div class="text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-kb-yellow-positive mx-auto mb-4"></div>
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-b-4 border-kb-yellow-positive mx-auto mb-4"
+          ></div>
           <p class="text-lg font-pretendard-medium text-kb-ui-02">처리중입니다...</p>
           <p class="text-sm text-kb-ui-04 mt-2">잠시만 기다려주세요</p>
         </div>

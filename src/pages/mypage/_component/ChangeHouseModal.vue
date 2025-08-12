@@ -7,7 +7,10 @@ import RadioListButton from "@/components/common/RadioListButton.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import PostcodeSearch from "./SearchAddress.vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { HomeRegisterRequestDTO, HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
+import type {
+  HomeRegisterRequestDTO,
+  HomeRegisterResponseDTO,
+} from "@/api/autoLoad/data-contracts";
 import mapUtil from "@/utils/naverMap/naverMap";
 const props = defineProps<
   | { type: "regist"; address?: never; contractDate?: never }
@@ -32,7 +35,7 @@ function restoreOriginalAddress() {
 
 function handleClose() {
   restoreOriginalAddress(); // 원래 주소 정보로 복원 (저장 성공 시 내부에서 무시)
-  emit('close'); // 모달 닫기
+  emit("close"); // 모달 닫기
 }
 
 const api = new Api();
@@ -77,7 +80,6 @@ const originalAddressInfo = ref<{
 
 // 컴포넌트 초기화
 onMounted(async () => {
-
   // 매번 모달 열릴 때 저장 성공 플래그 초기화
   saveSucceeded.value = false;
 
@@ -116,18 +118,21 @@ onMounted(async () => {
         dongName: homeData.umdNm || "",
         buildingNumber: homeData.buildingNumber || "",
         umdNm: homeData.umdNm || "",
-        jibunAddr: homeData.jibunAddr || ""
+        jibunAddr: homeData.jibunAddr || "",
       };
 
       // 모든 주소 정보 homeStore에 업데이트 - buildingName은 건물명이 있을 때만 설정
       const updateData = {
         roadAddress: homeData.roadAddress,
         jibunAddress: homeData.jibunAddr || "",
-        buildingName: homeData.buildingName && homeData.buildingName !== "경상남도 거제시" ? homeData.buildingName : "",
+        buildingName:
+          homeData.buildingName && homeData.buildingName !== "경상남도 거제시"
+            ? homeData.buildingName
+            : "",
         dongName: homeData.umdNm || "",
         buildingNumber: homeData.buildingNumber || "",
         umdNm: homeData.umdNm || "",
-        jibunAddr: homeData.jibunAddr || ""
+        jibunAddr: homeData.jibunAddr || "",
       };
 
       homeStore.updateAddressInfo(updateData);
@@ -136,18 +141,20 @@ onMounted(async () => {
       const updateData = {
         roadAddress: "", // 빈 문자열로 설정
         jibunAddress: homeData.jibunAddr || "",
-        buildingName: homeData.buildingName && homeData.buildingName !== "경상남도 거제시" ? homeData.buildingName : "",
+        buildingName:
+          homeData.buildingName && homeData.buildingName !== "경상남도 거제시"
+            ? homeData.buildingName
+            : "",
         dongName: homeData.umdNm || "",
         buildingNumber: homeData.buildingNumber || "",
         umdNm: homeData.umdNm || "",
-        jibunAddr: homeData.jibunAddr || ""
+        jibunAddr: homeData.jibunAddr || "",
       };
 
       homeStore.updateAddressInfo(updateData);
     }
 
     await nextTick();
-
   } else {
     // 등록 모드
   }
@@ -166,17 +173,30 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
 
     // 주소 정보 결정: 사용자가 새 주소를 선택했거나 buildingNumber를 변경했으면 homeStore의 정보, 아니면 기존 props의 정보
     const addressInfo = homeStore.homeInfo.addressInfo;
-    const hasNewAddress = (addressInfo.buildingName && addressInfo.roadAddress &&
-                          (props.type === "edit" && props.homeData ?
-                           (addressInfo.buildingName !== props.homeData.buildingName ||
-                            addressInfo.roadAddress !== props.homeData.roadAddress) : true)) ||
-                         (addressInfo.buildingNumber && props.type === "edit" && props.homeData &&
-                          addressInfo.buildingNumber !== props.homeData.buildingNumber);
+    const hasNewAddress =
+      (addressInfo.buildingName &&
+        addressInfo.roadAddress &&
+        (props.type === "edit" && props.homeData
+          ? addressInfo.buildingName !== props.homeData.buildingName ||
+            addressInfo.roadAddress !== props.homeData.roadAddress
+          : true)) ||
+      (addressInfo.buildingNumber &&
+        props.type === "edit" &&
+        props.homeData &&
+        addressInfo.buildingNumber !== props.homeData.buildingNumber);
 
     // 기존 집 정보를 유지하면서 수정된 정보만 업데이트
     const requestData: HomeRegisterRequestDTO = {
-      buildingName: hasNewAddress ? addressInfo.buildingName : (props.type === "edit" && props.homeData ? props.homeData.buildingName || "" : ""),
-      buildingNumber: hasNewAddress ? addressInfo.buildingNumber : (props.type === "edit" && props.homeData ? props.homeData.buildingNumber || "" : ""),
+      buildingName: hasNewAddress
+        ? addressInfo.buildingName
+        : props.type === "edit" && props.homeData
+          ? props.homeData.buildingName || ""
+          : "",
+      buildingNumber: hasNewAddress
+        ? addressInfo.buildingNumber
+        : props.type === "edit" && props.homeData
+          ? props.homeData.buildingNumber || ""
+          : "",
       contractStart: startDate.value || undefined,
       contractEnd: endDate.value || undefined,
       rentType: contractType.value === "jeonse" ? 1 : 2,
@@ -185,8 +205,16 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
       monthlyRent: contractType.value === "monthlyRent" ? parseInt(monthlyRent.value) || 0 : 0,
       monthlyDeposit: contractType.value === "monthlyRent" ? parseInt(deposit.value) || 0 : 0,
       // 좌표 정보: 새 주소가 있으면 homeStore에서, 없으면 기존 props에서 가져오기
-      lat: hasNewAddress ? (homeStore.homeInfo.lat || 0) : (props.type === "edit" && props.homeData ? props.homeData.latitude || 0 : 0),
-      lng: hasNewAddress ? (homeStore.homeInfo.lng || 0) : (props.type === "edit" && props.homeData ? props.homeData.longitude || 0 : 0),
+      lat: hasNewAddress
+        ? homeStore.homeInfo.lat || 0
+        : props.type === "edit" && props.homeData
+          ? props.homeData.latitude || 0
+          : 0,
+      lng: hasNewAddress
+        ? homeStore.homeInfo.lng || 0
+        : props.type === "edit" && props.homeData
+          ? props.homeData.longitude || 0
+          : 0,
     };
 
     if (props.type === "regist") {
@@ -214,7 +242,7 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
           dongName: response.data.data.umdNm || "",
           buildingNumber: response.data.data.buildingNumber || "",
           umdNm: response.data.data.umdNm || "",
-          jibunAddr: response.data.data.jibunAddr || ""
+          jibunAddr: response.data.data.jibunAddr || "",
         };
 
         homeStore.updateAddressInfo(updatedAddressInfo);
@@ -233,7 +261,7 @@ const submitForm = async (): Promise<{ success: boolean; message: string }> => {
             dongName: response.data.data.umdNm || "",
             buildingNumber: response.data.data.buildingNumber || "",
             umdNm: response.data.data.umdNm || "",
-            jibunAddr: response.data.data.jibunAddr || ""
+            jibunAddr: response.data.data.jibunAddr || "",
           };
         }
       }
@@ -262,8 +290,6 @@ async function searchAddressToCoordinate(address: string) {
     // homeStore에도 좌표 정보 업데이트
     homeStore.homeInfo.lat = lat;
     homeStore.homeInfo.lng = lng;
-
-
   } catch (error) {
     console.error("주소를 좌표로 변환하는 데 실패했습니다:", error);
   }
@@ -294,8 +320,6 @@ function handleAddressInfoUpdated(addressData: {
   // resetHomeInfo() 호출하지 않음 - 좌표 정보 유지
 }
 
-
-
 // 동 정보 변경 시
 function handleBuildingNumberChanged(buildingNumber: string) {
   // formData 업데이트
@@ -308,7 +332,7 @@ function handleBuildingNumberChanged(buildingNumber: string) {
   const currentAddressInfo = homeStore.homeInfo.addressInfo;
   homeStore.updateAddressInfo({
     ...currentAddressInfo,
-    buildingNumber: buildingNumber
+    buildingNumber: buildingNumber,
   });
 }
 
@@ -338,32 +362,39 @@ const options = [
 ];
 </script>
 <template>
-  <ModalForm :title="title" :handle-confirm="handleConfirm" :is-loading="isLoading" @close="handleClose" hasConfirmBtn>
+  <ModalForm
+    :title="title"
+    :handle-confirm="handleConfirm"
+    :is-loading="isLoading"
+    @close="handleClose"
+    hasConfirmBtn
+  >
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">집 주소</div>
       <PostcodeSearch
-        :initial-address="props.type === 'edit' && props.homeData ?
-          (() => {
-            const savedAddressInfo = homeStore.homeInfo.addressInfo;
-            if (savedAddressInfo.buildingName || savedAddressInfo.buildingNumber) {
-              return savedAddressInfo;
-            }
-            // 저장된 주소 정보가 없다면 props.homeData에서 직접 가져오기
-            return {
-              roadAddress: props.homeData.roadAddress || '',
-              jibunAddress: props.homeData.jibunAddr || '',
-              buildingName: props.homeData.buildingName || '',
-              dongName: props.homeData.umdNm || '',
-              buildingNumber: props.homeData.buildingNumber || '',
-              umdNm: props.homeData.umdNm || ''
-            };
-          })()
-        : undefined"
+        :initial-address="
+          props.type === 'edit' && props.homeData
+            ? (() => {
+                const savedAddressInfo = homeStore.homeInfo.addressInfo;
+                if (savedAddressInfo.buildingName || savedAddressInfo.buildingNumber) {
+                  return savedAddressInfo;
+                }
+                // 저장된 주소 정보가 없다면 props.homeData에서 직접 가져오기
+                return {
+                  roadAddress: props.homeData.roadAddress || '',
+                  jibunAddress: props.homeData.jibunAddr || '',
+                  buildingName: props.homeData.buildingName || '',
+                  dongName: props.homeData.umdNm || '',
+                  buildingNumber: props.homeData.buildingNumber || '',
+                  umdNm: props.homeData.umdNm || '',
+                };
+              })()
+            : undefined
+        "
         @address-selected="handleAddressSelected"
         @building-number-changed="handleBuildingNumberChanged"
         @address-info-updated="handleAddressInfoUpdated"
       />
-
     </div>
     <div class="mt-4">
       <div class="text-lg font-pretendard-bold">계약 기간</div>

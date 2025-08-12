@@ -276,12 +276,10 @@ async function loadBuildingList(dongName: string, regionCode: string) {
     const response = await api.getBuildingListUsingGet(requestData);
 
     if (response.data.success && response.data.data?.buildingInfos) {
-
       // 건물명 필터링
       const filteredBuildings: BuildingInfoDto[] = response.data.data.buildingInfos.filter(
         (building: BuildingInfoDto) => !shouldFilterBuilding(building.buildingName || ""),
       );
-
 
       buildingList.value = filteredBuildings;
     } else {
@@ -309,7 +307,6 @@ async function selectSido(sido: SidoDto) {
 // 시/군/구 선택
 async function selectSigugun(sigugun: SigugunDto) {
   selectedSigugun.value = sigugun;
-
 
   // 세종시의 경우 바로 건물 목록으로 이동
   if (selectedSido.value?.sidoCd === SIDO_CODES.SEJONG) {

@@ -77,8 +77,6 @@ function handleAddressComplete(payload: {
   buildingName?: string;
   dongName?: string;
 }) {
-
-
   // 건물명이 없으면 건물명 입력 모달 표시
   if (!payload.buildingName || payload.buildingName.trim() === "") {
     showBuildingNameInputModal.value = true;
@@ -135,8 +133,6 @@ function searchAddressToCoordinate(address: string) {
     const { x, y } = result.addresses[0];
     const latVal = parseFloat(y);
     const lngVal = parseFloat(x);
-
-
 
     store.updateFormData({
       lat: latVal,
@@ -209,13 +205,10 @@ async function handleMyHomeSearch() {
     if (response.data?.success && response.data?.data) {
       const homeInfo = response.data.data;
 
-
       // 위도/경도로 정확한 주소 정보 검색
       if (homeInfo.latitude && homeInfo.longitude) {
         const latlng = new naver.maps.LatLng(homeInfo.latitude, homeInfo.longitude);
         const addressInfo = await mapUtil.searchCoordinateToAddress(latlng);
-
-
 
         // safeReport store에 정확한 주소 정보 저장
         store.updateFormData({
@@ -231,16 +224,14 @@ async function handleMyHomeSearch() {
         if (homeInfo.rentType === 1) {
           // 전세
           store.updateFormData({
-            budget: homeInfo.jeonseAmount || 0
+            budget: homeInfo.jeonseAmount || 0,
           });
         } else {
           // 월세 (보증금만)
           store.updateFormData({
-            budget: homeInfo.monthlyDeposit || 0
+            budget: homeInfo.monthlyDeposit || 0,
           });
         }
-
-
 
         // 안심레포트 결과 페이지로 이동
         store.goToStep(SafeReportStep.RESULT);
@@ -250,7 +241,6 @@ async function handleMyHomeSearch() {
         router.push({ name: "mypage" });
       }
     } else {
-
       // 집 정보가 없는 경우: 마이페이지 집 등록으로 이동
       router.push({ name: "mypage" });
     }

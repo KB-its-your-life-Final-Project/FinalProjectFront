@@ -6,27 +6,34 @@ import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
 // store 초기화
 const homeStore = useHomeStore();
 
-const props = withDefaults(defineProps<{
-  initialAddress?: {
-    roadAddress?: string;
-    jibunAddress?: string;
-    buildingName?: string;
-    dongName?: string;
-    buildingNumber?: string;
-    umdNm?: string;
-    jibunAddr?: string;
-  };
-}>(), {
-  initialAddress: undefined
-});
+const props = withDefaults(
+  defineProps<{
+    initialAddress?: {
+      roadAddress?: string;
+      jibunAddress?: string;
+      buildingName?: string;
+      dongName?: string;
+      buildingNumber?: string;
+      umdNm?: string;
+      jibunAddr?: string;
+    };
+  }>(),
+  {
+    initialAddress: undefined,
+  },
+);
 
 // 주소 데이터 - ref로 변경하고 watch로 homeStore 변경 감지
 const roadAddress = ref(homeStore.homeInfo.addressInfo.roadAddress);
 
 // homeStore의 roadAddress 변경을 감지하여 ref 업데이트
-watch(() => homeStore.homeInfo.addressInfo.roadAddress, (newValue: string) => {
-  roadAddress.value = newValue;
-}, { immediate: true });
+watch(
+  () => homeStore.homeInfo.addressInfo.roadAddress,
+  (newValue: string) => {
+    roadAddress.value = newValue;
+  },
+  { immediate: true },
+);
 const jibunAddress = ref("");
 const buildingName = ref("");
 const dongName = ref("");
@@ -51,7 +58,7 @@ onMounted(() => {
 
     // buildingNumber가 있으면 building-number-changed 이벤트 발생
     if (props.initialAddress.buildingNumber) {
-      emit('building-number-changed', props.initialAddress.buildingNumber);
+      emit("building-number-changed", props.initialAddress.buildingNumber);
     }
   }
 });
@@ -66,15 +73,17 @@ function openPostcode() {
 const emit = defineEmits<{
   "address-selected": [address: string];
   "building-number-changed": [buildingNumber: string];
-  "address-info-updated": [addressData: {
-    roadAddress: string;
-    jibunAddress: string;
-    buildingName: string;
-    dongName: string;
-    buildingNumber: string;
-    umdNm?: string;
-    jibunAddr?: string;
-  }];
+  "address-info-updated": [
+    addressData: {
+      roadAddress: string;
+      jibunAddress: string;
+      buildingName: string;
+      dongName: string;
+      buildingNumber: string;
+      umdNm?: string;
+      jibunAddr?: string;
+    },
+  ];
 }>();
 
 async function onAddressSelected(
@@ -103,7 +112,7 @@ async function onAddressSelected(
     buildingName: buildingName.value,
     dongName: dongName.value,
     umdNm: umdNm.value,
-    jibunAddr: jibunAddr.value
+    jibunAddr: jibunAddr.value,
   });
 
   // 새로운 주소를 선택했으므로 건물동 번호는 유지 (사용자 입력값 보존)
@@ -122,7 +131,7 @@ async function onAddressSelected(
     dongName: dongName.value,
     buildingNumber: dongNo.value, // 현재 입력된 동 번호 사용
     umdNm: umdNm.value,
-    jibunAddr: jibunAddr.value
+    jibunAddr: jibunAddr.value,
   };
 
   console.log("🏠 SearchAddress - homeStore 업데이트 데이터:", updateData);
@@ -138,15 +147,14 @@ async function onAddressSelected(
     dongName: dongName.value,
     buildingNumber: dongNo.value, // 현재 입력된 동 번호 사용
     umdNm: umdNm.value,
-    jibunAddr: jibunAddr.value
+    jibunAddr: jibunAddr.value,
   });
 }
 
 // 동 번호 입력 시 처리
 function handleDongNoInput() {
-
   // 부모 컴포넌트로 동 번호 변경 알림
-  emit('building-number-changed', dongNo.value);
+  emit("building-number-changed", dongNo.value);
 
   // homeStore의 buildingNumber 업데이트
   homeStore.updateBuildingNumber(dongNo.value);
@@ -159,7 +167,7 @@ function handleDongNoInput() {
     dongName: dongName.value,
     buildingNumber: dongNo.value,
     umdNm: umdNm.value,
-    jibunAddr: jibunAddr.value
+    jibunAddr: jibunAddr.value,
   });
 }
 </script>
