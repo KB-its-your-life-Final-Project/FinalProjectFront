@@ -36,16 +36,15 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
     return { success: false, message: "기존 이름과 동일합니다" };
   }
 
-  const changeRequestFormDto = new FormData();
-  changeRequestFormDto.append("name", nameToChange);
-  changeRequestFormDto.append("profileImg", "");
-  changeRequestFormDto.append("pwd", "");
-  changeRequestFormDto.append("changeType", "1"); //  1: name, 2: pwd, 3: profileImg; 문자열로 넣어야 함 (FormData는 전부 문자열 or Blob)
-
-  console.log("changeRequestFormDto: ", changeRequestFormDto);
+  const changeRequestDto: ChangeRequestDTO = {
+    name: nameToChange,
+    pwd: "",
+    changeType: 1, // 1: name, 2: pwd
+  };
+  console.log("changeRequestDto: ", changeRequestDto);
 
   try {
-    const { data } = await api.changeMemberInfoUsingPut(changeRequestFormDto);
+    const { data } = await api.changeMemberInfoUsingPut(changeRequestDto);
     console.log("data: ", data);
     auth.member.name = newName.value;
     console.log("auth.member: ", auth.member);

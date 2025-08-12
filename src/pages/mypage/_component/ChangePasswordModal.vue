@@ -64,9 +64,8 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
 
   const changeRequestDto: ChangeRequestDTO = {
     name: "",
-    profileImg: "",
     pwd: newPwd.value,
-    changeType: 2, // 1: name, 2: pwd, 3: profileImg
+    changeType: 2, // 1: name, 2: pwd
   };
   console.log("changeRequestDto: ", changeRequestDto);
 
