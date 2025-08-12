@@ -60,7 +60,7 @@ onMounted(() => {
   <Header class="h-35 mb-12" headerShowtype="localInfo">
     <!-- 검색창 -->
     <img
-      src="@/assets/imgs/findneighborhood.PNG"
+      src="@/assets/imgs/findneighborhood.png"
       class="absolute right-1 top-12/20 -translate-y-1/2 h-25"
     />
     <div class="px-6 mt-3">

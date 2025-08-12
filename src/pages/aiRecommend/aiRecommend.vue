@@ -18,7 +18,7 @@ const handleNext = () => {
   <Header :headerShowtype="mainRouteName.aiRecommend">
     <div class="mt-23">
       <img
-        src="@/assets/imgs/homematch.PNG"
+        src="@/assets/imgs/homematch.png"
         class="absolute right-1 top-12/20 -translate-y-1/2 h-25"
       />
     </div>
