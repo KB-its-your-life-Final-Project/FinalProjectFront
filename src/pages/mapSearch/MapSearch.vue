@@ -10,7 +10,7 @@ import { mainRouteName } from "@/router/mainRoute";
   <!--  max-w-md  :늘리고 싶지 않으면  -->
   <Header :headerShowtype="mainRouteName.mapSearch">
     <!-- 검색창 -->
-    <div class="relative h-25"></div>
+    <div class="relative h-15"></div>
     <LogoSearchBar />
   </Header>
   <!-- 지도부분 넣어주세요!!!! -->

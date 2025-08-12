@@ -8,14 +8,16 @@ defineProps<{
 </script>
 
 <template>
-  <div class="w-full h-full p-3 bg-white">
-    <div class="flex justify-end">
+  <div class="w-full h-full bg-white flex flex-col">
+    <div class="flex justify-end mb-3">
       <slot name="mapDetailShow"></slot>
     </div>
-    <div class="flex flex-col gap-4 p-2">
-      <div v-for="marker in markers">
-        <div class="border-1 p-4 rounded-2xl min-h-20">
-          <MapDetailCard :marker="marker" />
+    <div class="flex-1 overflow-y-auto">
+      <div class="flex flex-col gap-4 p-2">
+        <div v-for="marker in markers" :key="marker.jibunAddress">
+          <div class="border-1 p-4 rounded-2xl min-h-20">
+            <MapDetailCard :marker="marker" />
+          </div>
         </div>
       </div>
     </div>
