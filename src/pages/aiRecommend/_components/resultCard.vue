@@ -65,7 +65,7 @@ onMounted(() => {
         >
           {{ index + 1 }}
         </div>
-        <h3 class="text-lg font-pretendard-bold text-kb-ui-11">{{ item.jibunAddres }}</h3>
+        <h3 class="text-lg font-pretendard-bold text-kb-ui-11">{{ item.jibunAddress }}</h3>
       </div>
     </div>
 
