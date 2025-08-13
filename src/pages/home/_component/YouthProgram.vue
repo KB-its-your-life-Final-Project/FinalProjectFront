@@ -41,7 +41,7 @@ async function fetchUnreadPrograms(page: number) {
         const hrefMatch = item.pstWholCn?.match(/href="([^"]+)"/);
         return {
           ...item,
-          hrefUrl: hrefMatch ? hrefMatch[1] : "", // 링크가 여러개 있는 경우 있음 -> 하나만 불러오기
+          pstUrlAddr: item.pstUrlAddr || (hrefMatch ? hrefMatch[1] : ""), // 기존 값이 없을 때만 대체, 링크가 여러개 있는 경우 있음 -> 하나만 불러오기
         };
       });
 
@@ -82,8 +82,8 @@ async function handleClick(program: YouthProgramDTO) {
   if (!program.id) {
     console.error("프로그램 ID가 없습니다.");
     // 링크만 열고 읽음 처리는 하지 않음
-    if (program.hrefUrl) {
-      window.open(program.hrefUrl, "_blank");
+    if (program.pstUrlAddr) {
+      window.open(program.pstUrlAddr, "_blank");
     }
     return;
   }
@@ -96,10 +96,9 @@ async function handleClick(program: YouthProgramDTO) {
   } catch (err) {
     console.error("읽음 처리 실패", err);
   }
-
   // 링크 새창 열기
-  if (program.hrefUrl) {
-    window.open(program.hrefUrl, "_blank");
+  if (program.pstUrlAddr) {
+    window.open(program.pstUrlAddr, "_blank");
   }
 }
 
@@ -131,8 +130,8 @@ onMounted(async () => {
         <div class="flex-1 pr-4 min-w-0">
           <h3 class="program-title">
             <a
-              v-if="program.hrefUrl"
-              :href="program.hrefUrl"
+              v-if="program.pstUrlAddr"
+              :href="program.pstUrlAddr"
               target="_blank"
               rel="noopener noreferrer"
               @click.prevent="handleClick(program)"
@@ -144,8 +143,8 @@ onMounted(async () => {
         </div>
         <div v-if="program.atchFile" class="img-wrapper">
           <a
-            v-if="program.hrefUrl"
-            :href="program.hrefUrl"
+            v-if="program.pstUrlAddr"
+            :href="program.pstUrlAddr"
             target="_blank"
             rel="noopener noreferrer"
             @click.prevent="handleClick(program)"
