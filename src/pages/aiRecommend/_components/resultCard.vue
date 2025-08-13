@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { EstateDTO } from "@/api/autoLoad/data-contracts";
 import movePage from "@/utils/movePage";
+import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const api = new Api();
 
@@ -70,7 +71,12 @@ onMounted(() => {
 
     <!-- 로딩 상태 -->
     <div v-if="isLoading" class="text-center py-4">
-      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-kb-yellow mx-auto mb-2"></div>
+      <LoadingSpinner
+        size="h-6 w-6"
+        borderColor="border-kb-yellow"
+        marginBottom="mb-2"
+        borderBottomOnly
+      />
       <p class="text-xs">부동산 정보를 불러오는 중...</p>
     </div>
 

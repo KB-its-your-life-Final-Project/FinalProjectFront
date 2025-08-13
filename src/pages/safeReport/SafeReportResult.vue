@@ -13,6 +13,7 @@ import { useIllegalBuildingStatus } from "./composables/useIllegalBuildingStatus
 import { SafeReportService } from "./services/safeReportService";
 import { getFloorLabel } from "./composables/floorUtils";
 import { formatAmount } from "@/utils/numberUtils";
+import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -262,10 +263,12 @@ function goToKB() {
 
   <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen">
     <div class="text-center">
-      <div
-        class="animate-spin rounded-full h-16 w-16 border-b-2 border-kb-yellow mx-auto mb-4"
-      ></div>
-
+      <LoadingSpinner
+        size="h-16 w-16"
+        borderColor="border-kb-yellow"
+        marginBottom="mb-4"
+        borderBottomOnly
+      />
       <h2 class="text-xl font-pretendard-bold text-kb-ui-01 mb-2">레포트를 생성 중입니다</h2>
       <p class="text-kb-ui-05 text-sm">잠시만 기다려주세요...</p>
     </div>

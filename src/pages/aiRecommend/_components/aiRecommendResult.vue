@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Api } from "@/api/autoLoad/Api";
 import ResultCard from "./resultCard.vue";
+import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const api = new Api();
 const router = useRouter();
@@ -98,9 +99,13 @@ onMounted(() => {
         <!-- 로딩 상태 -->
         <div v-if="isLoading" class="flex items-center justify-center min-h-48">
           <div class="text-center">
-            <div
-              class="animate-spin rounded-full h-12 w-12 border-4 border-kb-yellow border-t-transparent mx-auto mb-4"
-            ></div>
+            <LoadingSpinner
+              size="h-12 w-12"
+              borderWidth="border-4"
+              borderColor="border-kb-yellow"
+              marginBottom="mb-4"
+              borderTopTransparent
+            />
             <p class="text-gray-600 font-medium">AI 추천 결과를 생성하고 있습니다...</p>
             <p class="text-gray-500 text-sm mt-1">잠시만 기다려주세요</p>
           </div>
