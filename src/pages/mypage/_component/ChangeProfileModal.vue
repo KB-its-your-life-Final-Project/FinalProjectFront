@@ -47,12 +47,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
       console.log("auth.member: ", auth.member);
       return { success: true, message: "기본 이미지로 변경되었습니다" };
     } else if (selectedFile.value) {
-      const formData = new FormData();
-      formData.append("file", selectedFile.value);
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-      const { data } = await api.uploadProfileImageUsingPost(formData);
+      const { data } = await api.uploadProfileImageUsingPost({ file: selectedFile.value });
       console.log("프로필사진 변경: ", data);
       auth.member.profileImg = data.data?.profileImg || "";
       console.log("auth.member: ", auth.member);
