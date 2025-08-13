@@ -111,7 +111,7 @@ function openModal<T extends ModalNames>(type: T, props: ModalPropsMap[T]) {
       dongName: homeData.umdNm || "",
       buildingNumber: homeData.buildingNumber || "",
       umdNm: homeData.umdNm || "",
-      jibunAddr: homeData.jibunAddr || ""
+      jibunAddr: homeData.jibunAddr || "",
     };
 
     homeStore.updateAddressInfo(addressInfo);
@@ -222,7 +222,8 @@ const displayHomeData = computed(() => {
     return {
       ...homeData.value,
       buildingName: homeStore.homeInfo.addressInfo.buildingName || homeData.value.buildingName,
-      buildingNumber: homeStore.homeInfo.addressInfo.buildingNumber || homeData.value.buildingNumber,
+      buildingNumber:
+        homeStore.homeInfo.addressInfo.buildingNumber || homeData.value.buildingNumber,
       umdNm: homeStore.homeInfo.addressInfo.umdNm || homeData.value.umdNm,
       jibunAddr: homeStore.homeInfo.addressInfo.jibunAddr || homeData.value.jibunAddr,
     };
@@ -234,9 +235,9 @@ const displayHomeData = computed(() => {
 watch(
   () => homeStore.homeInfo.addressInfo,
   () => {
-  // computed 속성이 자동으로 재계산되어 UI가 업데이트됨
+    // computed 속성이 자동으로 재계산되어 UI가 업데이트됨
   },
-  { deep: true }
+  { deep: true },
 );
 
 // lifeCycle 훅
@@ -317,12 +318,16 @@ onBeforeUnmount(() => {
   <div v-else-if="displayHomeData" class="overflow-y-auto pb-20">
     <!-- 등록된 집 정보 -->
     <h2 class="text-lg mx-4 mt-4">나의 집 정보</h2>
-    <div class="mx-4 text-xs text-gray-400">{{ displayHomeData?.buildingName || "등록된 아파트" }}</div>
+    <div class="mx-4 text-xs text-gray-400">
+      {{ displayHomeData?.buildingName || "등록된 아파트" }}
+    </div>
     <InfoCard
       :key="`building-${displayHomeData?.buildingName}-${displayHomeData?.buildingNumber}`"
       :title="'등록된 아파트'"
       :content="displayHomeData?.buildingName || '정보 없음'"
-      :sub-content="displayHomeData?.buildingNumber ? `${displayHomeData.buildingNumber}` : '동 정보 없음'"
+      :sub-content="
+        displayHomeData?.buildingNumber ? `${displayHomeData.buildingNumber}` : '동 정보 없음'
+      "
     />
 
     <!-- 계약 정보 -->
@@ -354,7 +359,7 @@ onBeforeUnmount(() => {
             type: 'edit',
             address: displayHomeData?.buildingName || '',
             contractDate: displayHomeData?.contractStart || '',
-            homeData: displayHomeData || homeData
+            homeData: displayHomeData || homeData,
           })
         "
       >
