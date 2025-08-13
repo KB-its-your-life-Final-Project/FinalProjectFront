@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from "vue";
 import { useHomeStore } from "@/stores/homeStore";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import DatePicker from "@/components/common/DatePicker.vue";
 import RadioListButton from "@/components/common/RadioListButton.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
@@ -362,7 +362,7 @@ const options = [
 ];
 </script>
 <template>
-  <ModalForm
+  <ButtonnModal
     :title="title"
     :handle-confirm="handleConfirm"
     :is-loading="isLoading"
@@ -440,5 +440,5 @@ const options = [
       <DefaultInput label="보증금" type="money" v-model="deposit"></DefaultInput>
       <DefaultInput class="mt-4" label="월세" type="money" v-model="monthlyRent"></DefaultInput>
     </div>
-  </ModalForm>
+  </ButtonnModal>
 </template>

@@ -26,6 +26,7 @@ import { useHomeStore } from "@/stores/homeStore";
 import { Api } from "@/api/autoLoad/Api";
 import type { HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
 import { formatAmount } from "@/utils/numberUtils";
+import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const api = new Api();
 const auth = authStore();
@@ -144,7 +145,7 @@ function handleNameChanged(newName: string) {
 const fetchHomeData = async () => {
   try {
     isLoading.value = true;
-    const response = await api.getHomeInfoUsingGet("");
+    const response = await api.getHomeInfoUsingGet();
 
     if (response.data?.data) {
       homeData.value = response.data.data;
@@ -313,7 +314,12 @@ onBeforeUnmount(() => {
   </div>
 
   <div v-if="isLoading" class="h-100 flex items-center justify-center">
-    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <LoadingSpinner
+      size="h-8 w-8"
+      borderColor="border-blue-600"
+      marginBottom="mb-2"
+      borderBottomOnly
+    />
   </div>
   <div v-else-if="displayHomeData" class="overflow-y-auto pb-20">
     <!-- 등록된 집 정보 -->

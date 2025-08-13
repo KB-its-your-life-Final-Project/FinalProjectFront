@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { SidoDto, SigugunDto, DongDto, BuildingInfoDto } from "@/api/autoLoad/data-contracts";
+import LoadingSpinner from "./LoadingSpinner.vue";
 
 interface AddressData {
   sido: string | undefined;
@@ -467,7 +468,12 @@ function goBack() {
       <div class="p-4 flex-1 min-h-0">
         <!-- 로딩 상태 -->
         <div v-if="isLoading" class="flex justify-center items-center py-8">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-kb-yellow"></div>
+          <LoadingSpinner
+            size="h-8 w-8"
+            borderColor="border-kb-yellow"
+            marginBottom="mb-2"
+            borderBottomOnly
+          />
         </div>
 
         <!-- 시/도 선택 -->

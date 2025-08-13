@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import { Api } from "@/api/autoLoad/Api";
 import { authStore } from "@/stores/authStore";
 import defaultProfile from "@/assets/imgs/profile.jpg";
@@ -47,12 +47,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
       console.log("auth.member: ", auth.member);
       return { success: true, message: "기본 이미지로 변경되었습니다" };
     } else if (selectedFile.value) {
-      const formData = new FormData();
-      formData.append("file", selectedFile.value);
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-      const { data } = await api.uploadProfileImageUsingPost(formData);
+      const { data } = await api.uploadProfileImageUsingPost({ file: selectedFile.value });
       console.log("프로필사진 변경: ", data);
       auth.member.profileImg = data.data?.profileImg || "";
       console.log("auth.member: ", auth.member);
@@ -70,7 +65,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
 }
 </script>
 <template>
-  <ModalForm
+  <ButtonnModal
     :title="'프로필 이미지 변경'"
     :handle-confirm="handleConfirm"
     @close="emit('close')"
@@ -92,7 +87,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
       <label for="defaultProfile" class="default-btn">기본 이미지로 변경</label>
       <input id="defaultProfile" class="hidden" @click="handleDefaultProfileChange" />
     </div>
-  </ModalForm>
+  </ButtonnModal>
 </template>
 <style scoped>
 @reference "@/assets/styles/main.css";

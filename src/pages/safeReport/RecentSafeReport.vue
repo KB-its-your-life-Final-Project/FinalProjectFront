@@ -5,6 +5,7 @@ import { Api } from "@/api/autoLoad/Api";
 import type { RecentSafeReportResponseDto } from "@/api/autoLoad/data-contracts";
 import { mainRouteName } from "@/router/mainRoute";
 import Header from "@/components/layout/header/Header.vue";
+import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const router = useRouter();
 const api = new Api();
@@ -117,7 +118,13 @@ onMounted(() => {
   <div class="relative z-0">
     <!-- 로딩 상태 -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-[60vh]">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+      <LoadingSpinner
+        size="h-12 w-12"
+        borderColor="border-blue-600"
+        marginBottom="mb-4"
+        borderBottomOnly
+      />
+
       <p class="text-gray-600">최근 본 레포트를 불러오는 중...</p>
     </div>
 

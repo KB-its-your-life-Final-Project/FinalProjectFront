@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
 import { useRouter } from "vue-router";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import SearchAddressLayer from "@/components/common/SearchAddressLayer.vue";
 import SelectAddressPage from "@/components/common/SelectAddressPage.vue";
 import mapUtil from "@/utils/naverMap/naverMap";
@@ -325,7 +325,7 @@ async function handleMyHomeSearch() {
     </div>
 
     <!-- 건물 없음 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showBuildingNameInputModal"
       title="건물을 찾을 수 없습니다."
       :handle-confirm="() => ({ success: true, message: '' })"
@@ -345,7 +345,7 @@ async function handleMyHomeSearch() {
           <li>• 새로 지어진 건물은 등록이 지연될 수 있습니다</li>
         </ul>
       </div>
-    </ModalForm>
+    </ButtonnModal>
   </div>
 </template>
 

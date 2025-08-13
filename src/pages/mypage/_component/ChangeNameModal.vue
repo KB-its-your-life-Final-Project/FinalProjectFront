@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import { Api } from "@/api/autoLoad/Api";
 import { authStore } from "@/stores/authStore";
@@ -59,7 +59,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
 </script>
 
 <template>
-  <ModalForm
+  <ButtonnModal
     :title="'이름 변경'"
     :handle-confirm="handleConfirm"
     @close="emit('close')"
@@ -73,5 +73,5 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
       v-model="newName"
       type="text"
     ></DefaultInput>
-  </ModalForm>
+  </ButtonnModal>
 </template>

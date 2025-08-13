@@ -2,7 +2,7 @@
 import { useRouter } from "vue-router";
 import { computed, ref, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import ToolTip from "@/components/common/ToolTip.vue";
 import Header from "@/components/layout/header/Header.vue";
 import { mainRouteName } from "@/router/mainRoute";
@@ -13,6 +13,7 @@ import { useIllegalBuildingStatus } from "./composables/useIllegalBuildingStatus
 import { SafeReportService } from "./services/safeReportService";
 import { getFloorLabel } from "./composables/floorUtils";
 import { formatAmount } from "@/utils/numberUtils";
+import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const store = safeReportStore();
 const emit = defineEmits(["update", "next", "prev"]);
@@ -262,10 +263,12 @@ function goToKB() {
 
   <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen">
     <div class="text-center">
-      <div
-        class="animate-spin rounded-full h-16 w-16 border-b-2 border-kb-yellow mx-auto mb-4"
-      ></div>
-
+      <LoadingSpinner
+        size="h-16 w-16"
+        borderColor="border-kb-yellow"
+        marginBottom="mb-4"
+        borderBottomOnly
+      />
       <h2 class="text-xl font-pretendard-bold text-kb-ui-01 mb-2">레포트를 생성 중입니다</h2>
       <p class="text-kb-ui-05 text-sm">잠시만 기다려주세요...</p>
     </div>
@@ -398,7 +401,7 @@ function goToKB() {
     </div>
 
     <!-- 재정적 안전성 분석 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showModal_financial"
       title="재정적 안전성 분석"
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
@@ -428,10 +431,10 @@ function goToKB() {
           <span :class="gradeColor.text + ' font-bold'">{{ riskText }}</span>
         </p>
       </div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 건축물 정보 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showModal_building"
       title="건축물 정보"
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
@@ -520,10 +523,10 @@ function goToKB() {
         </div>
       </div>
       <div v-else class="text-center text-kb-ui-02">건축물 정보가 없습니다.</div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 매매 거래 내역 없음 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showNoDataModal"
       title="매매 거래 내역 없음"
       :handle-confirm="() => ({ success: true, message: '' })"
@@ -551,10 +554,10 @@ function goToKB() {
           참고 바랍니다.
         </p>
       </div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 건축물 정보 없음 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showNoBuildingDataModal"
       title="건축물 정보 없음"
       :handle-confirm="() => ({ success: true, message: '' })"
@@ -582,10 +585,10 @@ function goToKB() {
           참고 바랍니다.
         </p>
       </div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 매매 거래 내역과 건축물 정보 모두 없음 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showNoDataAndBuildingModal"
       title="레포트 제공 불가"
       :handle-confirm="() => ({ success: true, message: '' })"
@@ -612,7 +615,7 @@ function goToKB() {
           레포트를 제공할 수 없습니다.
         </p>
       </div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 전세가율 높음 모달 -->
     <div

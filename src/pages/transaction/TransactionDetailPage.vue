@@ -26,7 +26,7 @@ import { transactionPeriodOptions } from "@/types/tansactionType";
 import { estateTradeOptions } from "@/types/estateType";
 import { classifyRentType, GraphItemInput, GraphItemOutput } from "@/utils/transactionUtils";
 import estateUtils from "@/utils/estateUtils";
-import { EstateDTO, EstateSalesDTO } from "@/api/autoLoad/data-contracts";
+import { EstateDTO } from "@/api/autoLoad/data-contracts";
 
 const route = useRoute();
 const router = useRouter();
@@ -54,15 +54,8 @@ const latlng = computed<{ lat: number; lng: number }>(() => {
   };
 });
 
-const input = computed(() => ({
-  jibunAddress: queryData.value.jibunAddress,
-  roadAddress: queryData.value.roadAddress,
-  lat: latlng.value.lat,
-  lng: latlng.value.lng,
-}));
-
 // UI 전용 상태들
-const buildingName = ref<string | undefined>();
+const buildingName = ref<string | undefined>(route.query.aptName as string);
 const estateId = ref<number | undefined>();
 const selectedPeriod = ref("12"); // UI에서만 사용하는 기간 선택 상태
 const graphData = ref<GraphItemOutput[]>([]);
@@ -193,8 +186,7 @@ const filteredData = async () => {
 // 단일 watcher - queryData 변경시에만 API 호출
 watch(
   queryData,
-  async (newData) => {
-    // console.log("queryData 변경됨:", newData);
+  async () => {
     await filteredData();
   },
   { immediate: true, deep: true },

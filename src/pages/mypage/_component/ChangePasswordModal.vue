@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { VerifyPwdRequestDTO, ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
@@ -80,7 +80,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
 }
 </script>
 <template>
-  <ModalForm
+  <ButtonnModal
     :title="'비밀번호 변경'"
     :handle-confirm="handleConfirm"
     @close="emit('close')"
@@ -111,5 +111,5 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
       :type="'password'"
       placeholder="새 비밀번호를 입력하세요"
     ></DefaultInput>
-  </ModalForm>
+  </ButtonnModal>
 </template>

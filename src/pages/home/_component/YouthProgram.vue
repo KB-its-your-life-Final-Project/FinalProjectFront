@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import type { YouthProgramDTO } from "@/api/autoLoad/data-contracts";
 import { Api } from "@/api/autoLoad/Api";
 import { authStore } from "@/stores/authStore";
+import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const api = new Api();
 const auth = authStore();
@@ -15,6 +16,7 @@ const currentPage = ref(1);
 const pageSize = 20;
 const loading = ref(false);
 const hasMore = ref(true);
+let observer: IntersectionObserver | null = null;
 
 const loadMoreTrigger = ref<HTMLElement | null>(null);
 
@@ -65,7 +67,7 @@ async function fetchUnreadPrograms(page: number) {
 // IntersectionObserver 설정 (스크롤 끝 감지)
 function setupObserver() {
   if (!loadMoreTrigger.value) return;
-  const observer = new IntersectionObserver((entries) => {
+  observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting && hasMore.value && !loading.value) {
         fetchUnreadPrograms(currentPage.value + 1);
@@ -73,9 +75,6 @@ function setupObserver() {
     });
   });
   observer.observe(loadMoreTrigger.value);
-  onUnmounted(() => {
-    observer.disconnect();
-  });
 }
 
 async function handleClick(program: YouthProgramDTO) {
@@ -105,6 +104,9 @@ async function handleClick(program: YouthProgramDTO) {
 onMounted(async () => {
   await fetchUnreadPrograms(1);
   setupObserver();
+});
+onUnmounted(() => {
+  observer?.disconnect();
 });
 </script>
 
@@ -158,7 +160,14 @@ onMounted(async () => {
       <li ref="loadMoreTrigger" class="h-1"></li>
     </ul>
 
-    <p v-if="loading" class="loading">로딩중...</p>
+    <div v-if="loading" class="h-full flex items-center justify-center">
+      <LoadingSpinner
+        size="h-6 w-6"
+        borderColor="border-kb-yellow"
+        marginBottom="mb-2"
+        borderBottomOnly
+      />
+    </div>
     <p v-else-if="!hasMore && youthProgramList.length === 0" class="text-gray-500 mt-2">
       표시할 콘텐츠가 없습니다.
     </p>
@@ -199,8 +208,5 @@ ul::-webkit-scrollbar-thumb:hover {
 }
 .program-img {
   @apply max-w-27 max-h-27 object-cover rounded-lg shadow-sm shadow-gray-300;
-}
-.loading {
-  @apply text-[0.8rem] font-pretendard-regular text-kb-ui-06;
 }
 </style>
