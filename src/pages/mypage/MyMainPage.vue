@@ -145,7 +145,7 @@ function handleNameChanged(newName: string) {
 const fetchHomeData = async () => {
   try {
     isLoading.value = true;
-    const response = await api.getHomeInfoUsingGet("");
+    const response = await api.getHomeInfoUsingGet();
 
     if (response.data?.data) {
       homeData.value = response.data.data;

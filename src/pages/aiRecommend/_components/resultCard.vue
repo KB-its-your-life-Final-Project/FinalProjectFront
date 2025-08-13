@@ -30,7 +30,7 @@ const fetchEstateData = async () => {
     error.value = "";
 
     // 주소로 부동산 정보 조회
-    const estateResponse = await api.getEstateByAddressUsingGet(props.item.jibunAddres);
+    const estateResponse = await api.getEstateByAddressUsingGet(props.item.jibunAddress);
     if (estateResponse.data?.data) {
       estateData.value = estateResponse.data.data;
     }

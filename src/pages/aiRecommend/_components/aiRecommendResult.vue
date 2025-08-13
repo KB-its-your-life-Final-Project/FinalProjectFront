@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import { Api } from "@/api/autoLoad/Api";
 import ResultCard from "./resultCard.vue";
 import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const api = new Api();
-const router = useRouter();
 
 interface AiRecommendItem {
   jibunAddress: string;
@@ -60,6 +58,7 @@ const fetchAiRecommend = async () => {
       memberData = JSON.parse(storedMember);
     } catch (parseError) {
       error.value = "사용자 정보가 올바르지 않습니다. 다시 로그인해주세요.";
+      console.error(parseError);
       return;
     }
 
