@@ -2,7 +2,7 @@
 import { useRouter } from "vue-router";
 import { computed, ref, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import ToolTip from "@/components/common/ToolTip.vue";
 import Header from "@/components/layout/header/Header.vue";
 import { mainRouteName } from "@/router/mainRoute";
@@ -398,7 +398,7 @@ function goToKB() {
     </div>
 
     <!-- 재정적 안전성 분석 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showModal_financial"
       title="재정적 안전성 분석"
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
@@ -428,10 +428,10 @@ function goToKB() {
           <span :class="gradeColor.text + ' font-bold'">{{ riskText }}</span>
         </p>
       </div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 건축물 정보 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showModal_building"
       title="건축물 정보"
       :handle-confirm="() => ({ success: true, message: '확인되었습니다.' })"
@@ -520,10 +520,10 @@ function goToKB() {
         </div>
       </div>
       <div v-else class="text-center text-kb-ui-02">건축물 정보가 없습니다.</div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 매매 거래 내역 없음 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showNoDataModal"
       title="매매 거래 내역 없음"
       :handle-confirm="() => ({ success: true, message: '' })"
@@ -551,10 +551,10 @@ function goToKB() {
           참고 바랍니다.
         </p>
       </div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 건축물 정보 없음 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showNoBuildingDataModal"
       title="건축물 정보 없음"
       :handle-confirm="() => ({ success: true, message: '' })"
@@ -582,10 +582,10 @@ function goToKB() {
           참고 바랍니다.
         </p>
       </div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 매매 거래 내역과 건축물 정보 모두 없음 모달 -->
-    <ModalForm
+    <ButtonnModal
       v-if="showNoDataAndBuildingModal"
       title="레포트 제공 불가"
       :handle-confirm="() => ({ success: true, message: '' })"
@@ -612,7 +612,7 @@ function goToKB() {
           레포트를 제공할 수 없습니다.
         </p>
       </div>
-    </ModalForm>
+    </ButtonnModal>
 
     <!-- 전세가율 높음 모달 -->
     <div

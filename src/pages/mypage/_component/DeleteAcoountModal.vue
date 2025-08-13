@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { VerifyPwdRequestDTO } from "@/api/autoLoad/data-contracts";
@@ -74,7 +74,7 @@ async function checkPassword(password: string) {
 }
 </script>
 <template>
-  <ModalForm
+  <ButtonnModal
     :title="'회원 탈퇴'"
     @close="emit('close')"
     :handle-confirm="handleConfirm"
@@ -91,5 +91,5 @@ async function checkPassword(password: string) {
       ></DefaultInput>
     </div>
     <div v-if="isVerified" class="text-sm text-success mt-1 ml-1">* 인증 완료</div>
-  </ModalForm>
+  </ButtonnModal>
 </template>

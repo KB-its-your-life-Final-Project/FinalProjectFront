@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import { Api } from "@/api/autoLoad/Api";
 import { authStore } from "@/stores/authStore";
 import defaultProfile from "@/assets/imgs/profile.jpg";
@@ -70,7 +70,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
 }
 </script>
 <template>
-  <ModalForm
+  <ButtonnModal
     :title="'프로필 이미지 변경'"
     :handle-confirm="handleConfirm"
     @close="emit('close')"
@@ -92,7 +92,7 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
       <label for="defaultProfile" class="default-btn">기본 이미지로 변경</label>
       <input id="defaultProfile" class="hidden" @click="handleDefaultProfileChange" />
     </div>
-  </ModalForm>
+  </ButtonnModal>
 </template>
 <style scoped>
 @reference "@/assets/styles/main.css";

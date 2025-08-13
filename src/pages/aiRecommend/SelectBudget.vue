@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch, onMounted } from "vue";
 import { safeReportStore } from "@/stores/safeReportStore";
-import ModalForm from "@/components/common/ModalForm.vue";
+import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import { useBudgetInput } from "../safeReport/composables/useBudgetInput";
 import { useBudgetValidation } from "../safeReport/composables/useBudgetValidation";
 
@@ -87,12 +87,12 @@ const next = () => {
   </div>
 
   <!-- 유효성 검사 모달 -->
-  <ModalForm
+  <ButtonnModal
     v-if="showValidationModal"
     title="예산 부적합"
     :handle-confirm="handleValidationConfirm"
     @close="showValidationModal = false"
   >
     <p>{{ validationMessage }}</p>
-  </ModalForm>
+  </ButtonnModal>
 </template>
