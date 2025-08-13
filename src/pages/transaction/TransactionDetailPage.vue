@@ -101,7 +101,7 @@ const getTradeTypeCode = (label: string | null): number | null => {
 };
 
 // 쿼리 업데이트 헬퍼 함수
-const updateQuery = (updates: Record<string, any>) => {
+const updateQuery = (updates: Record<string, string | undefined>) => {
   router
     .replace({
       query: {
