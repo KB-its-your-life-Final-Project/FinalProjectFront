@@ -14,6 +14,7 @@ const props = withDefaults(
     targetType: "region" | "building";
     regionCd?: string;
     jibunAddr?: string;
+    buildingName?: string;
   }>(),
   {
     liked: undefined, // 기본값을 undefined로 설정
@@ -49,6 +50,7 @@ const handleClick = async () => {
     } else if (props.targetType === "building" && props.jibunAddr != null) {
       const payload: EstateWishlistRequestDTO = {
         jibunAddr: props.jibunAddr,
+        buildingName: props.buildingName,
       };
       if (!liked.value) {
         await api.addWishlistUsingPost(payload); // 건물 추가

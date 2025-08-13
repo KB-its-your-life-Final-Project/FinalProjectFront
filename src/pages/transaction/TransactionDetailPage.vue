@@ -56,7 +56,6 @@ const latlng = computed<{ lat: number; lng: number }>(() => {
 
 // UI 전용 상태들
 const buildingName = ref<string | undefined>(route.query.aptName as string);
-const estateId = ref<number | undefined>();
 const selectedPeriod = ref("12"); // UI에서만 사용하는 기간 선택 상태
 const graphData = ref<GraphItemOutput[]>([]);
 
@@ -240,7 +239,7 @@ const handleDateChange = () => {
         <WishButton
           target-type="building"
           :jibun-addr="queryData.jibunAddress"
-          :estate-id="estateId"
+          :building-name="buildingName"
         />
       </div>
 
