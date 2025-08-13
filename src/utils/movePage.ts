@@ -7,7 +7,7 @@ import router from "@/router";
 const makeRoute = (routeName: string) => {
   //쿼리 생성
   const makeQuery = (query?: Record<string, string>) => {
-    const routeConfig: any = {
+    const routeConfig: unknown = {
       name: routeName,
     };
 

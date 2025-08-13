@@ -54,14 +54,14 @@ async function handleConfirm(): Promise<{ success: boolean; message: string }> {
       }
       const { data } = await api.uploadProfileImageUsingPost(formData);
       console.log("프로필사진 변경: ", data);
-      auth.member.profileImg = data.data?.profileImg;
+      auth.member.profileImg = data.data?.profileImg || "";
       console.log("auth.member: ", auth.member);
       return { success: true, message: "프로필이 변경되었습니다" };
     } else {
       return { success: false, message: "이미지를 선택하거나 기본 이미지를 선택하세요" };
     }
   } catch (error: unknown) {
-    console.error("프로필사진 변경 실패, error");
+    console.error("프로필사진 변경 실패: ", error);
     const errorMsg = isDefaultProfileImg.value
       ? "기본 이미지 변경 중 오류가 발생했습니다"
       : "업로드 중 오류가 발생했습니다";
