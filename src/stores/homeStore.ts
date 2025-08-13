@@ -1,7 +1,10 @@
 import { defineStore } from "pinia";
 import { reactive, computed } from "vue";
 import { Api } from "@/api/autoLoad/Api";
-import type { HomeRegisterRequestDTO, HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
+import type {
+  HomeRegisterRequestDTO,
+  HomeRegisterResponseDTO,
+} from "@/api/autoLoad/data-contracts";
 
 const api = new Api();
 
@@ -96,7 +99,9 @@ export const useHomeStore = defineStore("home", () => {
   };
 
   // 집 정보 등록
-  const registerHome = async (requestData: HomeRegisterRequestDTO): Promise<HomeRegisterResponseDTO> => {
+  const registerHome = async (
+    requestData: HomeRegisterRequestDTO,
+  ): Promise<HomeRegisterResponseDTO> => {
     try {
       isLoading.value = true;
       const { data } = await api.registerHomeUsingPost(requestData);
@@ -117,7 +122,9 @@ export const useHomeStore = defineStore("home", () => {
   };
 
   // 집 정보 수정
-  const updateHome = async (requestData: HomeRegisterRequestDTO): Promise<HomeRegisterResponseDTO> => {
+  const updateHome = async (
+    requestData: HomeRegisterRequestDTO,
+  ): Promise<HomeRegisterResponseDTO> => {
     try {
       isLoading.value = true;
       const { data } = await api.registerHomeUsingPost(requestData);
@@ -254,7 +261,7 @@ export const useHomeStore = defineStore("home", () => {
     };
   };
 
-    return {
+  return {
     // 상태
     homeInfo,
     isLoading: computed(() => isLoading.value),

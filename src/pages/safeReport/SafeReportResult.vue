@@ -111,12 +111,13 @@ async function loadSavedReportData() {
     // 데이터 유효성 검사 및 모달 표시
     const validation = SafeReportService.validateReportData(savedData);
     const hasNoData = validation.hasNoData;
-    const hasNoBuildingData = !savedData.floorAndPurposeList || savedData.floorAndPurposeList.length === 0;
+    const hasNoBuildingData =
+      !savedData.floorAndPurposeList || savedData.floorAndPurposeList.length === 0;
 
     console.log("🔍 데이터 유효성 검사 결과:", {
       hasNoData,
       hasNoBuildingData,
-      hasHighRatio: validation.hasHighRatio
+      hasHighRatio: validation.hasHighRatio,
     });
 
     // 매매거래내역과 건축물 정보가 모두 없는 경우
@@ -181,12 +182,13 @@ async function loadReportFromAPI() {
     // 데이터 유효성 검사 및 모달 표시
     const validation = SafeReportService.validateReportData(reportData);
     const hasNoData = validation.hasNoData;
-    const hasNoBuildingData = !reportData.floorAndPurposeList || reportData.floorAndPurposeList.length === 0;
+    const hasNoBuildingData =
+      !reportData.floorAndPurposeList || reportData.floorAndPurposeList.length === 0;
 
     console.log("🔍 데이터 유효성 검사 결과:", {
       hasNoData,
       hasNoBuildingData,
-      hasHighRatio: validation.hasHighRatio
+      hasHighRatio: validation.hasHighRatio,
     });
 
     // 매매거래내역과 건축물 정보가 모두 없는 경우
@@ -409,7 +411,10 @@ function goToKB() {
         </p>
       </div>
       <div v-else>
-        <p>예산 금액 {{ formatAmount(store.formData.budget) }}에 기반하여 분석한 결과는 다음과 같습니다.</p>
+        <p>
+          예산 금액 {{ formatAmount(store.formData.budget) }}에 기반하여 분석한 결과는 다음과
+          같습니다.
+        </p>
         <p class="mt-4">
           {{ store.formData.buildingName }}의 최근 거래 가격은
           {{ formatAmount(store.resultData?.dealAmount) }} 입니다. 이에 따라 역전세율은

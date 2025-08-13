@@ -3,6 +3,11 @@
 import Header from "@/components/layout/header/Header.vue";
 import Section from "@/components/nav/BottomNav.vue";
 
+// 프로필 컴포넌트
+import ProfileImage from "@/components/common/ProfileImage.vue";
+import ProfileInfo from "@/components/common/ProfileInfo.vue";
+import defaultProfile from "@/assets/imgs/profile.jpg";
+
 // 마이 페이지 컴포넌트
 import EditItem from "./_component/EditItem.vue";
 import InfoCard from "./_component/InfoCard.vue";
@@ -12,21 +17,20 @@ import ChangeProfileModal from "./_component/ChangeProfileModal.vue";
 import ChangeHouseModal from "./_component/ChangeHouseModal.vue";
 import DeleteAcoountModal from "./_component/DeleteAcoountModal.vue";
 
-import { markRaw, ref, computed, onMounted, watch } from "vue";
+import { markRaw, ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { mainRouteName } from "@/router/mainRoute";
 import movePage from "@/utils/movePage";
 import { authStore } from "@/stores/authStore";
 import { useHomeStore } from "@/stores/homeStore";
 
-import defaultProfile from "@/assets/imgs/profile.jpg";
-import ProfileImage from "@/components/common/ProfileImage.vue";
-import ProfileInfo from "@/components/common/ProfileInfo.vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { HomeRegisterResponseDTO } from "@/api/autoLoad/data-contracts";
 import { formatAmount } from "@/utils/numberUtils";
 
 const api = new Api();
+const auth = authStore();
 const homeStore = useHomeStore();
+
 const modalMap = {
   name: markRaw(ChangeNameModal),
   editHouse: markRaw(ChangeHouseModal),
@@ -35,6 +39,7 @@ const modalMap = {
   password: markRaw(ChangePasswordModal),
   delete: markRaw(DeleteAcoountModal),
 };
+
 type ModalMap = typeof modalMap;
 type ModalNames = keyof ModalMap;
 
@@ -62,24 +67,27 @@ type ModalPropsMap = {
   };
 };
 
-const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-
+const drawerRef = ref<HTMLElement | null>(null);
 const isOpenDrawer = ref(false);
 const currentModalName = ref<null | ModalNames>(null);
 const modalProps = ref<ModalPropsMap[ModalNames] | null>(null);
-const isPwdChangeable = computed(() => auth.member.createdType === 1); // 1: 이메일 계정
-
-const auth = authStore();
+const fileBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 const user = computed(() => ({
   name: auth.member.name ?? "사용자",
   email: auth.member.email ?? "이메일 없음",
   isRegistered: false,
   imagePath: auth.member.profileImg ? `${fileBaseUrl}${auth.member.profileImg}` : defaultProfile,
 }));
-
+const isPwdChangeable = computed(() => auth.member.createdType === 1); // 1: 이메일 계정
 const isLoading = ref(false);
 const homeData = ref<HomeRegisterResponseDTO | null>(null);
 const isRegistered = ref(false);
+
+function handleClickOutside(event: MouseEvent) {
+  if (drawerRef.value && !drawerRef.value.contains(event.target as Node)) {
+    isOpenDrawer.value = false;
+  }
+}
 
 function openDrawer() {
   isOpenDrawer.value = !isOpenDrawer.value;
@@ -223,12 +231,22 @@ const displayHomeData = computed(() => {
 });
 
 // homeStore의 addressInfo 변경을 감지하여 UI 즉시 업데이트
-watch(() => homeStore.homeInfo.addressInfo, () => {
+watch(
+  () => homeStore.homeInfo.addressInfo,
+  () => {
   // computed 속성이 자동으로 재계산되어 UI가 업데이트됨
-}, { deep: true });
+  },
+  { deep: true }
+);
 
+// lifeCycle 훅
 onMounted(() => {
   fetchHomeData();
+  document.addEventListener("click", handleClickOutside); // 회원 수정 영역 밖 클릭 시 드로어 숨김을 위한 설정
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside); // 메모리 누수 방지
 });
 </script>
 
@@ -252,7 +270,7 @@ onMounted(() => {
       </div>
       <ProfileInfo :name="user.name" :email="user.email" />
 
-      <div class="w-4/5 relative h-10 mt-3">
+      <div class="w-4/5 relative h-10 mt-3" ref="drawerRef">
         <div class="absolute w-full border border-kb-ui-07 rounded-lg">
           <button
             class="text-md font-pretendard-medium py-2 w-full font-bold cursor-pointer text-kb-ui-04 flex justify-center items-center gap-2"
