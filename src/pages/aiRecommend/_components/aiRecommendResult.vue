@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { mainRouteName } from "@/router/mainRoute";
-import Header from "@/components/layout/header/Header.vue";
+import { useRouter } from "vue-router";
 import { Api } from "@/api/autoLoad/Api";
-import { authStore } from "@/stores/authStore";
 import ResultCard from "./resultCard.vue";
 
 const api = new Api();
-const store = authStore();
+const router = useRouter();
 
 interface AiRecommendItem {
-  jibunAddres: string;
+  jibunAddress: string;
   positiveFactor: string;
   reason: string;
 }
@@ -53,22 +51,35 @@ const fetchAiRecommend = async () => {
 
     // 로컬 스토리지에서 사용자 정보 가져오기
     const storedMember = localStorage.getItem("authUser");
+    console.log("저장된 사용자 정보:", storedMember);
+
     if (!storedMember) {
-      throw new Error("로그인 정보가 없습니다.");
+      throw new Error("로그인 정보가 없습니다. 다시 로그인해주세요.");
     }
 
-    const memberData = JSON.parse(storedMember);
+    let memberData;
+    try {
+      memberData = JSON.parse(storedMember);
+    } catch (parseError) {
+      console.error("사용자 정보 파싱 실패:", parseError);
+      throw new Error("사용자 정보가 올바르지 않습니다. 다시 로그인해주세요.");
+    }
+
     const memberId = memberData.id;
+    console.log("사용자 ID:", memberId);
 
     if (!memberId) {
-      throw new Error("사용자 ID를 찾을 수 없습니다.");
+      throw new Error("사용자 ID를 찾을 수 없습니다. 다시 로그인해주세요.");
     }
 
     const response = await api.getAiRecommendUsingGet(memberId);
-    aiRecommendResult.value = response.data || "추천 결과를 가져올 수 없습니다.";
+    console.log("AI 추천 API 응답:", response);
+
+    aiRecommendResult.value = response.data?.data || "추천 결과를 가져올 수 없습니다.";
 
     // JSON 파싱
     const parsed = parseAiResult(aiRecommendResult.value);
+    console.log("파싱된 AI 추천 결과:", parsed);
     parsedResults.value = parsed;
   } catch (err) {
     console.error("AI 추천 결과 가져오기 실패:", err);
@@ -84,52 +95,79 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="relative flex flex-col flex-1 min-h-screen px-6 gap-6 mt-6">
-    <div>
-      <h1 class="text-2xl font-pretendard-bold mb-1">AI 추천 결과</h1>
-      <p class="text-kb-ui-06">입력하신 예산을 바탕으로 추천 결과를 제공합니다.</p>
-    </div>
+  <div class="relative flex flex-col min-h-screen bg-gray-50">
+    <!-- 메인 컨텐츠 -->
+    <div class="flex-1 px-3 py-3">
+      <div class="max-w-md mx-auto">
+        <!-- 로딩 상태 -->
+        <div v-if="isLoading" class="flex items-center justify-center min-h-48">
+          <div class="text-center">
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-4 border-kb-yellow border-t-transparent mx-auto mb-4"
+            ></div>
+            <p class="text-gray-600 font-medium">AI 추천 결과를 생성하고 있습니다...</p>
+            <p class="text-gray-500 text-sm mt-1">잠시만 기다려주세요</p>
+          </div>
+        </div>
 
-    <!-- 로딩 상태 -->
-    <div v-if="isLoading" class="flex-1 flex items-center justify-center">
-      <div class="text-center">
-        <div
-          class="animate-spin rounded-full h-12 w-12 border-b-2 border-kb-yellow mx-auto mb-4"
-        ></div>
-        <p class="text-kb-ui-06">AI 추천 결과를 생성하고 있습니다...</p>
-      </div>
-    </div>
+        <!-- 에러 상태 -->
+        <div v-else-if="error" class="flex items-center justify-center min-h-48">
+          <div class="text-center bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div
+              class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3"
+            >
+              <svg
+                class="w-6 h-6 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                ></path>
+              </svg>
+            </div>
+            <p class="text-red-600 font-medium mb-3">{{ error }}</p>
+            <div class="flex gap-2 justify-center">
+              <button
+                @click="fetchAiRecommend"
+                class="px-4 py-2 bg-kb-yellow rounded-lg text-gray-900 font-medium hover:bg-opacity-90 transition-colors"
+              >
+                다시 시도
+              </button>
+              <button
+                v-if="error.includes('로그인')"
+                @click="() => router.push('/login')"
+                class="px-4 py-2 bg-blue-500 rounded-lg text-white font-medium hover:bg-opacity-90 transition-colors"
+              >
+                로그인하기
+              </button>
+            </div>
+          </div>
+        </div>
 
-    <!-- 에러 상태 -->
-    <div v-else-if="error" class="flex-1 flex items-center justify-center">
-      <div class="text-center">
-        <p class="text-red-500 mb-4">{{ error }}</p>
-        <button
-          @click="fetchAiRecommend"
-          class="px-4 py-2 bg-kb-yellow rounded text-kb-ui-11 hover:bg-opacity-80"
-        >
-          다시 시도
-        </button>
-      </div>
-    </div>
+        <!-- 결과 표시 -->
+        <div v-else>
+          <!-- AI 추천 카드들 -->
+          <div v-if="parsedResults.length > 0" class="flex flex-col gap-3">
+            <ResultCard
+              v-for="(item, index) in parsedResults"
+              :key="index"
+              :item="item"
+              :index="index"
+            />
+          </div>
 
-    <!-- 결과 표시 -->
-    <div v-else class="flex-1">
-      <!-- AI 추천 카드들 -->
-      <div v-if="parsedResults.length > 0" class="space-y-4">
-        <ResultCard
-          v-for="(item, index) in parsedResults"
-          :key="index"
-          :item="item"
-          :index="index"
-        />
-      </div>
-
-      <!-- 파싱된 결과가 없는 경우 원본 텍스트 표시 -->
-      <div v-else class="bg-white rounded-lg p-6 shadow-sm border border-kb-ui-06">
-        <h2 class="text-lg font-pretendard-bold mb-4">AI 추천 내용</h2>
-        <div class="whitespace-pre-wrap text-kb-ui-08 leading-relaxed">
-          {{ aiRecommendResult }}
+          <!-- 파싱된 결과가 없는 경우 원본 텍스트 표시 -->
+          <div v-else class="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+            <h2 class="text-lg font-pretendard-bold mb-3 text-gray-900">AI 추천 내용</h2>
+            <div class="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm">
+              {{ aiRecommendResult }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
