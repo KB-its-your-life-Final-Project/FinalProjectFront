@@ -16,11 +16,22 @@ const handleNext = () => {
 
 <template>
   <Header :headerShowtype="mainRouteName.aiRecommend">
-    <div class="mt-23">
-      <img
-        src="@/assets/imgs/homematch.png"
-        class="absolute right-1 top-12/20 -translate-y-1/2 h-25"
-      />
+    <div class="flex h-25">
+      <div>
+        <!-- 헤더 섹션 -->
+        <div class="px-4 py-6">
+          <div class="max-w-md mx-auto">
+            <h1 class="text-2xl font-pretendard-bold mb-2 text-gray-900">AI 추천 결과</h1>
+            <p class="text-gray-600 text-sm">입력하신 예산을 바탕으로 추천 결과를 제공합니다.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <img
+          src="@/assets/imgs/homematch.png"
+          class="absolute right-1 top-12/20 -translate-y-1/2 h-25"
+        />
+      </div>
     </div>
   </Header>
 
