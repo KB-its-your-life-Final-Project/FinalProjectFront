@@ -28,20 +28,15 @@ const fetchEstateData = async () => {
     isLoading.value = true;
     error.value = "";
 
-    console.log("부동산 정보 조회 주소:", props.item.jibunAddress);
-
     // 주소로 부동산 정보 조회
     const estateResponse = await api.getEstateByAddressUsingGet(props.item.jibunAddress);
-    console.log("부동산 API 응답:", estateResponse);
 
     if (estateResponse.data?.data) {
       estateData.value = estateResponse.data.data;
-      console.log("부동산 데이터 설정:", estateData.value);
     } else {
       console.log("부동산 데이터가 없습니다:", estateResponse);
     }
   } catch (err) {
-    console.error("부동산 데이터 가져오기 실패:", err);
     error.value = "부동산 정보를 가져오는데 실패했습니다.";
   } finally {
     isLoading.value = false;
@@ -50,7 +45,7 @@ const fetchEstateData = async () => {
 
 // 카드 클릭 시 거래 상세 페이지로 이동
 const handleCardClick = () => {
-  const encodedAddress = encodeURIComponent(props.item.jibunAddress);
+  const encodedAddress = props.item.jibunAddress;
   movePage.transactionDetail({ jibunAddress: encodedAddress });
 };
 
@@ -61,7 +56,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 cursor-pointer hover:shadow-lg transition-all duration-200 active:scale-95"
+    class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 cursor-pointer transition-all duration-200"
     @click="handleCardClick"
   >
     <!-- 주소 -->

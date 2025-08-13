@@ -22,12 +22,9 @@ const error = ref<string>("");
 // JSON 파싱 함수
 const parseAiResult = (result: string): AiRecommendItem[] => {
   try {
-    console.log("파싱할 원본 데이터:", result);
-
     // JSON 부분만 추출 (```json과 ``` 사이의 내용)
     const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/);
     if (jsonMatch) {
-      console.log("JSON 블록 찾음:", jsonMatch[1]);
       const parsed = JSON.parse(jsonMatch[1]);
       // 단일 객체인 경우 배열로 변환
       return Array.isArray(parsed) ? parsed : [parsed];
@@ -51,38 +48,37 @@ const fetchAiRecommend = async () => {
 
     // 로컬 스토리지에서 사용자 정보 가져오기
     const storedMember = localStorage.getItem("authUser");
-    console.log("저장된 사용자 정보:", storedMember);
 
     if (!storedMember) {
-      throw new Error("로그인 정보가 없습니다. 다시 로그인해주세요.");
+      error.value = "로그인 정보가 없습니다. 다시 로그인해주세요.";
+      return;
     }
 
     let memberData;
     try {
       memberData = JSON.parse(storedMember);
     } catch (parseError) {
-      console.error("사용자 정보 파싱 실패:", parseError);
-      throw new Error("사용자 정보가 올바르지 않습니다. 다시 로그인해주세요.");
+      error.value = "사용자 정보가 올바르지 않습니다. 다시 로그인해주세요.";
+      return;
     }
 
     const memberId = memberData.id;
-    console.log("사용자 ID:", memberId);
 
     if (!memberId) {
-      throw new Error("사용자 ID를 찾을 수 없습니다. 다시 로그인해주세요.");
+      error.value = "사용자 ID를 찾을 수 없습니다. 다시 로그인해주세요.";
+      return;
     }
 
     const response = await api.getAiRecommendUsingGet(memberId);
-    console.log("AI 추천 API 응답:", response);
 
     aiRecommendResult.value = response.data?.data || "추천 결과를 가져올 수 없습니다.";
 
     // JSON 파싱
     const parsed = parseAiResult(aiRecommendResult.value);
-    console.log("파싱된 AI 추천 결과:", parsed);
     parsedResults.value = parsed;
   } catch (err) {
     console.error("AI 추천 결과 가져오기 실패:", err);
+
     error.value = err instanceof Error ? err.message : "AI 추천 결과를 가져오는데 실패했습니다.";
   } finally {
     isLoading.value = false;
@@ -131,21 +127,6 @@ onMounted(() => {
               </svg>
             </div>
             <p class="text-red-600 font-medium mb-3">{{ error }}</p>
-            <div class="flex gap-2 justify-center">
-              <button
-                @click="fetchAiRecommend"
-                class="px-4 py-2 bg-kb-yellow rounded-lg text-gray-900 font-medium hover:bg-opacity-90 transition-colors"
-              >
-                다시 시도
-              </button>
-              <button
-                v-if="error.includes('로그인')"
-                @click="() => router.push('/login')"
-                class="px-4 py-2 bg-blue-500 rounded-lg text-white font-medium hover:bg-opacity-90 transition-colors"
-              >
-                로그인하기
-              </button>
-            </div>
           </div>
         </div>
 
