@@ -50,7 +50,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const auth = authStore();
   const { createToast, addToast } = useToast();
-  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+  if (to.meta.requiresAuth && await auth.checkLoginStatus() === false ) {
     // 로그인 안 했는데 접근 → 로그인 페이지로
     addToast(createToast("로그인이 필요한 서비스입니다.", "info", 2000));
     movePage.login();
