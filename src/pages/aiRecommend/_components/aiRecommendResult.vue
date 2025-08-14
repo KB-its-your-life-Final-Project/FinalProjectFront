@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { Api } from "@/api/autoLoad/Api";
 import ResultCard from "./resultCard.vue";
-import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 
 const api = new Api();
+const router = useRouter();
 
 interface AiRecommendItem {
   jibunAddress: string;
@@ -58,7 +59,6 @@ const fetchAiRecommend = async () => {
       memberData = JSON.parse(storedMember);
     } catch (parseError) {
       error.value = "사용자 정보가 올바르지 않습니다. 다시 로그인해주세요.";
-      console.error(parseError);
       return;
     }
 
@@ -98,13 +98,9 @@ onMounted(() => {
         <!-- 로딩 상태 -->
         <div v-if="isLoading" class="flex items-center justify-center min-h-48">
           <div class="text-center">
-            <LoadingSpinner
-              size="h-12 w-12"
-              borderWidth="border-4"
-              borderColor="border-kb-yellow"
-              marginBottom="mb-4"
-              borderTopTransparent
-            />
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-4 border-kb-yellow border-t-transparent mx-auto mb-4"
+            ></div>
             <p class="text-gray-600 font-medium">AI 추천 결과를 생성하고 있습니다...</p>
             <p class="text-gray-500 text-sm mt-1">잠시만 기다려주세요</p>
           </div>
