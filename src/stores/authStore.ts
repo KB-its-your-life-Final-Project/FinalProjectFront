@@ -52,20 +52,19 @@ export const authStore = defineStore("auth", () => {
   };
 
   // 로그인 여부 확인
-  const checkLoginStatus = async (): Promise<MemberResponseDTO> => {
+  const checkLoginStatus = async (): Promise<boolean> => {
     try {
       const { data } = await api.checkLoginStatusUsingGet();
       console.log("로그인 상태 확인 결과: ", data);
       console.log("message: ", data.message);
-      console.log("로그인 상태 여부: ", data.success);
 
-      if (!data.data) {
-        throw new Error("로그인 정보가 없습니다.");
+      if (!data || !data.success || !data.data) {
+        return false;
       }
-      return data.data;
+      return true;
     } catch (error: unknown) {
       console.error("로그인 상태 확인 오류:", error);
-      throw error;
+      return false;
     }
   };
 

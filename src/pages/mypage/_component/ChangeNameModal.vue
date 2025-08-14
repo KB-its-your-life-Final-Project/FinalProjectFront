@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import ButtonnModal from "@/components/common/modal/ButtonnModal.vue";
 import DefaultInput from "@/components/common/DefaultInput.vue";
 import { Api } from "@/api/autoLoad/Api";
+import { ChangeRequestDTO } from "@/api/autoLoad/data-contracts";
 import { authStore } from "@/stores/authStore";
 import { isEmpty, isValidName } from "@/utils/validate";
 
