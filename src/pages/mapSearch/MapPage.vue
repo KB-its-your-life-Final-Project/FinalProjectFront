@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, toRaw, watch, computed } from "vue";
+import { ref, onMounted, onUnmounted, toRaw, watch } from "vue";
 import mapUtil from "@/utils/naverMap/naverMap";
 import { useRoute } from "vue-router";
-import MapFilter from "@/pages/mapSearch/_components/MapFilter.vue";
 import MapDetailList from "@/pages/mapSearch/_components/MapDetailList.vue";
 import { MarkerDataType } from "@/types/markerDataType";
 

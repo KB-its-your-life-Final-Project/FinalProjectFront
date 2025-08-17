@@ -1,17 +1,13 @@
 import { defineStore } from "pinia";
 import { computed, reactive } from "vue";
 import { Api } from "@/api/autoLoad/Api";
-import type {
-  LoginRequestDTO,
-  MemberResponseDTO,
-  ApiResponseMemberResponseDTO,
-} from "@/api/autoLoad/data-contracts";
+import type { LoginRequestDTO, ApiResponseMemberResponseDTO } from "@/api/autoLoad/data-contracts";
 import { useToast } from "@/utils/useToast";
 
 const api = new Api();
 const { addToast, createToast } = useToast();
 
-// 사용자 인터페이스
+/** 사용자 정보 인터페이스 */
 interface Member {
   id: number;
   email: string;
@@ -23,6 +19,7 @@ interface Member {
   createdType: number;
 }
 
+/** 기본 사용자 초기값 */
 const getDefaultMember = (): Member => ({
   id: 0,
   email: "",
@@ -34,13 +31,21 @@ const getDefaultMember = (): Member => ({
   createdType: 0,
 });
 
+/** 인증 관련 상태 및 메서드 관리 Pinia 스토어 */
 export const authStore = defineStore("auth", () => {
-  // 상태
+  /** 현재 로그인한 사용자 상태 */
   const member = reactive<Member>(getDefaultMember());
+
+  /** 로그인 여부 계산 (id가 존재하고 이메일/Kakao/Google 아이디 중 하나라도 있는 경우) */
   const isLoggedIn = computed(() => {
     return member.id !== 0 && (member.email || member.kakaoId || member.googleId);
   });
-  // 이메일 중복 확인
+
+  /**
+   * 이메일 중복 확인
+   * @param email 확인할 이메일
+   * @returns 중복 여부
+   */
   const checkDuplicateEmail = async (email: string): Promise<boolean> => {
     try {
       const { data } = await api.checkDuplicateEmailUsingGet(email);
@@ -51,16 +56,14 @@ export const authStore = defineStore("auth", () => {
     }
   };
 
-  // 로그인 여부 확인
+  /**
+   * 로그인 상태 확인
+   * @returns 로그인 여부
+   */
   const checkLoginStatus = async (): Promise<boolean> => {
     try {
       const { data } = await api.checkLoginStatusUsingGet();
-      console.log("로그인 상태 확인 결과: ", data);
-      console.log("message: ", data.message);
-
-      if (!data || !data.success || !data.data) {
-        return false;
-      }
+      if (!data || !data.success || !data.data) return false;
       return true;
     } catch (error: unknown) {
       console.error("로그인 상태 확인 오류:", error);
@@ -68,61 +71,70 @@ export const authStore = defineStore("auth", () => {
     }
   };
 
-  // 로그인 (토큰은 쿠키에 있으므로 응답에서 사용자 정보만 받아서 상태에 저장)
+  /**
+   * 로그인 수행 (토큰은 쿠키 기반)
+   * @param loginInfo 로그인 요청 DTO
+   * @returns 로그인 API 응답
+   */
   const login = async (loginInfo: LoginRequestDTO): Promise<ApiResponseMemberResponseDTO> => {
     try {
       const { data } = await api.loginUsingPost(loginInfo);
-      console.log("data: ", data);
-      if (data.success === false && data.code === 1013) {
-        console.log("error message: ", data.message);
-        return data;
-      }
+
+      if (data.success === false && data.code === 1013) return data;
+
       if (data.success === true && data.data) {
         // 상태 업데이트
         Object.assign(member, data.data);
-        console.log("member: ", member);
+
         // 로컬 스토리지에 회원 정보 저장
         localStorage.setItem("authUser", JSON.stringify(data.data));
+
+        // 로그인 방식 확인
         const createdType = data.data.createdType;
-        if (createdType === 1) {
-          console.log("이메일 로그인 성공");
-        } else if (createdType === 2) {
-          console.log("카카오 로그인 성공");
-        } else if (createdType === 3) {
-          console.log("구글 로그인 성공");
-        } else {
-          console.log("알 수 없는 로그인 방식");
-        }
+        if (createdType === 1) console.log("이메일 로그인 성공");
+        else if (createdType === 2) console.log("카카오 로그인 성공");
+        else if (createdType === 3) console.log("구글 로그인 성공");
+        else console.log("알 수 없는 로그인 방식");
+
         return data;
       }
+
       throw new Error(data.message || "로그인 실패");
     } catch (error: unknown) {
       throw error;
     }
   };
 
-  // 로그아웃
+  /**
+   * 로그아웃 수행
+   * - 서버 로그아웃 API 호출
+   * - 로컬 상태 초기화 및 토스트 메시지
+   */
   const logout = async (): Promise<void> => {
     try {
       await api.logoutUsingPost();
       addToast(createToast("로그아웃 되었습니다", "success"));
-      console.log("로그아웃 성공");
     } catch (error: unknown) {
       console.error("로그아웃 실패:", error);
     } finally {
       localStorage.removeItem("authUser");
-      // 상태 초기화
       Object.assign(member, getDefaultMember());
     }
   };
 
-  // 사용자 상태 직접 설정
+  /**
+   * 사용자 상태 직접 설정
+   * @param newMember Partial<Member> 업데이트할 회원 정보
+   */
   const setMember = (newMember: Partial<Member>): void => {
     Object.assign(member, newMember);
     localStorage.setItem("authUser", JSON.stringify(member));
   };
 
-  // 로컬 스토리지에서 사용자 정보 로드 (페이지 새로고침 시 유지용)
+  /**
+   * 로컬 스토리지에서 사용자 정보 로드
+   * - 페이지 새로고침 시 로그인 상태 유지용
+   */
   const load = (): void => {
     const storedMember = localStorage.getItem("authUser");
     if (storedMember) {
@@ -131,12 +143,12 @@ export const authStore = defineStore("auth", () => {
         Object.assign(member, parsed);
       } catch (error: unknown) {
         console.error("로컬스토리지 JSON 파싱 실패:", error);
-        localStorage.removeItem("authUser"); // 잘못된 값 제거
+        localStorage.removeItem("authUser");
       }
     }
   };
 
-  load();
+  load(); // 스토어 초기화 시 로컬 스토리지에서 상태 복원
 
   return {
     member,

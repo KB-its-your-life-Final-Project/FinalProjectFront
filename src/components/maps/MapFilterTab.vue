@@ -1,3 +1,11 @@
+<!--
+FilterNav 컴포넌트
+
+1. 두 그룹 필터 버튼(거래 유형, 매물 유형)을 화면 상단에 네비게이션 형태로 제공
+2. saleOptions: 거래 유형 옵션 배열, propertyOptions: 매물 유형 옵션 배열
+3. 선택된 옵션은 각각 saleType, propertyType으로 바인딩
+4. 버튼 클릭 시 update 이벤트 발생하여 부모 컴포넌트에서 값 갱신 가능
+-->
 <script setup lang="ts">
 import { defineEmits, defineProps } from "vue";
 

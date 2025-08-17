@@ -14,7 +14,11 @@ import movePage from "../movePage";
 import { Api } from "@/api/autoLoad/Api";
 
 const mapUtil = {
-  // 네이버 지도 API 스크립트 로드
+  /**
+   * 네이버 지도 API 스크립트를 동적으로 로드
+   * @param apiKey - Naver Map API Key
+   * @returns Promise<void>
+   */
   loadNaverMapScript: (apiKey: string = "55s76chbvh"): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (window.naver) {
@@ -35,7 +39,11 @@ const mapUtil = {
     });
   },
 
-  // 지도 생성
+  /**
+   * 지도를 생성
+   * @param mapEl - 지도를 렌더링할 HTMLDivElement
+   * @returns Naver Map 객체
+   */
   createMap: (mapEl: HTMLDivElement) => {
     //기본 옵션 설정
     const defaultOptions = {
@@ -56,7 +64,11 @@ const mapUtil = {
     return map;
   },
 
-  // InfoWindow 생성
+  /**
+   * InfoWindow 생성
+   * @param options - InfoWindow 옵션 (content, anchorSkew 등)
+   * @returns InfoWindow 객체
+   */
   createInfoWindow: (options?: { content?: string; anchorSkew?: boolean }) => {
     return new naver.maps.InfoWindow({
       content: "",
@@ -65,7 +77,11 @@ const mapUtil = {
     });
   },
 
-  // 기존 마커/클러스터 제거
+  /**
+   * 현재 마커와 클러스터 제거
+   * @param currentMarkers - 현재 지도에 표시된 마커 배열
+   * @param currentClusters - 현재 지도에 표시된 클러스터 배열
+   */
   clearCurrentMarkers: (currentMarkers: naver.maps.Marker[], currentClusters: any[]) => {
     currentMarkers.forEach((marker) => marker.setMap(null));
     currentClusters.forEach((cluster) => cluster.setMap(null));
@@ -73,7 +89,14 @@ const mapUtil = {
     currentClusters.length = 0;
   },
 
-  // 줌 레벨에 따른 마커/클러스터 관리
+  /**
+   * 줌 레벨에 따라 마커 또는 클러스터를 생성/관리
+   * @param map - Naver Map 객체
+   * @param markerDataList - 마커 데이터 배열
+   * @param markerType - 마커 타입 (옵션)
+   * @param onClickCallback - 마커 클릭 시 호출되는 콜백 (옵션)
+   * @returns 마커와 클러스터 배열, 업데이트 함수
+   */
   createMarkersWithZoomControl: (
     map: naver.maps.Map,
     markerDataList: Array<MarkerDataType>,
@@ -112,8 +135,13 @@ const mapUtil = {
       updateMarkersByZoom,
     };
   },
-
-  // 마커 생성
+  /**
+   * 개별 마커 생성
+   * @param map - Naver Map 객체
+   * @param markerDataList - 마커 데이터 배열
+   * @param markerType - 마커 타입 (옵션)
+   * @returns 생성된 마커 배열
+   */
   createMarkers: async (
     map: naver.maps.Map,
     markerDataList: Array<MarkerDataType>,
@@ -211,7 +239,12 @@ const mapUtil = {
     return markers;
   },
 
-  // 클러스터 생성
+  /**
+   * 클러스터 생성
+   * @param map - Naver Map 객체
+   * @param markerDataList - 마커 데이터 배열
+   * @returns 생성된 클러스터 배열
+   */
   createClusters: (map: naver.maps.Map, markerDataList: Array<MarkerDataType>) => {
     const clusters: any[] = [];
 
@@ -287,7 +320,11 @@ const mapUtil = {
     return clusters;
   },
 
-  //가장자이 구하기
+  /**
+   * 지도 경계 좌표 가져오기
+   * @param map - Naver Map 객체
+   * @returns 지도 상단좌표, 하단좌표, 좌우 좌표
+   */
   getBoundary: (map: naver.maps.Map) => {
     const bounds = map.getBounds();
 
@@ -409,7 +446,11 @@ const mapUtil = {
   //   return buildings;
   // },
 
-  // 지도 영역 내 건물 정보 검색
+  /**
+   * 지도 범위 내 건물 검색
+   * @param map - Naver Map 객체
+   * @returns MarkerDataType 배열
+   */
   searchBuildingsInBounds: async (map: naver.maps.Map): Promise<Array<MarkerDataType>> => {
     const mapBoundary = mapUtil.getBoundary(map);
     const minLat = mapBoundary.bottomLeft.lat;
@@ -475,7 +516,11 @@ const mapUtil = {
     return buildings;
   },
 
-  // 좌표 기반 주소 검색
+  /**
+   * 좌표 -> 주소 변환
+   * @param latlng - Naver Map LatLng 객체
+   * @returns MarkerDataType 객체 (주소 포함)
+   */
   searchCoordinateToAddress: (latlng: naver.maps.LatLng): Promise<MarkerDataType> => {
     return new Promise((resolve, reject) => {
       naver.maps.Service.reverseGeocode(
@@ -501,7 +546,11 @@ const mapUtil = {
     });
   },
 
-  // 주소 기반 좌표 검색
+  /**
+   * 주소 -> 좌표 변환
+   * @param address - 변환할 주소 문자열
+   * @returns MarkerDataType 객체 (좌표 포함)
+   */
   searchAddressToCoordinate: (address: string): Promise<MarkerDataType> => {
     return new Promise((resolve, reject) => {
       naver.maps.Service.geocode(
@@ -525,7 +574,10 @@ const mapUtil = {
     });
   },
 
-  // 현재 위치 가져오기
+  /**
+   * 현재 위치 가져오기 (GPS)
+   * @returns 현재 위치 LatLng
+   */
   getCurrentLocation: (): Promise<naver.maps.LatLng> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -549,6 +601,11 @@ const mapUtil = {
     });
   },
 
+  /**
+   * 주소 또는 좌표에 따라 정보 반환
+   * @param item - 주소 문자열, LatLng 객체 또는 null
+   * @returns MarkerDataType 객체
+   */
   getTotalItemsByAnyLocation: async (item: any) => {
     //주소인 경우
     if (typeof item === "string") {
@@ -563,7 +620,11 @@ const mapUtil = {
     }
   },
 
-  // 주소 생성 헬퍼 함수 start
+  /**
+   * 주소 생성 헬퍼 함수
+   * @param item - 지도 API 응답 아이템
+   * @returns 생성된 주소 문자열
+   */
   makeAddress: (item: any) => {
     if (!item) {
       return;

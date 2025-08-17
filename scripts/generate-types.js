@@ -15,6 +15,26 @@ dotenv.config();
 //백엔드 설정
 const backendUrl = `http://localhost:${process.env.VITE_BACKEND_PORT}` || "http://localhost:8080";
 
+/**
+ * Swagger API 문서를 기반으로 TypeScript 타입을 자동 생성하는 스크립트
+ *
+ * 주요 기능:
+ * 1. .env에서 백엔드 포트 번호를 읽어 backendUrl 설정
+ * 2. 백엔드 서버가 실행 중인지 확인 (HTTP/HTTPS 프로토콜 구분 포함)
+ * 3. 서버가 정상 응답하면 swagger-typescript-api 패키지를 이용해 타입 정의 파일 생성
+ * 4. 생성된 http-client.ts 파일에 axios 설정을 수정하여 withCredentials: true 자동 추가
+ *    (인증 정보를 포함한 요청이 가능하도록 설정)
+ *
+ * 실행 흐름:
+ * - generateTypes() 실행
+ *   └ checkServerStatus() 로 서버 상태 확인
+ *   └ swagger-typescript-api CLI 실행 (execSync)
+ *   └ addCredentials() 호출 → axios 인스턴스 수정
+ *
+ * 사용 목적:
+ * - 프론트엔드에서 Swagger 기반 API 타입 정의를 자동 관리
+ * - 쿠키/세션 기반 인증을 지원하기 위한 axios 설정 자동화
+ */
 function checkServerStatus(url) {
   const promise = new Promise((resolve) => {
     //http 구별

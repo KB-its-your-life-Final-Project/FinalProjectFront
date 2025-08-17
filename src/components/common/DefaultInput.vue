@@ -1,3 +1,9 @@
+<!--
+커스텀 입력 컴포넌트.
+일반 입력 또는 금액 입력(type="money")을 지원하며,
+금액 입력 시 숫자만 허용하고 천억 이하만 입력 가능, 자동 포맷 표시.
+옵션으로 우측 버튼을 노출하고 클릭 이벤트를 부모로 전달할 수 있음.
+-->
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { sanitizeNumberInput, formatAmount } from "@/utils/numberUtils";

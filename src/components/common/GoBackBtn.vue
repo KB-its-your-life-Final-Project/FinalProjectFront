@@ -1,3 +1,7 @@
+<!--
+뒤로가기 버튼 컴포넌트.
+go_back_icon.svg 아이콘을 클릭하면 movePage.back()을 호출하여 이전 페이지로 이동.
+-->
 <script setup lang="ts">
 import movePage from "@/utils/movePage";
 

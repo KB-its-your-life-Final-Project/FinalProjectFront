@@ -1,3 +1,9 @@
+<!--
+다음 우편번호 컴포넌트.
+visible prop으로 표시/숨김, fullscreen prop으로 전체 화면 모드 지원.
+우편번호 검색 완료 시 선택한 주소 데이터를 emit("complete")로 반환하고, 닫기 시 emit("close").
+iframe 글자 크기 조정 및 returnFields 옵션으로 필요한 필드만 반환 가능.
+-->
 <script setup lang="ts">
 import { ref, watch } from "vue";
 

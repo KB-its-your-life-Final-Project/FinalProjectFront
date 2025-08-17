@@ -1,3 +1,11 @@
+<!--
+툴팁 컴포넌트
+1. info 아이콘 클릭 시 show 상태 토글
+2. show가 true면 슬롯 내용 표시
+3. 툴팁 외부 클릭 시 자동으로 닫힘
+4. transition으로 부드러운 fade-up 애니메이션
+5. 화살표(삼각형) 포함, 최대 너비 300px
+-->
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 const show = ref(false);
