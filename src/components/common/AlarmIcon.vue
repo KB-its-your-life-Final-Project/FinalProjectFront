@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import alarmService from "@/services/alarmService";
+import alarmService from "@/pages/mypage/_service/alarmService";
 import AlarmList from "@/pages/mypage/_component/AlarmList.vue";
 
 const props = defineProps<{
