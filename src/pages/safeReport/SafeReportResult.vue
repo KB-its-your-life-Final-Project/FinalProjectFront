@@ -244,7 +244,7 @@ function goToSelectBudget() {
 }
 
 function goToKB() {
-  window.open("https://m.naver.com/");
+  window.open("https://obank.kbstar.com/quics?page=C103507");
 }
 </script>
 
