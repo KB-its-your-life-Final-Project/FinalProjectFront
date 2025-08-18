@@ -3,7 +3,6 @@ import { computed, reactive } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type {
   LoginRequestDTO,
-  MemberResponseDTO,
   ApiResponseMemberResponseDTO,
 } from "@/api/autoLoad/data-contracts";
 import { useToast } from "@/utils/useToast";
