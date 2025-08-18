@@ -41,10 +41,13 @@ const toggleWishlist = async () => {
   try {
     // 로그인 체크
     try {
-      await auth.checkLoginStatus();
-    } catch {
-      toast.addToast(toast.createToast("로그인 시에만 사용할 수 있습니다", "info"));
-      return;
+      const isLogin = await auth.checkLoginStatus();
+      if (!isLogin) {
+        toast.addToast(toast.createToast("로그인 후 사용 가능합니다", "info"));
+        return;
+      }
+    } catch (e) {
+      console.error("로그인 확인 실패", e);
     }
 
     if (props.targetType === "region" && props.regionCd) {
