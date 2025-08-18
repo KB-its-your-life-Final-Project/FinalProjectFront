@@ -1,4 +1,10 @@
 <script lang="ts" setup>
+/**
+ * 버튼 그룹 컴포넌트.
+ * options 배열 기반으로 버튼 렌더링, 선택된 값에 스타일 적용.
+ * 클릭 시 update:modelValue & change 이벤트 emit.
+ * rounded=true면 첫/마지막 버튼 모서리 둥글게 처리.
+ */
 import { defineEmits } from "vue";
 import { TransactionPeriodType } from "@/types/tansactionType";
 

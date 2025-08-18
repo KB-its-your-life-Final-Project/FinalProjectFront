@@ -1,3 +1,4 @@
+// 하단 네비 데이터 타입 정의
 type WithoutBottomNavPageItem = {
   name: string;
 };
@@ -14,6 +15,7 @@ type BottomNavList = {
   withoutBottomNavPages: WithoutBottomNavPageItem[];
 };
 
+// 실제 하단 네비 데이터
 const bottomNavList: BottomNavList = {
   title: "MZ 세대를 위한 부동산 안전거래 도우미 앱",
   navBarMenus: [

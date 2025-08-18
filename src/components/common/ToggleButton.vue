@@ -1,4 +1,12 @@
 <script setup lang="ts">
+/**
+ * 토글 스위치 컴포넌트
+ * 1. modelValue 기반으로 상태(on/off) 결정
+ * 2. 클릭 시 toggle 함수로 상태 반전 후 부모에 update:modelValue 이벤트 발생
+ * 3. 배경 색상(isOn)에 따라 변경 (노랑/회색)
+ * 4. 스위치 원 위치도 isOn에 따라 이동
+ * 5. CSS transition으로 부드러운 색상/위치 변경
+ */
 import { computed } from "vue";
 
 const props = defineProps<{

@@ -2,12 +2,20 @@ import { myPageRouteName } from "@/router/mypageRoutes";
 import { mainRouteName } from "@/router/mainRoute";
 import { authRouteName } from "@/router/authRoute";
 import router from "@/router";
+import type { RouteLocationRaw } from "vue-router";
 
-//라우트 생성
+/**
+ * 라우트 생성 헬퍼
+ * @param routeName - 이동할 라우트 이름
+ * @returns 쿼리를 받아 해당 라우트로 이동하는 함수
+ */
 const makeRoute = (routeName: string) => {
-  //쿼리 생성
+  /**
+   * 쿼리 기반 페이지 이동
+   * @param query - 선택적 쿼리 객체
+   */
   const makeQuery = (query?: Record<string, string>) => {
-    const routeConfig: unknown = {
+    const routeConfig: RouteLocationRaw = {
       name: routeName,
     };
 
@@ -21,7 +29,9 @@ const makeRoute = (routeName: string) => {
   return makeQuery;
 };
 
-// route name 기반 페이지 이동
+/**
+ * route name 기반 페이지 이동 객체
+ */
 const movePage = {
   back() {
     router.back();

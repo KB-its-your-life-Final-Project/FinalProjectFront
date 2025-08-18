@@ -1,4 +1,13 @@
 <script setup lang="ts">
+/**
+ * 주소 선택 컴포넌트
+ * 1. 시/도 → 시/군/구 → 읍/면/동 → 건물 단계로 선택
+ * 2. API 호출로 각 단계 목록 로드
+ * 3. 세종시는 읍/면/동 단계 생략
+ * 4. 건물명 필터링 (빈값/숫자만 제외)
+ * 5. 선택 완료 시 address-selected 또는 building-selected 이벤트 발생
+ * 6. 로딩 상태 표시 및 단계별 UI 그리드 제공
+ */
 import { ref, onMounted } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type { SidoDto, SigugunDto, DongDto, BuildingInfoDto } from "@/api/autoLoad/data-contracts";

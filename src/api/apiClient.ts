@@ -1,11 +1,4 @@
-import axios, {
-  type AxiosInstance,
-  type AxiosRequestConfig,
-  type AxiosResponse,
-  AxiosError,
-} from "axios";
-import { authStore } from "@/stores/authStore";
-import router from "@/router";
+import axios, { type AxiosInstance, type AxiosResponse } from "axios";
 
 // axios객체 생성 (프로젝트 전체에서 사용할 객체)
 // request/response 인터셉터 설정이 된 axios객체를 사용하기 위함

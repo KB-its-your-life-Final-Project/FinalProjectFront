@@ -21,6 +21,14 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Toast 알림 컴포넌트
+ * 1. useToast에서 관리하는 toasts 배열을 순회하며 표시
+ * 2. 타입(success, error, info)에 따라 색상과 아이콘 변경
+ * 3. transition-group으로 등장/퇴장 애니메이션 적용
+ * 4. 화면 하단 중앙에 고정 표시
+ * 5. 메시지 길이에 따라 줄바꿈 가능
+ */
 import { useToast } from "@/utils/useToast";
 const bgColorMap: Record<string, string> = {
   success: "bg-green-500",

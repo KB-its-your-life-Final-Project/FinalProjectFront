@@ -61,7 +61,7 @@ onMounted(() => {
     <!-- 검색창 -->
     <img
       src="@/assets/imgs/findneighborhood.png"
-      class="absolute right-1 top-12/20 -translate-y-1/2 h-25"
+      class="absolute right-1 top-11/20 -translate-y-1/2 h-25"
     />
     <div class="px-6 mt-3">
       <RegionSearch @region-selected="handleRegionSelected" />
