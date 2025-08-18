@@ -19,7 +19,7 @@ const mapUtil = {
    * @param apiKey - Naver Map API Key
    * @returns Promise<void>
    */
-  loadNaverMapScript: (apiKey: string = "55s76chbvh"): Promise<void> => {
+  loadNaverMapScript: (apiKey: string = "9j5byktxr0"): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (window.naver) {
         resolve();
