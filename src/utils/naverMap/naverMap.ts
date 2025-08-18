@@ -15,7 +15,7 @@ import { Api } from "@/api/autoLoad/Api";
 
 const mapUtil = {
   // 네이버 지도 API 스크립트 로드
-  loadNaverMapScript: (apiKey: string = "55s76chbvh"): Promise<void> => {
+  loadNaverMapScript: (apiKey: string = "9j5byktxr0"): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (window.naver) {
         resolve();
