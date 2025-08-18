@@ -94,6 +94,15 @@ const handleBuildingWishlist = async (jibunAddr: string, targetName: string) => 
 onMounted(async () => {
   if (liked.value === undefined) {
     try {
+      // 로그인 체크
+      try {
+        const isLogin = await auth.checkLoginStatus();
+        if (!isLogin) {
+          return;
+        }
+      } catch (e) {
+        console.error("로그인 확인 실패", e);
+      }
       if (props.targetType === "region" && props.regionCd) {
         const res = await api.existWishlistByRegionCdUsingGet(props.regionCd);
         liked.value = res.data.data;
