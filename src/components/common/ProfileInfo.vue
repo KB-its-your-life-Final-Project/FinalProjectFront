@@ -1,8 +1,8 @@
-<!--
-사용자 프로필 정보 컴포넌트.
-props로 name, email을 받아 표시하며, authStore의 createdType이 0이 아닐 경우 체크 아이콘 표시.
--->
 <script setup lang="ts">
+/**
+ * 사용자 프로필 정보 컴포넌트.
+ * props로 name, email을 받아 표시하며, authStore의 createdType이 0이 아닐 경우 체크 아이콘 표시.
+ */
 import { authStore } from "@/stores/authStore";
 import { computed } from "vue";
 import kakaoIcon from "@/assets/imgs/kakao.svg";

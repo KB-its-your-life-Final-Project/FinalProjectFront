@@ -1,4 +1,19 @@
 <script setup lang="ts">
+/**
+ * ConfirmModal 컴포넌트
+ * - 기본 모달(BaseModal)을 확장하여 확인/취소 버튼이 있는 모달을 제공
+ * - props.handleConfirm 이 있으면 "완료" 버튼 클릭 시 비동기/동기 처리 로직 실행
+ * - 처리 결과에 따라 Toast 메시지를 띄움
+ *
+ * Props:
+ * @prop title         - 모달 제목 (필수)
+ * @prop hasConfirmBtn - 확인/닫기 버튼 2개 여부 (true 시 "닫기/완료", false 시 "확인")
+ * @prop handleConfirm - 확인 버튼 클릭 시 실행할 콜백
+ *                       (Promise 또는 동기 객체 반환, { success, message } 형식)
+ *
+ * Emits:
+ * @emit close - 모달 닫기 이벤트
+ */
 import { useToast, ToastType } from "@/utils/useToast";
 import BaseModal from "./BaseModal.vue";
 const props = defineProps<{

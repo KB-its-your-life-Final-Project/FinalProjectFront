@@ -1,10 +1,10 @@
-<!-- 
- 알림 버튼 컴포넌트. 
- 서버에서 미확인 알림 개수를 조회해 배지로 표시하고 5분마다 갱신. 아이콘 클릭 시 AlarmList 모달을 열고, 닫을 때 다시 개수를 갱신함. 
- props.showBadge로 배지 표시 여부 제어 
- click 이벤트를 부모로 전달. 
--->
 <script setup lang="ts">
+/**
+ * 알림 버튼 컴포넌트.
+ * 서버에서 미확인 알림 개수를 조회해 배지로 표시하고 5분마다 갱신. 아이콘 클릭 시 AlarmList 모달을 열고, 닫을 때 다시 개수를 갱신함.
+ * props.showBadge로 배지 표시 여부 제어
+ * click 이벤트를 부모로 전달.
+ */
 import { ref, onMounted, onUnmounted } from "vue";
 import alarmService from "@/pages/mypage/_service/alarmService";
 import AlarmList from "@/pages/mypage/_component/AlarmList.vue";

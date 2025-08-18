@@ -1,12 +1,12 @@
-<!--
-  관심 목록 Star 컴포넌트
-  1. targetType: "region" | "building" – 관심 목록 대상 지정
-  2. regionCd / jibunAddr: 관심 대상 ID 지정 (필수)
-  3. liked: 초기 상태 지정 (선택, 없으면 API 호출로 가져옴)
-  4. 클릭 시 로그인 여부 확인 후 관심 목록 등록/해제, toast 알림 표시
-  5. font-awesome star 아이콘 사용, 색상은 liked 상태에 따라 변경
--->
 <script lang="ts" setup>
+/**
+ * 관심 목록 Star 컴포넌트
+ * 1. targetType: "region" | "building" – 관심 목록 대상 지정
+ * 2. regionCd / jibunAddr: 관심 대상 ID 지정 (필수)
+ * 3. liked: 초기 상태 지정 (선택, 없으면 API 호출로 가져옴)
+ * 4. 클릭 시 로그인 여부 확인 후 관심 목록 등록/해제, toast 알림 표시
+ * 5. font-awesome star 아이콘 사용, 색상은 liked 상태에 따라 변경
+ */
 import { ref, onMounted } from "vue";
 import { Api } from "@/api/autoLoad/Api";
 import type {

@@ -1,9 +1,9 @@
-<!--
-커스텀 로딩 스피너 컴포넌트.
-크기, 테두리 두께/색상, margin 등을 props로 제어 가능.
-옵션에 따라 border-top 투명 처리나 border-bottom-only 모드 지원.
--->
 <script setup lang="ts">
+/**
+ * 커스텀 로딩 스피너 컴포넌트.
+ * 크기, 테두리 두께/색상, margin 등을 props로 제어 가능.
+ * 옵션에 따라 border-top 투명 처리나 border-bottom-only 모드 지원.
+ */
 import { computed, defineProps } from "vue";
 
 const props = defineProps({
